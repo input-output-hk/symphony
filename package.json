@@ -16,6 +16,7 @@
   "author": "Scott Darby <scott@kuva.io>",
   "dependencies": {
     "blockchain.info": "^2.10.1",
+    "firebase": "^4.5.0",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
     "voronoi": "^1.0.0"

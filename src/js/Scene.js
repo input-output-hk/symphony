@@ -6,6 +6,9 @@ import OrbitContructor from 'three-orbit-controls'
 import Config from './Config'
 let Voronoi = require('voronoi')
 
+const firebase = require('firebase')
+require('firebase/firestore')
+
 // blockchain api
 let blockexplorer = require('blockchain.info/blockexplorer')
 
@@ -28,6 +31,15 @@ export default class Scene {
     this.relaxIterations
     this.textureLoader
     this.bgMap
+    this.firebaseDB
+
+    firebase.initializeApp({
+      apiKey: 'AIzaSyD92ewqzwYPP6L4-XmlU3LucH74n8Xa6tw',
+      authDomain: 'orpheus-f3a39.firebaseapp.com',
+      projectId: 'orpheus-f3a39'
+    })
+
+    this.firebaseDB = firebase.firestore()
 
     this.textureLoader = new THREE.TextureLoader()
 
@@ -36,7 +48,9 @@ export default class Scene {
     this.groundSize = 200
 
     this.hashes = [
-      '00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
+      '000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
+      //'000000000000000074953313ca30236fafe09ebd7b990f69e31778cf54c33de6',
+      //'00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
       //'0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
       //'00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
     ]
@@ -72,7 +86,6 @@ export default class Scene {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.minDistance = 0
     this.controls.maxDistance = 3500
-    this.controls.target.set(0.0, 20.0, 0.0)
 
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
@@ -112,7 +125,7 @@ export default class Scene {
 
       let offset = (this.groundSize * hashIndex) - this.groundSize / 2
 
-      blockexplorer.getBlock(hash).then(function(block) {
+      this.getBlock(hash).then(function(block) {
 
         this.currentBlock = block
 
@@ -161,31 +174,12 @@ export default class Scene {
           //side: THREE.DoubleSide,
           //transparent: true,
           envMap: this.bgMap,
-        });
-
-        // sort transactions by value ascending
-        this.currentBlock.tx.sort(function(a, b) {
-
-          let transactionValueA = 0
-          a.out.forEach((output, index) => {
-            transactionValueA += output.value
-          })
-          a.transactionValue = transactionValueA
-
-          let transactionValueB = 0
-          b.out.forEach((output, index) => {
-            transactionValueB += output.value
-          })
-          b.transactionValue = transactionValueB
-
-          return transactionValueA - transactionValueB
-
         })
 
         this.currentBlock.tx.forEach((tx, index) => {
 
           // convert from satoshis
-          let btcValue = tx.transactionValue / 100000000
+          let btcValue = tx.value / 100000000
 
           let extrudeAmount = btcValue + 0.1
 
@@ -205,6 +199,7 @@ export default class Scene {
                 shape,
                 {
                   steps: 1,
+                  bevelSegments: 1,
                   amount: extrudeAmount,
                   bevelEnabled: true,
                   bevelThickness: 5,
@@ -230,6 +225,82 @@ export default class Scene {
 
   }
 
+  getBlock(hash) {
+
+    return new Promise((resolve, reject) => {
+
+      // get from firebase
+      let blockRef = this.firebaseDB.collection('blocks').doc(hash)
+
+      blockRef.get().then(function(doc) {
+
+        if (doc.exists) {
+
+          resolve(doc.data())
+
+        } else {
+
+          // get from API
+          blockexplorer.getBlock(hash).then(function(block) {
+
+            // sort transactions by value ascending
+            block.tx.sort(function(a, b) {
+
+              let transactionValueA = 0
+              a.out.forEach((output, index) => {
+                transactionValueA += output.value
+              })
+              a.value = transactionValueA
+
+              let transactionValueB = 0
+              b.out.forEach((output, index) => {
+                transactionValueB += output.value
+              })
+              b.value = transactionValueB
+
+              return transactionValueA - transactionValueB
+
+            })
+
+            // store in cache
+            let transactions = []
+            block.tx.forEach((tx) => {
+              let txObj = {
+                value: tx.value
+              }
+              transactions.push(txObj)
+            })
+
+            this.firebaseDB.collection('blocks').doc(block.hash).set({
+              hash: block.hash,
+              height: block.height,
+              prev_block: block.prev_block,
+              n_tx: block.n_tx,
+              tx: transactions
+            })
+            .then(function() {
+              console.log("Document successfully written!");
+            })
+            .catch(function(error) {
+              console.error("Error writing document: ", error);
+            })
+
+            resolve(block)
+
+          }).catch(function(error) {
+            console.log('Error getting document:', error)
+          })
+
+        }
+
+      }).catch(function(error) {
+        console.log('Error getting document:', error)
+      })
+
+    })
+
+  }
+
   resize() {
     this.width = window.innerWidth
     this.height = window.innerHeight
@@ -249,12 +320,6 @@ export default class Scene {
   }
 
   // Lloyds relaxation methods credit: http://www.raymondhill.net/voronoi/rhill-voronoi-demo5.html
-  distance(a, b) {
-    let dx = a.x - b.x
-    let dy = a.y - b.y
-    return Math.sqrt(dx * dx + dy * dy)
-  }
-
   cellArea(cell) {
 
     let area = 0,
@@ -322,7 +387,8 @@ export default class Scene {
       rn = Math.random()
 
       site = this.cellCentroid(cell)
-      dist = this.distance(site, cell.site)
+
+      dist = new THREE.Vector2(site).distanceTo(new THREE.Vector2(cell.site))
 
       // don't relax too fast
       if (dist > 2) {
