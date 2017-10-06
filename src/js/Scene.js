@@ -287,13 +287,13 @@ export default class Scene {
 
             resolve(block)
 
-          }).catch(function(error) {
+          }.bind(this)).catch(function(error) {
             console.log('Error getting document:', error)
           })
 
         }
 
-      }).catch(function(error) {
+      }.bind(this)).catch(function(error) {
         console.log('Error getting document:', error)
       })
 
