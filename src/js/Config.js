@@ -11,14 +11,14 @@ const Config = {
   },
   scene: {
     bgColor: 0x13091f,
-    shadowsOn: true,
+    shadowsOn: false,
     antialias: true,
   },
   postProcessing: {
     effectDownscaleDivisor: 2
   },
   camera: {
-    fov: 120,
+    fov: 90,
     autoMove: true
   }
 }
