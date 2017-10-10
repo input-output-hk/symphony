@@ -1,5 +1,5 @@
 # Orpheus
-
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 > Project Orpheus
 
 ## Build Setup
@@ -16,6 +16,18 @@ npm run build
 
 # build for production and view the bundle analyzer report
 npm run build --report
+
+# Run Standard.js test over code
+npm run test
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Code Style
+
+[![standard][standard-image]][standard-url]
+
+This repository uses [`standard`][standard-url] to maintain code style and consistency,
+and to avoid style arguments. `npm test` runs `standard` automatically, so you don't have
+to!
+
+[standard-image]: https://cdn.rawgit.com/standard/standard/master/badge.svg
+[standard-url]: https://github.com/standard/standard
