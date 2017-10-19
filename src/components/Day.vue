@@ -16,7 +16,7 @@ export default {
   data(){
     return {
       value: 0,
-      fee: 0,
+      fee: '0',
       numBlocks: 0,
       day: ''
     }
@@ -24,7 +24,7 @@ export default {
   created(){
     getDay(moment(this.date).toDate())
       .then(({ blocks, fee, date }) => {
-        this.fee = fee
+        this.fee = fee.toLocaleString('USD')
         this.day = moment(date).format('MMM Do YYYY')
         this.numBlocks = blocks.length
       })
