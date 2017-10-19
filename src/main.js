@@ -1,36 +1,20 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from './Home'
-import { getBlocksOnDay, getTransactionFeesOverTime } from './data/btc'
+import Block from './components/Block'
+import Day from './components/Day'
+import moment from 'moment'
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: Home }
+  { path: '/block/:blockid', component: Block, props: true },
+  { path: '/:date', component: Day, props: true },
+  { path: '/', redirect: to => `/${moment().format('YYYY-MM-DD')}` }
 ]
 
 const router = new VueRouter({ routes, mode: 'history' })
-
-/*
-  Get all blocks that have occured today
-*/
-const today = Date.now()
-const blocks = []
-getBlocksOnDay(today).get().then(snapshot => {
-  snapshot.forEach(doc => blocks.push(doc.data()))
-})
-
-/*
-  Get a list of daily transaction fees
-*/
-getTransactionFeesOverTime().then(console.log)
-
-/*
-  Get an array of daily transaction values
-*/
-getTransactionVolumeOverTime().then(console.log)
 
 /* eslint-disable no-new */
 new Vue({ router }).$mount('#app')
