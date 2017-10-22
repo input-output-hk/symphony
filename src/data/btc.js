@@ -13,19 +13,31 @@ const blocks = firebase.firestore().collection('blocks')
 
 window.blocks = blocks
 
+const formatTimeSeries = function ({ data }) {
+  const times = []
+  const values = []
+  data.values.forEach(({ x, y }) => {
+    times.push(x)
+    values.push(y)
+  })
+  return { times, values }
+}
+
 /*
   Get a list of BTC transaction over a time period
 */
 export const getTransactionFeesOverTime = (start, end) => axios.get('https://api.blockchain.info/charts/transaction-fees?timespan=all&format=json&cors=true')
-  .then(({ data }) => data.values)
+  .then(formatTimeSeries)
 
 export const getTransactionVolumeOverTime = (start, end) => axios.get('https://api.blockchain.info/charts/estimated-transaction-volume?format=json&cors=true')
-  .then(({ data }) => data.values)
+  .then(formatTimeSeries)
 
 /*
   Returns a block from a given hash
 */
 export const getBlock = hash => blocks.where('hash', '==', hash)
+  .get()
+  .then(({ docs }) => docs[0].data())
 
 /*
   Returns all the blocks that occured on the current date 00:01 - 00:00

@@ -5,6 +5,12 @@
     <br><b>Fee:</b> {{ this.fee }}</br>
     <router-link :to='this.prevDay'>{{ this.prevDay }}</router-link>
     <router-link v-if='this.isBeforeToday' :to='this.nextDay'>{{ this.nextDay }}</router-link>
+    <ul>
+      <li v-for="block in blocks">
+        <router-link :to='"/block/"+block.hash'>{{ block.hash }}</router-link>
+      </li>
+    </ul>
+    {{ }}
   </div>
 </template>
 
@@ -26,14 +32,12 @@ export default {
       fee: '0',
       day: '',
       numBlocks: 0,
+      blocks: [],
       nextDay: '',
       prevDay: '',
       isBeforeToday: false
     }
   },
-  // computed: {
-  //   dateLiteral: _ => moment(this.date).startOf('day').toDate()
-  // },
   created(){this.asyncFetch()},
   beforeUpdate(){this.asyncFetch()},
   methods: {
@@ -44,6 +48,7 @@ export default {
           this.fee = fee.toLocaleString('USD')
           this.day = moment(date).format('MMM Do YYYY')
           this.numBlocks = blocks.length
+          this.blocks = blocks
           this.nextDay = moment(this.date).add(1, 'days').format('YYYY-MM-DD'),
           this.prevDay = moment(this.date).subtract(1, 'days').format('YYYY-MM-DD'),
           this.isBeforeToday = this.dateLiteral < moment(new Date()).startOf('day').toDate()

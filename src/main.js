@@ -16,7 +16,8 @@ const routes = [
     props: true,
     children:[
       { path: '', redirect: to => `/${moment().format('YYYY-MM-DD')}` },
-      { path: '/block/', component: Block, props: true },
+      // { path: '/block/', component: Block, props: true },
+      { path: '/block/:blockhash', component: Block, props: true },
       { path: '/:date', component: Day, props: true },
     ]
   },

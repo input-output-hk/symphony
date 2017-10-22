@@ -1,6 +1,7 @@
 <template>
   <div>
-    <router-view></router-view>
+    <router-view/>
+    <graph/>
     <webgl/>
   </div>
 </template>
@@ -9,10 +10,11 @@
 import { getDay } from '../data/btc'
 import moment from 'moment'
 import webgl from './webgl'
+import graph from './graph'
 
 export default {
   name: 'home',
-  components:{ webgl },
+  components:{ webgl, graph },
 }
 </script>
 

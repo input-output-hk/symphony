@@ -1,7 +1,7 @@
 <template>
   <div>
-    <canvas/>
     <div>WebGL Canvas</div>
+    <canvas/>
   </div>
 </template>
 
