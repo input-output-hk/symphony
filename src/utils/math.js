@@ -12,6 +12,16 @@ export const cMix = (min, max, ratio) => min + (max - min) * clamp(ratio, 0, 1)
 export const unMix = (min, max, val) => (val - min) / (max - min)
 export const cUnMix = (min, max, val) => clamp((val - min) / (max - min), 0, 1)
 
+/*
+ * Linearly maps n from range [ a, b ] -> [ x, y ]
+ */
+export const map = (n, a, b, x, y) => x + (n - a) * (y - x) / (b - a)
+
+/*
+ * Linearly maps n from range [ a, b ] -> [ 0, 1 ]
+ */
+export const normalize = (n, a, b) => map(n, a, b, 0, 1)
+
 export const smoothstep = (edge0, edge1, val) => {
   val = cUnMix(edge0, edge1, val)
   return val * val * (3 - val * 2)

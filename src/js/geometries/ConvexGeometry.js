@@ -10,7 +10,7 @@ import * as THREE from 'three'
  *
  */
 
-( function() {
+
 
 	var Visible = 0;
 	var Deleted = 1;
@@ -1215,29 +1215,11 @@ import * as THREE from 'three'
 
 	} );
 
-	// export
-
-	THREE.QuickHull = QuickHull;
-
-
-} ) ();
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-( function() {
 
 	// ConvexGeometry
 
@@ -1270,13 +1252,13 @@ import * as THREE from 'three'
 
 	  // execute QuickHull
 
-		if ( THREE.QuickHull === undefined ) {
+		if ( QuickHull === undefined ) {
 
-			console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.QuickHull' );
+			console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on QuickHull' );
 
 		}
 
-	  var quickHull = new THREE.QuickHull().setFromPoints( points );
+	  var quickHull = new QuickHull().setFromPoints( points );
 
 	  // generate vertices and normals
 
@@ -1314,7 +1296,7 @@ import * as THREE from 'three'
 
 	// export
 
-	THREE.ConvexGeometry = ConvexGeometry;
-	THREE.ConvexBufferGeometry = ConvexBufferGeometry;
+	//THREE.ConvexGeometry = ConvexGeometry;
+	//THREE.ConvexBufferGeometry = ConvexBufferGeometry;
 
-} ) ();
+export {ConvexGeometry, ConvexBufferGeometry}
