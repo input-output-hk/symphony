@@ -74,5 +74,7 @@ export const getTransactionsForBlock = async hash => blocks.where('hash', '==', 
   .then(({docs}) => docs[0].ref.collection('metadata').get())
   .then(transactions => transactions.docs[0].data().transaction)
 
-window.blocks = blocks
-window.btc = { getDay, getBlocksOnDay, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
+if(process.env.NODE_ENV === 'development'){
+  window.blocks = blocks
+  window.btc = { getDay, getBlocksOnDay, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
+}
