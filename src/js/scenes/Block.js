@@ -8,7 +8,7 @@ import Config from '../Config'
 import {ExtrudeCrystalGeometry, ExtrudeCrystalBufferGeometry} from '../geometries/ExtrudeCrystalGeometry'
 import {ConvexGeometry} from '../geometries/ConvexGeometry'
 
-import tsnejs from '../helpers/tsne'
+import tsnejs from 'tsne'
 
 const firebase = require('firebase')
 require('firebase/firestore')
@@ -26,9 +26,6 @@ export default class Block {
     this.renderer
     this.width
     this.height
-    this.currentBlock
-    this.diagram
-    this.relaxIterations
     this.textureLoader
     this.bgMap
     this.firebaseDB
@@ -42,7 +39,7 @@ export default class Block {
 
     this.textureLoader = new THREE.TextureLoader()
 
-    this.hash = '0000000000000000c5e63614209fbe7bd71257be5b9bed3212066e5224bbdf60'
+    //this.hash = '0000000000000000c5e63614209fbe7bd71257be5b9bed3212066e5224bbdf60'
 
     // canvas dimensions
     this.width = window.innerWidth
@@ -227,7 +224,7 @@ export default class Block {
         TSNEOptions.perplexity = this.pointCount
       }
 
-      TSNEOptions.dim = 4 // dimensionality of the embedding
+      TSNEOptions.dim = 3 // dimensionality of the embedding
 
       let tsne = new tsnejs.tSNE(TSNEOptions)
 
@@ -235,7 +232,7 @@ export default class Block {
       for (var i = 0; i < this.currentBlock.tx.length; i++) {
         transactionData.push(
           [
-            this.currentBlock.tx[i].value,
+            this.currentBlock.tx[i].output,
             this.currentBlock.tx[i].time,
             this.currentBlock.tx[i].size,
             this.currentBlock.tx[i].weight
@@ -245,9 +242,9 @@ export default class Block {
 
       tsne.initDataRaw(transactionData)
 
-      for (var k = 0; k < this.tsneIterations; k++) {
+      for (var k = 1; k <= this.tsneIterations; k++) {
         tsne.step()
-        console.log('Completed TSNE step ' + k+1 + ' of ' + this.tsneIterations)
+        console.log('Completed TSNE step ' + k + ' of ' + this.tsneIterations)
       }
 
       this.TSNESolution = tsne.getSolution()
