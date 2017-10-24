@@ -4,15 +4,13 @@
 import * as THREE from 'three'
 import OrbitContructor from 'three-orbit-controls'
 import Config from './Config'
-let Voronoi = require('voronoi')
-import { ExtrudeCrystalGeometry, ExtrudeCrystalBufferGeometry } from './geometries/ExtrudeCrystalGeometry'
 
+import {ExtrudeCrystalGeometry, ExtrudeCrystalBufferGeometry} from './geometries/ExtrudeCrystalGeometry'
+import {ConvexGeometry} from './geometries/ConvexGeometry'
+import TSNE from 'tsne-js';
 const firebase = require('firebase')
 require('firebase/firestore')
-
-// blockchain api
 let blockexplorer = require('blockchain.info/blockexplorer')
-
 let glslify = require('glslify')
 let OrbitControls = OrbitContructor(THREE)
 
@@ -20,7 +18,7 @@ export default class Scene {
 
   constructor() {
 
-    // declare class lets
+    // declare class vars
     this.camera
     this.scene
     this.renderer
@@ -28,11 +26,15 @@ export default class Scene {
     this.height
     this.currentBlock
     this.diagram
-    this.voronoi
     this.relaxIterations
     this.textureLoader
     this.bgMap
     this.firebaseDB
+    this.model
+    this.tsneIterations
+    this.crystalMaterial
+    this.pointCount
+    this.TSNESolution
 
     firebase.initializeApp({apiKey: 'AIzaSyD92ewqzwYPP6L4-XmlU3LucH74n8Xa6tw', authDomain: 'orpheus-f3a39.firebaseapp.com', projectId: 'orpheus-f3a39'})
 
@@ -40,17 +42,9 @@ export default class Scene {
 
     this.textureLoader = new THREE.TextureLoader()
 
-    this.voronoi = new Voronoi()
-    this.relaxIterations = 0
-    this.groundSize = 400
+    this.groundSize = 100
 
-    this.hashes = [
-      //'000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
-      //'000000000000000074953313ca30236fafe09ebd7b990f69e31778cf54c33de6',
-      '00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
-      //'0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
-      //'00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
-    ]
+    this.hash = '0000000000000000c5e63614209fbe7bd71257be5b9bed3212066e5224bbdf60'
 
     // canvas dimensions
     this.width = window.innerWidth
@@ -58,7 +52,7 @@ export default class Scene {
 
     // scene
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.001)
+    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.000001)
 
     // renderer
     this.renderer = new THREE.WebGLRenderer({antialias: Config.scene.antialias})
@@ -74,15 +68,14 @@ export default class Scene {
     document.body.appendChild(this.renderer.domElement)
 
     // camera
-    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 5000)
-    this.camera.position.set(0.0, 20.0, 0.0)
-    //this.camera.lookAt(-10.0, -20.0, 0.0)
+    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
+    this.camera.position.set(0.0, 1.0, 0.0)
     this.camera.updateMatrixWorld()
 
     // controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.minDistance = 0
-    this.controls.maxDistance = 3500
+    this.controls.maxDistance = 5000
 
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
@@ -102,14 +95,12 @@ export default class Scene {
     this.scene.add(ambLight)
 
     let light = new THREE.SpotLight(0xffffff)
-    light.position.set(1000, 300, 0)
+    light.position.set(10000, 300, 0)
     light.target.position.set(0, 0, 0)
 
     if (Config.scene.shadowsOn) {
       light.castShadow = true
       light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(50, 1, 500, 15000))
-      //light.shadow.bias = 0.0000001
-      //light.shadow.radius = 0.1
       light.shadow.mapSize.width = 2048
       light.shadow.mapSize.height = 2048
     }
@@ -118,95 +109,95 @@ export default class Scene {
 
   }
 
-  init() {}
-
   addObjects() {
 
-    this.hashes.forEach(function(hash, hashIndex) {
-
-      let offset = (this.groundSize * hashIndex) - this.groundSize / 2
-
-      this.getBlock(hash).then(function(block) {
+      this.getBlock(this.hash).then(function(block) {
 
         this.currentBlock = block
 
-        let pointCount = this.currentBlock.n_tx
+        this.pointCount = this.currentBlock.n_tx
 
+        console.log('Block contains ' + this.pointCount + ' transactions')
+
+        this.runTSNE()
+
+        // add coords from TSNE to array
         let sites = []
-        for (let i = 0; i < pointCount; i++) {
+        for (let i = 0; i < this.pointCount; i++) {
+          let coords = this.TSNESolution[i]
           sites.push(
-						{
-							x: Math.random(),
-							y: Math.random()
-						}
-					)
-        }
-
-        this.diagram = this.voronoi.compute(sites, {
-          xl: 0,
-          xr: 1,
-          yt: 0,
-          yb: 1
-        })
-
-        for (let i = 0; i < this.relaxIterations; i++) {
-          this.relaxSites()
+            {
+              x: coords[0],
+              y: coords[1],
+              z: coords[2]
+            }
+          )
         }
 
         let group = new THREE.Group()
         this.scene.add(group)
 
-        this.cubeUrls = [
-          'right.png',
-          'left.png',
-          'top.png',
-          'bot.png',
-          'front.png',
-          'back.png'
-        ]
+        // convert points to three js vectors for convex hull
+        let v3Points = []
+        for (var i = 0; i < sites.length; i++) {
+          let point = sites[i]
+          v3Points.push(new THREE.Vector3(point.x, point.y, point.z))
+        }
 
-				this.bgMap = new THREE.CubeTextureLoader().setPath('./assets/textures/skybox/').load(this.cubeUrls)
-        this.bgMap.mapping = THREE.CubeRefractionMapping
+        if (Config.scene.showConvexHull) {
+          this.addConvexHull(v3Points)
+        }
 
-        this.scene.background = this.bgMap
-
-        let material = new THREE.MeshPhysicalMaterial({
-          color: 0xffffff,
-          metalness: 1.0,
-          roughness: 0.4,
-          refractionRatio: 0.88,
-          opacity: 0.8,
-          reflectivity: 1.0,
-          side: THREE.DoubleSide,
-          transparent: true,
-          envMap: this.bgMap
-        })
+        this.setupMaterials()
 
         this.currentBlock.tx.forEach((tx, index) => {
 
           // convert from satoshis
           let btcValue = tx.value / 100000000
 
-          let extrudeAmount = btcValue + 0.1
+          let extrudeAmount = Math.log(btcValue + 1.5)
 
           // lookup cell
-          let cell = this.diagram.cells[index]
+          let centroid = sites[index];
 
-          let points = []
-          for (let i = 0; i < cell.halfedges.length; i++) {
-            let start = cell.halfedges[i].getStartpoint()
-            points.push(new THREE.Vector2(start.x, start.y).multiplyScalar(this.groundSize))
+          let centroidVector = new THREE.Vector2(centroid.x, centroid.y)
+
+          let closest = Number.MAX_SAFE_INTEGER
+
+          for (var i = 0; i < sites.length; i++) {
+
+            let site = new THREE.Vector2(sites[i].x, sites[i].y)
+            let distance = site.distanceTo(centroidVector)
+
+            if (distance > 0) {
+              closest = Math.min(distance, closest)
+            }
+
           }
 
-          let shape = new THREE.Shape(points)
+          let shapePoints = [],
+            totalPoints = 6
+
+          for (let i = 0; i < totalPoints; i++) {
+            let sideLength = closest / 50
+            sideLength = Math.min(sideLength, .003)
+            let angle = i / totalPoints * Math.PI * 2
+            shapePoints.push(
+              new THREE.Vector2(
+                Math.cos(angle) * sideLength,
+                Math.sin(angle) * sideLength
+              ).multiplyScalar(100)
+            )
+          }
+
+          let shape = new THREE.Shape(shapePoints)
 
           let mesh = new THREE.Mesh(new ExtrudeCrystalBufferGeometry(shape, {
             steps: 1,
-            amount: extrudeAmount
-          }), material)
+            amount: extrudeAmount / 10
+          }), this.crystalMaterial)
 
-          mesh.rotation.set(-Math.PI / 2, 0.0, 0.0)
-          mesh.position.set(offset, 0, this.groundSize / 2)
+          mesh.position.set(centroid.x, centroid.y, centroid.z)
 
           mesh.castShadow = true
           mesh.receiveShadow = true
@@ -217,195 +208,193 @@ export default class Scene {
 
       }.bind(this))
 
-    }.bind(this))
 
-  }
+    }
 
-  getBlock(hash) {
+    runTSNE() {
 
-    return new Promise((resolve, reject) => {
+      switch (this.pointCount) {
 
-      // get from firebase
-      let blockRef = this.firebaseDB.collection('blocks').doc(hash)
+        case this.pointCount < 100:
+          this.tsneIterations = 2
+          break;
 
-      blockRef.get().then(function(doc) {
+        case this.pointCount < 50:
+          this.tsneIterations = 1
+          break;
 
-        if (doc.exists) {
+        default:
+          this.tsneIterations = 20
 
-          resolve(doc.data())
+      }
 
-        } else {
+      let TSNEOptions = {}
+      TSNEOptions.epsilon = 100
+      TSNEOptions.perplexity = 30 // roughly how many neighbours each point influences
 
-          console.log('grabbing data from API')
+      // ensure perplexity is not greater than the total point count
+      if (this.pointCount > TSNEOptions.perplexity) {
+        TSNEOptions.perplexity = this.pointCount
+      }
 
-          // get from API
-          blockexplorer.getBlock(hash).then(function(block) {
+      TSNEOptions.dim = 4 // dimensionality of the embedding
 
-            // sort transactions by value ascending
-            block.tx.sort(function(a, b) {
+      let tsne = new tsnejs.tSNE(TSNEOptions)
 
-              let transactionValueA = 0
-              a.out.forEach((output, index) => {
-                transactionValueA += output.value
-              })
-              a.value = transactionValueA
+      let transactionData = []
+      for (var i = 0; i < this.currentBlock.tx.length; i++) {
+        transactionData.push(
+          [
+            this.currentBlock.tx[i].value,
+            this.currentBlock.tx[i].time,
+            this.currentBlock.tx[i].size,
+            this.currentBlock.tx[i].weight
+          ]
+        )
+      }
 
-              let transactionValueB = 0
-              b.out.forEach((output, index) => {
-                transactionValueB += output.value
-              })
-              b.value = transactionValueB
+      tsne.initDataRaw(transactionData)
 
-              // return transactionValueA - transactionValueB
+      for (var k = 0; k < this.tsneIterations; k++) {
+        tsne.step()
+        console.log('Completed TSNE step ' + k+1 + ' of ' + this.tsneIterations)
+      }
 
-            })
+      this.TSNESolution = tsne.getSolution()
+    }
 
-            // store in cache
-            let transactions = []
-            block.tx.forEach((tx) => {
-              let txObj = {
-                value: tx.value
-              }
-              transactions.push(txObj)
-            })
+    addConvexHull(points) {
+      // Convex Hull
+      var CVgeometry = new THREE.ConvexGeometry(points)
+      var CVmaterial = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true, opacity: 0.5, transparent: true})
+      var CVmesh = new THREE.Mesh(CVgeometry, CVmaterial)
+      this.scene.add(CVmesh)
+    }
 
-            this.firebaseDB.collection('blocks').doc(block.hash).set({hash: block.hash, height: block.height, prev_block: block.prev_block, n_tx: block.n_tx, tx: transactions}).then(function() {
-              console.log("Document successfully written!")
-            }).catch(function(error) {
-              console.error("Error writing document: ", error)
-            })
+    setupMaterials() {
 
-						resolve(block)
+      this.cubeMapUrls = [
+        'right.png',
+        'left.png',
+        'top.png',
+        'bot.png',
+        'front.png',
+        'back.png'
+      ]
 
-          }.bind(this)).catch(function(error) {
-            console.log('Error getting document:', error)
-          })
+      this.bgMap = new THREE.CubeTextureLoader().setPath('./assets/textures/skybox/').load(this.cubeMapUrls)
+      this.bgMap.mapping = THREE.CubeRefractionMapping
 
-        }
+      this.scene.background = this.bgMap
 
-      }.bind(this)).catch(function(error) {
-        console.log('Error getting document:', error)
+      this.crystalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0.8,
+        roughness: 0.5,
+        refractionRatio: 0.88,
+        opacity: 0.8,
+        reflectivity: 1.0,
+        side: THREE.DoubleSide,
+        transparent: false,
+        envMap: this.bgMap
       })
 
-    })
-
-  }
-
-  resize() {
-    this.width = window.innerWidth
-    this.height = window.innerHeight
-    this.camera.aspect = this.width / this.height
-    this.camera.updateProjectionMatrix()
-    this.renderer.setSize(this.width, this.height)
-  }
-
-  render() {
-    this.renderer.render(this.scene, this.camera)
-    this.controls.update()
-  }
-
-  animate() {
-    requestAnimationFrame(this.animate.bind(this))
-    this.render()
-  }
-
-  // Lloyds relaxation methods credit: http://www.raymondhill.net/voronoi/rhill-voronoi-demo5.html
-  cellArea(cell) {
-
-    let area = 0,
-      halfedges = cell.halfedges,
-      halfedgeIndex = halfedges.length,
-      halfedge,
-      startPoint,
-      endPoint
-
-    while (halfedgeIndex--) {
-      halfedge = halfedges[halfedgeIndex]
-      startPoint = halfedge.getStartpoint()
-      endPoint = halfedge.getEndpoint()
-      area += startPoint.x * endPoint.y
-      area -= startPoint.y * endPoint.x
     }
 
-    return area / 2
+    getBlock(hash) {
 
-  }
+      return new Promise((resolve, reject) => {
 
-  cellCentroid(cell) {
+        // get from firebase
+        let blockRef = this.firebaseDB.collection('blocks').doc(hash)
 
-    let x = 0,
-      y = 0,
-      halfedges = cell.halfedges,
-      halfedgeIndex = halfedges.length,
-      halfedge,
-      v,
-      startPoint,
-      endPoint
+        blockRef.get().then(function(doc) {
 
-    while (halfedgeIndex--) {
-      halfedge = halfedges[halfedgeIndex]
-      startPoint = halfedge.getStartpoint()
-      endPoint = halfedge.getEndpoint()
-      let vector = startPoint.x * endPoint.y - endPoint.x * startPoint.y
-      x += (startPoint.x + endPoint.x) * vector
-      y += (startPoint.y + endPoint.y) * vector
-    }
+          if (doc.exists) {
 
-    v = this.cellArea(cell) * 6
+            resolve(doc.data())
 
-    return {
-      x: x / v,
-      y: y / v
-    }
+          } else {
 
-  }
+            console.log('grabbing data from API')
 
-  relaxSites() {
+            // get from API
+            blockexplorer.getBlock(hash).then(function(block) {
 
-    let cells = this.diagram.cells,
-      cellIndex = cells.length,
-      cell,
-      site,
-      sites = [],
-      rn,
-      dist
+              // sort transactions by value ascending
+              block.tx.sort(function(a, b) {
 
-    let p = 1 / cellIndex * 0.1
+                let transactionValueA = 0
+                a.out.forEach((output, index) => {
+                  transactionValueA += output.value
+                })
+                a.value = transactionValueA
 
-    while (cellIndex--) {
-      cell = cells[cellIndex]
-      rn = Math.random()
+                let transactionValueB = 0
+                b.out.forEach((output, index) => {
+                  transactionValueB += output.value
+                })
+                b.value = transactionValueB
 
-      site = this.cellCentroid(cell)
+                // return transactionValueA - transactionValueB
 
-      dist = new THREE.Vector2(site).distanceTo(new THREE.Vector2(cell.site))
+              })
 
-      // don't relax too fast
-      if (dist > 2) {
-        site.x = (site.x + cell.site.x) / 2
-        site.y = (site.y + cell.site.y) / 2
-      }
+              // store in cache
+              let transactions = []
+              block.tx.forEach((tx) => {
 
-      // probability of mytosis
-      if (rn > (1 - p)) {
-        dist /= 2
-        sites.push({
-          x: site.x + (site.x - cell.site.x) / dist,
-          y: site.y + (site.y - cell.site.y) / dist
+                //console.log(tx)
+
+                let txObj = {
+                  size: tx.size,
+                  time: tx.time,
+                  weight: tx.weight,
+                  tx_index: tx.tx_index,
+                  value: tx.value
+                }
+
+                transactions.push(txObj)
+              })
+
+              this.firebaseDB.collection('blocks').doc(block.hash).set({hash: block.hash, height: block.height, prev_block: block.prev_block, n_tx: block.n_tx, tx: transactions}).then(function() {
+                console.log("Document successfully written!")
+              }).catch(function(error) {
+                console.error("Error writing document: ", error)
+              })
+              resolve(block)
+
+            }.bind(this)).catch(function(error) {
+              console.log('Error getting document:', error)
+            })
+
+          }
+
+        }.bind(this)).catch(function(error) {
+          console.log('Error getting document:', error)
         })
-      }
 
-      sites.push(site)
+      })
 
     }
 
-    this.diagram = this.voronoi.compute(sites, {
-      xl: 0,
-      xr: 1,
-      yt: 0,
-      yb: 1
-    })
+    resize() {
+      this.width = window.innerWidth
+      this.height = window.innerHeight
+      this.camera.aspect = this.width / this.height
+      this.camera.updateProjectionMatrix()
+      this.renderer.setSize(this.width, this.height)
+    }
+
+    render() {
+      this.renderer.render(this.scene, this.camera)
+      this.controls.update()
+    }
+
+    animate() {
+      requestAnimationFrame(this.animate.bind(this))
+      this.render()
+    }
+
 
   }
-
-}

@@ -19,6 +19,7 @@
     "firebase": "^4.5.0",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
+    "tsne-js": "^1.0.3",
     "voronoi": "^1.0.0"
   },
   "devDependencies": {

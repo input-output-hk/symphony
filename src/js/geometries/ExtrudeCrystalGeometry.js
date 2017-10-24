@@ -117,7 +117,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
 
   let scope = this
 
-  let shapePoints = shape.extractPoints(1)
+  let shapePoints = shape.extractPoints(12)
 
   let vertices = shapePoints.shape
 
@@ -144,7 +144,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
   let avgY = totalY / vertices.length
 
   // get center vector and add a bit of randomness to position
-  let centerVector = new THREE.Vector2(avgX + (Math.random() * 2) - 1, avgY + (Math.random() * 2) - 1)
+  let centerVector = new THREE.Vector2(avgX, avgY)
 
   vertices.push(centerVector)
 
@@ -194,19 +194,20 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
       vert = vertices[i]
 
       // offset top vertices
-      vert.x += xOffset * (amount * 0.1)
-      vert.y += yOffset * (amount * 0.1)
+    //  vert.x += xOffset * (amount * 0.1)
+    //  vert.y += yOffset * (amount * 0.1)
 
       // center vertex is always last, extrude separately
-      if (i == vlen - 1) {
+//      if (i == vlen - 1) {
 
-        v(vert.x, vert.y, (amount * 1.2) / steps * s)
+  //      v(vert.x, vert.y, (amount + amount / 3) / steps * s)
 
-      } else {
+    //  } else {
 
-        v(vert.x, vert.y, (amount + (Math.random() * amount * 0.05)) / steps * s)
+    //  v(vert.x, vert.y, (amount + (Math.random() * amount * 0.05)) / steps * s)
+        v(vert.x, vert.y, (amount) / steps * s)
 
-      }
+    //  }
 
     }
 
