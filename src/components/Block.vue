@@ -24,10 +24,9 @@ export default {
   // beforeUpdate(){ this.asyncFetch() },
   methods: {
     asyncFetch: function(){
-      console.log( 'hellor')
       getBlock(this.blockhash)
         // .then(({ hash, time, prev_block, size, height, relayed_by, n_tx, bits, fee }) => {
-        .then(block => this.block = block )
+        .then(block => this.block = block)
     }
   }
 }

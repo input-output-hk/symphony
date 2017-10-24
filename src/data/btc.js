@@ -11,8 +11,6 @@ firebase.initializeApp({
 // Initialize Cloud Firestore through Firebase
 const blocks = firebase.firestore().collection('blocks')
 
-window.blocks = blocks
-
 const formatTimeSeries = function ({ data }) {
   const times = []
   const values = []
@@ -66,3 +64,15 @@ export const getDay = async date => {
   // const value = blocks.reduce((a, b => a + b.value, 0))
   return { date, blocks, fee }
 }
+
+export const getLatestBlock = _ => blocks.orderBy('time', 'desc')
+  .limit(1)
+  .get()
+  .then(({ docs }) => docs[0].data())
+
+export const getTransactionsForBlock = async hash => blocks.where('hash', '==', hash).get()
+  .then(({docs}) => docs[0].ref.collection('metadata').get())
+  .then(transactions => transactions.docs[0].data().transaction)
+
+window.blocks = blocks
+window.btc = { getDay, getBlocksOnDay, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }

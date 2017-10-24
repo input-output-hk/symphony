@@ -10,7 +10,6 @@
         <router-link :to='"/block/"+block.hash'>{{ block.hash }}</router-link>
       </li>
     </ul>
-    {{ }}
   </div>
 </template>
 
