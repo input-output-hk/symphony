@@ -13,12 +13,8 @@ import {
   ConvexGeometry
 } from '../geometries/ConvexGeometry'
 
-//import tsnejs from 'tsne'
 
-const firebase = require('firebase')
-require('firebase/firestore')
 
-let glslify = require('glslify')
 let OrbitControls = OrbitContructor(THREE)
 
 
