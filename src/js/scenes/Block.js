@@ -17,10 +17,9 @@ let glslify = require('glslify')
 let OrbitControls = OrbitContructor(THREE)
 
 
-
-
-
-
+/**
+ * tsnejs
+ */
 
  // utility function
 var assert = function(condition, message) {
@@ -378,7 +377,7 @@ tSNE.prototype = {
   }
 }
 
-
+// end tsnejs
 
 
 
@@ -432,7 +431,7 @@ export default class Block {
 
     // camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(0.0, 1.0, 0.0)
+    this.camera.position.set(0.0, 10.0, 0.0)
     this.camera.updateMatrixWorld()
 
     // controls
@@ -565,6 +564,8 @@ export default class Block {
 
       })
 
+      group.rotation.set(0.0, Math.PI, Math.PI)
+
     }
 
     runTSNE() {
@@ -619,6 +620,9 @@ export default class Block {
       var CVgeometry = new ConvexGeometry(points)
       var CVmaterial = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true, opacity: 0.5, transparent: true})
       var CVmesh = new THREE.Mesh(CVgeometry, CVmaterial)
+
+      CVmesh.rotation.set(0.0, Math.PI, Math.PI)
+
       this.scene.add(CVmesh)
     }
 
@@ -633,7 +637,7 @@ export default class Block {
         'back.png'
       ]
 
-      this.bgMap = new THREE.CubeTextureLoader().setPath('./assets/textures/skybox/').load(this.cubeMapUrls)
+      this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/skybox/').load(this.cubeMapUrls)
       this.bgMap.mapping = THREE.CubeRefractionMapping
 
       this.scene.background = this.bgMap
