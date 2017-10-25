@@ -20,10 +20,7 @@ const routes = [
       { path: '/block/:blockhash', component: Block, props: true },
       { path: '/:date', component: Day, props: true },
     ]
-  },
-  // { path: '/block/:blockid', component: Block, props: true },
-  // { path: '/:date', component: Day, props: true },
-  // { path: '/', redirect: to => `/${moment().format('YYYY-MM-DD')}` }
+  }
 ]
 
 const router = new VueRouter({ routes, mode: 'history' })

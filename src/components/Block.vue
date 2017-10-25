@@ -15,7 +15,7 @@
 
 import BlockScene from '../js/scenes/block'
 
-import { getBlock } from '../data/btc'
+import { getBlock, getTransactionsForBlock } from '../data/btc'
 
 export default {
   name: 'home',
@@ -33,7 +33,13 @@ export default {
 
           this.block = block
 
-          new BlockScene(block)
+          getTransactionsForBlock(this.blockhash).then((tx) => {
+
+            this.block.tx = tx
+
+            new BlockScene(block)
+
+          })
 
         })
     }

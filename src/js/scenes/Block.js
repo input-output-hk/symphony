@@ -219,14 +219,15 @@ export default class Block {
       TSNEOptions.epsilon = 100
       TSNEOptions.perplexity = 30 // roughly how many neighbours each point influences
 
-      // ensure perplexity is not greater than the total point count
-      if (this.pointCount > TSNEOptions.perplexity) {
-        TSNEOptions.perplexity = this.pointCount
-      }
+
 
       TSNEOptions.dim = 3 // dimensionality of the embedding
 
       let tsne = new tsnejs.tSNE(TSNEOptions)
+
+      console.log(TSNEOptions)
+
+      debugger
 
       let transactionData = []
       for (var i = 0; i < this.currentBlock.tx.length; i++) {
@@ -239,6 +240,8 @@ export default class Block {
           ]
         )
       }
+
+      console.log(transactionData)
 
       tsne.initDataRaw(transactionData)
 
