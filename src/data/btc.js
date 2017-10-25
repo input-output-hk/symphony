@@ -21,6 +21,9 @@ const formatTimeSeries = function ({ data }) {
   return { times, values }
 }
 
+
+const Block = block => ({ ...block, fee: block.output - block.input })
+
 /*
   Get a list of BTC transaction over a time period
 */
@@ -35,7 +38,7 @@ export const getTransactionVolumeOverTime = (start, end) => axios.get('https://a
 */
 export const getBlock = hash => blocks.where('hash', '==', hash)
   .get()
-  .then(({ docs }) => docs[0].data())
+  .then(({ docs }) => Block(docs[0].data()))
 
 /*
   Returns all the blocks that occured on the current date 00:01 - 00:00
@@ -50,19 +53,21 @@ export const getBlocksOnDay = async date => {
   const toDay = new Date(fromDay.getTime())
   toDay.setHours(toDay.getHours() + 24)
 
-  const blockData = await blocks.where('time', '>=', fromDay / 1000)
+  const blocksArr = await blocks.where('time', '>=', fromDay / 1000)
     .where('time', '<', toDay / 1000)
     .get()
-    .then(({ docs }) => docs.map(doc => doc.data()))
+    .then(({ docs }) => docs.map(doc => Block(doc.data())))
 
-  return blockData
+  return blocksArr
 }
 
 export const getDay = async date => {
   const blocks = await getBlocksOnDay(date)
-  const fee = blocks.reduce((a, b) => a + b.fee, 0)
+  const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
+  const input = blocks.reduce((a, { input }) => a + input, 0) || 0
+  const output = blocks.reduce((a, { output }) => a + output, 0) || 0
   // const value = blocks.reduce((a, b => a + b.value, 0))
-  return { date, blocks, fee }
+  return { date, blocks, fee, input, output }
 }
 
 export const getLatestBlock = _ => blocks.orderBy('time', 'desc')

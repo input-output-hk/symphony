@@ -1,6 +1,5 @@
 <template>
   <div>
-    <div>WebGL Canvas</div>
     <canvas/>
   </div>
 </template>
@@ -13,8 +12,6 @@ export default {
   name: 'webgl'
 }
 </script>
-
-
 
 <style scoped>
   @import "../assets/common.css";

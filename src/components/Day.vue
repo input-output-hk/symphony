@@ -3,13 +3,9 @@
     <br><b>Day:</b> {{ this.day }}</br>
     <br><b>Number of Blocks:</b> {{ this.numBlocks }}</br>
     <br><b>Fee:</b> {{ this.fee }}</br>
+    <br><b>Value:</b> {{ this.value.toLocaleString('USD') }}</br>
     <router-link :to='this.prevDay'>{{ this.prevDay }}</router-link>
     <router-link v-if='this.isBeforeToday' :to='this.nextDay'>{{ this.nextDay }}</router-link>
-    <ul>
-      <li v-for="block in blocks">
-        <router-link :to='"/block/"+block.hash'>{{ block.hash }}</router-link>
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -42,9 +38,10 @@ export default {
   methods: {
     asyncFetch: function(){
       getDay(moment(this.date).toDate())
-        .then(({ blocks, fee, date }) => {
+        .then(({ blocks, fee, date, input, output }) => {
           this.dateLiteral = moment(this.date).startOf('day').toDate()
-          this.fee = fee.toLocaleString('USD')
+          this.fee = Math.floor( fee / 100000000 ).toLocaleString('USD')
+          this.value = Math.floor( output / 100000000 )
           this.day = moment(date).format('MMM Do YYYY')
           this.numBlocks = blocks.length
           this.blocks = blocks

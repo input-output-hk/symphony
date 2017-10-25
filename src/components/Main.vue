@@ -1,8 +1,10 @@
 <template>
   <div>
-    <router-view/>
-    <graph/>
-    <webgl/>
+    <div class='main'>
+      <router-view class='big'/>
+      <graph/>
+    </div>
+    <!-- <webgl/> -->
   </div>
 </template>
 
@@ -20,4 +22,16 @@ export default {
 
 <style scoped>
   @import "../assets/common.css";
+
+  .main{
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    /*height: 100vh;*/
+  }
+
+  .big{
+    flex: 1;
+  }
 </style>

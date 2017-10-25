@@ -1,11 +1,10 @@
 <template>
   <div class='graph'>
-    <div>Graph</div>
-    <svg :width='width + 100' :height='height'>
-      <rect x="0" y="0" :width='width' :height='height' stroke='black' fill='none'/>
-      <polyline fill="none" stroke="black" :points='graph.map((n, i) => [i*width/graph.length, n].join(","))'/>
-      <text :x='width + 5' y='10' >{{ this.max }}</text>
-      <text :x='width + 5' :y='height' >{{ this.min }}</text>
+    <svg width='100%' :height='height' viewBox='0 0 100 100' preserveAspectRatio='none'>
+      <!-- <rect x="0" y="0" width='100%' :height='height' stroke='black' fill='none'/> -->
+      <polyline fill="rgba(0, 0, 0, 1.0)" stroke="black" :points='graph.map((n, i) => [`${i/graph.length*100}`, n].join(","))'/>
+      <text :x='width' y='10' >{{ this.max }}</text>
+      <text :x='width' :y='height' >{{ this.min }}</text>
     </svg>
   </div>
 </template>
@@ -34,11 +33,25 @@ export default {
 
         // Map data domain to height of graph
         this.graph = values.map(value => map(value, this.min, this.max, this.height, 0))
+
+        // To fill the graph we need 2 additional points at the start and end
+        this.graph = [ 100 ].concat(this.graph, [ 100 ])
       })
   }
 }
 
 </script>
-
 <style scoped>
+
+  rect, polyline {
+    vector-effect: non-scaling-stroke;
+    shape-rendering: geometricPrecision;
+  }
+
+  /*.graph{
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+  }*/
+
 </style>
