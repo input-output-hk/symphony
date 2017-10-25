@@ -13,7 +13,7 @@ const Config = {
     bgColor: 0x000000,
     shadowsOn: false,
     antialias: true,
-    showConvexHull: true
+    showConvexHull: false
   },
   postProcessing: {
     effectDownscaleDivisor: 2

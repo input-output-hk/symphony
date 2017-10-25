@@ -24,6 +24,10 @@ export default {
   @import "../assets/common.css";
 
   .main{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
