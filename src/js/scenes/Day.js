@@ -103,6 +103,9 @@ export default class Day {
 
   addObjects() {
 
+    this.group = new THREE.Group()
+    this.scene.add(this.group)
+
     for (let i = 0; i < this.blocks.length; i++) {
 
       let block = this.blocks[i]
@@ -119,9 +122,13 @@ export default class Day {
       cube.translateX(10 + boxWidth / 2)
       cube.translateY(i / 15)
 
-      this.scene.add(cube)
+      this.group.add(cube)
 
     }
+
+    this.group.rotation.x = 2.0
+    this.group.position.z = -5.0
+
 
   }
 
@@ -178,6 +185,9 @@ export default class Day {
   }
 
   render() {
+
+    this.group.rotation.y += 0.0001
+
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
   }
