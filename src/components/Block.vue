@@ -15,7 +15,7 @@
 
 <script>
 
-import BlockScene from '../js/scenes/block'
+import BlockScene from '../js/scenes/Block'
 
 import { getBlock, getTransactionsForBlock } from '../data/btc'
 

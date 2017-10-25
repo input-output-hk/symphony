@@ -10,7 +10,7 @@ const Config = {
     orbitControls: false
   },
   scene: {
-    bgColor: 0x13091f,
+    bgColor: 0x000000,
     shadowsOn: false,
     antialias: true,
     showConvexHull: true

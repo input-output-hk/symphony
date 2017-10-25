@@ -10,6 +10,9 @@
 </template>
 
 <script>
+
+import DayScene from '../js/scenes/Day'
+
 import { getDay } from '../data/btc'
 import format from '../utils/dateformat'
 import moment from 'moment'
@@ -34,7 +37,7 @@ export default {
     }
   },
   created(){this.asyncFetch()},
-  beforeUpdate(){this.asyncFetch()},
+  //beforeUpdate(){this.asyncFetch()},
   methods: {
     asyncFetch: function(){
       getDay(moment(this.date).toDate())
@@ -48,6 +51,9 @@ export default {
           this.nextDay = moment(this.date).add(1, 'days').format('YYYY-MM-DD'),
           this.prevDay = moment(this.date).subtract(1, 'days').format('YYYY-MM-DD'),
           this.isBeforeToday = this.dateLiteral < moment(new Date()).startOf('day').toDate()
+
+          new DayScene(blocks)
+
         })
     }
   }
