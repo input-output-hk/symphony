@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas/>
+    <canvas id="stage" />
   </div>
 </template>
 

@@ -4,7 +4,7 @@
       <router-view class='big'/>
       <graph/>
     </div>
-    <!-- <webgl/> -->
+    <webgl />
   </div>
 </template>
 

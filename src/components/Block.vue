@@ -14,7 +14,10 @@
 </template>
 
 <script>
-import { getBlock } from '../data/btc'
+
+import BlockScene from '../js/scenes/block'
+
+import { getBlock, getTransactionsForBlock } from '../data/btc'
 
 export default {
   name: 'home',
@@ -27,7 +30,19 @@ export default {
   methods: {
     asyncFetch: function(){
       getBlock(this.blockhash)
-        .then(block => this.block = block)
+        .then((block) => {
+
+          this.block = block
+
+          getTransactionsForBlock(this.blockhash).then((tx) => {
+
+            this.block.tx = tx
+
+            new BlockScene(block)
+
+          })
+
+        })
     }
   }
 }
