@@ -13,7 +13,6 @@ import {
   ConvexGeometry
 } from '../geometries/ConvexGeometry'
 
-let glslify = require('glslify')
 let OrbitControls = OrbitContructor(THREE)
 
 export default class Day {
@@ -162,7 +161,7 @@ export default class Day {
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
 
     //this.scene.background = this.bgMap
-    
+
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xafbfd9,
       metalness: 0.6,

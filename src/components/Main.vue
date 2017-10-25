@@ -11,8 +11,8 @@
 <script>
 import { getDay } from '../data/btc'
 import moment from 'moment'
-import webgl from './webgl'
-import graph from './graph'
+import webgl from './WebGL'
+import graph from './Graph'
 
 export default {
   name: 'home',
