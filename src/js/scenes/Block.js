@@ -530,8 +530,8 @@ export default class Block {
       })
     }
 
-    let group = new THREE.Group()
-    this.scene.add(group)
+    this.group = new THREE.Group()
+    this.scene.add(this.group)
 
     // convert points to three js vectors for convex hull
     let v3Points = []
@@ -598,16 +598,21 @@ export default class Block {
       mesh.castShadow = true
       mesh.receiveShadow = true
 
-      group.add(mesh)
+      let crystal = new THREE.Group()
+
+      crystal.add(mesh)
 
       // crudely copy and flip todo: change this
       let rotated = mesh.clone()
       rotated.rotation.y = Math.PI
-      group.add(rotated)
+      crystal.add(rotated)
+
+      this.group.add(crystal)
 
     })
 
-    group.rotation.set(0.0, Math.PI, Math.PI)
+    this.group.rotation.set(0.0, Math.PI, Math.PI)
+
 
   }
 
@@ -712,6 +717,9 @@ export default class Block {
   }
 
   render() {
+
+    this.group.rotation.z += 0.0005
+
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
   }
