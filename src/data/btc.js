@@ -9,7 +9,7 @@ firebase.initializeApp({
 })
 
 // Initialize Cloud Firestore through Firebase
-const blocks = firebase.firestore().collection('blocks')
+const blocks = firebase.firestore().collection('block')
 
 const formatTimeSeries = function ({ data }) {
   const times = []
