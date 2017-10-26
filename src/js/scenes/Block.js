@@ -48,7 +48,7 @@ export default class Block {
 
     // camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(0.0, 10.0, 0.0)
+    this.camera.position.set(0.0, 5.0, 15.0)
     this.camera.updateMatrixWorld()
 
     // controls
@@ -120,7 +120,6 @@ export default class Block {
     this.setupMaterials()
 
     this.currentBlock.tx.forEach((tx, index) => {
-
       // convert from satoshis
       let btcValue = tx.output / 100000000
 
@@ -181,7 +180,7 @@ export default class Block {
       this.group.add(crystal)
     })
 
-    this.group.rotation.set(0.0, Math.PI, Math.PI)
+    this.group.rotation.x = -Math.PI / 2
   }
 
   runTSNE () {

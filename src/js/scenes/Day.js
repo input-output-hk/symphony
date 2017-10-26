@@ -6,26 +6,13 @@ import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
 
 import {
-  ExtrudeCrystalGeometry,
-  ExtrudeCrystalBufferGeometry
-} from '../geometries/ExtrudeCrystalGeometry'
-import {
   ConvexGeometry
 } from '../geometries/ConvexGeometry'
 
 let OrbitControls = OrbitContructor(THREE)
 
 export default class Day {
-
-  constructor(blocks) {
-
-    // declare class vars
-    this.camera
-    this.scene
-    this.renderer
-    this.width
-    this.height
-    this.bgMap
+  constructor (blocks) {
     this.blocks = blocks
     this.textureLoader = new THREE.TextureLoader()
 
@@ -59,7 +46,7 @@ export default class Day {
 
     // camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(0.0, 35.0, 0.0)
+    this.camera.position.set(0.0, 25.0, 25.0)
     this.camera.updateMatrixWorld()
 
     // controls
@@ -77,11 +64,9 @@ export default class Day {
 
     // animation loop
     this.animate()
-
   }
 
-  addLights(scene) {
-
+  addLights (scene) {
     let ambLight = new THREE.AmbientLight(0xf1d0c5)
     this.scene.add(ambLight)
 
@@ -89,24 +74,21 @@ export default class Day {
     light.position.set(100, 30, 0)
     light.target.position.set(0, 0, 0)
 
-    //if (Config.scene.shadowsOn) {
+    if (Config.scene.shadowsOn) {
       light.castShadow = true
       light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(50, 1, 500, 15000))
       light.shadow.mapSize.width = 2048
       light.shadow.mapSize.height = 2048
-    //}
+    }
 
     this.scene.add(light)
-
   }
 
-  addObjects() {
-
+  addObjects () {
     this.group = new THREE.Group()
     this.scene.add(this.group)
 
     for (let i = 0; i < this.blocks.length; i++) {
-
       let block = this.blocks[i]
 
       let boxWidth = block.n_tx / 250
@@ -122,16 +104,10 @@ export default class Day {
       cube.translateY(i / 15)
 
       this.group.add(cube)
-
     }
-
-    this.group.rotation.x = 2.0
-    this.group.position.z = -5.0
-
-
   }
 
-  addConvexHull(points) {
+  addConvexHull (points) {
     // Convex Hull
     var CVgeometry = new ConvexGeometry(points)
     var CVmaterial = new THREE.MeshBasicMaterial({
@@ -147,8 +123,7 @@ export default class Day {
     this.scene.add(CVmesh)
   }
 
-  setupMaterials() {
-
+  setupMaterials () {
     this.cubeMapUrls = [
       'px.png',
       'nx.png',
@@ -160,7 +135,7 @@ export default class Day {
 
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
 
-    //this.scene.background = this.bgMap
+    // this.scene.background = this.bgMap
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xafbfd9,
@@ -169,13 +144,12 @@ export default class Day {
       opacity: 1.0,
       side: THREE.DoubleSide,
       transparent: false,
-      envMap: this.bgMap,
-      //wireframe: true,
+      envMap: this.bgMap
+      // wireframe: true,
     })
-
   }
 
-  resize() {
+  resize () {
     this.width = window.innerWidth
     this.height = window.innerHeight
     this.camera.aspect = this.width / this.height
@@ -183,18 +157,15 @@ export default class Day {
     this.renderer.setSize(this.width, this.height)
   }
 
-  render() {
-
+  render () {
     this.group.rotation.y += 0.0001
 
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
   }
 
-  animate() {
+  animate () {
     requestAnimationFrame(this.animate.bind(this))
     this.render()
   }
-
-
 }
