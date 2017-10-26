@@ -17,7 +17,6 @@
     "moment": "^2.19.1",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
-    "tsne": "^1.0.1",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0"
   },
