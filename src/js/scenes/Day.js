@@ -11,6 +11,8 @@ import {
 
 let OrbitControls = OrbitContructor(THREE)
 
+
+
 export default class Day {
   constructor (blocks) {
     this.blocks = blocks
@@ -57,6 +59,8 @@ export default class Day {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
+    this.addEvents()
+
     // objects
     this.addLights()
     this.setupMaterials()
@@ -64,6 +68,37 @@ export default class Day {
 
     // animation loop
     this.animate()
+  }
+
+  addEvents () {
+    this.raycaster = new THREE.Raycaster()
+    this.intersected = null
+    this.mousePos = new THREE.Vector2()
+
+    document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
+    document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
+  }
+
+  onDocumentMouseDown (event) {
+    event.preventDefault()
+
+    this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
+    this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+    this.raycaster.setFromCamera(this.mousePos, this.camera)
+
+    var intersects = this.raycaster.intersectObjects(this.group.children)
+
+    if (intersects.length > 0) {
+      intersects[0].object.material.color.setHex(Math.random() * 0xffffff)
+      let hash = intersects[0].object.blockchainData.hash
+      document.location.href = '/block/' + hash
+    }
+  }
+
+  onDocumentMouseMove (event) {
+    this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
+    this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
   }
 
   addLights (scene) {
@@ -95,7 +130,21 @@ export default class Day {
       let boxHeight = block.fee / 5000000000
 
       let geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxHeight)
-      let cube = new THREE.Mesh(geometry, this.crystalMaterial)
+
+      let material = new THREE.MeshPhysicalMaterial({
+        color: 0xafbfd9,
+        metalness: 0.6,
+        roughness: 0.0,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        transparent: false,
+        envMap: this.bgMap
+        // wireframe: true,
+      })
+
+      let cube = new THREE.Mesh(geometry, material)
+
+      cube.blockchainData = block
 
       let rotation = ((2 * Math.PI) / this.blocks.length) * i
 
@@ -159,6 +208,26 @@ export default class Day {
 
   render () {
     this.group.rotation.y += 0.0001
+
+    var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
+    vector.unproject(this.camera)
+    var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
+    var intersects = ray.intersectObjects(this.group.children)
+    if (intersects.length > 0) {
+      if (intersects[0].object !== this.intersected) {
+        if (this.intersected) {
+          this.intersected.material.color.setHex(this.intersected.currentHex)
+        }
+        this.intersected = intersects[0].object
+        this.intersected.currentHex = this.intersected.material.color.getHex()
+        this.intersected.material.color.setHex(0xffffff)
+      }
+    } else {
+      if (this.intersected) {
+        this.intersected.material.color.setHex(this.intersected.currentHex)
+      }
+      this.intersected = null
+    }
 
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
