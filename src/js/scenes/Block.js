@@ -13,12 +13,15 @@ import {
 } from '../geometries/ConvexGeometry'
 
 import TSNE from '../helpers/tsne'
+import Tone from 'tone'
 
 let OrbitControls = OrbitContructor(THREE)
 
 export default class Block {
   constructor (block) {
     this.currentBlock = block
+
+    this.assetsDir = '/static/assets/'
 
     this.textureLoader = new THREE.TextureLoader()
 
@@ -63,9 +66,60 @@ export default class Block {
     this.addLights()
     this.addObjects()
 
+    // sound
+    this.setupSound()
+    
     // animation loop
     this.animate()
   }
+  
+  loadSound () {
+
+    return new Promise((resolve, reject) => {
+
+      this.sampler = new Tone.Sampler({
+        'C3': this.assetsDir + 'sounds/1.wav',
+        'D#3': this.assetsDir + 'sounds/2.wav'
+      }, function () {
+  
+        resolve()
+  
+      }).chain(this.pingPong, this.convolver, this.masterVol)
+
+    })
+
+  }
+
+  setupSound () {
+
+    this.bpm = 120
+
+    this.masterVol = new Tone.Volume(-6).toMaster()
+
+    this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
+    this.convolver.set('wet', 1.0)
+
+    this.pingPong = new Tone.PingPongDelay('16n', 0.85)
+
+    Tone.Transport.bpm.value = this.bpm
+
+    this.loadSound().then(() => {
+
+      new Tone.Loop((time) => {
+
+        this.sampler.triggerAttack('C3', '@1n')
+        this.sampler.triggerAttack('D#3', '@2n')
+        this.sampler.triggerAttack('D#4', '@8n')
+        this.sampler.triggerAttack('C2', '@1m')
+
+      }, '1m').start(0)
+
+      Tone.Transport.start()
+
+    })
+
+  }
+
 
   addLights (scene) {
     let ambLight = new THREE.AmbientLight(0xffffff)
@@ -253,7 +307,7 @@ export default class Block {
       'nz.png'
     ]
 
-    this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
+    this.bgMap = new THREE.CubeTextureLoader().setPath(this.assetsDir + 'textures/').load(this.cubeMapUrls)
     // this.bgMap.mapping = THREE.CubeRefractionMapping
 
     // this.scene.background = this.bgMap

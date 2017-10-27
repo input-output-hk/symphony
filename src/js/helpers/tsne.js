@@ -51,7 +51,7 @@ export default class TSNE {
     return mu + this.gaussRandom() * std
   }
 
-  // utilitity that creates contiguous vector of zeros of size n
+  // utility that creates contiguous vector of zeros of size n
   zeros (n) {
     if (typeof (n) === 'undefined' || isNaN(n)) {
       return []
