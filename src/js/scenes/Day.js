@@ -90,7 +90,7 @@ export default class Day {
     var intersects = this.raycaster.intersectObjects(this.group.children)
 
     if (intersects.length > 0) {
-      intersects[0].object.material.color.setHex(Math.random() * 0xffffff)
+      intersects[0].object.material.color.setHex(0xffffff)
       let hash = intersects[0].object.blockchainData.hash
       document.location.href = '/block/' + hash
     }

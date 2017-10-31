@@ -21,6 +21,130 @@ export default class Block {
   constructor (block) {
     this.currentBlock = block
 
+    this.notes = {
+      55.000: 'A1',
+      58.270: 'A#1',
+      // 61.735: 'B1',
+      65.406: 'C1',
+      // 69.296: 'C#1',
+      73.416: 'D1',
+      // 77.782: 'D#1',
+      82.407: 'E1',
+      87.307: 'F1',
+      //92.499: 'F#1',
+      97.999: 'G1',
+      //103.826: 'G#1',
+      110.000: 'A2',
+      116.541: 'A#2',
+      //123.471: 'B2',
+      130.813: 'C2',
+      //138.591: 'C#2',
+      146.832: 'D2',
+      //155.563: 'D#2',
+      164.814: 'E2',
+      174.614: 'F2',
+      //184.997: 'F#2',
+      195.998: 'G2',
+      //207.652: 'G#2',
+      220.000: 'A3',
+      233.082: 'A#3',
+      // 246.942: 'B3',
+      261.626: 'C3',
+      //277.183: 'C#3',
+      293.665: 'D3',
+      //311.127: 'D#3',
+      329.628: 'E3',
+      349.228: 'F3',
+      //369.994: 'F#3',
+      391.995: 'G3',
+      //415.305: 'G#3',
+      440.000: 'A4',
+      466.164: 'A#4',
+      //493.883: 'B4',
+      523.251: 'C4',
+      //554.365: 'C#4',
+      587.330: 'D4',
+      //622.254: 'D#4',
+      659.255: 'E4',
+      698.456: 'F4',
+      //739.989: 'F#4',
+      783.991: 'G4',
+      //830.609: 'G#4'
+    }
+
+    this.modes = {
+      'ionian': [
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'A',
+        'B',
+        'C'
+      ],
+      'dorian': [
+        'C',
+        'D',
+        'D#',
+        'F',
+        'G',
+        'A',
+        'A#',
+        'C'
+      ],
+      'phrygian': [
+        'C',
+        'C#',
+        'D#',
+        'F',
+        'G',
+        'G#',
+        'A#',
+        'C'
+      ],
+      'lydian': [
+        'C',
+        'D',
+        'E',
+        'F#',
+        'G',
+        'A',
+        'B',
+        'C'
+      ],
+      'mixolydian': [
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'A',
+        'A#',
+        'C'
+      ],
+      'aeolian': [
+        'C',
+        'D',
+        'D#',
+        'F',
+        'G',
+        'G#',
+        'A#',
+        'C'
+      ],
+      'locrian': [
+        'C',
+        'C#',
+        'D#',
+        'F',
+        'F#',
+        'G#',
+        'A#',
+        'C'
+      ]
+    }
+
     this.assetsDir = '/static/assets/'
 
     this.textureLoader = new THREE.TextureLoader()
@@ -51,6 +175,7 @@ export default class Block {
 
     // camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
+
     this.camera.position.set(0.0, 5.0, 15.0)
     this.camera.updateMatrixWorld()
 
@@ -62,62 +187,66 @@ export default class Block {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
-    // objects
     this.addLights()
-    this.addObjects()
 
     // sound
-    this.setupSound()
-    
-    // animation loop
-    this.animate()
+    this.setupSound().then(() => {
+      // objects
+      this.addObjects()
+
+      // animation loop
+      this.animate()
+    })
   }
-  
+
   loadSound () {
+    Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+    this.controls.addEventListener('change', function () {
+      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+    }.bind(this))
+
+    let cameraForwardVector = new THREE.Vector3()
+    let quaternion = new THREE.Quaternion()
+    cameraForwardVector.set(0, 0, -1).applyQuaternion(quaternion)
+
+    Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
 
     return new Promise((resolve, reject) => {
+      resolve()
 
-      this.sampler = new Tone.Sampler({
-        'C3': this.assetsDir + 'sounds/1.wav',
-        'D#3': this.assetsDir + 'sounds/2.wav'
-      }, function () {
-  
-        resolve()
-  
-      }).chain(this.pingPong, this.convolver, this.masterVol)
+      /* this.sampler = new Tone.Sampler({
+         'C3': this.assetsDir + 'sounds/1.wav',
+         'D#3': this.assetsDir + 'sounds/2.wav'
+       }, function (sampler) {
+         resolve(sampler)
+       //}).chain(this.pingPong, this.convolver, this.masterVol)
+       })*/
 
     })
-
   }
 
   setupSound () {
 
-    this.bpm = 120
+    return new Promise((resolve, reject) => {
+      this.bpm = 120
 
-    this.masterVol = new Tone.Volume(-6).toMaster()
+      this.masterVol = new Tone.Volume(-6).toMaster()
 
-    this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
-    this.convolver.set('wet', 1.0)
+      this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
+      this.convolver.set('wet', 1.0)
 
-    this.pingPong = new Tone.PingPongDelay('16n', 0.85)
+      this.pingPong = new Tone.PingPongDelay('16n', 0.85)
 
-    Tone.Transport.bpm.value = this.bpm
+      Tone.Transport.bpm.value = this.bpm
 
-    this.loadSound().then(() => {
+      this.loadSound().then(() => {
+        console.log('sound loaded')
 
-      new Tone.Loop((time) => {
+        resolve()
 
-        this.sampler.triggerAttack('C3', '@1n')
-        this.sampler.triggerAttack('D#3', '@2n')
-        this.sampler.triggerAttack('D#4', '@8n')
-        this.sampler.triggerAttack('C2', '@1m')
-
-      }, '1m').start(0)
-
-      Tone.Transport.start()
-
+        Tone.Transport.start()
+      })
     })
-
   }
 
 
@@ -146,16 +275,35 @@ export default class Block {
 
     this.runTSNE()
 
+    let maxZ = 0
+    let minZ = Number.MAX_SAFE_INTEGER
+
     // add coords from TSNE to array
     let sites = []
+    let zValues = []
     for (let i = 0; i < this.pointCount; i++) {
+
       let coords = this.TSNESolution[i]
+
+      maxZ = Math.max(coords[2], maxZ)
+      minZ = Math.min(coords[2], minZ)
+
+      zValues.push(coords[2])
+
       sites.push({
         x: coords[0],
         y: coords[1],
         z: coords[2]
       })
     }
+
+    Array.prototype.scaleBetween = function (scaledMin, scaledMax) {
+      var max = Math.max.apply(Math, this)
+      var min = Math.min.apply(Math, this)
+      return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin)
+    }
+
+    zValues = zValues.scaleBetween(55.000, 830.609)
 
     this.group = new THREE.Group()
     this.scene.add(this.group)
@@ -173,6 +321,9 @@ export default class Block {
 
     this.setupMaterials()
 
+    let noteTotal = 30
+    let noteCount = 0
+
     this.currentBlock.tx.forEach((tx, index) => {
       // convert from satoshis
       let btcValue = tx.output / 100000000
@@ -181,6 +332,8 @@ export default class Block {
 
       // lookup cell
       let centroid = sites[index]
+
+      let zValue = zValues[index]
 
       let centroidVector = new THREE.Vector2(centroid.x, centroid.y)
 
@@ -198,8 +351,10 @@ export default class Block {
       let shapePoints = []
       let totalPoints = 6
 
+      let sideLength
+
       for (let i = 0; i < totalPoints; i++) {
-        let sideLength = closest / 50
+        sideLength = closest / 200
         sideLength = Math.min(sideLength, 0.003)
         let angle = i / totalPoints * Math.PI * 2
         shapePoints.push(
@@ -232,23 +387,64 @@ export default class Block {
       crystal.add(rotated)
 
       this.group.add(crystal)
+
+      if (sideLength > 0.0005) {
+        noteCount++
+
+        if (noteCount < noteTotal) {
+          // add positional audio
+          let panner = new Tone.Panner3D().chain(this.masterVol)
+          panner.refDistance = 5
+          panner.rolloffFactor = 200
+          panner.setPosition(centroid.x, centroid.y, centroid.z)
+
+          // get closest note
+
+          let minDiff = Number.MAX_SAFE_INTEGER
+          let note = 'C1'
+
+          for (var frequency in this.notes) {
+            if (this.notes.hasOwnProperty(frequency)) {
+              let diff = Math.abs(zValue - frequency)
+
+              if (diff < minDiff) {
+                minDiff = diff
+                note = this.notes[frequency]
+              }
+            }
+          }
+
+          let sampler = new Tone.Sampler({
+            'C3': this.assetsDir + 'sounds/kal_c4.wav'
+          }, function () {
+            console.log(extrudeAmount)
+
+            new Tone.Loop((time) => {
+              sampler.triggerAttack(note, '@16n', extrudeAmount)
+            }, '1m').start(Math.random() * 100)
+          })
+
+          sampler.fan(panner)
+
+          crystal.panner = panner
+        }
+      }
     })
 
     this.group.rotation.x = -Math.PI / 2
   }
 
   runTSNE () {
-    switch (this.pointCount) {
-      case this.pointCount < 100:
-        this.tsneIterations = 2
-        break
-
-      case this.pointCount < 50:
-        this.tsneIterations = 1
-        break
-
-      default:
-        this.tsneIterations = 30
+    if (this.pointCount < 50) {
+      this.tsneIterations = 1
+    } else if (this.pointCount < 200) {
+      this.tsneIterations = 5
+    } else if (this.pointCount < 500) {
+      this.tsneIterations = 10
+    } else if (this.pointCount < 1000) {
+      this.tsneIterations = 20
+    } else {
+      this.tsneIterations = 30
     }
 
     let TSNEOptions = {}
@@ -333,11 +529,21 @@ export default class Block {
   }
 
   render () {
-    this.group.rotation.z += 0.0005
+    this.group.rotation.z += 0.005
+
+    this.group.children.forEach((crystal, index) => {
+      if (typeof crystal.panner !== 'undefined') {
+        var vector = new THREE.Vector3()
+        vector.setFromMatrixPosition(crystal.children[0].matrixWorld)
+        crystal.panner.setPosition(vector.x, vector.y, vector.z)
+        // console.log('setpos')
+      }
+    })
 
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
   }
+
 
   animate () {
     requestAnimationFrame(this.animate.bind(this))
