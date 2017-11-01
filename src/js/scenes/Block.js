@@ -230,7 +230,7 @@ export default class Block {
     return new Promise((resolve, reject) => {
       this.bpm = 120
 
-      this.masterVol = new Tone.Volume(-10).toMaster()
+      this.masterVol = new Tone.Volume(-24).toMaster()
 
       this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0)
