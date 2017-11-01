@@ -390,8 +390,6 @@ export default class Block {
 
       if (sideLength > 0.0005) {
 
-        console.log(noteCount)
-
         noteCount++
 
         if (noteCount < noteTotal) {
@@ -408,25 +406,22 @@ export default class Block {
 
           // filter out notes not in mode
 
-          let mode = this.modes.mixolydian
+          let mode = this.modes.locrian
 
           for (var frequency in this.notes) {
             if (this.notes.hasOwnProperty(frequency)) {
+              let noteName = this.notes[frequency].replace(/[0-9]/g, '')
 
-                let noteName = this.notes[frequency].replace(/[0-9]/g, '')
-
-                if (mode.indexOf(noteName) !== -1) {
-                  
-                  let diff = Math.abs(zValue - frequency)
-                  if (diff < minDiff) {
-                    minDiff = diff
-                    note = this.notes[frequency]
-                  }
-
+              if (mode.indexOf(noteName) !== -1) {
+                let diff = Math.abs(zValue - frequency)
+                if (diff < minDiff) {
+                  minDiff = diff
+                  note = this.notes[frequency]
                 }
-              
+              }
             }
           }
+
 
           let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
 
