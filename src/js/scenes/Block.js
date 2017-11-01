@@ -24,52 +24,52 @@ export default class Block {
     this.notes = {
       55.000: 'A1',
       58.270: 'A#1',
-      // 61.735: 'B1',
+      61.735: 'B1',
       65.406: 'C1',
-      // 69.296: 'C#1',
+      69.296: 'C#1',
       73.416: 'D1',
-      // 77.782: 'D#1',
+      77.782: 'D#1',
       82.407: 'E1',
       87.307: 'F1',
-      //92.499: 'F#1',
+      92.499: 'F#1',
       97.999: 'G1',
-      //103.826: 'G#1',
+      103.826: 'G#1',
       110.000: 'A2',
       116.541: 'A#2',
-      //123.471: 'B2',
+      123.471: 'B2',
       130.813: 'C2',
-      //138.591: 'C#2',
+      138.591: 'C#2',
       146.832: 'D2',
-      //155.563: 'D#2',
+      155.563: 'D#2',
       164.814: 'E2',
       174.614: 'F2',
-      //184.997: 'F#2',
+      184.997: 'F#2',
       195.998: 'G2',
-      //207.652: 'G#2',
+      207.652: 'G#2',
       220.000: 'A3',
       233.082: 'A#3',
-      // 246.942: 'B3',
+      246.942: 'B3',
       261.626: 'C3',
-      //277.183: 'C#3',
+      277.183: 'C#3',
       293.665: 'D3',
-      //311.127: 'D#3',
+      311.127: 'D#3',
       329.628: 'E3',
       349.228: 'F3',
-      //369.994: 'F#3',
+      369.994: 'F#3',
       391.995: 'G3',
-      //415.305: 'G#3',
-      440.000: 'A4',
-      466.164: 'A#4',
-      //493.883: 'B4',
+      415.305: 'G#3',
+      440.000: 'A3',
+      466.164: 'A#3',
+      493.883: 'B3',
       523.251: 'C4',
-      //554.365: 'C#4',
+      554.365: 'C#4',
       587.330: 'D4',
-      //622.254: 'D#4',
+      622.254: 'D#4',
       659.255: 'E4',
       698.456: 'F4',
-      //739.989: 'F#4',
+      739.989: 'F#4',
       783.991: 'G4',
-      //830.609: 'G#4'
+      830.609: 'G#4'
     }
 
     this.modes = {
@@ -230,7 +230,7 @@ export default class Block {
     return new Promise((resolve, reject) => {
       this.bpm = 120
 
-      this.masterVol = new Tone.Volume(-6).toMaster()
+      this.masterVol = new Tone.Volume(-10).toMaster()
 
       this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0)
@@ -303,7 +303,7 @@ export default class Block {
       return this.map(num => (scaledMax - scaledMin) * (num - min) / (max - min) + scaledMin)
     }
 
-    zValues = zValues.scaleBetween(55.000, 830.609)
+    zValues = zValues.scaleBetween(55.000, 523.251)
 
     this.group = new THREE.Group()
     this.scene.add(this.group)
@@ -321,7 +321,7 @@ export default class Block {
 
     this.setupMaterials()
 
-    let noteTotal = 30
+    let noteTotal = 40
     let noteCount = 0
 
     this.currentBlock.tx.forEach((tx, index) => {
@@ -389,6 +389,9 @@ export default class Block {
       this.group.add(crystal)
 
       if (sideLength > 0.0005) {
+
+        console.log(noteCount)
+
         noteCount++
 
         if (noteCount < noteTotal) {
@@ -403,57 +406,32 @@ export default class Block {
           let minDiff = Number.MAX_SAFE_INTEGER
           let note = 'C1'
 
+          // filter out notes not in mode
+
+          let mode = this.modes.mixolydian
+
           for (var frequency in this.notes) {
             if (this.notes.hasOwnProperty(frequency)) {
-              let diff = Math.abs(zValue - frequency)
 
-              if (diff < minDiff) {
-                minDiff = diff
-                note = this.notes[frequency]
-              }
+                let noteName = this.notes[frequency].replace(/[0-9]/g, '')
+
+                if (mode.indexOf(noteName) !== -1) {
+                  
+                  let diff = Math.abs(zValue - frequency)
+                  if (diff < minDiff) {
+                    minDiff = diff
+                    note = this.notes[frequency]
+                  }
+
+                }
+              
             }
           }
 
-         // console.log(this.assetsDir + 'sounds/kalimba/C1.wav')
+          let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
 
           let sampler = new Tone.Sampler({
-            'C1': this.assetsDir + 'sounds/kalimba/C1.wav',
-            'C#1': this.assetsDir + 'sounds/kalimba/CS1.wav',
-            'D1': this.assetsDir + 'sounds/kalimba/D1.wav',
-            'D#1': this.assetsDir + 'sounds/kalimba/DS1.wav',
-            'E1': this.assetsDir + 'sounds/kalimba/E1.wav',
-            'F1': this.assetsDir + 'sounds/kalimba/F1.wav',
-            'F#1': this.assetsDir + 'sounds/kalimba/FS1.wav',
-            'G1': this.assetsDir + 'sounds/kalimba/G1.wav',
-            'G#1': this.assetsDir + 'sounds/kalimba/GS1.wav',
-            'A1': this.assetsDir + 'sounds/kalimba/A1.wav',
-            'A#1': this.assetsDir + 'sounds/kalimba/AS1.wav',
-            'B1': this.assetsDir + 'sounds/kalimba/B1.wav',
-            'C2': this.assetsDir + 'sounds/kalimba/C2.wav',
-            'C#2': this.assetsDir + 'sounds/kalimba/CS2.wav',
-            'D2': this.assetsDir + 'sounds/kalimba/D2.wav',
-            'D#2': this.assetsDir + 'sounds/kalimba/DS2.wav',
-            'E2': this.assetsDir + 'sounds/kalimba/E2.wav',
-            'F2': this.assetsDir + 'sounds/kalimba/F2.wav',
-            'F#2': this.assetsDir + 'sounds/kalimba/FS2.wav',
-            'G2': this.assetsDir + 'sounds/kalimba/G2.wav',
-            'G#2': this.assetsDir + 'sounds/kalimba/GS2.wav',
-            'A2': this.assetsDir + 'sounds/kalimba/A2.wav',
-            'A#2': this.assetsDir + 'sounds/kalimba/AS2.wav',
-            'B2': this.assetsDir + 'sounds/kalimba/B2.wav',
-            'C3': this.assetsDir + 'sounds/kalimba/C3.wav',
-            'C#3': this.assetsDir + 'sounds/kalimba/CS3.wav',
-            'D3': this.assetsDir + 'sounds/kalimba/D3.wav',
-            'D#3': this.assetsDir + 'sounds/kalimba/DS3.wav',
-            'E3': this.assetsDir + 'sounds/kalimba/E3.wav',
-            'F3': this.assetsDir + 'sounds/kalimba/F3.wav',
-            'F#3': this.assetsDir + 'sounds/kalimba/FS3.wav',
-            'G3': this.assetsDir + 'sounds/kalimba/G3.wav',
-            'G#3': this.assetsDir + 'sounds/kalimba/GS3.wav',
-            'A3': this.assetsDir + 'sounds/kalimba/A3.wav',
-            'A#3': this.assetsDir + 'sounds/kalimba/AS3.wav',
-            'B3': this.assetsDir + 'sounds/kalimba/B3.wav',
-            'C4': this.assetsDir + 'sounds/kalimba/C4.wav'
+            [note]: fileName
           }, function () {
             new Tone.Loop((time) => {
               sampler.triggerAttack(note, '@16n', extrudeAmount)
