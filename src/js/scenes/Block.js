@@ -213,7 +213,7 @@ export default class Block {
 
     return new Promise((resolve, reject) => {
       resolve()
-
+      
       /* this.sampler = new Tone.Sampler({
          'C3': this.assetsDir + 'sounds/1.wav',
          'D#3': this.assetsDir + 'sounds/2.wav'
@@ -394,8 +394,8 @@ export default class Block {
         if (noteCount < noteTotal) {
           // add positional audio
           let panner = new Tone.Panner3D().chain(this.masterVol)
-          panner.refDistance = 5
-          panner.rolloffFactor = 200
+          panner.refDistance = 6
+          panner.rolloffFactor = 50
           panner.setPosition(centroid.x, centroid.y, centroid.z)
 
           // get closest note
@@ -414,11 +414,47 @@ export default class Block {
             }
           }
 
-          let sampler = new Tone.Sampler({
-            'C3': this.assetsDir + 'sounds/kal_c4.wav'
-          }, function () {
-            console.log(extrudeAmount)
+         // console.log(this.assetsDir + 'sounds/kalimba/C1.wav')
 
+          let sampler = new Tone.Sampler({
+            'C1': this.assetsDir + 'sounds/kalimba/C1.wav',
+            'C#1': this.assetsDir + 'sounds/kalimba/CS1.wav',
+            'D1': this.assetsDir + 'sounds/kalimba/D1.wav',
+            'D#1': this.assetsDir + 'sounds/kalimba/DS1.wav',
+            'E1': this.assetsDir + 'sounds/kalimba/E1.wav',
+            'F1': this.assetsDir + 'sounds/kalimba/F1.wav',
+            'F#1': this.assetsDir + 'sounds/kalimba/FS1.wav',
+            'G1': this.assetsDir + 'sounds/kalimba/G1.wav',
+            'G#1': this.assetsDir + 'sounds/kalimba/GS1.wav',
+            'A1': this.assetsDir + 'sounds/kalimba/A1.wav',
+            'A#1': this.assetsDir + 'sounds/kalimba/AS1.wav',
+            'B1': this.assetsDir + 'sounds/kalimba/B1.wav',
+            'C2': this.assetsDir + 'sounds/kalimba/C2.wav',
+            'C#2': this.assetsDir + 'sounds/kalimba/CS2.wav',
+            'D2': this.assetsDir + 'sounds/kalimba/D2.wav',
+            'D#2': this.assetsDir + 'sounds/kalimba/DS2.wav',
+            'E2': this.assetsDir + 'sounds/kalimba/E2.wav',
+            'F2': this.assetsDir + 'sounds/kalimba/F2.wav',
+            'F#2': this.assetsDir + 'sounds/kalimba/FS2.wav',
+            'G2': this.assetsDir + 'sounds/kalimba/G2.wav',
+            'G#2': this.assetsDir + 'sounds/kalimba/GS2.wav',
+            'A2': this.assetsDir + 'sounds/kalimba/A2.wav',
+            'A#2': this.assetsDir + 'sounds/kalimba/AS2.wav',
+            'B2': this.assetsDir + 'sounds/kalimba/B2.wav',
+            'C3': this.assetsDir + 'sounds/kalimba/C3.wav',
+            'C#3': this.assetsDir + 'sounds/kalimba/CS3.wav',
+            'D3': this.assetsDir + 'sounds/kalimba/D3.wav',
+            'D#3': this.assetsDir + 'sounds/kalimba/DS3.wav',
+            'E3': this.assetsDir + 'sounds/kalimba/E3.wav',
+            'F3': this.assetsDir + 'sounds/kalimba/F3.wav',
+            'F#3': this.assetsDir + 'sounds/kalimba/FS3.wav',
+            'G3': this.assetsDir + 'sounds/kalimba/G3.wav',
+            'G#3': this.assetsDir + 'sounds/kalimba/GS3.wav',
+            'A3': this.assetsDir + 'sounds/kalimba/A3.wav',
+            'A#3': this.assetsDir + 'sounds/kalimba/AS3.wav',
+            'B3': this.assetsDir + 'sounds/kalimba/B3.wav',
+            'C4': this.assetsDir + 'sounds/kalimba/C4.wav'
+          }, function () {
             new Tone.Loop((time) => {
               sampler.triggerAttack(note, '@16n', extrudeAmount)
             }, '1m').start(Math.random() * 100)
