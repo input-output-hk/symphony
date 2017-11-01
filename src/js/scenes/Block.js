@@ -176,7 +176,7 @@ export default class Block {
     // camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
 
-    this.camera.position.set(0.0, 5.0, 15.0)
+    this.camera.position.set(0.0, 0.0, 5.0)
     this.camera.updateMatrixWorld()
 
     // controls
