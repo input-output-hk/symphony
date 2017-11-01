@@ -154,6 +154,9 @@ export default class Day {
 
       this.group.add(cube)
     }
+
+    document.getElementById('loading').style.display = 'none'
+
   }
 
   addConvexHull (points) {

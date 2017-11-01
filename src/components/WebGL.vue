@@ -18,6 +18,7 @@ export default {
   @import "../assets/common.css";
 
   #loading {
+    position: absolute;
     width: 100vw;
     height: 100vh;
     text-align: center;
