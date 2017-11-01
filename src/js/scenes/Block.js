@@ -72,6 +72,8 @@ export default class Block {
       830.609: 'G#4'
     }
 
+    this.loading = true
+
     this.modes = {
       'ionian': [
         'C',
@@ -389,7 +391,6 @@ export default class Block {
       this.group.add(crystal)
 
       if (sideLength > 0.0005) {
-
         noteCount++
 
         if (noteCount < noteTotal) {
@@ -439,6 +440,8 @@ export default class Block {
         }
       }
     })
+
+    document.getElementById('loading').style.display = 'none'
 
     this.group.rotation.x = -Math.PI / 2
   }
