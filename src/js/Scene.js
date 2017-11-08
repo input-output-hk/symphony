@@ -10,6 +10,10 @@ import {
   ExtrudeCrystalBufferGeometry
 } from './geometries/ExtrudeCrystalGeometry'
 
+import {
+  ConvexGeometry
+} from './geometries/ConvexGeometry'
+
 let glslify = require('glslify')
 let OrbitControls = OrbitContructor(THREE)
 
@@ -36,11 +40,11 @@ export default class Scene {
     this.hashes = [
       //'00000000000000000020665ca90c97a1138268211e0f1891dd669e480d692602',
       //'000000000000000018a9a6c39806292529a401918ec55e078306b35884814b7c'
-      '000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
+      //'000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
       // '000000000000000074953313ca30236fafe09ebd7b990f69e31778cf54c33de6',
       //'00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
-      // '0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
-      // '00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
+       //'0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
+       '00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
     ]
 
     // canvas dimensions
@@ -80,6 +84,34 @@ export default class Scene {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
+    this.assetsDir = '/static/assets/'
+
+    this.cubeMapUrls = [
+      'px.png',
+      'nx.png',
+      'py.png',
+      'ny.png',
+      'pz.png',
+      'nz.png'
+    ]
+
+    this.bgMap = new THREE.CubeTextureLoader().setPath(this.assetsDir + 'textures/').load(this.cubeMapUrls)
+    // this.bgMap.mapping = THREE.CubeRefractionMapping
+
+    // this.scene.background = this.bgMap
+
+    this.crystalMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xafbfd9,
+      metalness: 0.6,
+      roughness: 0.0,
+      opacity: 1.0,
+      side: THREE.DoubleSide,
+      transparent: false,
+      envMap: this.bgMap,
+      shading: THREE.FlatShading
+      // wireframe: true,
+    })
+
     // objects
     this.addLights()
     this.addObjects()
@@ -110,6 +142,12 @@ export default class Scene {
   }
 
   addObjects() {
+
+
+
+
+
+
     this.hashes.forEach(function (hash, hashIndex) {
       this.getBlock(hash).then(function (block) {
         this.currentBlock = block
@@ -129,7 +167,7 @@ export default class Scene {
         const Y = new THREE.Vector3(0, 1, 0)
         const Z = new THREE.Vector3(0, 0, 1)
 
-        let angle = 60.0
+        let angle = 90.0
 
         let xPosRotation = new THREE.Quaternion().setFromAxisAngle(X, (Math.PI / 180) * angle)
         let xNegRotation = new THREE.Quaternion().setFromAxisAngle(X, (Math.PI / 180) * -angle)
@@ -138,16 +176,6 @@ export default class Scene {
         let yReverseRotation = new THREE.Quaternion().setFromAxisAngle(Y, (Math.PI / 180) * 180)
         let zPosRotation = new THREE.Quaternion().setFromAxisAngle(Z, (Math.PI / 180) * angle)
         let zNegRotation = new THREE.Quaternion().setFromAxisAngle(Z, (Math.PI / 180) * -angle)
-
-        let rotations = [
-          xPosRotation,
-          xNegRotation,
-          yPosRotation,
-          yNegRotation,
-          yReverseRotation,
-          zPosRotation,
-          zNegRotation
-        ]
 
         merkle.fromArray(args, function (err, tree) {
           if (!err) {
@@ -238,8 +266,9 @@ export default class Scene {
               }
             }
 
+            let points = []
 
-            console.log(tree)
+            //console.log(tree)
 
             let buildCalled = 0
 
@@ -256,7 +285,7 @@ export default class Scene {
 
               let magnitude = node.level
               //let magnitude = 2
-              
+
               let hue = Math.abs(scale(node.value, minValue, maxValue) * 360)
 
               let colour = new THREE.Color('hsl(' + hue + ', 100%, 50%)')
@@ -264,8 +293,24 @@ export default class Scene {
               let startPosition = startingPosition.clone()
               let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
               var tdirection = endPosition.clone().sub(startPosition).normalize()
-              var arrow = new THREE.ArrowHelper(tdirection, startPosition, startPosition.distanceTo(endPosition), colour)
-              treeGroup.add(arrow)
+
+
+              points.push(startPosition)
+              points.push(endPosition)
+
+              let path = new THREE.LineCurve3(startPosition, endPosition)
+
+              var geometry = new THREE.TubeBufferGeometry(path, 1, 0.1, 6, false)
+              var material = new THREE.MeshBasicMaterial({
+                color: 0x00ff00
+              })
+              var mesh = new THREE.Mesh(geometry, context.crystalMaterial)
+              treeGroup.add(mesh)
+
+
+
+              /*var arrow = new THREE.ArrowHelper(tdirection, startPosition, startPosition.distanceTo(endPosition), colour)
+              treeGroup.add(mesh)*/
 
               let i = 0
               for (var key in node.children) {
@@ -300,7 +345,7 @@ export default class Scene {
 
                       //console.log(newDirection)
 
-                      build(childNode, endPosition, newDirection)
+                      build(childNode, endPosition, newDirection, context)
                     }
                   }
                 }
@@ -312,7 +357,29 @@ export default class Scene {
 
             //console.log(sortedTree)
 
-            build(sortedTree, startingPosition, direction)
+            build(sortedTree, startingPosition, direction, this)
+
+            console.log(points)
+
+            // Convex Hull
+            var CVgeometry = new ConvexGeometry(points)
+            var CVmaterial = new THREE.MeshBasicMaterial({
+              color: 0xffffff,
+              wireframe: true,
+              opacity: 0.3,
+              transparent: true
+            })
+            var CVmesh = new THREE.Mesh(CVgeometry, CVmaterial)
+
+            //CVmesh.center()
+
+            CVmesh.scale.set(1.1, 1.1, 1.1)
+
+            this.scene.add(CVmesh)
+
+
+
+
           }
         }.bind(this))
 

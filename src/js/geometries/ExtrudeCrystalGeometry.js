@@ -27,7 +27,7 @@ ExtrudeCrystalGeometry.prototype.constructor = ExtrudeCrystalGeometry
 
 function ExtrudeCrystalBufferGeometry(shapes, options) {
 
-  if (typeof(shapes) === "undefined") {
+  if (typeof (shapes) === "undefined") {
     return
   }
 
@@ -35,9 +35,8 @@ function ExtrudeCrystalBufferGeometry(shapes, options) {
 
   this.type = 'ExtrudeCrystalBufferGeometry'
 
-  shapes = Array.isArray(shapes)
-    ? shapes
-    : [shapes]
+  shapes = Array.isArray(shapes) ?
+    shapes : [shapes]
 
   this.addShapeList(shapes, options)
 
@@ -48,28 +47,29 @@ function ExtrudeCrystalBufferGeometry(shapes, options) {
 ExtrudeCrystalBufferGeometry.prototype = Object.create(THREE.BufferGeometry.prototype)
 ExtrudeCrystalBufferGeometry.prototype.constructor = ExtrudeCrystalBufferGeometry
 
-ExtrudeCrystalBufferGeometry.prototype.getArrays = function() {
+ExtrudeCrystalBufferGeometry.prototype.getArrays = function () {
 
   let positionAttribute = this.getAttribute("position")
-  let verticesArray = positionAttribute
-    ? Array.prototype.slice.call(positionAttribute.array)
-    : []
+  let verticesArray = positionAttribute ?
+    Array.prototype.slice.call(positionAttribute.array) : []
 
   let uvAttribute = this.getAttribute("uv")
-  let uvarray = uvAttribute
-    ? Array.prototype.slice.call(uvAttribute.array)
-    : []
+  let uvarray = uvAttribute ?
+    Array.prototype.slice.call(uvAttribute.array) : []
 
   let IndexAttribute = this.index
-  let indicesArray = IndexAttribute
-    ? Array.prototype.slice.call(IndexAttribute.array)
-    : []
+  let indicesArray = IndexAttribute ?
+    Array.prototype.slice.call(IndexAttribute.array) : []
 
-  return {position: verticesArray, uv: uvarray, index: indicesArray}
+  return {
+    position: verticesArray,
+    uv: uvarray,
+    index: indicesArray
+  }
 
 }
 
-ExtrudeCrystalBufferGeometry.prototype.addShapeList = function(shapes, options) {
+ExtrudeCrystalBufferGeometry.prototype.addShapeList = function (shapes, options) {
 
   let sl = shapes.length
   options.arrays = this.getArrays()
@@ -85,11 +85,11 @@ ExtrudeCrystalBufferGeometry.prototype.addShapeList = function(shapes, options) 
 
 }
 
-ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
+ExtrudeCrystalBufferGeometry.prototype.addShape = function (shape, options) {
 
-  let arrays = options.arrays
-      ? options.arrays
-      : this.getArrays()
+  let arrays = options.arrays ?
+    options.arrays :
+    this.getArrays()
 
   let verticesArray = arrays.position
   let indicesArray = arrays.index
@@ -97,18 +97,18 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
 
   let placeholder = []
 
-  let amount = options.amount !== undefined
-      ? options.amount
-      : 100
+  let amount = options.amount !== undefined ?
+    options.amount :
+    100
 
-  let steps = options.steps !== undefined
-      ? options.steps
-      : 1
+  let steps = options.steps !== undefined ?
+    options.steps :
+    1
 
   // Use default WorldUVGenerator if no UV generators are specified.
-  let uvgen = options.UVGenerator !== undefined
-      ? options.UVGenerator
-      : ExtrudeCrystalGeometry.WorldUVGenerator
+  let uvgen = options.UVGenerator !== undefined ?
+    options.UVGenerator :
+    ExtrudeCrystalGeometry.WorldUVGenerator
 
   let splineTube,
     binormal,
@@ -117,7 +117,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
 
   let scope = this
 
-  let shapePoints = shape.extractPoints(1)
+  let shapePoints = shape.extractPoints(12)
 
   let vertices = shapePoints.shape
 
@@ -144,7 +144,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
   let avgY = totalY / vertices.length
 
   // get center vector and add a bit of randomness to position
-  let centerVector = new THREE.Vector2(avgX + (Math.random() * 2) - 1, avgY + (Math.random() * 2) - 1)
+  let centerVector = new THREE.Vector2(avgX, avgY)
 
   vertices.push(centerVector)
 
@@ -194,19 +194,20 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
       vert = vertices[i]
 
       // offset top vertices
-      vert.x += xOffset * (amount * 0.1)
-      vert.y += yOffset * (amount * 0.1)
+      //vert.x += xOffset * (amount * 0.1)
+      //vert.y += yOffset * (amount * 0.1)
 
-      // center vertex is always last, extrude separately
-      if (i == vlen - 1) {
+      //center vertex is always last, extrude separately
+    //  if (i == vlen - 1) {
 
-        v(vert.x, vert.y, (amount * 1.2) / steps * s)
+      //  v(vert.x, vert.y, (amount + amount / 2) / steps * s)
 
-      } else {
+      //} else {
 
-        v(vert.x, vert.y, (amount + (Math.random() * amount * 0.05)) / steps * s)
+        //v(vert.x, vert.y, (amount + (Math.random() * amount * 0.2)) / steps * s)
+        v(vert.x, vert.y, (amount) / steps * s)
 
-      }
+     // }
 
     }
 
@@ -227,7 +228,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
     // Bottom faces
     for (let i = 0; i < flen; i++) {
       face = faces[i]
-      f3(face[2], face[1], face[0])
+      f3(face[2], face[1], face[0], true)
     }
 
     // Top faces
@@ -236,9 +237,9 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
       f3(face[0] + vlen * steps, face[1] + vlen * steps, face[2] + vlen * steps)
     }
 
-    scope.addGroup(start, verticesArray.length / 3 - start, options.material !== undefined
-      ? options.material
-      : 0)
+    scope.addGroup(start, verticesArray.length / 3 - start, options.material !== undefined ?
+      options.material :
+      0)
 
   }
 
@@ -251,9 +252,9 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
     sidewalls(contour, layeroffset)
     layeroffset += contour.length
 
-    scope.addGroup(start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined
-      ? options.extrudeMaterial
-      : 1)
+    scope.addGroup(start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined ?
+      options.extrudeMaterial :
+      1)
 
   }
 
@@ -358,7 +359,7 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function(shape, options) {
 
 ExtrudeCrystalGeometry.WorldUVGenerator = {
 
-  generateTopUV: function(geometry, vertices, indexA, indexB, indexC) {
+  generateTopUV: function (geometry, vertices, indexA, indexB, indexC) {
 
     let a_x = vertices[indexA * 3]
     let a_y = vertices[indexA * 3 + 1]
@@ -375,7 +376,7 @@ ExtrudeCrystalGeometry.WorldUVGenerator = {
 
   },
 
-  generateSideWallUV: function(geometry, vertices, indexA, indexB, indexC, indexD) {
+  generateSideWallUV: function (geometry, vertices, indexA, indexB, indexC, indexD) {
 
     let a_x = vertices[indexA * 3]
     let a_y = vertices[indexA * 3 + 1]
@@ -413,4 +414,7 @@ ExtrudeCrystalGeometry.WorldUVGenerator = {
   }
 }
 
-export {ExtrudeCrystalGeometry, ExtrudeCrystalBufferGeometry}
+export {
+  ExtrudeCrystalGeometry,
+  ExtrudeCrystalBufferGeometry
+}
