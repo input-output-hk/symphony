@@ -38,13 +38,13 @@ export default class Scene {
     this.textureLoader = new THREE.TextureLoader()
 
     this.hashes = [
-      //'00000000000000000020665ca90c97a1138268211e0f1891dd669e480d692602',
-      //'000000000000000018a9a6c39806292529a401918ec55e078306b35884814b7c'
-      //'000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
+      '00000000000000000020665ca90c97a1138268211e0f1891dd669e480d692602',
+      '000000000000000018a9a6c39806292529a401918ec55e078306b35884814b7c',
+      '000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
       // '000000000000000074953313ca30236fafe09ebd7b990f69e31778cf54c33de6',
       //'00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
        //'0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
-       '00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
+      // '00000000000000000088092c77b76f59f7294ef68b361a23c8827cc6bc3fe29f',
     ]
 
     // canvas dimensions
@@ -84,7 +84,7 @@ export default class Scene {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
-    this.assetsDir = '/static/assets/'
+    this.assetsDir = 'assets/'
 
     this.cubeMapUrls = [
       'px.png',
@@ -256,7 +256,7 @@ export default class Scene {
 
             }
 
-            for (var level = 0; level < tree.levels; level++) {
+            /*for (var level = 0; level < tree.levels; level++) {
               for (var key in tree) {
                 if (tree.hasOwnProperty(key)) {
                   if (tree[key].level === level) {
@@ -264,13 +264,11 @@ export default class Scene {
                   }
                 }
               }
-            }
+            }*/
 
             let points = []
 
             //console.log(tree)
-
-            let buildCalled = 0
 
             let treeGroup = new THREE.Group()
 
@@ -281,18 +279,18 @@ export default class Scene {
             }
 
             function build(node, startingPosition, direction, context) {
-              buildCalled++
+              //buildCalled++
 
               let magnitude = node.level
               //let magnitude = 2
 
               let hue = Math.abs(scale(node.value, minValue, maxValue) * 360)
 
-              let colour = new THREE.Color('hsl(' + hue + ', 100%, 50%)')
+              //let colour = new THREE.Color('hsl(' + hue + ', 100%, 50%)')
 
               let startPosition = startingPosition.clone()
               let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
-              var tdirection = endPosition.clone().sub(startPosition).normalize()
+             // var tdirection = endPosition.clone().sub(startPosition).normalize()
 
 
               points.push(startPosition)
@@ -305,7 +303,7 @@ export default class Scene {
                 color: 0x00ff00
               })
               var mesh = new THREE.Mesh(geometry, context.crystalMaterial)
-              treeGroup.add(mesh)
+              //treeGroup.add(mesh)
 
 
 
@@ -359,7 +357,7 @@ export default class Scene {
 
             build(sortedTree, startingPosition, direction, this)
 
-            console.log(points)
+            //console.log(points)
 
             // Convex Hull
             var CVgeometry = new ConvexGeometry(points)
