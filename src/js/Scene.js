@@ -39,8 +39,8 @@ export default class Scene {
 
     this.hashes = [
       '00000000000000000020665ca90c97a1138268211e0f1891dd669e480d692602',
-      '000000000000000018a9a6c39806292529a401918ec55e078306b35884814b7c',
-      '000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
+      //'000000000000000018a9a6c39806292529a401918ec55e078306b35884814b7c',
+      //'000000000000000000a3ccaa60d0f98276b24e0b0f4c145477805e4181325140',
       // '000000000000000074953313ca30236fafe09ebd7b990f69e31778cf54c33de6',
       //'00000000000000000043eaeb09b0d6b25e564068a130642fab809ed91e1acfcc',
        //'0000000000000587556425a377c751a40d61fe1156c2e6b16e844fdc38c252b7',
@@ -298,12 +298,12 @@ export default class Scene {
 
               let path = new THREE.LineCurve3(startPosition, endPosition)
 
-              var geometry = new THREE.TubeBufferGeometry(path, 1, 0.1, 6, false)
+              var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
               var material = new THREE.MeshBasicMaterial({
                 color: 0x00ff00
               })
               var mesh = new THREE.Mesh(geometry, context.crystalMaterial)
-              //treeGroup.add(mesh)
+              treeGroup.add(mesh)
 
 
 
