@@ -40,8 +40,14 @@ export default {
   //beforeUpdate(){this.asyncFetch()},
   methods: {
     asyncFetch: function(){
+
+      let days = []
+
       getDay(moment(this.date).toDate())
         .then(({ blocks, fee, date, input, output }) => {
+          
+          days.push(blocks)
+
           this.dateLiteral = moment(this.date).startOf('day').toDate()
           this.fee = Math.floor( fee / 100000000 ).toLocaleString('USD')
           this.value = Math.floor( output / 100000000 )
@@ -52,7 +58,7 @@ export default {
           this.prevDay = moment(this.date).subtract(1, 'days').format('YYYY-MM-DD'),
           this.isBeforeToday = this.dateLiteral < moment(new Date()).startOf('day').toDate()
 
-          new DayScene(blocks)
+          new DayScene(days)
 
         })
     }

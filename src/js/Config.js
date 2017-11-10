@@ -10,7 +10,7 @@ const Config = {
     orbitControls: false
   },
   scene: {
-    bgColor: 0x000000,
+    bgColor: 0xFFFFFF,
     shadowsOn: false,
     antialias: true,
     showConvexHull: false
@@ -19,7 +19,7 @@ const Config = {
     effectDownscaleDivisor: 2
   },
   camera: {
-    fov: 60,
+    fov: 90,
     autoMove: true
   }
 }
