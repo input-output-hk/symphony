@@ -18,6 +18,9 @@ export default class Day {
 
     this.days = days
 
+    // keep track of each of the block within a day
+    this.dayGroups = []
+
     this.textureLoader = new THREE.TextureLoader()
 
     // canvas dimensions
@@ -91,13 +94,14 @@ export default class Day {
 
     this.raycaster.setFromCamera(this.mousePos, this.camera)
 
-    /*var intersects = this.raycaster.intersectObjects(this.group.children)
-
-    if (intersects.length > 0) {
-      intersects[0].object.material.color.setHex(0xffffff)
-      let hash = intersects[0].object.blockchainData.hash
-      document.location.href = '/block/' + hash
-    }*/
+    this.dayGroups.forEach((group) => {
+      var intersects = this.raycaster.intersectObjects(group.children)
+      if (intersects.length > 0) {
+        intersects[0].object.material.color.setHex(0xffffff)
+        let hash = intersects[0].object.blockchainData.hash
+        document.location.href = '/block/' + hash
+      }
+    })
   }
 
   onDocumentMouseMove(event) {
@@ -129,6 +133,9 @@ export default class Day {
       let blocks = this.days[daysIndex]
       
       let group = new THREE.Group()
+
+      this.dayGroups.push(group)
+
       let spiralPoints = []
       
       this.scene.add(group)
@@ -252,7 +259,7 @@ export default class Day {
             if (points.length > 3) {
 
               let CVgeometry = new ConvexGeometry(points)
-              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial)
+              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
 
               CVmesh.blockchainData = block
 
@@ -338,25 +345,29 @@ export default class Day {
   render() {
     /*this.group.rotation.y += 0.0001*/
 
-    /*var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
+    var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
-    var intersects = ray.intersectObjects(this.group.children)
-    if (intersects.length > 0) {
-      if (intersects[0].object !== this.intersected) {
+
+    this.dayGroups.forEach((group) => {
+      var intersects = ray.intersectObjects(group.children)
+      if (intersects.length > 0) {
+        if (intersects[0].object !== this.intersected) {
+          if (this.intersected) {
+            this.intersected.material.color.setHex(this.intersected.currentHex)
+          }
+          this.intersected = intersects[0].object
+          this.intersected.currentHex = this.intersected.material.color.getHex()
+          this.intersected.material.color.setHex(0xffffff)
+        }
+      } else {
         if (this.intersected) {
           this.intersected.material.color.setHex(this.intersected.currentHex)
         }
-        this.intersected = intersects[0].object
-        this.intersected.currentHex = this.intersected.material.color.getHex()
-        this.intersected.material.color.setHex(0xffffff)
+        this.intersected = null
       }
-    } else {
-      if (this.intersected) {
-        this.intersected.material.color.setHex(this.intersected.currentHex)
-      }
-      this.intersected = null
-    }*/
+
+    }, this)
 
     this.renderer.render(this.scene, this.camera)
     this.controls.update()
