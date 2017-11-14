@@ -41,6 +41,8 @@ export default class Day {
       alpha: true
     })
 
+    this.isAnimating = false
+
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
 
     this.renderer.autoClear = false
@@ -54,8 +56,10 @@ export default class Day {
     this.renderer.sortObjects = false
 
     // camera
+    this.initialCameraPos = new THREE.Vector3(0.0, 1000.0, 0.0)
+
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(0.0, 2000.0, 0.0)
+    this.camera.position.set(this.initialCameraPos.x, this.initialCameraPos.y, this.initialCameraPos.z)
     this.camera.updateMatrixWorld()
 
     this.camPos = this.camera.position.clone()
@@ -70,7 +74,8 @@ export default class Day {
     this.moveQuaternion = new THREE.Quaternion()
     this.camera.quaternion.set(this.moveQuaternion)
 
-    this.focussing = false
+    // are we focussed on a block?
+    this.focussed = false
 
     window.camera = this.camera
 
@@ -89,6 +94,8 @@ export default class Day {
     this.setupMaterials()
     this.addObjects()
 
+    this.moveCamera()
+
     // animation loop
     this.animate()
   }
@@ -100,6 +107,21 @@ export default class Day {
 
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
+    document.addEventListener('keydown', this.onkeydown.bind(this), false)
+  }
+
+  onkeydown (event) {
+    var isEscape = false
+    if ('key' in event) {
+      isEscape = (event.key === 'Escape' || event.key === 'Esc')
+    } else {
+      isEscape = (event.keyCode === 27)
+    }
+    if (isEscape) {
+      this.focussed = false
+      this.isAnimating = false
+      this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0))
+    }
   }
 
   onDocumentMouseDown (event) {
@@ -110,41 +132,76 @@ export default class Day {
 
     this.raycaster.setFromCamera(this.mousePos, this.camera)
 
+    this.focussed = true
+
     this.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
+
         let block = intersects[0].object
+
+        let lookAtPos = block.getWorldPosition().clone()
 
         let blockDir = block.getWorldPosition().clone().normalize()
         let newCamPos = block.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         newCamPos.y += 80.0
 
-        this.targetPos = newCamPos
-        this.origin = block.getWorldPosition()
-
-        // grab initial postion/rotation
-        let fromPosition = new THREE.Vector3().copy(this.camera.position)
-        let fromRotation = new THREE.Euler().copy(this.camera.rotation)
-
-        this.camera.position.set(newCamPos.x, newCamPos.y, newCamPos.z)
-        this.camera.lookAt(this.origin)
-        let toRotation = new THREE.Euler().copy(this.camera.rotation)
-
-        // reset original position and rotation
-        this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-        this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
-
-        this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
-        this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
-        this.moveQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
-        //this.camera.quaternion.set(this.moveQuaternion)
-
-        this.time = 0
+        this.animateCamera(newCamPos, lookAtPos)
 
         /*let hash = intersects[0].object.blockchainData.hash
         document.location.href = '/block/' + hash*/
       }
     })
+  }
+
+  animateCamera (target, lookAt) {
+    if (this.isAnimating) {
+      console.log('animating')
+      return
+    }
+    this.isAnimating = true
+
+    this.targetPos = target.clone()
+    this.origin = lookAt.clone()
+
+    // grab initial postion/rotation
+    let fromPosition = new THREE.Vector3().copy(this.camera.position)
+    let fromRotation = new THREE.Euler().copy(this.camera.rotation)
+
+    this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
+    this.camera.lookAt(this.origin)
+    let toRotation = new THREE.Euler().copy(this.camera.rotation)
+
+    // reset original position and rotation
+    this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
+    this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
+
+    this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
+    this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
+    this.moveQuaternion = new THREE.Quaternion()
+
+    var tweenVars = { time: 0 }
+
+    this.transitionDuration = 2000
+    this.easing = TWEEN.Easing.Quartic.InOut
+
+    new TWEEN.Tween(tweenVars)
+    .to({time: 1}, this.transitionDuration)
+    .onUpdate(function () {
+      this.moveCamera(tweenVars.time)
+    }.bind(this))
+    .easing(this.easing)
+    .onComplete(function () {
+      this.isAnimating = false
+      console.log('DONE')
+    }.bind(this))
+    .start()
+  }
+
+  moveCamera (time) {
+    this.camPos.lerp(this.targetPos, 0.05)
+    this.camera.position.copy(this.camPos)
+    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.camera.quaternion, time)
   }
 
   onDocumentMouseMove (event) {
@@ -385,24 +442,7 @@ export default class Day {
   }
 
   render () {
-    //TWEEN.update()
-
-    // Interpolate camPos toward targetPos
-    this.camPos.lerp(this.targetPos, 0.05)
-     
-    // Apply new camPos to your camera
-    this.camera.position.copy(this.camPos)
-
-    if (this.time < 1) {
-      this.time += 0.01
-    }
-
-    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, this.time)
-    this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
-
-    //this.lookAtPos.lerp(this.origin, 0.05)
-    //console.log(this.lookAtPos)
-    //this.camera.lookAt(this.lookAtPos)
+    
 
     var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
     vector.unproject(this.camera)
@@ -428,14 +468,16 @@ export default class Day {
       }
     }, this)
 
-    if (this.mouseStatic) {
+    /*if (this.mouseStatic && !this.focussed) {
       this.dayGroups.forEach((group) => {
         group.rotation.y -= 0.0002
       })
       this.lineGroups.forEach((group) => {
         group.rotation.y -= 0.0002
       })
-    }
+    }*/
+
+    TWEEN.update()
 
     this.renderer.render(this.scene, this.camera)
     //this.controls.update()
