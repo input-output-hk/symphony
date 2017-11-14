@@ -1,7 +1,4 @@
-
-import * as THREE from 'three'
-
-
+const THREE = require('three')
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -1299,4 +1296,4 @@ import * as THREE from 'three'
 	//THREE.ConvexGeometry = ConvexGeometry;
 	//THREE.ConvexBufferGeometry = ConvexBufferGeometry;
 
-export {ConvexGeometry, ConvexBufferGeometry}
+module.exports = {ConvexGeometry, ConvexBufferGeometry}
