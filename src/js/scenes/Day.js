@@ -4,10 +4,10 @@
 import * as THREE from 'three'
 import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
-import {
-  ConvexGeometry
-} from '../geometries/ConvexGeometry'
-
+// import {
+//   ConvexGeometry
+// } from '../geometries/ConvexGeometry'
+import loader from '../../utils/loader'
 let OrbitControls = OrbitContructor(THREE)
 let merkle = require('merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
@@ -82,15 +82,23 @@ export default class Day {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
-    this.addEvents()
+    /*
+      Temp loading mechanism
+    */
+    loader.get('convexHull')
+      .then(({ data }) => {
 
-    // objects
-    this.addLights()
-    this.setupMaterials()
-    this.addObjects()
+        this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
+        this.addEvents()
 
-    // animation loop
-    this.animate()
+        // objects
+        this.addLights()
+        this.setupMaterials()
+        this.addObjects()
+
+        // animation loop
+        this.animate()
+      })
   }
 
   addEvents () {
@@ -253,8 +261,7 @@ export default class Day {
 
             // Convex Hull
             if (this.points.length > 3) {
-              let CVgeometry = new ConvexGeometry(this.points)
-              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
+              let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
 
               CVmesh.blockchainData = block
 
@@ -389,7 +396,7 @@ export default class Day {
 
     // Interpolate camPos toward targetPos
     this.camPos.lerp(this.targetPos, 0.05)
-     
+
     // Apply new camPos to your camera
     this.camera.position.copy(this.camPos)
 

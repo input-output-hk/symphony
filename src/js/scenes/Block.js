@@ -8,9 +8,9 @@ import Config from '../Config'
 import {
   ExtrudeCrystalBufferGeometry
 } from '../geometries/ExtrudeCrystalGeometry'
-import {
-  ConvexGeometry
-} from '../geometries/ConvexGeometry'
+// import {
+//   ConvexGeometry
+// } from '../geometries/ConvexGeometry'
 
 import TSNE from '../helpers/tsne'
 import Tone from 'tone'
@@ -215,7 +215,7 @@ export default class Block {
 
     return new Promise((resolve, reject) => {
       resolve()
-      
+
       /* this.sampler = new Tone.Sampler({
          'C3': this.assetsDir + 'sounds/1.wav',
          'D#3': this.assetsDir + 'sounds/2.wav'

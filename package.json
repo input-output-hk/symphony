@@ -11,8 +11,10 @@
     "test": "standard 'src/**/*.js'"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.1.1",
     "axios": "^0.16.2",
     "firebase": "^4.5.2",
+    "merkle-tree-gen": "^1.1.0",
     "moment": "^2.19.1",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
