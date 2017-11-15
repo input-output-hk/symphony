@@ -4,9 +4,9 @@
 import * as THREE from 'three'
 import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
-// import {
-//   ConvexGeometry
-// } from '../geometries/ConvexGeometry'
+import {
+   ConvexGeometry
+} from '../../../functions/ConvexGeometry'
 import loader from '../../utils/loader'
 let OrbitControls = OrbitContructor(THREE)
 let merkle = require('merkle-tree-gen')
@@ -15,6 +15,11 @@ const TWEEN = require('@tweenjs/tween.js')
 export default class Day {
   constructor (days) {
     this.days = days
+
+    this.currentBlock = null
+    this.crystalOpacity = 0.7
+
+    this.view = 'day' // can be 'day' or 'block'
 
     this.mouseStatic = true
     this.mouseMoveTimeout = null
@@ -90,10 +95,10 @@ export default class Day {
     /*
       Temp loading mechanism
     */
-    loader.get('convexHull')
-      .then(({ data }) => {
+   // loader.get('convexHull')
+   //   .then(({ data }) => {
 
-        this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
+      //  this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
         this.addEvents()
 
         // objects
@@ -105,7 +110,7 @@ export default class Day {
 
         // animation loop
         this.animate()
-      })
+ //     })
   }
 
   addEvents () {
@@ -126,14 +131,39 @@ export default class Day {
       isEscape = (event.keyCode === 27)
     }
     if (isEscape) {
-      this.focussed = false
-      this.isAnimating = false
-      this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0))
+      this.resetDayView()
+    }
+  }
+
+  resetDayView () {
+    this.view = 'day'
+
+    this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0))
+
+    this.focussed = false
+    this.isAnimating = false
+    this.toggleBlocks(true)
+
+    if (this.currentBlock) {
+      new TWEEN.Tween( this.currentBlock.material )
+      .to( { opacity: this.crystalOpacity }, 1000 )
+      .start()
+    }
+  }
+
+  removeTrees () {
+    if (typeof this.treeGroup !== 'undefined') {
+      this.scene.remove(this.treeGroup)
     }
   }
 
   onDocumentMouseDown (event) {
     event.preventDefault()
+
+    console.log(this.view)
+    if (this.view === 'block') {
+      return
+    }
 
     this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
     this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
@@ -146,64 +176,158 @@ export default class Day {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
 
-        let block = intersects[0].object
+        let blockObject = intersects[0].object
 
-        let lookAtPos = block.getWorldPosition().clone()
+        this.currentBlock = blockObject
 
-        let blockDir = block.getWorldPosition().clone().normalize()
-        let newCamPos = block.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
+        let lookAtPos = blockObject.getWorldPosition().clone()
+
+        let blockDir = blockObject.getWorldPosition().clone().normalize()
+        let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         newCamPos.y += 80.0
 
-        this.animateCamera(newCamPos, lookAtPos)
+        this.animateCamera(newCamPos, lookAtPos).then(() => {
+          this.buildSingleTree(blockObject)
+        })
 
-        /*let hash = intersects[0].object.blockchainData.hash
-        document.location.href = '/block/' + hash*/
       }
     })
   }
 
-  animateCamera (target, lookAt) {
-    if (this.isAnimating) {
-      console.log('animating')
-      return
+  toggleBlocks (visibility) {
+    this.dayGroups.forEach((group) => {
+      group.visible = visibility
+    }, this)
+
+    this.lineGroups.forEach((group) => {
+      group.visible = visibility
+    }, this)
+  }
+
+  buildSingleTree (blockObject) {
+
+    this.view = 'block'
+
+    let block = blockObject.blockchainData
+
+    let sortedTree
+    
+    let position = blockObject.getWorldPosition().clone()
+    let rotation = blockObject.getWorldRotation().clone()
+
+    new TWEEN.Tween( blockObject.material )
+      .to( { opacity: 0 }, 1000 )
+      .onComplete(() => {
+
+        this.toggleBlocks(false)
+
+        let blockDir = position.clone().normalize()
+        let newCamPos = position.clone().add(blockDir.multiplyScalar(27))
+        newCamPos.y += 40.0
+
+        this.animateCamera(newCamPos, position.clone())
+
+      })
+      .start()
+
+    this.removeTrees()
+    this.treeGroup = new THREE.Group()
+    this.treeGroup.position.set(position.x, position.y, position.z)
+    this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+    this.scene.add(this.treeGroup)
+
+    // create an array of ints the same size as the number of transactions in this block
+    let tx = []
+    for (let index = 0; index < block.n_tx; index++) {
+      tx.push(index)
     }
-    this.isAnimating = true
 
-    this.targetPos = target.clone()
-    this.origin = lookAt.clone()
+    var args = {
+      array: tx,
+      hashalgo: 'md5'
+    }
 
-    // grab initial postion/rotation
-    let fromPosition = new THREE.Vector3().copy(this.camera.position)
-    let fromRotation = new THREE.Euler().copy(this.camera.rotation)
+    merkle.fromArray(args, function (err, tree) {
+      if (!err) {
+        console.log('Root hash: ' + tree.root)
+        //console.log('Number of leaves: ' + tree.leaves)
+        //console.log('Number of levels: ' + tree.levels)
 
-    this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
-    this.camera.lookAt(this.origin)
-    let toRotation = new THREE.Euler().copy(this.camera.rotation)
+        for (var key in tree) {
+          if (tree.hasOwnProperty(key)) {
+            var element = tree[key]
+            if (element.type === 'root' || element.type === 'node') {
+              tree[key].children = {}
+              tree[key].children[element.left] = tree[element.left]
+              tree[key].children[element.right] = tree[element.right]
+              if (element.type === 'root') {
+                sortedTree = element
+              }
+            }
+          }
+        }
 
-    // reset original position and rotation
-    this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-    this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
+        this.points = []
 
-    this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
-    this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
-    this.moveQuaternion = new THREE.Quaternion()
+        let startingPosition = new THREE.Vector3(0, 0, 0)
+        let direction = new THREE.Vector3(0, 1, 0)
 
-    var tweenVars = { time: 0 }
+        this.build(sortedTree, startingPosition, direction, this, true)
 
-    this.transitionDuration = 2000
-    this.easing = TWEEN.Easing.Quartic.InOut
-
-    new TWEEN.Tween(tweenVars)
-    .to({time: 1}, this.transitionDuration)
-    .onUpdate(function () {
-      this.moveCamera(tweenVars.time)
+      }
     }.bind(this))
-    .easing(this.easing)
-    .onComplete(function () {
-      this.isAnimating = false
-      console.log('DONE')
-    }.bind(this))
-    .start()
+  }
+
+  animateCamera (target, lookAt) {
+
+    return new Promise((resolve, reject) => {
+
+      if (this.isAnimating) {
+        console.log('animating')
+        return
+      }
+      this.isAnimating = true
+
+      this.targetPos = target.clone()
+      this.origin = lookAt.clone()
+
+      // grab initial postion/rotation
+      let fromPosition = new THREE.Vector3().copy(this.camera.position)
+      let fromRotation = new THREE.Euler().copy(this.camera.rotation)
+
+      this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
+      this.camera.lookAt(this.origin)
+      let toRotation = new THREE.Euler().copy(this.camera.rotation)
+
+      // reset original position and rotation
+      this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
+      this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
+
+      this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
+      this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
+      this.moveQuaternion = new THREE.Quaternion()
+
+      var tweenVars = { time: 0 }
+
+      this.transitionDuration = 2000
+      this.easing = TWEEN.Easing.Quartic.InOut
+
+      new TWEEN.Tween(tweenVars)
+      .to({time: 1}, this.transitionDuration)
+      .onUpdate(function () {
+        this.moveCamera(tweenVars.time)
+      }.bind(this))
+      .easing(this.easing)
+      .onComplete(function () {
+        this.isAnimating = false
+        
+        resolve()
+
+      }.bind(this))
+      .start()
+
+    })
+
   }
 
   moveCamera (time) {
@@ -308,9 +432,6 @@ export default class Day {
 
             this.points = []
 
-            let treeGroup = new THREE.Group()
-            this.scene.add(treeGroup)
-
             let startingPosition = new THREE.Vector3(0, 0, 0)
             let direction = new THREE.Vector3(0, 1, 0)
 
@@ -318,7 +439,9 @@ export default class Day {
 
             // Convex Hull
             if (this.points.length > 3) {
-              let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
+              let CVgeometry = new ConvexGeometry(this.points)
+              //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
+              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
 
               CVmesh.blockchainData = block
 
@@ -366,7 +489,7 @@ export default class Day {
     document.getElementById('loading').style.display = 'none'
   }
 
-  build (node, startingPosition, direction, context) {
+  build (node, startingPosition, direction, context, visualise) {
     let magnitude = node.level
 
     let startPosition = startingPosition.clone()
@@ -375,11 +498,14 @@ export default class Day {
     this.points.push(startPosition)
     this.points.push(endPosition)
 
-    //let path = new THREE.LineCurve3(startPosition, endPosition)
+    if (visualise) {
+      let path = new THREE.LineCurve3(startPosition, endPosition)
+      
+      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
+      var mesh = new THREE.Mesh(geometry, this.crystalMaterial.clone())
 
-    //var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
-    //var mesh = new THREE.Mesh(geometry, context.crystalMaterial)
-    //treeGroup.add(mesh)
+      this.treeGroup.add(mesh)
+    }
 
     let i = 0
     for (var key in node.children) {
@@ -407,7 +533,7 @@ export default class Day {
               newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(yaxis, yangle))
             }
 
-            this.build(childNode, endPosition, newDirection, context)
+            this.build(childNode, endPosition, newDirection, context, visualise)
           }
         }
       }
@@ -432,7 +558,7 @@ export default class Day {
       color: 0xafbfd9,
       metalness: 0.6,
       roughness: 0.0,
-      opacity: 0.7,
+      opacity: this.crystalOpacity,
       side: THREE.DoubleSide,
       transparent: true,
       envMap: this.bgMap
@@ -449,25 +575,7 @@ export default class Day {
   }
 
   render () {
-    //TWEEN.update()
-
-    // Interpolate camPos toward targetPos
-    this.camPos.lerp(this.targetPos, 0.05)
-
-    // Apply new camPos to your camera
-    this.camera.position.copy(this.camPos)
-
-    if (this.time < 1) {
-      this.time += 0.01
-    }
-
-    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, this.time)
-    this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
-
-    //this.lookAtPos.lerp(this.origin, 0.05)
-    //console.log(this.lookAtPos)
-    //this.camera.lookAt(this.lookAtPos)
-
+    
     var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
