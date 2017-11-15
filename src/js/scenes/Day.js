@@ -16,6 +16,131 @@ export default class Day {
   constructor (days) {
     this.days = days
 
+    this.notes = {
+      55.000: 'A1',
+      58.270: 'A#1',
+      61.735: 'B1',
+      65.406: 'C1',
+      69.296: 'C#1',
+      73.416: 'D1',
+      77.782: 'D#1',
+      82.407: 'E1',
+      87.307: 'F1',
+      92.499: 'F#1',
+      97.999: 'G1',
+      103.826: 'G#1',
+      110.000: 'A2',
+      116.541: 'A#2',
+      123.471: 'B2',
+      130.813: 'C2',
+      138.591: 'C#2',
+      146.832: 'D2',
+      155.563: 'D#2',
+      164.814: 'E2',
+      174.614: 'F2',
+      184.997: 'F#2',
+      195.998: 'G2',
+      207.652: 'G#2',
+      220.000: 'A3',
+      233.082: 'A#3',
+      246.942: 'B3',
+      261.626: 'C3',
+      277.183: 'C#3',
+      293.665: 'D3',
+      311.127: 'D#3',
+      329.628: 'E3',
+      349.228: 'F3',
+      369.994: 'F#3',
+      391.995: 'G3',
+      415.305: 'G#3',
+      440.000: 'A3',
+      466.164: 'A#3',
+      493.883: 'B3',
+      523.251: 'C4',
+      554.365: 'C#4',
+      587.330: 'D4',
+      622.254: 'D#4',
+      659.255: 'E4',
+      698.456: 'F4',
+      739.989: 'F#4',
+      783.991: 'G4',
+      830.609: 'G#4'
+    }
+
+    this.modes = {
+      'ionian': [
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'A',
+        'B',
+        'C'
+      ],
+      'dorian': [
+        'C',
+        'D',
+        'D#',
+        'F',
+        'G',
+        'A',
+        'A#',
+        'C'
+      ],
+      'phrygian': [
+        'C',
+        'C#',
+        'D#',
+        'F',
+        'G',
+        'G#',
+        'A#',
+        'C'
+      ],
+      'lydian': [
+        'C',
+        'D',
+        'E',
+        'F#',
+        'G',
+        'A',
+        'B',
+        'C'
+      ],
+      'mixolydian': [
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'A',
+        'A#',
+        'C'
+      ],
+      'aeolian': [
+        'C',
+        'D',
+        'D#',
+        'F',
+        'G',
+        'G#',
+        'A#',
+        'C'
+      ],
+      'locrian': [
+        'C',
+        'C#',
+        'D#',
+        'F',
+        'F#',
+        'G#',
+        'A#',
+        'C'
+      ]
+    }
+
+
     this.currentBlock = null
     this.crystalOpacity = 0.7
 
@@ -137,6 +262,8 @@ export default class Day {
 
   resetDayView () {
     this.view = 'day'
+
+    this.removeTrees()
 
     this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0))
 
@@ -306,6 +433,7 @@ export default class Day {
       this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
       this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
       this.moveQuaternion = new THREE.Quaternion()
+      this.camera.quaternion.set(this.moveQuaternion)
 
       var tweenVars = { time: 0 }
 
@@ -333,7 +461,8 @@ export default class Day {
   moveCamera (time) {
     this.camPos.lerp(this.targetPos, 0.05)
     this.camera.position.copy(this.camPos)
-    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.camera.quaternion, time)
+    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, time)
+    this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
   }
 
   onDocumentMouseMove (event) {
@@ -608,6 +737,10 @@ export default class Day {
         group.rotation.y -= 0.0002
       })
     }*/
+
+    if (this.view === 'block') {
+      this.treeGroup.rotation.y += 0.002
+    }
 
     TWEEN.update()
 
