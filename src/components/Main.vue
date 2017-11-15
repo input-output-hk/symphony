@@ -27,7 +27,7 @@ export default {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100vw;
+    width: 90%;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
