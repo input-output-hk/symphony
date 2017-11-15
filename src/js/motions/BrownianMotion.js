@@ -2,7 +2,7 @@ const THREE = require('three')
 
 // ported from https://github.com/keijiro/Klak/blob/master/Assets/Klak/Motion/BrownianMotion.cs
 
-function BrownianMotion() {
+function BrownianMotion () {
   this.position = new THREE.Vector3()
   this.rotation = new THREE.Quaternion()
 
@@ -35,13 +35,13 @@ let _v = new THREE.Vector3()
 
 const FBM_NORM = 1 / 0.75
 
-function rehash() {
+function rehash () {
   for (var i = 0; i < 6; i++) {
     this.times[i] = Math.random() * -10000
   }
 }
 
-function update(dt) {
+function update (dt) {
   dt = dt === undefined ? 1000 / 60 : dt
 
   if (this.enablePositionNoise) {
@@ -80,7 +80,7 @@ function update(dt) {
 
 var _noise = new Simple1DNoise()
 
-function Simple1DNoise() {
+function Simple1DNoise () {
   var MAX_VERTICES = 256
   var MAX_VERTICES_MASK = MAX_VERTICES - 1
   var amplitude = 1
@@ -92,7 +92,7 @@ function Simple1DNoise() {
     r.push(Math.random())
   }
 
-  var getVal = function(x) {
+  var getVal = (x) => {
     var scaledX = x * scale
     var xFloor = Math.floor(scaledX)
     var t = scaledX - xFloor
@@ -114,23 +114,23 @@ function Simple1DNoise() {
    * @param t The value between the two
    * @returns {number}
    */
-  var lerp = function(a, b, t) {
+  var lerp = (a, b, t) => {
     return a * (1 - t) + b * t
   }
 
   // return the API
   return {
     getVal: getVal,
-    setAmplitude: function(newAmplitude) {
+    setAmplitude: (newAmplitude) => {
       amplitude = newAmplitude
     },
-    setScale: function(newScale) {
+    setScale: (newScale) => {
       scale = newScale
     }
   }
 };
 
-function _fbm(x, octave) {
+function _fbm (x, octave) {
   var f = 0.0
   var w = 0.5
   for (var i = 0; i < octave; i++) {

@@ -198,16 +198,16 @@ ExtrudeCrystalBufferGeometry.prototype.addShape = function (shape, options) {
       //vert.y += yOffset * (amount * 0.1)
 
       //center vertex is always last, extrude separately
-    //  if (i == vlen - 1) {
+      if (i == vlen - 1) {
 
-      //  v(vert.x, vert.y, (amount + amount / 2) / steps * s)
+        v(vert.x, vert.y, (amount + amount / 2) / steps * s)
 
-      //} else {
+      } else {
 
-        //v(vert.x, vert.y, (amount + (Math.random() * amount * 0.2)) / steps * s)
-        v(vert.x, vert.y, (amount) / steps * s)
+        v(vert.x, vert.y, (amount + (Math.random() * amount * 0.2)) / steps * s)
+        //v(vert.x, vert.y, (amount) / steps * s)
 
-     // }
+      }
 
     }
 

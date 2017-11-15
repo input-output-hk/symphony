@@ -10,15 +10,16 @@ const Config = {
     orbitControls: false
   },
   scene: {
-    bgColor: 0x13091f,
+    bgColor: 0xFFFFFF,
     shadowsOn: false,
-    antialias: true
+    antialias: true,
+    showConvexHull: false
   },
   postProcessing: {
     effectDownscaleDivisor: 2
   },
   camera: {
-    fov: 50,
+    fov: 90,
     autoMove: true
   }
 }
