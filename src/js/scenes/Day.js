@@ -278,7 +278,7 @@ export default class Day {
     }.bind(this))
   }
 
-  animateCamera (target, lookAt) {
+  animateCamera (target, lookAt, duration) {
 
     return new Promise((resolve, reject) => {
 
@@ -309,7 +309,7 @@ export default class Day {
 
       var tweenVars = { time: 0 }
 
-      this.transitionDuration = 2000
+      this.transitionDuration = duration ? duration : 2000
       this.easing = TWEEN.Easing.Quartic.InOut
 
       new TWEEN.Tween(tweenVars)
