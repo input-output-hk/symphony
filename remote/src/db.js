@@ -44,3 +44,17 @@ export const addBlock = async block => {
   await dbBlockRef.set({ ...dbBlock(block), input, output }, { merge: true })
   await dbBlockRef.collection('metadata').add({ transaction })
 }
+
+export const getTransactionsForBlock = async hash => db.where('hash', '==', hash).get()
+  .then(({docs}) => docs[0].ref.collection('metadata').get())
+  .then(transactions => transactions.docs[0].data().transaction)
+
+
+const Block = block => ({ ...block, fee: block.output - block.input })
+
+/*
+  Returns a block from a given hash
+*/
+export const getBlock = hash => db.where('hash', '==', hash)
+  .get()
+  .then(({ docs }) => Block(docs[0].data()))

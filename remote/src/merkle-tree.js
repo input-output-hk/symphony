@@ -4,7 +4,6 @@ import * as THREE from 'three'
 
 const DEG2RAD = Math.PI / 180
 const angle = 90.0 * DEG2RAD
-
 const X = new THREE.Vector3(1, 0, 0)
 const Y = new THREE.Vector3(0, 1, 0)
 const Z = new THREE.Vector3(0, 0, 1)
@@ -59,10 +58,12 @@ const build = (node, startingPosition, direction, points = [], angle = 90) => {
   return points
 }
 
-export default array => {
+export default (array, cb = _ => _) => {
   let sortedTree
 
   merkle.fromArray({array, hashalgo}, function (err, tree) {
+    let points = []
+
     if (!err) {
       console.log('Root hash: ' + tree.root)
 
@@ -82,7 +83,8 @@ export default array => {
 
       let startingPosition = new THREE.Vector3(0, 0, 0)
       let direction = new THREE.Vector3(0, 1, 0)
-      let points = build(sortedTree, startingPosition, direction, [])
+      build(sortedTree, startingPosition, direction, points)
     }
+    cb(points)
   })
 }
