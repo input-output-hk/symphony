@@ -8,13 +8,19 @@ import {
    ConvexGeometry
 } from '../../../functions/ConvexGeometry'
 import loader from '../../utils/loader'
+import Tone from 'tone'
 let OrbitControls = OrbitContructor(THREE)
 let merkle = require('merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
+const _ = require('lodash')
+const BrownianMotion = require('../motions/BrownianMotion')
 
 export default class Day {
   constructor (days) {
     this.days = days
+
+    this.defaultCameraPosition = new THREE.Vector3()
+    this.defaultCameraRotation = new THREE.Quaternion()
 
     this.notes = {
       55.000: 'A1',
@@ -140,14 +146,24 @@ export default class Day {
       ]
     }
 
+    this.cameraMoveEvent = new Event('cameraMove')
+
+    this.assetsDir = '/static/assets/'
 
     this.currentBlock = null
     this.crystalOpacity = 0.7
-
+    
     this.view = 'day' // can be 'day' or 'block'
+    
+    this.brownianMotionCamera = new BrownianMotion()
 
     this.mouseStatic = true
     this.mouseMoveTimeout = null
+
+    this.mouseX = 0
+    this.mouseY = 0
+    this.targetMouseX = 0
+    this.targetMouseY = 0
 
     // keep track of each of the block within a day
     this.dayGroups = []
@@ -186,7 +202,10 @@ export default class Day {
     this.renderer.sortObjects = false
 
     // camera
-    this.initialCameraPos = new THREE.Vector3(0.0, 1000.0, 0.0)
+    this.initialCameraPos = new THREE.Vector3(0.0, 1200.0, 0.0)
+
+    this.defaultCameraPosition = new THREE.Vector3()
+    this.defaultCameraRotation = new THREE.Quaternion()
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.initialCameraPos.x, this.initialCameraPos.y, this.initialCameraPos.z)
@@ -196,13 +215,16 @@ export default class Day {
     this.targetPos = this.camPos.clone()
     this.origin = new THREE.Vector3(0, 0, 0)
     this.lookAtPos = new THREE.Vector3(0, 0, 0)
-
+    
     this.camera.lookAt(this.lookAtPos)
     let toRotation = new THREE.Euler().copy(this.camera.rotation)
     this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
     this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
     this.moveQuaternion = new THREE.Quaternion()
-    this.camera.quaternion.set(this.moveQuaternion)
+    //this.camera.quaternion.set(this.moveQuaternion)
+
+    this.defaultCameraPosition.copy(this.camera.position)
+    this.defaultCameraRotation.copy(this.camera.quaternion)
 
     // are we focussed on a block?
     this.focussed = false
@@ -217,25 +239,73 @@ export default class Day {
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
-    /*
-      Temp loading mechanism
-    */
-   // loader.get('convexHull')
-   //   .then(({ data }) => {
+    this.setupSound().then(() => {
 
-      //  this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
-        this.addEvents()
+      /*
+        Temp loading mechanism
+      */
+    // loader.get('convexHull')
+    //   .then(({ data }) => {
 
-        // objects
-        this.addLights()
-        this.setupMaterials()
-        this.addObjects()
+        //  this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
+          this.addEvents()
 
-        this.moveCamera()
+          // objects
+          this.addLights()
+          this.setupMaterials()
+          this.addObjects()
 
-        // animation loop
-        this.animate()
- //     })
+          this.moveCamera()
+
+          // animation loop
+          this.animate()
+  //     })
+    })
+
+  }
+
+  loadSound () {
+    Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+
+    document.addEventListener('cameraMove', function () { 
+      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+    }.bind(this), false)
+
+    /*this.controls.addEventListener('change', function () {
+      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+    }.bind(this))*/
+
+    let cameraForwardVector = new THREE.Vector3()
+    let quaternion = new THREE.Quaternion()
+    cameraForwardVector.set(0, 0, -1).applyQuaternion(quaternion)
+
+    Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
+
+    return new Promise((resolve, reject) => {
+      resolve()
+    })
+  }
+
+  setupSound () {
+    
+    return new Promise((resolve, reject) => {
+      this.bpm = 120
+
+      this.masterVol = new Tone.Volume(0).toMaster()
+
+      this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
+      this.convolver.set('wet', 1.0)
+
+      this.pingPong = new Tone.PingPongDelay('16n', 0.85)
+
+      Tone.Transport.bpm.value = this.bpm
+
+      this.loadSound().then(() => {
+        console.log('sound loaded!')
+        Tone.Transport.start()
+        resolve()
+      })
+    })
   }
 
   addEvents () {
@@ -243,6 +313,7 @@ export default class Day {
     this.intersected = null
     this.mousePos = new THREE.Vector2()
 
+    
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onkeydown.bind(this), false)
@@ -287,18 +358,15 @@ export default class Day {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
-    console.log(this.view)
     if (this.view === 'block') {
       return
     }
 
-    this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
-    this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
+    //this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
+    //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
 
     this.raycaster.setFromCamera(this.mousePos, this.camera)
-
-    this.focussed = true
-
+    
     this.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
@@ -399,7 +467,79 @@ export default class Day {
         let startingPosition = new THREE.Vector3(0, 0, 0)
         let direction = new THREE.Vector3(0, 1, 0)
 
+        this.currentBlock.endNodes = []
+
         this.build(sortedTree, startingPosition, direction, this, true)
+
+        let seen = []
+        let reducedArray = []
+        this.currentBlock.endNodes.forEach((nodePos, index) => {
+
+          let position = {
+            x: Math.ceil(nodePos.x / 10) * 10,
+            y: Math.ceil(nodePos.y / 10) * 10,
+            z: Math.ceil(nodePos.z / 10) * 10
+          }
+
+          let key = JSON.stringify(position)
+
+          if (seen.indexOf(key) === -1) {
+            seen.push(key)
+            nodePos.y = Math.abs(nodePos.y) * 20
+            reducedArray.push(nodePos)
+          }
+
+        })
+
+        let noteTotal = 40
+        let noteCount = 0
+
+        reducedArray.forEach((point) => {
+          noteCount++
+          if (noteCount < noteTotal) {
+
+            let pointVector = new THREE.Vector3(point.x, point.y, point.z)
+            let offsetPosition = pointVector.add(position.clone())
+
+            // add positional audio
+            let panner = new Tone.Panner3D().chain(this.masterVol)
+            panner.refDistance = 1000
+            //panner.rolloffFactor = 50
+            panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
+  
+            // get closest note
+            let minDiff = Number.MAX_SAFE_INTEGER
+            let note = 'C1'
+  
+            let mode = this.modes.locrian
+            for (var frequency in this.notes) {
+              if (this.notes.hasOwnProperty(frequency)) {
+                let noteName = this.notes[frequency].replace(/[0-9]/g, '')
+                if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
+                  let diff = Math.abs(offsetPosition.y - frequency)
+                  if (diff < minDiff) {
+                    minDiff = diff
+                    note = this.notes[frequency]
+                  }
+                }
+              }
+            }
+  
+            let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
+  
+            let sampler = new Tone.Sampler({
+              [note]: fileName
+            }, function () {
+              new Tone.Loop((time) => {
+                sampler.triggerAttack(note, '@16n', 1.0)
+              }, '1m').start(Math.random() * 100)
+            })
+  
+            sampler.fan(panner)
+  
+            //crystal.panner = panner
+          }
+        })
 
       }
     }.bind(this))
@@ -463,11 +603,20 @@ export default class Day {
     this.camera.position.copy(this.camPos)
     THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, time)
     this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
+
+    document.dispatchEvent(this.cameraMoveEvent)
+
   }
 
   onDocumentMouseMove (event) {
-    this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
-    this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
+    //this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
+    //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+    var rect = this.renderer.domElement.getBoundingClientRect()
+    let x = event.clientX - rect.left
+    let y = event.clientY - rect.top
+    this.targetMouseX = x / window.innerWidth * 2 - 1
+    this.targetMouseY = 1 - y / window.innerHeight * 2
 
     this.mouseStatic = false
 
@@ -545,6 +694,8 @@ export default class Day {
             //console.log('Number of leaves: ' + tree.leaves)
             //console.log('Number of levels: ' + tree.levels)
 
+            this.totalLevels = tree.levels
+
             for (var key in tree) {
               if (tree.hasOwnProperty(key)) {
                 var element = tree[key]
@@ -593,7 +744,7 @@ export default class Day {
       }
 
       let material = new THREE.LineBasicMaterial({
-        color: 0x000000,
+        color: 0xefefef,
         transparent: true,
         opacity: 0.5
       })
@@ -663,11 +814,24 @@ export default class Day {
             }
 
             this.build(childNode, endPosition, newDirection, context, visualise)
+          } else {
+            // no child nodes
+            if (this.currentBlock) {
+              this.currentBlock.endNodes.push(
+                {
+                  x: endPosition.x,
+                  y: endPosition.y,
+                  z: endPosition.z
+                }
+              )
+            }
           }
         }
       }
     }
   }
+
+
 
   setupMaterials () {
     this.cubeMapUrls = [
@@ -704,7 +868,9 @@ export default class Day {
   }
 
   render () {
-    
+
+    TWEEN.update()
+
     var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
@@ -712,6 +878,7 @@ export default class Day {
     this.dayGroups.forEach((group) => {
       var intersects = ray.intersectObjects(group.children)
       if (intersects.length > 0) {
+        this.focussed = true
         this.mouseStatic = false
         if (intersects[0].object !== this.intersected) {
           if (this.intersected) {
@@ -722,12 +889,24 @@ export default class Day {
           this.intersected.material.color.setHex(0xffffff)
         }
       } else {
+        this.focussed = false
         if (this.intersected) {
           this.intersected.material.color.setHex(this.intersected.currentHex)
         }
         this.intersected = null
       }
     }, this)
+
+    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.1
+    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.1
+
+    if (!this.focussed && this.view === 'day') {
+      this.camera.position.x += this.mousePos.x
+      this.camera.position.z -= this.mousePos.y
+      document.dispatchEvent(this.cameraMoveEvent)
+    }
+    
+    this.scene.updateMatrixWorld(true)
 
     /*if (this.mouseStatic && !this.focussed) {
       this.dayGroups.forEach((group) => {
@@ -742,7 +921,7 @@ export default class Day {
       this.treeGroup.rotation.y += 0.002
     }
 
-    TWEEN.update()
+    
 
     this.renderer.render(this.scene, this.camera)
     //this.controls.update()
