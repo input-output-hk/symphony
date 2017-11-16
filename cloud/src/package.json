@@ -5,8 +5,10 @@
     "axios": "^0.16.2",
     "babel-polyfill": "^6.26.0",
     "blockchain.info": "^2.10.1",
+    "cors": "^2.8.4",
     "firebase-admin": "~5.4.0",
-    "firebase-functions": "^0.7.0"
+    "firebase-functions": "^0.7.0",
+    "three": "^0.88.0"
   },
   "private": true
 }
