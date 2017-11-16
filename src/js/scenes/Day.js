@@ -202,7 +202,7 @@ export default class Day {
     this.renderer.sortObjects = false
 
     // camera
-    this.initialCameraPos = new THREE.Vector3(0.0, 1200.0, 0.0)
+    this.initialCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
 
     this.defaultCameraPosition = new THREE.Vector3()
     this.defaultCameraRotation = new THREE.Quaternion()
@@ -726,8 +726,12 @@ export default class Day {
               CVmesh.blockchainData = block
 
               let rotation = ((8 * Math.PI) / blocks.length) * blockIndex
+              CVmesh.rotation.z = rotation
+              CVmesh.translateY(700 + (blockIndex * 4))
+
+              CVmesh.rotation.z = 0
+              CVmesh.rotation.x = Math.PI / 2
               CVmesh.rotation.y = rotation
-              CVmesh.translateX(700 + (blockIndex * 4))
               //CVmesh.translateY(blockIndex * 5)
 
               // add random rotation
@@ -750,13 +754,13 @@ export default class Day {
       })
 
       let curve = new THREE.CatmullRomCurve3(spiralPoints)
-      let points = curve.getPoints(spiralPoints.length * 2)
+      let points = curve.getPoints(spiralPoints.length * 10)
       let geometry = new THREE.Geometry()
       geometry.vertices = points
       let line = new THREE.Line(geometry, material)
 
-      group.translateY(daysIndex * 500)
-      line.translateY(daysIndex * 500)
+      group.translateZ(daysIndex * 500)
+      line.translateZ(daysIndex * 500)
 
       let lineGroup = new THREE.Group()
       this.scene.add(lineGroup)
@@ -900,11 +904,20 @@ export default class Day {
     this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.1
     this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.1
 
-    if (!this.focussed && this.view === 'day') {
-      this.camera.position.x += this.mousePos.x
-      this.camera.position.z -= this.mousePos.y
+    //if (!this.focussed && this.view === 'day') {
+
+      let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
+      let quat = (new THREE.Quaternion).setFromEuler(euler)
+
+      this.camera.lookAt(this.origin)
+
+      this.camera.position.x += -this.mousePos.x
+      this.camera.position.y += -0.3 - this.mousePos.y
+      this.camera.position.z += this.mousePos.y
+      this.camera.quaternion.premultiply(quat)
+      
       document.dispatchEvent(this.cameraMoveEvent)
-    }
+   // }
     
     this.scene.updateMatrixWorld(true)
 
