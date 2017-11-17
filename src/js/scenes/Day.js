@@ -9,15 +9,21 @@ import {
 } from '../../../functions/ConvexGeometry'
 import loader from '../../utils/loader'
 import Tone from 'tone'
+import { getDay } from '../../data/btc'
+import format from '../../utils/dateformat'
+import moment from 'moment'
 let OrbitControls = OrbitContructor(THREE)
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
-const _ = require('lodash')
 const BrownianMotion = require('../motions/BrownianMotion')
 
 export default class Day {
-  constructor (days) {
-    this.days = days
+  constructor (blocks, currentDate) {
+    this.blocks = blocks
+    this.currentDate = currentDate
+
+    this.daysLoaded = 1
+    this.daysToLoad = 4 // how many days to load in the future?
 
     this.panners = []
 
@@ -180,7 +186,7 @@ export default class Day {
 
     // scene
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.0001)
+    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.00015)
 
     // renderer
     this.canvas = document.getElementById('stage')
@@ -413,7 +419,7 @@ export default class Day {
     
     this.currentBlock = block
 
-    this.angle = 25.0 + (block.output % 60)
+    this.angle = 25.0 + (block.output % 100)
 
     this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
     this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
@@ -496,7 +502,7 @@ export default class Day {
 
           if (seen.indexOf(key) === -1) {
             seen.push(key)
-            nodePos.y = Math.abs(nodePos.y) * 20
+            nodePos.y = Math.abs(nodePos.y) * 10
             reducedArray.push(nodePos)
           }
 
@@ -644,140 +650,142 @@ export default class Day {
     this.scene.add(light)
   }
 
+  loadPrevDay() {
+
+    this.nextDay = moment(this.currentDate).add(this.daysLoaded, 'days').format('YYYY-MM-DD'),
+
+    getDay(moment(this.nextDay).toDate(), this.daysLoaded)
+      .then(({ blocks, fee, date, input, output, index }) => {
+        this.addDay(blocks, index)
+      })
+  }
+
   addObjects () {
-    for (let daysIndex = 0; daysIndex < this.days.length; daysIndex++) {
-      let blocks = this.days[daysIndex]
-      let group = new THREE.Group()
+    this.addDay(this.blocks, this.daysLoaded)
+    document.getElementById('loading').style.display = 'none'
+  }
 
-      this.dayGroups.push(group)
+  addDay (blocks, index) {
+    console.log('add day' + index)
+    let group = new THREE.Group()
 
-      let spiralPoints = []
-      this.scene.add(group)
+    this.dayGroups.push(group)
 
-      for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-        let block = blocks[blockIndex]
+    let spiralPoints = []
+    this.scene.add(group)
 
-        // TODO: set this from network health value
-        this.angle = 25.0 + (block.output % 60)
+    for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+      let block = blocks[blockIndex]
 
-        //blocks[blockIndex].angle = angle
+      // TODO: set this from network health value
+      this.angle = 25.0 + (block.output % 100)
 
-        //this.currentBlock = blocks[blockIndex]
+      // create an array of ints the same size as the number of transactions in this block
+      let tx = []
+      for (let index = 0; index < block.n_tx; index++) {
+        tx.push(index.toString())
+      }
 
-        //this.currentBlock.endNodes = []
+      let sortedTree
 
-        // create an array of ints the same size as the number of transactions in this block
-        let tx = []
-        for (let index = 0; index < block.n_tx; index++) {
-          tx.push(index.toString())
-        }
+      this.X = new THREE.Vector3(1, 0, 0)
+      this.Y = new THREE.Vector3(0, 1, 0)
+      this.Z = new THREE.Vector3(0, 0, 1)
 
-        let sortedTree
+      this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
+      this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
+      this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
+      this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
+      this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
+      this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
+      this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
 
-        this.X = new THREE.Vector3(1, 0, 0)
-        this.Y = new THREE.Vector3(0, 1, 0)
-        this.Z = new THREE.Vector3(0, 0, 1)
+      var args = {
+        array: tx,
+        hashalgo: 'md5',
+        hashlist: true
+      }
 
-        this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
-        this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
-        this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
-        this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
-        this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
-        this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
-        this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
-
-        var args = {
-          array: tx,
-          hashalgo: 'md5',
-          hashlist: true
-        }
-
-        // console.time('merkle')
-        merkle.fromArray(args, function (err, tree) {
-          if (!err) {
-            // console.log('Root hash: ' + tree.root)
-            // console.timeEnd('merkle')
-
-            this.totalLevels = tree.levels
-
-            for (var key in tree) {
-              if (tree.hasOwnProperty(key)) {
-                var element = tree[key]
-                if (element.type === 'root' || element.type === 'node') {
-                  tree[key].children = {}
-                  tree[key].children[element.left] = tree[element.left]
-                  tree[key].children[element.right] = tree[element.right]
-                  if (element.type === 'root') {
-                    sortedTree = element
-                  }
+      merkle.fromArray(args, function (err, tree) {
+        if (!err) {
+          this.totalLevels = tree.levels
+          for (var key in tree) {
+            if (tree.hasOwnProperty(key)) {
+              var element = tree[key]
+              if (element.type === 'root' || element.type === 'node') {
+                tree[key].children = {}
+                tree[key].children[element.left] = tree[element.left]
+                tree[key].children[element.right] = tree[element.right]
+                if (element.type === 'root') {
+                  sortedTree = element
                 }
               }
             }
-
-            this.points = []
-
-            let startingPosition = new THREE.Vector3(0, 0, 0)
-            let direction = new THREE.Vector3(0, 1, 0)
-
-            this.build(sortedTree, startingPosition, direction, this)
-
-            // Convex Hull
-            if (this.points.length > 3) {
-              // console.time('convex')
-              let CVgeometry = new ConvexGeometry(this.points)
-              // console.timeEnd('convex')
-              //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
-              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
-
-              CVmesh.blockchainData = block
-
-              let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-              CVmesh.rotation.z = rotation
-              CVmesh.translateY(700 + (blockIndex * 4))
-
-              CVmesh.rotation.z = 0
-              CVmesh.rotation.x = Math.PI / 2
-              CVmesh.rotation.y = rotation
-              //CVmesh.translateY(blockIndex * 5)
-
-              // add random rotation
-              /*CVmesh.rotation.y = Math.random()
-              CVmesh.rotation.x = Math.random()
-              CVmesh.rotation.z = Math.random()*/
-
-              group.add(CVmesh)
-
-              spiralPoints.push(CVmesh.position)
-            }
           }
-        }.bind(this))
 
-      }
+          this.points = []
 
-      let material = new THREE.LineBasicMaterial({
-        color: 0xefefef,
-        transparent: true,
-        opacity: 0.5
-      })
+          let startingPosition = new THREE.Vector3(0, 0, 0)
+          let direction = new THREE.Vector3(0, 1, 0)
 
-      let curve = new THREE.CatmullRomCurve3(spiralPoints)
-      let points = curve.getPoints(spiralPoints.length * 10)
-      let geometry = new THREE.Geometry()
-      geometry.vertices = points
-      let line = new THREE.Line(geometry, material)
+          this.build(sortedTree, startingPosition, direction, this)
 
-      group.translateZ(daysIndex * 500)
-      line.translateZ(daysIndex * 500)
+          // Convex Hull
+          if (this.points.length > 3) {
+            // console.time('convex')
+            let CVgeometry = new ConvexGeometry(this.points)
+            // console.timeEnd('convex')
+            //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
+            let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
 
-      let lineGroup = new THREE.Group()
-      this.scene.add(lineGroup)
+            CVmesh.blockchainData = block
 
-      lineGroup.add(line)
+            let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+            CVmesh.rotation.z = rotation
+            CVmesh.translateY(700 + (blockIndex * 4))
 
-      this.lineGroups.push(lineGroup)
+            CVmesh.rotation.z = 0
+            CVmesh.rotation.x = Math.PI / 2
+            CVmesh.rotation.y = rotation
+            //CVmesh.translateY(blockIndex * 5)
+
+            // add random rotation
+            /*CVmesh.rotation.y = Math.random()
+            CVmesh.rotation.x = Math.random()
+            CVmesh.rotation.z = Math.random()*/
+
+            group.add(CVmesh)
+
+            spiralPoints.push(CVmesh.position)
+          }
+        }
+      }.bind(this))
+
     }
 
-    document.getElementById('loading').style.display = 'none'
+    let material = new THREE.LineBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.5
+    })
+
+    let curve = new THREE.CatmullRomCurve3(spiralPoints)
+    let points = curve.getPoints(spiralPoints.length * 100)
+    let geometry = new THREE.Geometry()
+    geometry.vertices = points
+    let line = new THREE.Line(geometry, material)
+
+    group.translateZ(-(index * 1000))
+    line.translateZ(-(index * 1000))
+
+    let lineGroup = new THREE.Group()
+    this.scene.add(lineGroup)
+
+    lineGroup.add(line)
+
+    this.lineGroups.push(lineGroup)
+ // }
+
   }
 
   build (node, startingPosition, direction, context, visualise) {
@@ -792,7 +800,7 @@ export default class Day {
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
 
-      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
+      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 25), 6, false)
       var mesh = new THREE.Mesh(geometry, this.merkleMaterial.clone())
 
       this.treeGroup.add(mesh)
@@ -870,7 +878,7 @@ export default class Day {
       color: 0xafbfd9,
       metalness: 0.6,
       roughness: 0.0,
-      opacity: this.crystalOpacity,
+      opacity: 1.0,
       side: THREE.DoubleSide,
       transparent: false,
       envMap: this.bgMap,
@@ -945,15 +953,20 @@ export default class Day {
     }*/
 
     if (this.view === 'block') {
-      this.currentBlockObject.rotation.x -= 0.002
+      this.currentBlockObject.rotation.z += 0.002
       //this.currentBlockObject.rotation.y += 0.002
       //this.currentBlockObject.rotation.z += 0.002
 
-      this.treeGroup.rotation.x -= 0.002
+      this.treeGroup.rotation.z += 0.002
       //this.treeGroup.rotation.y += 0.002
       //this.treeGroup.rotation.z += 0.002
     }
 
+    // load in prev day?
+    if (this.daysLoaded <= this.daysToLoad) {
+      this.daysLoaded++
+      this.loadPrevDay()
+    }
 
     this.renderer.render(this.scene, this.camera)
   }

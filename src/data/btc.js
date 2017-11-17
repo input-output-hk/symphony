@@ -61,13 +61,13 @@ export const getBlocksOnDay = async date => {
   return blocksArr
 }
 
-export const getDay = async date => {
+export const getDay = async (date, index) => {
   const blocks = await getBlocksOnDay(date)
   const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
   const input = blocks.reduce((a, { input }) => a + input, 0) || 0
   const output = blocks.reduce((a, { output }) => a + output, 0) || 0
   // const value = blocks.reduce((a, b => a + b.value, 0))
-  return { date, blocks, fee, input, output }
+  return { date, blocks, fee, input, output, index }
 }
 
 export const getLatestBlock = _ => blocks.orderBy('time', 'desc')
