@@ -19,6 +19,8 @@ export default class Day {
   constructor (days) {
     this.days = days
 
+    this.panners = []
+
     this.defaultCameraPosition = new THREE.Vector3()
     this.defaultCameraRotation = new THREE.Quaternion()
 
@@ -215,6 +217,7 @@ export default class Day {
     this.targetPos = this.camPos.clone()
     this.origin = new THREE.Vector3(0, 0, 0)
     this.lookAtPos = new THREE.Vector3(0, 0, 0)
+    this.targetLookAt = new THREE.Vector3(0, 0, 0)
     
     this.camera.lookAt(this.lookAtPos)
     let toRotation = new THREE.Euler().copy(this.camera.rotation)
@@ -350,6 +353,12 @@ export default class Day {
   }
 
   removeTrees () {
+    this.panners.forEach((panner) => {
+      panner.dispose()
+    })
+
+    this.panners = []
+
     if (typeof this.treeGroup !== 'undefined') {
       this.scene.remove(this.treeGroup)
     }
@@ -365,7 +374,7 @@ export default class Day {
     //this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
     //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
 
-    this.raycaster.setFromCamera(this.mousePos, this.camera)
+    this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
     
     this.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
@@ -378,8 +387,9 @@ export default class Day {
         let lookAtPos = blockObject.getWorldPosition().clone()
 
         let blockDir = blockObject.getWorldPosition().clone().normalize()
-        let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
-        newCamPos.y += 80.0
+        //let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
+        let newCamPos = blockObject.getWorldPosition().clone()
+        newCamPos.z += 80.0
 
         this.animateCamera(newCamPos, lookAtPos).then(() => {
           this.buildSingleTree(blockObject)
@@ -416,11 +426,11 @@ export default class Day {
 
         this.toggleBlocks(false)
 
-        let blockDir = position.clone().normalize()
+        /*let blockDir = position.clone().normalize()
         let newCamPos = position.clone().add(blockDir.multiplyScalar(27))
         newCamPos.y += 40.0
 
-        this.animateCamera(newCamPos, position.clone())
+        this.animateCamera(newCamPos, position.clone())*/
 
       })
       .start()
@@ -506,6 +516,8 @@ export default class Day {
             panner.refDistance = 1000
             //panner.rolloffFactor = 50
             panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
+
+            this.panners.push(panner)
   
             // get closest note
             let minDiff = Number.MAX_SAFE_INTEGER
@@ -516,7 +528,7 @@ export default class Day {
               if (this.notes.hasOwnProperty(frequency)) {
                 let noteName = this.notes[frequency].replace(/[0-9]/g, '')
                 if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-                  let diff = Math.abs(offsetPosition.y - frequency)
+                  let diff = Math.abs(point.y - frequency)
                   if (diff < minDiff) {
                     minDiff = diff
                     note = this.notes[frequency]
@@ -556,24 +568,29 @@ export default class Day {
       this.isAnimating = true
 
       this.targetPos = target.clone()
-      this.origin = lookAt.clone()
+      this.targetLookAt = lookAt.clone()
 
       // grab initial postion/rotation
       let fromPosition = new THREE.Vector3().copy(this.camera.position)
-      let fromRotation = new THREE.Euler().copy(this.camera.rotation)
+      //let fromRotation = new THREE.Euler().copy(this.camera.rotation)
 
       this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
-      this.camera.lookAt(this.origin)
-      let toRotation = new THREE.Euler().copy(this.camera.rotation)
+      //this.camera.lookAt(this.origin)
+      
+      //let objectRotation = THREE.Euler().copy(target.rotation)
+      //let toRotation = target.rotation.clone()
+
+      //this.camera.rotation.set(objectRotation.x, objectRotation.y, objectRotation.z)
+      //let toRotation = new THREE.Euler().copy(this.camera.rotation)
 
       // reset original position and rotation
       this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-      this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
+      //this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
 
-      this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
-      this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
-      this.moveQuaternion = new THREE.Quaternion()
-      this.camera.quaternion.set(this.moveQuaternion)
+      //this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
+      //this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
+      //this.moveQuaternion = new THREE.Quaternion()
+      //this.camera.quaternion.set(this.moveQuaternion)
 
       var tweenVars = { time: 0 }
 
@@ -601,10 +618,13 @@ export default class Day {
   moveCamera (time) {
     this.camPos.lerp(this.targetPos, 0.05)
     this.camera.position.copy(this.camPos)
-    THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, time)
-    this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
 
-    document.dispatchEvent(this.cameraMoveEvent)
+    this.lookAtPos.lerp(this.targetLookAt, 0.05)
+
+    //THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, time)
+    //this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
+
+    //document.dispatchEvent(this.cameraMoveEvent)
 
   }
 
@@ -786,7 +806,7 @@ export default class Day {
       let path = new THREE.LineCurve3(startPosition, endPosition)
       
       var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
-      var mesh = new THREE.Mesh(geometry, this.crystalMaterial.clone())
+      var mesh = new THREE.Mesh(geometry, this.merkleMaterial.clone())
 
       this.treeGroup.add(mesh)
     }
@@ -861,6 +881,17 @@ export default class Day {
       envMap: this.bgMap
       // wireframe: true,
     })
+
+    this.merkleMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xafbfd9,
+      metalness: 0.6,
+      roughness: 0.0,
+      opacity: this.crystalOpacity,
+      side: THREE.DoubleSide,
+      transparent: false,
+      envMap: this.bgMap,
+      //wireframe: true,
+    })
   }
 
   resize () {
@@ -875,7 +906,7 @@ export default class Day {
 
     TWEEN.update()
 
-    var vector = new THREE.Vector3(this.mousePos.x, this.mousePos.y, 1)
+    var vector = new THREE.Vector3(this.targetMouseX, this.targetMouseY, 0.5)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
 
@@ -901,15 +932,15 @@ export default class Day {
       }
     }, this)
 
-    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.1
-    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.1
+    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.01
+    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.01
 
-    //if (!this.focussed && this.view === 'day') {
+    if (this.view === 'day') {
 
       let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
       let quat = (new THREE.Quaternion).setFromEuler(euler)
 
-      this.camera.lookAt(this.origin)
+      this.camera.lookAt(this.lookAtPos)
 
       this.camera.position.x += -this.mousePos.x
       this.camera.position.y += -0.3 - this.mousePos.y
@@ -917,7 +948,7 @@ export default class Day {
       this.camera.quaternion.premultiply(quat)
       
       document.dispatchEvent(this.cameraMoveEvent)
-   // }
+    }
     
     this.scene.updateMatrixWorld(true)
 
@@ -931,7 +962,9 @@ export default class Day {
     }*/
 
     if (this.view === 'block') {
+      this.treeGroup.rotation.x -= 0.002
       this.treeGroup.rotation.y += 0.002
+      this.treeGroup.rotation.z += 0.002
     }
 
     
