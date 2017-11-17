@@ -939,8 +939,8 @@ export default class Day {
       }
     }, this)
 
-    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.01
-    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.01
+    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
+    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
 
     if (this.view === 'day') {
 

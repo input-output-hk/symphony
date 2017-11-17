@@ -61,7 +61,8 @@
         }
 
         // Return the fastMap
-        cb(fastMap);
+        // cb(fastMap);
+        return fastMap
     }
 
     // Export the the HashArray function
