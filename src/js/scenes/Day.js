@@ -10,7 +10,7 @@ import {
 import loader from '../../utils/loader'
 import Tone from 'tone'
 let OrbitControls = OrbitContructor(THREE)
-let merkle = require('merkle-tree-gen')
+let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const _ = require('lodash')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -154,9 +154,9 @@ export default class Day {
 
     this.currentBlock = null
     this.crystalOpacity = 0.7
-    
+
     this.view = 'day' // can be 'day' or 'block'
-    
+
     this.brownianMotionCamera = new BrownianMotion()
 
     this.mouseStatic = true
@@ -218,7 +218,7 @@ export default class Day {
     this.origin = new THREE.Vector3(0, 0, 0)
     this.lookAtPos = new THREE.Vector3(0, 0, 0)
     this.targetLookAt = new THREE.Vector3(0, 0, 0)
-    
+
     this.camera.lookAt(this.lookAtPos)
     let toRotation = new THREE.Euler().copy(this.camera.rotation)
     this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
@@ -270,7 +270,7 @@ export default class Day {
   loadSound () {
     Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
 
-    document.addEventListener('cameraMove', function () { 
+    document.addEventListener('cameraMove', function () {
       Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
     }.bind(this), false)
 
@@ -290,7 +290,7 @@ export default class Day {
   }
 
   setupSound () {
-    
+
     return new Promise((resolve, reject) => {
       this.bpm = 120
 
@@ -316,7 +316,7 @@ export default class Day {
     this.intersected = null
     this.mousePos = new THREE.Vector2()
 
-    
+
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onkeydown.bind(this), false)
@@ -375,7 +375,7 @@ export default class Day {
     //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
 
     this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
-    
+
     this.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
@@ -416,7 +416,7 @@ export default class Day {
     let block = blockObject.blockchainData
 
     let sortedTree
-    
+
     let position = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
 
@@ -444,17 +444,18 @@ export default class Day {
     // create an array of ints the same size as the number of transactions in this block
     let tx = []
     for (let index = 0; index < block.n_tx; index++) {
-      tx.push(index)
+      tx.push(index.toString())
     }
 
     var args = {
       array: tx,
-      hashalgo: 'md5'
+      hashalgo: 'md5',
+      hashlist: true
     }
-
+    // console.time('merkle')
     merkle.fromArray(args, function (err, tree) {
       if (!err) {
-        console.log('Root hash: ' + tree.root)
+        // console.log('Root hash: ' + tree.root)
         //console.log('Number of leaves: ' + tree.leaves)
         //console.log('Number of levels: ' + tree.levels)
 
@@ -518,11 +519,11 @@ export default class Day {
             panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
 
             this.panners.push(panner)
-  
+
             // get closest note
             let minDiff = Number.MAX_SAFE_INTEGER
             let note = 'C1'
-  
+
             let mode = this.modes.locrian
             for (var frequency in this.notes) {
               if (this.notes.hasOwnProperty(frequency)) {
@@ -536,9 +537,9 @@ export default class Day {
                 }
               }
             }
-  
+
             let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
-  
+
             let sampler = new Tone.Sampler({
               [note]: fileName
             }, function () {
@@ -546,15 +547,16 @@ export default class Day {
                 sampler.triggerAttack(note, '@16n', 1.0)
               }, '1m').start(Math.random() * 100)
             })
-  
+
             sampler.fan(panner)
-  
+
             //crystal.panner = panner
           }
         })
 
       }
     }.bind(this))
+    // console.timeEnd('merkle')
   }
 
   animateCamera (target, lookAt, duration) {
@@ -576,7 +578,7 @@ export default class Day {
 
       this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
       //this.camera.lookAt(this.origin)
-      
+
       //let objectRotation = THREE.Euler().copy(target.rotation)
       //let toRotation = target.rotation.clone()
 
@@ -605,7 +607,7 @@ export default class Day {
       .easing(this.easing)
       .onComplete(function () {
         this.isAnimating = false
-        
+
         resolve()
 
       }.bind(this))
@@ -683,7 +685,7 @@ export default class Day {
         // create an array of ints the same size as the number of transactions in this block
         let tx = []
         for (let index = 0; index < block.n_tx; index++) {
-          tx.push(index)
+          tx.push(index.toString())
         }
 
         let sortedTree
@@ -704,13 +706,15 @@ export default class Day {
 
         var args = {
           array: tx,
-          hashalgo: 'md5'
-          //hashlist: true
+          hashalgo: 'md5',
+          hashlist: true
         }
 
+        // console.time('merkle')
         merkle.fromArray(args, function (err, tree) {
           if (!err) {
-            console.log('Root hash: ' + tree.root)
+            // console.log('Root hash: ' + tree.root)
+            // console.timeEnd('merkle')
             //console.log('Number of leaves: ' + tree.leaves)
             //console.log('Number of levels: ' + tree.levels)
 
@@ -739,7 +743,9 @@ export default class Day {
 
             // Convex Hull
             if (this.points.length > 3) {
+              // console.time('convex')
               let CVgeometry = new ConvexGeometry(this.points)
+              // console.timeEnd('convex')
               //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
               let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
 
@@ -765,6 +771,7 @@ export default class Day {
             }
           }
         }.bind(this))
+
       }
 
       let material = new THREE.LineBasicMaterial({
@@ -804,7 +811,7 @@ export default class Day {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-      
+
       var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
       var mesh = new THREE.Mesh(geometry, this.merkleMaterial.clone())
 
@@ -946,10 +953,10 @@ export default class Day {
       this.camera.position.y += -0.3 - this.mousePos.y
       this.camera.position.z += this.mousePos.y
       this.camera.quaternion.premultiply(quat)
-      
+
       document.dispatchEvent(this.cameraMoveEvent)
     }
-    
+
     this.scene.updateMatrixWorld(true)
 
     /*if (this.mouseStatic && !this.focussed) {
@@ -967,7 +974,7 @@ export default class Day {
       this.treeGroup.rotation.z += 0.002
     }
 
-    
+
 
     this.renderer.render(this.scene, this.camera)
     //this.controls.update()

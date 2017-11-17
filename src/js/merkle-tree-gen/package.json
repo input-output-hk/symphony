@@ -1,0 +1,65 @@
+{
+  "_from": "merkle-tree-gen",
+  "_id": "merkle-tree-gen@1.1.0",
+  "_inBundle": false,
+  "_integrity": "sha1-f8OETHFxePdCbWfWYAaLC8sV+IA=",
+  "_location": "/merkle-tree-gen",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "merkle-tree-gen",
+    "name": "merkle-tree-gen",
+    "escapedName": "merkle-tree-gen",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/merkle-tree-gen/-/merkle-tree-gen-1.1.0.tgz",
+  "_shasum": "7fc3844c717178f7426d67d660068b0bcb15f880",
+  "_spec": "merkle-tree-gen",
+  "_where": "/Users/mark/Projects/IOHK-Orpheus",
+  "author": {
+    "name": "devedge",
+    "email": "devedge@outlook.com"
+  },
+  "bugs": {
+    "url": "https://github.com/devedge/merkle-tree-gen/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "chunking-streams": "0.0.8",
+    "collections": "^3.0.0",
+    "hasha": "^2.2.0"
+  },
+  "deprecated": false,
+  "description": "Merkle Tree implementation in NodeJS",
+  "directories": {
+    "lib": "./lib"
+  },
+  "homepage": "https://github.com/devedge/merkle-tree-gen#readme",
+  "keywords": [
+    "merkle",
+    "tree",
+    "fs",
+    "array",
+    "generator",
+    "hash",
+    "hashing"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "merkle-tree-gen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devedge/merkle-tree-gen.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.1.0"
+}

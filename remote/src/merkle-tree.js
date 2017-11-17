@@ -61,6 +61,7 @@ const build = (node, startingPosition, direction, points = [], angle = 90) => {
 export default (array, cb = _ => _) => {
   let sortedTree
 
+  console.time('merkle')
   merkle.fromArray({array, hashalgo}, function (err, tree) {
     let points = []
 
@@ -87,4 +88,6 @@ export default (array, cb = _ => _) => {
     }
     cb(points)
   })
+  console.timeEnd('merkle')
+
 }
