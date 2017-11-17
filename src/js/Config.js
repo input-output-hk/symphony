@@ -19,7 +19,7 @@ const Config = {
     effectDownscaleDivisor: 2
   },
   camera: {
-    fov: 90,
+    fov: 45,
     autoMove: true
   }
 }
