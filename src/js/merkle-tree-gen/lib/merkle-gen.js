@@ -122,7 +122,8 @@
         tree[tree.root].parent = "root";
 
         // return tree
-        cb(tree);
+        // cb(tree);
+        return tree
     }
 
     // Export the genMerkle() function
