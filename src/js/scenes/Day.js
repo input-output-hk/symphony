@@ -827,7 +827,7 @@ export default class Day {
             this.build(childNode, endPosition, newDirection, context, visualise)
           } else {
             // no child nodes
-            if (false) {
+            if (this.currentBlock) {
               this.currentBlock.endNodes.push(
                 {
                   x: endPosition.x,
@@ -946,12 +946,12 @@ export default class Day {
 
     if (this.view === 'block') {
       this.currentBlockObject.rotation.x -= 0.002
-      this.currentBlockObject.rotation.y += 0.002
-      this.currentBlockObject.rotation.z += 0.002
+      //this.currentBlockObject.rotation.y += 0.002
+      //this.currentBlockObject.rotation.z += 0.002
 
       this.treeGroup.rotation.x -= 0.002
-      this.treeGroup.rotation.y += 0.002
-      this.treeGroup.rotation.z += 0.002
+      //this.treeGroup.rotation.y += 0.002
+      //this.treeGroup.rotation.z += 0.002
     }
 
 
