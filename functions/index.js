@@ -1,28 +1,12 @@
-// The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
-const THREE = require('three')
-const functions = require('firebase-functions')
-const { ConvexBufferGeometry } = require('./ConvexGeometry')
-const cors = require('cors')({origin: true})
-// The Firebase Admin SDK to access the Firebase Realtime Database.
-const admin = require('firebase-admin')
-admin.initializeApp(functions.config().firebase)
+'use strict';
 
-let points = []
-let N = 100
-while (N-- > 0) {
-  points.push(new THREE.Vector3(
-    Math.random() * 20 - 10,
-    Math.random() * 20 - 10,
-    Math.random() * 20 - 10
-  ))
-}
+var _populate = require('./populate');
 
-// Grab the text parameter.
-exports.convexHull = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
-    const geom = new ConvexBufferGeometry(points)
-    res.setHeader('Content-Type', 'application/json')
-    // res.setHeader('Access-Control-Allow-Origin', "*")
-    res.status(200).send(JSON.stringify(geom.toJSON()))
-  })
-})
+var functions = require('firebase-functions');
+
+
+exports.checkForNewBlocks = functions.https.onRequest(function (req, res) {
+  (0, _populate.checkForNewBlocks)().then(function (blockresponse) {
+    return res.status(200).send(blockresponse);
+  });
+});
