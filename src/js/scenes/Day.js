@@ -652,7 +652,7 @@ export default class Day {
 
   loadPrevDay() {
 
-    this.nextDay = moment(this.currentDate).add(this.daysLoaded, 'days').format('YYYY-MM-DD'),
+    this.nextDay = moment(this.currentDate).subtract(this.daysLoaded, 'days').format('YYYY-MM-DD'),
 
     getDay(moment(this.nextDay).toDate(), this.daysLoaded)
       .then(({ blocks, fee, date, input, output, index }) => {
