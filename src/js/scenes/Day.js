@@ -153,7 +153,8 @@ export default class Day {
     this.assetsDir = '/static/assets/'
 
     this.currentBlock = null
-    this.crystalOpacity = 0.7
+    this.currentBlockObject = null
+    this.crystalOpacity = 0.5
 
     this.view = 'day' // can be 'day' or 'block'
 
@@ -339,16 +340,16 @@ export default class Day {
 
     this.removeTrees()
 
-    this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0))
+    this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
 
     this.focussed = false
     this.isAnimating = false
     this.toggleBlocks(true)
 
-    if (this.currentBlock) {
-      new TWEEN.Tween( this.currentBlock.material )
+    if (this.currentBlockObject) {
+     /* new TWEEN.Tween( this.currentBlockObject.material )
       .to( { opacity: this.crystalOpacity }, 1000 )
-      .start()
+      .start()*/
     }
   }
 
@@ -371,9 +372,6 @@ export default class Day {
       return
     }
 
-    //this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
-    //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
-
     this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
 
     this.dayGroups.forEach((group) => {
@@ -382,16 +380,16 @@ export default class Day {
 
         let blockObject = intersects[0].object
 
-        this.currentBlock = blockObject
+        this.currentBlockObject = blockObject
 
         let lookAtPos = blockObject.getWorldPosition().clone()
 
         let blockDir = blockObject.getWorldPosition().clone().normalize()
         //let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         let newCamPos = blockObject.getWorldPosition().clone()
-        newCamPos.z += 80.0
+        newCamPos.z += 150.0
 
-        this.animateCamera(newCamPos, lookAtPos).then(() => {
+        this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
           this.buildSingleTree(blockObject)
         })
 
@@ -400,41 +398,45 @@ export default class Day {
   }
 
   toggleBlocks (visibility) {
-    this.dayGroups.forEach((group) => {
+    /*this.dayGroups.forEach((group) => {
       group.visible = visibility
     }, this)
 
     this.lineGroups.forEach((group) => {
       group.visible = visibility
-    }, this)
+    }, this)*/
   }
 
   buildSingleTree (blockObject) {
 
-    this.view = 'block'
-
     let block = blockObject.blockchainData
+    
+    this.currentBlock = block
+
+    this.angle = 25.0 + (block.output % 60)
+
+    this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
+    this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
+    this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
+    this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
+    this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
+    this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
+    this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
 
     let sortedTree
 
     let position = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
+    
+    /*new TWEEN.Tween( blockObject.material )
+    .to( { opacity: 0 }, 4000 )
+    .onComplete(() => {
+    })
+    .start()*/
 
-    new TWEEN.Tween( blockObject.material )
-      .to( { opacity: 0 }, 1000 )
-      .onComplete(() => {
-
-        this.toggleBlocks(false)
-
-        /*let blockDir = position.clone().normalize()
-        let newCamPos = position.clone().add(blockDir.multiplyScalar(27))
-        newCamPos.y += 40.0
-
-        this.animateCamera(newCamPos, position.clone())*/
-
-      })
-      .start()
-
+    this.view = 'block'
+    this.toggleBlocks(false)
+      
     this.removeTrees()
     this.treeGroup = new THREE.Group()
     this.treeGroup.position.set(position.x, position.y, position.z)
@@ -456,8 +458,6 @@ export default class Day {
     merkle.fromArray(args, function (err, tree) {
       if (!err) {
         // console.log('Root hash: ' + tree.root)
-        //console.log('Number of leaves: ' + tree.leaves)
-        //console.log('Number of levels: ' + tree.levels)
 
         for (var key in tree) {
           if (tree.hasOwnProperty(key)) {
@@ -550,7 +550,6 @@ export default class Day {
 
             sampler.fan(panner)
 
-            //crystal.panner = panner
           }
         })
 
@@ -574,25 +573,11 @@ export default class Day {
 
       // grab initial postion/rotation
       let fromPosition = new THREE.Vector3().copy(this.camera.position)
-      //let fromRotation = new THREE.Euler().copy(this.camera.rotation)
 
       this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
-      //this.camera.lookAt(this.origin)
-
-      //let objectRotation = THREE.Euler().copy(target.rotation)
-      //let toRotation = target.rotation.clone()
-
-      //this.camera.rotation.set(objectRotation.x, objectRotation.y, objectRotation.z)
-      //let toRotation = new THREE.Euler().copy(this.camera.rotation)
 
       // reset original position and rotation
       this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-      //this.camera.rotation.set(fromRotation.x, fromRotation.y, fromRotation.z)
-
-      //this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
-      //this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
-      //this.moveQuaternion = new THREE.Quaternion()
-      //this.camera.quaternion.set(this.moveQuaternion)
 
       var tweenVars = { time: 0 }
 
@@ -620,20 +605,10 @@ export default class Day {
   moveCamera (time) {
     this.camPos.lerp(this.targetPos, 0.05)
     this.camera.position.copy(this.camPos)
-
     this.lookAtPos.lerp(this.targetLookAt, 0.05)
-
-    //THREE.Quaternion.slerp(this.fromQuaternion, this.toQuaternion, this.moveQuaternion, time)
-    //this.camera.quaternion.set(this.moveQuaternion.x, this.moveQuaternion.y, this.moveQuaternion.z, this.moveQuaternion.w)
-
-    //document.dispatchEvent(this.cameraMoveEvent)
-
   }
 
   onDocumentMouseMove (event) {
-    //this.mousePos.x = (event.clientX / window.innerWidth) * 2 - 1
-    //this.mousePos.y = -(event.clientY / window.innerHeight) * 2 + 1
-
     var rect = this.renderer.domElement.getBoundingClientRect()
     let x = event.clientX - rect.left
     let y = event.clientY - rect.top
@@ -682,6 +657,15 @@ export default class Day {
       for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
         let block = blocks[blockIndex]
 
+        // TODO: set this from network health value
+        this.angle = 25.0 + (block.output % 60)
+
+        //blocks[blockIndex].angle = angle
+
+        //this.currentBlock = blocks[blockIndex]
+
+        //this.currentBlock.endNodes = []
+
         // create an array of ints the same size as the number of transactions in this block
         let tx = []
         for (let index = 0; index < block.n_tx; index++) {
@@ -689,8 +673,6 @@ export default class Day {
         }
 
         let sortedTree
-
-        this.angle = 90.0
 
         this.X = new THREE.Vector3(1, 0, 0)
         this.Y = new THREE.Vector3(0, 1, 0)
@@ -715,8 +697,6 @@ export default class Day {
           if (!err) {
             // console.log('Root hash: ' + tree.root)
             // console.timeEnd('merkle')
-            //console.log('Number of leaves: ' + tree.leaves)
-            //console.log('Number of levels: ' + tree.levels)
 
             this.totalLevels = tree.levels
 
@@ -751,7 +731,7 @@ export default class Day {
 
               CVmesh.blockchainData = block
 
-              let rotation = ((8 * Math.PI) / blocks.length) * blockIndex
+              let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
               CVmesh.rotation.z = rotation
               CVmesh.translateY(700 + (blockIndex * 4))
 
@@ -862,8 +842,6 @@ export default class Day {
     }
   }
 
-
-
   setupMaterials () {
     this.cubeMapUrls = [
       'px.png',
@@ -886,7 +864,6 @@ export default class Day {
       side: THREE.DoubleSide,
       transparent: true,
       envMap: this.bgMap
-      // wireframe: true,
     })
 
     this.merkleMaterial = new THREE.MeshPhysicalMaterial({
@@ -897,7 +874,6 @@ export default class Day {
       side: THREE.DoubleSide,
       transparent: false,
       envMap: this.bgMap,
-      //wireframe: true,
     })
   }
 
@@ -969,15 +945,17 @@ export default class Day {
     }*/
 
     if (this.view === 'block') {
+      this.currentBlockObject.rotation.x -= 0.002
+      //this.currentBlockObject.rotation.y += 0.002
+      //this.currentBlockObject.rotation.z += 0.002
+
       this.treeGroup.rotation.x -= 0.002
-      this.treeGroup.rotation.y += 0.002
-      this.treeGroup.rotation.z += 0.002
+      //this.treeGroup.rotation.y += 0.002
+      //this.treeGroup.rotation.z += 0.002
     }
 
 
-
     this.renderer.render(this.scene, this.camera)
-    //this.controls.update()
   }
 
   animate () {
