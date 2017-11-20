@@ -410,7 +410,7 @@ export default class Day {
   buildSingleTree (blockObject) {
 
     let block = blockObject.blockchainData
-    
+
     this.currentBlock = block
 
     this.angle = 25.0 + (block.output % 60)
@@ -427,7 +427,7 @@ export default class Day {
 
     let position = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
-    
+
     /*new TWEEN.Tween( blockObject.material )
     .to( { opacity: 0 }, 4000 )
     .onComplete(() => {
@@ -436,7 +436,7 @@ export default class Day {
 
     this.view = 'block'
     this.toggleBlocks(false)
-      
+
     this.removeTrees()
     this.treeGroup = new THREE.Group()
     this.treeGroup.position.set(position.x, position.y, position.z)
@@ -777,7 +777,7 @@ export default class Day {
       this.lineGroups.push(lineGroup)
     }
 
-    document.getElementById('loading').style.display = 'none'
+    // document.getElementById('loading').style.display = 'none'
   }
 
   build (node, startingPosition, direction, context, visualise) {

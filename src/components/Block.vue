@@ -16,7 +16,7 @@
 <script>
 
 import BlockScene from '../js/scenes/Block'
-
+import webgl from './WebGL'
 import { getBlock, getTransactionsForBlock } from '../data/btc'
 
 export default {
@@ -26,23 +26,24 @@ export default {
     block: { hash: '', time: 0, prev_block: '', next_block: '', size: 0, height: 0, relayed_by: '', n_tx: 0, bits: 0, fee: 0, input: 0}
   }),
   created(){ this.asyncFetch() },
-  // beforeUpdate(){ this.asyncFetch() },
+  components:{webgl},
   methods: {
     asyncFetch: function(){
-      getBlock(this.blockhash)
-        .then((block) => {
-
-          this.block = block
-
-          getTransactionsForBlock(this.blockhash).then((tx) => {
-
-            this.block.tx = tx
-
-            new BlockScene(block)
-
-          })
-
-        })
+      console.log('block')
+      // getBlock(this.blockhash)
+      //   .then((block) => {
+      //
+      //     this.block = block
+      //
+      //     getTransactionsForBlock(this.blockhash).then((tx) => {
+      //
+      //       this.block.tx = tx
+      //
+      //       new BlockScene(block)
+      //
+      //     })
+      //
+      //   })
     }
   }
 }

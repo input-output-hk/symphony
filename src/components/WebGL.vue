@@ -1,16 +1,17 @@
 <template>
-  <div>
-    <div id="loading">Loading...</div>
-    <canvas id="stage" />
-  </div>
+  <canvas id="stage"/>
 </template>
 
 <script>
-import { getDay } from '../data/btc'
 import moment from 'moment'
 
 export default {
-  name: 'webgl'
+  name: 'webgl',
+  props: ['blocks', 'focusOnBlock'],
+  created(){ console.log('created webgl', this.blocks, this.focusOnBlock)},
+  beforeUpdate(){
+    console.log('update webgl', this.blocks, this.focusOnBlock)
+  }
 }
 </script>
 

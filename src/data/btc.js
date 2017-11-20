@@ -21,7 +21,6 @@ const formatTimeSeries = function ({ data }) {
   return { times, values }
 }
 
-
 const Block = block => ({ ...block, fee: block.output - block.input })
 
 /*
@@ -43,26 +42,14 @@ export const getBlock = hash => blocks.where('hash', '==', hash)
 /*
   Returns all the blocks that occured on the current date 00:01 - 00:00
 */
-export const getBlocksOnDay = async date => {
-  const fromDay = new Date(date)
-  fromDay.setMilliseconds(0)
-  fromDay.setSeconds(0)
-  fromDay.setMinutes(0)
-  fromDay.setHours(0)
+export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
+  .where('time', '>=', fromDate / 1000)
+  .where('time', '<=', toDate / 1000)
+  .get()
+  .then(({ docs }) => docs.map(doc => Block(doc.data())))
 
-  const toDay = new Date(fromDay.getTime())
-  toDay.setHours(toDay.getHours() + 24)
-
-  const blocksArr = await blocks.where('time', '>=', fromDay / 1000)
-    .where('time', '<', toDay / 1000)
-    .get()
-    .then(({ docs }) => docs.map(doc => Block(doc.data())))
-
-  return blocksArr
-}
-
-export const getDay = async date => {
-  const blocks = await getBlocksOnDay(date)
+export const getDay = async (date, toDate = new Date()) => {
+  const blocks = await getBlocksSince(date, toDate)
   const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
   const input = blocks.reduce((a, { input }) => a + input, 0) || 0
   const output = blocks.reduce((a, { output }) => a + output, 0) || 0
@@ -81,5 +68,5 @@ export const getTransactionsForBlock = async hash => blocks.where('hash', '==', 
 
 if(process.env.NODE_ENV === 'development'){
   window.blocks = blocks
-  window.btc = { getDay, getBlocksOnDay, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
+  window.btc = { getDay, getBlocksSince, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
 }
