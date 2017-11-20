@@ -2,54 +2,50 @@
 
 // libs
 import * as THREE from 'three'
-import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
 import { ConvexGeometry } from '../../../functions/ConvexGeometry'
-import loader from '../../utils/loader'
 import { getDay } from '../../data/btc'
-import format from '../../utils/dateformat'
 import moment from 'moment'
 import Audio from '../audio/audio'
-let OrbitControls = OrbitContructor(THREE)
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
 
 export default class Day {
   constructor (blocks, currentDate) {
-    this.blocks = blocks
-    this.currentDate = currentDate
-
-    this.daysLoaded = 1
-    this.daysToLoad = 3 // how many days to load in the future?
-
-    this.defaultCameraPosition = new THREE.Vector3()
-    this.defaultCameraRotation = new THREE.Quaternion()
-
-    this.cameraMoveEvent = new Event('cameraMove')
-
-    this.currentBlock = null
-    this.currentBlockObject = null
-    this.crystalOpacity = 0.5
-
-    this.view = 'day' // can be 'day' or 'block'
-
-    this.brownianMotionCamera = new BrownianMotion()
-
-    this.mouseStatic = true
-    this.mouseMoveTimeout = null
-
-    this.mouseX = 0
-    this.mouseY = 0
-    this.targetMouseX = 0
-    this.targetMouseY = 0
-
-    // keep track of each of the block within a day
-    this.dayGroups = []
-    this.lineGroups = []
-
     this.textureLoader = new THREE.TextureLoader()
 
+    this.initState(blocks, currentDate)
+    this.initRenderer()
+    this.initCamera()
+
+    this.audio = new Audio(this.camera)
+
+    this.audio.init().then(() => {
+      this.addEvents()
+      this.addLights()
+      this.setupMaterials()
+      this.addObjects()
+      this.moveCamera()
+      this.animate()
+    })
+  }
+
+  initState (blocks, currentDate) {
+    this.state = {}
+    this.state.focussed = false // are we focussed on a block?
+    this.state.blocks = blocks
+    this.state.currentDate = currentDate
+    this.state.dayGroups = []
+    this.state.lineGroups = []
+    this.state.daysLoaded = 1
+    this.state.daysToLoad = 3 // how many days to load in the future?
+    this.state.currentBlock = null
+    this.state.currentBlockObject = null
+    this.state.view = 'day' // can be 'day' or 'block'
+  }
+
+  initRenderer () {
     // canvas dimensions
     this.width = window.innerWidth
     this.height = window.innerHeight
@@ -66,12 +62,8 @@ export default class Day {
       alpha: true
     })
 
-    this.isAnimating = false
-
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
-
     this.renderer.autoClear = false
-
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.renderer.shadowMap.enabled = true
@@ -79,20 +71,17 @@ export default class Day {
     this.renderer.shadowMap.soft = true
     this.renderer.autoClear = false
     this.renderer.sortObjects = false
+  }
 
-    // camera
-    this.initialCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
-
-    this.defaultCameraPosition = new THREE.Vector3()
-    this.defaultCameraRotation = new THREE.Quaternion()
+  initCamera () {
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(this.initialCameraPos.x, this.initialCameraPos.y, this.initialCameraPos.z)
+    this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 
     this.camPos = this.camera.position.clone()
     this.targetPos = this.camPos.clone()
-    this.origin = new THREE.Vector3(0, 0, 0)
     this.lookAtPos = new THREE.Vector3(0, 0, 0)
     this.targetLookAt = new THREE.Vector3(0, 0, 0)
 
@@ -101,45 +90,31 @@ export default class Day {
     this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
     this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
     this.moveQuaternion = new THREE.Quaternion()
-    // this.camera.quaternion.set(this.moveQuaternion)
-
-    this.defaultCameraPosition.copy(this.camera.position)
-    this.defaultCameraRotation.copy(this.camera.quaternion)
-
-    this.audio = new Audio(this.camera)
-
-    // are we focussed on a block?
-    this.focussed = false
 
     window.camera = this.camera
 
-    // controls
-    // this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    // this.controls.minDistance = 0
-    // this.controls.maxDistance = 5000
+    this.brownianMotionCamera = new BrownianMotion()
 
-    window.addEventListener('resize', this.resize.bind(this), false)
-    this.resize()
-
-    this.audio.setupSound().then(() => {
-      this.addEvents()
-
-      // objects
-      this.addLights()
-      this.setupMaterials()
-      this.addObjects()
-
-      this.moveCamera()
-
-      // animation loop
-      this.animate()
-    })
+    this.cameraMoveEvent = new Event('cameraMove')
   }
 
   addEvents () {
     this.raycaster = new THREE.Raycaster()
-    this.intersected = null
+    this.intersected = []
     this.mousePos = new THREE.Vector2()
+
+    this.mouseStatic = true
+    this.mouseMoveTimeout = null
+
+    this.mouseX = 0
+    this.mouseY = 0
+    this.targetMouseX = 0
+    this.targetMouseY = 0
+
+    this.isAnimating = false
+
+    window.addEventListener('resize', this.resize.bind(this), false)
+    this.resize()
 
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
@@ -159,18 +134,18 @@ export default class Day {
   }
 
   resetDayView () {
-    this.view = 'day'
+    this.state.view = 'day'
 
     this.removeTrees()
 
-    this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
+    this.animateCamera(this.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
 
-    this.focussed = false
+    this.state.focussed = false
     this.isAnimating = false
     this.toggleBlocks(true)
 
-    if (this.currentBlockObject) {
-     /* new TWEEN.Tween( this.currentBlockObject.material )
+    if (this.state.currentBlockObject) {
+     /* new TWEEN.Tween( this.state.currentBlockObject.material )
       .to( { opacity: this.crystalOpacity }, 1000 )
       .start() */
     }
@@ -187,18 +162,18 @@ export default class Day {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
-    if (this.view === 'block') {
-      return
-    }
+    // if (this.state.view === 'block') {
+    // return
+    // }
 
     this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
 
-    this.dayGroups.forEach((group) => {
+    this.state.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
         let blockObject = intersects[0].object
 
-        this.currentBlockObject = blockObject
+        this.state.currentBlockObject = blockObject
 
         let lookAtPos = blockObject.getWorldPosition().clone()
 
@@ -215,11 +190,11 @@ export default class Day {
   }
 
   toggleBlocks (visibility) {
-    /* this.dayGroups.forEach((group) => {
+    /* this.state.dayGroups.forEach((group) => {
       group.visible = visibility
     }, this)
 
-    this.lineGroups.forEach((group) => {
+    this.state.lineGroups.forEach((group) => {
       group.visible = visibility
     }, this) */
   }
@@ -227,7 +202,7 @@ export default class Day {
   buildSingleTree (blockObject) {
     let block = blockObject.blockchainData
 
-    this.currentBlock = block
+    this.state.currentBlock = block
 
     this.angle = 25.0 + (block.output % 100)
 
@@ -250,7 +225,7 @@ export default class Day {
     })
     .start() */
 
-    this.view = 'block'
+    this.state.view = 'block'
     this.toggleBlocks(false)
 
     this.removeTrees()
@@ -292,13 +267,13 @@ export default class Day {
         let startingPosition = new THREE.Vector3(0, 0, 0)
         let direction = new THREE.Vector3(0, 1, 0)
 
-        this.currentBlock.endNodes = []
+        this.state.currentBlock.endNodes = []
 
         this.build(sortedTree, startingPosition, direction, this, true)
 
         let seen = []
         let reducedArray = []
-        this.currentBlock.endNodes.forEach((nodePos, index) => {
+        this.state.currentBlock.endNodes.forEach((nodePos, index) => {
           let position = {
             x: Math.ceil(nodePos.x / 10) * 10,
             y: Math.ceil(nodePos.y / 10) * 10,
@@ -401,16 +376,16 @@ export default class Day {
   }
 
   loadPrevDay () {
-    this.nextDay = moment(this.currentDate).subtract(this.daysLoaded, 'days').format('YYYY-MM-DD'),
+    this.nextDay = moment(this.state.currentDate).subtract(this.state.daysLoaded, 'days').format('YYYY-MM-DD')
 
-    getDay(moment(this.nextDay).toDate(), this.daysLoaded)
+    getDay(moment(this.nextDay).toDate(), this.state.daysLoaded)
       .then(({ blocks, fee, date, input, output, index }) => {
         this.addDay(blocks, index)
       })
   }
 
   addObjects () {
-    this.addDay(this.blocks, this.daysLoaded)
+    this.addDay(this.state.blocks, this.state.daysLoaded)
     document.getElementById('loading').style.display = 'none'
   }
 
@@ -418,7 +393,7 @@ export default class Day {
     console.log('add day' + index)
     let group = new THREE.Group()
 
-    this.dayGroups.push(group)
+    this.state.dayGroups.push(group)
 
     let spiralPoints = []
     this.scene.add(group)
@@ -531,7 +506,7 @@ export default class Day {
 
     lineGroup.add(line)
 
-    this.lineGroups.push(lineGroup)
+    this.state.lineGroups.push(lineGroup)
  // }
   }
 
@@ -582,8 +557,8 @@ export default class Day {
             this.build(childNode, endPosition, newDirection, context, visualise)
           } else {
             // no child nodes
-            if (this.currentBlock) {
-              this.currentBlock.endNodes.push(
+            if (this.state.currentBlock) {
+              this.state.currentBlock.endNodes.push(
                 {
                   x: endPosition.x,
                   y: endPosition.y,
@@ -598,6 +573,8 @@ export default class Day {
   }
 
   setupMaterials () {
+    this.crystalOpacity = 0.5
+
     this.cubeMapUrls = [
       'px.png',
       'nx.png',
@@ -640,79 +617,75 @@ export default class Day {
     this.renderer.setSize(this.width, this.height)
   }
 
-  render () {
-    TWEEN.update()
-
+  checkMouseIntersection () {
     var vector = new THREE.Vector3(this.targetMouseX, this.targetMouseY, 0.5)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
 
-    this.dayGroups.forEach((group) => {
-      var intersects = ray.intersectObjects(group.children)
+    this.state.dayGroups.forEach((group, dayIndex) => {
+      let intersects = ray.intersectObjects(group.children)
       if (intersects.length > 0) {
-        this.focussed = true
+        this.state.focussed = true
         this.mouseStatic = false
-        if (intersects[0].object !== this.intersected) {
-          if (this.intersected) {
-            this.intersected.material.color.setHex(this.intersected.currentHex)
+        if (intersects[0].object !== this.intersected[dayIndex]) {
+          if (this.intersected[dayIndex]) {
+            this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
           }
-          this.intersected = intersects[0].object
-          this.intersected.currentHex = this.intersected.material.color.getHex()
-          this.intersected.material.color.setHex(0xffffff)
+          this.intersected[dayIndex] = intersects[0].object
+          this.intersected[dayIndex].currentHex = this.intersected[dayIndex].material.color.getHex()
+          this.intersected[dayIndex].material.color.setHex(0xffffff)
         }
       } else {
-        this.focussed = false
-        if (this.intersected) {
-          this.intersected.material.color.setHex(this.intersected.currentHex)
+        this.state.focussed = false
+        if (this.intersected[dayIndex]) {
+          this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
         }
-        this.intersected = null
+        this.intersected[dayIndex] = null
       }
     }, this)
+  }
 
-    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
-    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
+  animateBlock () {
+    if (this.state.view === 'block') {
+      this.state.currentBlockObject.rotation.z += 0.002
+      this.treeGroup.rotation.z += 0.002
+    }
+  }
 
-    if (this.view === 'day') {
+  ambientCameraMovement () {
+    if (this.state.view === 'day') {
       let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
       let quat = (new THREE.Quaternion()).setFromEuler(euler)
-
       this.camera.lookAt(this.lookAtPos)
-
       this.camera.position.x += -this.mousePos.x
       this.camera.position.y += -0.3 - this.mousePos.y
       this.camera.position.z += this.mousePos.y
       this.camera.quaternion.premultiply(quat)
-
-      document.dispatchEvent(this.cameraMoveEvent)
     }
 
-    this.scene.updateMatrixWorld(true)
+    document.dispatchEvent(this.cameraMoveEvent)
+  }
 
-    /* if (this.mouseStatic && !this.focussed) {
-      this.dayGroups.forEach((group) => {
-        group.rotation.y -= 0.0002
-      })
-      this.lineGroups.forEach((group) => {
-        group.rotation.y -= 0.0002
-      })
-    } */
+  updateMouse () {
+    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
+    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
+  }
 
-    if (this.view === 'block') {
-      this.currentBlockObject.rotation.z += 0.002
-      // this.currentBlockObject.rotation.y += 0.002
-      // this.currentBlockObject.rotation.z += 0.002
-
-      this.treeGroup.rotation.z += 0.002
-      // this.treeGroup.rotation.y += 0.002
-      // this.treeGroup.rotation.z += 0.002
-    }
-
+  loadDays () {
     // load in prev day?
-    if (this.daysLoaded <= this.daysToLoad) {
-      this.daysLoaded++
+    if (this.state.daysLoaded <= this.state.daysToLoad) {
+      this.state.daysLoaded++
       this.loadPrevDay()
     }
+  }
 
+  render () {
+    TWEEN.update()
+    this.checkMouseIntersection()
+    this.updateMouse()
+    this.ambientCameraMovement()
+    this.animateBlock()
+    this.loadDays()
     this.renderer.render(this.scene, this.camera)
   }
 

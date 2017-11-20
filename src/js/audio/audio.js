@@ -8,6 +8,7 @@ import _ from 'lodash'
 export default class Audio {
   constructor (camera) {
     this.camera = camera
+    this.bpm = 100
     this.notes = {
       55.000: 'A1',
       58.270: 'A#1',
@@ -135,7 +136,7 @@ export default class Audio {
     this.panners = []
   }
 
-  loadSound () {
+  preload () {
     return new Promise((resolve, reject) => {
       let loadCount = 0
       let self = this
@@ -156,10 +157,8 @@ export default class Audio {
     })
   }
 
-  setupSound () {
+  init () {
     return new Promise((resolve, reject) => {
-      this.bpm = 120
-
       this.masterVol = new Tone.Volume(0).toMaster()
 
       this.convolver = new Tone.Convolver(Config.assetPath + 'sounds/IR/r1_ortf.wav')
@@ -181,7 +180,7 @@ export default class Audio {
 
       Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
 
-      this.loadSound().then(() => {
+      this.preload().then(() => {
         Tone.Transport.start()
         resolve()
       })
