@@ -15,7 +15,7 @@
 
 <script>
 
-import BlockScene from '../js/scenes/Block'
+//import BlockScene from '../js/scenes/Block'
 
 import { getBlock, getTransactionsForBlock } from '../data/btc'
 
@@ -38,7 +38,7 @@ export default {
 
             this.block.tx = tx
 
-            new BlockScene(block)
+            //new BlockScene(block)
 
           })
 

@@ -4,14 +4,12 @@
 import * as THREE from 'three'
 import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
-import {
-   ConvexGeometry
-} from '../../../functions/ConvexGeometry'
+import { ConvexGeometry } from '../../../functions/ConvexGeometry'
 import loader from '../../utils/loader'
-import Tone from 'tone'
 import { getDay } from '../../data/btc'
 import format from '../../utils/dateformat'
 import moment from 'moment'
+import Audio from '../audio/audio'
 let OrbitControls = OrbitContructor(THREE)
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
@@ -23,140 +21,12 @@ export default class Day {
     this.currentDate = currentDate
 
     this.daysLoaded = 1
-    this.daysToLoad = 4 // how many days to load in the future?
-
-    this.panners = []
+    this.daysToLoad = 3 // how many days to load in the future?
 
     this.defaultCameraPosition = new THREE.Vector3()
     this.defaultCameraRotation = new THREE.Quaternion()
 
-    this.notes = {
-      55.000: 'A1',
-      58.270: 'A#1',
-      61.735: 'B1',
-      65.406: 'C1',
-      69.296: 'C#1',
-      73.416: 'D1',
-      77.782: 'D#1',
-      82.407: 'E1',
-      87.307: 'F1',
-      92.499: 'F#1',
-      97.999: 'G1',
-      103.826: 'G#1',
-      110.000: 'A2',
-      116.541: 'A#2',
-      123.471: 'B2',
-      130.813: 'C2',
-      138.591: 'C#2',
-      146.832: 'D2',
-      155.563: 'D#2',
-      164.814: 'E2',
-      174.614: 'F2',
-      184.997: 'F#2',
-      195.998: 'G2',
-      207.652: 'G#2',
-      220.000: 'A3',
-      233.082: 'A#3',
-      246.942: 'B3',
-      261.626: 'C3',
-      277.183: 'C#3',
-      293.665: 'D3',
-      311.127: 'D#3',
-      329.628: 'E3',
-      349.228: 'F3',
-      369.994: 'F#3',
-      391.995: 'G3',
-      415.305: 'G#3',
-      440.000: 'A3',
-      466.164: 'A#3',
-      493.883: 'B3',
-      523.251: 'C4',
-      554.365: 'C#4',
-      587.330: 'D4',
-      622.254: 'D#4',
-      659.255: 'E4',
-      698.456: 'F4',
-      739.989: 'F#4',
-      783.991: 'G4',
-      830.609: 'G#4'
-    }
-
-    this.modes = {
-      'ionian': [
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'A',
-        'B',
-        'C'
-      ],
-      'dorian': [
-        'C',
-        'D',
-        'D#',
-        'F',
-        'G',
-        'A',
-        'A#',
-        'C'
-      ],
-      'phrygian': [
-        'C',
-        'C#',
-        'D#',
-        'F',
-        'G',
-        'G#',
-        'A#',
-        'C'
-      ],
-      'lydian': [
-        'C',
-        'D',
-        'E',
-        'F#',
-        'G',
-        'A',
-        'B',
-        'C'
-      ],
-      'mixolydian': [
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'A',
-        'A#',
-        'C'
-      ],
-      'aeolian': [
-        'C',
-        'D',
-        'D#',
-        'F',
-        'G',
-        'G#',
-        'A#',
-        'C'
-      ],
-      'locrian': [
-        'C',
-        'C#',
-        'D#',
-        'F',
-        'F#',
-        'G#',
-        'A#',
-        'C'
-      ]
-    }
-
     this.cameraMoveEvent = new Event('cameraMove')
-
-    this.assetsDir = '/static/assets/'
 
     this.currentBlock = null
     this.currentBlockObject = null
@@ -231,10 +101,12 @@ export default class Day {
     this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
     this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
     this.moveQuaternion = new THREE.Quaternion()
-    //this.camera.quaternion.set(this.moveQuaternion)
+    // this.camera.quaternion.set(this.moveQuaternion)
 
     this.defaultCameraPosition.copy(this.camera.position)
     this.defaultCameraRotation.copy(this.camera.quaternion)
+
+    this.audio = new Audio(this.camera)
 
     // are we focussed on a block?
     this.focussed = false
@@ -242,79 +114,25 @@ export default class Day {
     window.camera = this.camera
 
     // controls
-    //this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    //this.controls.minDistance = 0
-    //this.controls.maxDistance = 5000
+    // this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+    // this.controls.minDistance = 0
+    // this.controls.maxDistance = 5000
 
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
-    this.setupSound().then(() => {
+    this.audio.setupSound().then(() => {
+      this.addEvents()
 
-      /*
-        Temp loading mechanism
-      */
-    // loader.get('convexHull')
-    //   .then(({ data }) => {
+      // objects
+      this.addLights()
+      this.setupMaterials()
+      this.addObjects()
 
-        //  this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
-          this.addEvents()
+      this.moveCamera()
 
-          // objects
-          this.addLights()
-          this.setupMaterials()
-          this.addObjects()
-
-          this.moveCamera()
-
-          // animation loop
-          this.animate()
-  //     })
-    })
-
-  }
-
-  loadSound () {
-    Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-
-    document.addEventListener('cameraMove', function () {
-      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-    }.bind(this), false)
-
-    /*this.controls.addEventListener('change', function () {
-      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-    }.bind(this))*/
-
-    let cameraForwardVector = new THREE.Vector3()
-    let quaternion = new THREE.Quaternion()
-    cameraForwardVector.set(0, 0, -1).applyQuaternion(quaternion)
-
-    Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
-
-    return new Promise((resolve, reject) => {
-      resolve()
-    })
-  }
-
-  setupSound () {
-
-    return new Promise((resolve, reject) => {
-      this.bpm = 120
-
-      this.masterVol = new Tone.Volume(0).toMaster()
-
-      this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
-      this.convolver.set('wet', 1.0)
-
-      this.pingPong = new Tone.PingPongDelay('16n', 0.85)
-
-      Tone.Transport.bpm.value = this.bpm
-
-      this.loadSound().then(() => {
-        console.log('sound loaded!')
-        Tone.Transport.start()
-        resolve()
-      })
+      // animation loop
+      this.animate()
     })
   }
 
@@ -322,7 +140,6 @@ export default class Day {
     this.raycaster = new THREE.Raycaster()
     this.intersected = null
     this.mousePos = new THREE.Vector2()
-
 
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
@@ -355,16 +172,12 @@ export default class Day {
     if (this.currentBlockObject) {
      /* new TWEEN.Tween( this.currentBlockObject.material )
       .to( { opacity: this.crystalOpacity }, 1000 )
-      .start()*/
+      .start() */
     }
   }
 
   removeTrees () {
-    this.panners.forEach((panner) => {
-      panner.dispose()
-    })
-
-    this.panners = []
+    this.audio.unloadSound()
 
     if (typeof this.treeGroup !== 'undefined') {
       this.scene.remove(this.treeGroup)
@@ -383,7 +196,6 @@ export default class Day {
     this.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
-
         let blockObject = intersects[0].object
 
         this.currentBlockObject = blockObject
@@ -391,32 +203,30 @@ export default class Day {
         let lookAtPos = blockObject.getWorldPosition().clone()
 
         let blockDir = blockObject.getWorldPosition().clone().normalize()
-        //let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
+        // let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         let newCamPos = blockObject.getWorldPosition().clone()
         newCamPos.z += 150.0
 
         this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
           this.buildSingleTree(blockObject)
         })
-
       }
     })
   }
 
   toggleBlocks (visibility) {
-    /*this.dayGroups.forEach((group) => {
+    /* this.dayGroups.forEach((group) => {
       group.visible = visibility
     }, this)
 
     this.lineGroups.forEach((group) => {
       group.visible = visibility
-    }, this)*/
+    }, this) */
   }
 
   buildSingleTree (blockObject) {
-
     let block = blockObject.blockchainData
-    
+
     this.currentBlock = block
 
     this.angle = 25.0 + (block.output % 100)
@@ -431,21 +241,21 @@ export default class Day {
 
     let sortedTree
 
-    let position = blockObject.getWorldPosition().clone()
+    let blockObjectPosition = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
-    
-    /*new TWEEN.Tween( blockObject.material )
+
+    /* new TWEEN.Tween( blockObject.material )
     .to( { opacity: 0 }, 4000 )
     .onComplete(() => {
     })
-    .start()*/
+    .start() */
 
     this.view = 'block'
     this.toggleBlocks(false)
-      
+
     this.removeTrees()
     this.treeGroup = new THREE.Group()
-    this.treeGroup.position.set(position.x, position.y, position.z)
+    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.scene.add(this.treeGroup)
 
@@ -463,8 +273,6 @@ export default class Day {
     // console.time('merkle')
     merkle.fromArray(args, function (err, tree) {
       if (!err) {
-        // console.log('Root hash: ' + tree.root)
-
         for (var key in tree) {
           if (tree.hasOwnProperty(key)) {
             var element = tree[key]
@@ -491,7 +299,6 @@ export default class Day {
         let seen = []
         let reducedArray = []
         this.currentBlock.endNodes.forEach((nodePos, index) => {
-
           let position = {
             x: Math.ceil(nodePos.x / 10) * 10,
             y: Math.ceil(nodePos.y / 10) * 10,
@@ -505,69 +312,15 @@ export default class Day {
             nodePos.y = Math.abs(nodePos.y) * 10
             reducedArray.push(nodePos)
           }
-
         })
 
-        let noteTotal = 40
-        let noteCount = 0
-
-        reducedArray.forEach((point) => {
-          noteCount++
-          if (noteCount < noteTotal) {
-
-            let pointVector = new THREE.Vector3(point.x, point.y, point.z)
-            let offsetPosition = pointVector.add(position.clone())
-
-            // add positional audio
-            let panner = new Tone.Panner3D().chain(this.masterVol)
-            panner.refDistance = 1000
-            //panner.rolloffFactor = 50
-            panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
-
-            this.panners.push(panner)
-
-            // get closest note
-            let minDiff = Number.MAX_SAFE_INTEGER
-            let note = 'C1'
-
-            let mode = this.modes.locrian
-            for (var frequency in this.notes) {
-              if (this.notes.hasOwnProperty(frequency)) {
-                let noteName = this.notes[frequency].replace(/[0-9]/g, '')
-                if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-                  let diff = Math.abs(point.y - frequency)
-                  if (diff < minDiff) {
-                    minDiff = diff
-                    note = this.notes[frequency]
-                  }
-                }
-              }
-            }
-
-            let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
-
-            let sampler = new Tone.Sampler({
-              [note]: fileName
-            }, function () {
-              new Tone.Loop((time) => {
-                sampler.triggerAttack(note, '@16n', 1.0)
-              }, '1m').start(Math.random() * 100)
-            })
-
-            sampler.fan(panner)
-
-          }
-        })
-
+        this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
       }
     }.bind(this))
-    // console.timeEnd('merkle')
   }
 
   animateCamera (target, lookAt, duration) {
-
     return new Promise((resolve, reject) => {
-
       if (this.isAnimating) {
         console.log('animating')
         return
@@ -587,7 +340,7 @@ export default class Day {
 
       var tweenVars = { time: 0 }
 
-      this.transitionDuration = duration ? duration : 2000
+      this.transitionDuration = duration || 2000
       this.easing = TWEEN.Easing.Quartic.InOut
 
       new TWEEN.Tween(tweenVars)
@@ -600,12 +353,9 @@ export default class Day {
         this.isAnimating = false
 
         resolve()
-
       }.bind(this))
       .start()
-
     })
-
   }
 
   moveCamera (time) {
@@ -650,8 +400,7 @@ export default class Day {
     this.scene.add(light)
   }
 
-  loadPrevDay() {
-
+  loadPrevDay () {
     this.nextDay = moment(this.currentDate).subtract(this.daysLoaded, 'days').format('YYYY-MM-DD'),
 
     getDay(moment(this.nextDay).toDate(), this.daysLoaded)
@@ -735,7 +484,7 @@ export default class Day {
             // console.time('convex')
             let CVgeometry = new ConvexGeometry(this.points)
             // console.timeEnd('convex')
-            //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
+            // let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
             let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
 
             CVmesh.blockchainData = block
@@ -747,12 +496,12 @@ export default class Day {
             CVmesh.rotation.z = 0
             CVmesh.rotation.x = Math.PI / 2
             CVmesh.rotation.y = rotation
-            //CVmesh.translateY(blockIndex * 5)
+            // CVmesh.translateY(blockIndex * 5)
 
             // add random rotation
-            /*CVmesh.rotation.y = Math.random()
+            /* CVmesh.rotation.y = Math.random()
             CVmesh.rotation.x = Math.random()
-            CVmesh.rotation.z = Math.random()*/
+            CVmesh.rotation.z = Math.random() */
 
             group.add(CVmesh)
 
@@ -760,7 +509,6 @@ export default class Day {
           }
         }
       }.bind(this))
-
     }
 
     let material = new THREE.LineBasicMaterial({
@@ -785,7 +533,6 @@ export default class Day {
 
     this.lineGroups.push(lineGroup)
  // }
-
   }
 
   build (node, startingPosition, direction, context, visualise) {
@@ -881,7 +628,7 @@ export default class Day {
       opacity: 1.0,
       side: THREE.DoubleSide,
       transparent: false,
-      envMap: this.bgMap,
+      envMap: this.bgMap
     })
   }
 
@@ -894,7 +641,6 @@ export default class Day {
   }
 
   render () {
-
     TWEEN.update()
 
     var vector = new THREE.Vector3(this.targetMouseX, this.targetMouseY, 0.5)
@@ -927,9 +673,8 @@ export default class Day {
     this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
 
     if (this.view === 'day') {
-
       let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
-      let quat = (new THREE.Quaternion).setFromEuler(euler)
+      let quat = (new THREE.Quaternion()).setFromEuler(euler)
 
       this.camera.lookAt(this.lookAtPos)
 
@@ -943,23 +688,23 @@ export default class Day {
 
     this.scene.updateMatrixWorld(true)
 
-    /*if (this.mouseStatic && !this.focussed) {
+    /* if (this.mouseStatic && !this.focussed) {
       this.dayGroups.forEach((group) => {
         group.rotation.y -= 0.0002
       })
       this.lineGroups.forEach((group) => {
         group.rotation.y -= 0.0002
       })
-    }*/
+    } */
 
     if (this.view === 'block') {
       this.currentBlockObject.rotation.z += 0.002
-      //this.currentBlockObject.rotation.y += 0.002
-      //this.currentBlockObject.rotation.z += 0.002
+      // this.currentBlockObject.rotation.y += 0.002
+      // this.currentBlockObject.rotation.z += 0.002
 
       this.treeGroup.rotation.z += 0.002
-      //this.treeGroup.rotation.y += 0.002
-      //this.treeGroup.rotation.z += 0.002
+      // this.treeGroup.rotation.y += 0.002
+      // this.treeGroup.rotation.z += 0.002
     }
 
     // load in prev day?
