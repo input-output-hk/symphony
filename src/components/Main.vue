@@ -4,7 +4,7 @@
       <router-view class='big' :blocks='blocks'/>
       <graph/>
     </div>
-    <!-- <webgl :blocks='blocks' focusOn='123'/> -->
+    <webgl :blocks='blocks' focusOn='123'/>
   </div>
 </template>
 
@@ -13,10 +13,12 @@ import { getLatestBlock, getBlocksSince } from '../data/btc'
 import moment from 'moment'
 import webgl from './WebGL'
 import graph from './Graph'
+import cfg from '../js/Config'
 
 export default {
   name: 'home',
   components:{ webgl, graph },
+  props: ['date', 'block'],
   asyncComputed: {
 
     focusOnBlock: async ({ block }) => block && await getBlock(block),
@@ -24,22 +26,13 @@ export default {
     blocks: {
       async get({ date }){
         if(!date) return []
-        const a = moment(date).subtract(5, 'days').startOf('day').toDate()
+        const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
         const b = moment(date).endOf('day').toDate()
-        // console.log( 'b', b )
         return await getBlocksSince(a, b)
       },
       default: []
     }
-  },
-  beforeUpdate(){
-    console.log('Main: Update')
-  },
-  props: ['date', 'block'],
-  // beforeRouteUpdate(from, to, next){
-  //   console.log('Main: Route Update')
-  //   next()
-  // }
+  }
 }
 </script>
 <style scoped>

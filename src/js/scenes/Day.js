@@ -2,185 +2,56 @@
 
 // libs
 import * as THREE from 'three'
-import OrbitContructor from 'three-orbit-controls'
 import Config from '../Config'
-import {
-   ConvexGeometry
-} from '../../../functions/ConvexGeometry'
-import loader from '../../utils/loader'
-import Tone from 'tone'
-let OrbitControls = OrbitContructor(THREE)
+import { ConvexGeometry } from '../../../functions/ConvexGeometry'
+import { getDay } from '../../data/btc'
+import moment from 'moment'
+import Audio from '../audio/audio'
+import { BoxBufferGeometry } from 'three'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
-const _ = require('lodash')
 const BrownianMotion = require('../motions/BrownianMotion')
 
 export default class Day {
-  constructor (days) {
-    this.days = days
-
-    this.panners = []
-
-    this.defaultCameraPosition = new THREE.Vector3()
-    this.defaultCameraRotation = new THREE.Quaternion()
-
-    this.notes = {
-      55.000: 'A1',
-      58.270: 'A#1',
-      61.735: 'B1',
-      65.406: 'C1',
-      69.296: 'C#1',
-      73.416: 'D1',
-      77.782: 'D#1',
-      82.407: 'E1',
-      87.307: 'F1',
-      92.499: 'F#1',
-      97.999: 'G1',
-      103.826: 'G#1',
-      110.000: 'A2',
-      116.541: 'A#2',
-      123.471: 'B2',
-      130.813: 'C2',
-      138.591: 'C#2',
-      146.832: 'D2',
-      155.563: 'D#2',
-      164.814: 'E2',
-      174.614: 'F2',
-      184.997: 'F#2',
-      195.998: 'G2',
-      207.652: 'G#2',
-      220.000: 'A3',
-      233.082: 'A#3',
-      246.942: 'B3',
-      261.626: 'C3',
-      277.183: 'C#3',
-      293.665: 'D3',
-      311.127: 'D#3',
-      329.628: 'E3',
-      349.228: 'F3',
-      369.994: 'F#3',
-      391.995: 'G3',
-      415.305: 'G#3',
-      440.000: 'A3',
-      466.164: 'A#3',
-      493.883: 'B3',
-      523.251: 'C4',
-      554.365: 'C#4',
-      587.330: 'D4',
-      622.254: 'D#4',
-      659.255: 'E4',
-      698.456: 'F4',
-      739.989: 'F#4',
-      783.991: 'G4',
-      830.609: 'G#4'
-    }
-
-    this.modes = {
-      'ionian': [
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'A',
-        'B',
-        'C'
-      ],
-      'dorian': [
-        'C',
-        'D',
-        'D#',
-        'F',
-        'G',
-        'A',
-        'A#',
-        'C'
-      ],
-      'phrygian': [
-        'C',
-        'C#',
-        'D#',
-        'F',
-        'G',
-        'G#',
-        'A#',
-        'C'
-      ],
-      'lydian': [
-        'C',
-        'D',
-        'E',
-        'F#',
-        'G',
-        'A',
-        'B',
-        'C'
-      ],
-      'mixolydian': [
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'A',
-        'A#',
-        'C'
-      ],
-      'aeolian': [
-        'C',
-        'D',
-        'D#',
-        'F',
-        'G',
-        'G#',
-        'A#',
-        'C'
-      ],
-      'locrian': [
-        'C',
-        'C#',
-        'D#',
-        'F',
-        'F#',
-        'G#',
-        'A#',
-        'C'
-      ]
-    }
-
-    this.cameraMoveEvent = new Event('cameraMove')
-
-    this.assetsDir = '/static/assets/'
-
-    this.currentBlock = null
-    this.currentBlockObject = null
-    this.crystalOpacity = 0.5
-
-    this.view = 'day' // can be 'day' or 'block'
-
-    this.brownianMotionCamera = new BrownianMotion()
-
-    this.mouseStatic = true
-    this.mouseMoveTimeout = null
-
-    this.mouseX = 0
-    this.mouseY = 0
-    this.targetMouseX = 0
-    this.targetMouseY = 0
-
-    // keep track of each of the block within a day
-    this.dayGroups = []
-    this.lineGroups = []
-
+  constructor (blocks = [], currentDate = new Date()) {
     this.textureLoader = new THREE.TextureLoader()
 
+    this.initState(blocks, currentDate)
+    this.initRenderer()
+    this.initCamera()
+
+    this.audio = new Audio(this.camera)
+
+    this.audio.init().then(() => {
+      this.addEvents()
+      this.addLights()
+      this.setupMaterials()
+      this.addObjects()
+      this.moveCamera()
+      this.animate()
+    })
+  }
+
+  initState (blocks, currentDate) {
+    this.state = {}
+    this.state.focussed = false // are we focussed on a block?
+    this.state.blocks = blocks
+    this.state.currentDate = currentDate
+    this.state.dayGroups = []
+    this.state.lineGroups = []
+    this.state.currentBlock = null
+    this.state.currentBlockObject = null
+    this.state.view = 'day' // can be 'day' or 'block'
+  }
+
+  initRenderer () {
     // canvas dimensions
     this.width = window.innerWidth
     this.height = window.innerHeight
 
     // scene
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.0001)
+    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.00015)
 
     // renderer
     this.canvas = document.getElementById('stage')
@@ -190,12 +61,8 @@ export default class Day {
       alpha: true
     })
 
-    this.isAnimating = false
-
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
-
     this.renderer.autoClear = false
-
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.renderer.shadowMap.enabled = true
@@ -203,20 +70,17 @@ export default class Day {
     this.renderer.shadowMap.soft = true
     this.renderer.autoClear = false
     this.renderer.sortObjects = false
+  }
 
-    // camera
-    this.initialCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
-
-    this.defaultCameraPosition = new THREE.Vector3()
-    this.defaultCameraRotation = new THREE.Quaternion()
+  initCamera () {
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
-    this.camera.position.set(this.initialCameraPos.x, this.initialCameraPos.y, this.initialCameraPos.z)
+    this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 
     this.camPos = this.camera.position.clone()
     this.targetPos = this.camPos.clone()
-    this.origin = new THREE.Vector3(0, 0, 0)
     this.lookAtPos = new THREE.Vector3(0, 0, 0)
     this.targetLookAt = new THREE.Vector3(0, 0, 0)
 
@@ -225,98 +89,31 @@ export default class Day {
     this.fromQuaternion = new THREE.Quaternion().copy(this.camera.quaternion)
     this.toQuaternion = new THREE.Quaternion().setFromEuler(toRotation)
     this.moveQuaternion = new THREE.Quaternion()
-    //this.camera.quaternion.set(this.moveQuaternion)
-
-    this.defaultCameraPosition.copy(this.camera.position)
-    this.defaultCameraRotation.copy(this.camera.quaternion)
-
-    // are we focussed on a block?
-    this.focussed = false
 
     window.camera = this.camera
 
-    // controls
-    //this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    //this.controls.minDistance = 0
-    //this.controls.maxDistance = 5000
+    this.brownianMotionCamera = new BrownianMotion()
 
-    window.addEventListener('resize', this.resize.bind(this), false)
-    this.resize()
-
-    this.setupSound().then(() => {
-
-      /*
-        Temp loading mechanism
-      */
-    // loader.get('convexHull')
-    //   .then(({ data }) => {
-
-        //  this.templateGeometry = new THREE.BufferGeometryLoader().parse(data)
-          this.addEvents()
-
-          // objects
-          this.addLights()
-          this.setupMaterials()
-          this.addObjects()
-
-          this.moveCamera()
-
-          // animation loop
-          this.animate()
-  //     })
-    })
-
-  }
-
-  loadSound () {
-    Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-
-    document.addEventListener('cameraMove', function () {
-      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-    }.bind(this), false)
-
-    /*this.controls.addEventListener('change', function () {
-      Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-    }.bind(this))*/
-
-    let cameraForwardVector = new THREE.Vector3()
-    let quaternion = new THREE.Quaternion()
-    cameraForwardVector.set(0, 0, -1).applyQuaternion(quaternion)
-
-    Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
-
-    return new Promise((resolve, reject) => {
-      resolve()
-    })
-  }
-
-  setupSound () {
-
-    return new Promise((resolve, reject) => {
-      this.bpm = 120
-
-      this.masterVol = new Tone.Volume(0).toMaster()
-
-      this.convolver = new Tone.Convolver(this.assetsDir + 'sounds/IR/r1_ortf.wav')
-      this.convolver.set('wet', 1.0)
-
-      this.pingPong = new Tone.PingPongDelay('16n', 0.85)
-
-      Tone.Transport.bpm.value = this.bpm
-
-      this.loadSound().then(() => {
-        console.log('sound loaded!')
-        Tone.Transport.start()
-        resolve()
-      })
-    })
+    this.cameraMoveEvent = new Event('cameraMove')
   }
 
   addEvents () {
     this.raycaster = new THREE.Raycaster()
-    this.intersected = null
+    this.intersected = []
     this.mousePos = new THREE.Vector2()
 
+    this.mouseStatic = true
+    this.mouseMoveTimeout = null
+
+    this.mouseX = 0
+    this.mouseY = 0
+    this.targetMouseX = 0
+    this.targetMouseY = 0
+
+    this.isAnimating = false
+
+    window.addEventListener('resize', this.resize.bind(this), false)
+    this.resize()
 
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
@@ -336,29 +133,25 @@ export default class Day {
   }
 
   resetDayView () {
-    this.view = 'day'
+    this.state.view = 'day'
 
     this.removeTrees()
 
-    this.animateCamera(this.initialCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
+    this.animateCamera(this.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
 
-    this.focussed = false
+    this.state.focussed = false
     this.isAnimating = false
     this.toggleBlocks(true)
 
-    if (this.currentBlockObject) {
-     /* new TWEEN.Tween( this.currentBlockObject.material )
+    if (this.state.currentBlockObject) {
+     /* new TWEEN.Tween( this.state.currentBlockObject.material )
       .to( { opacity: this.crystalOpacity }, 1000 )
-      .start()*/
+      .start() */
     }
   }
 
   removeTrees () {
-    this.panners.forEach((panner) => {
-      panner.dispose()
-    })
-
-    this.panners = []
+    this.audio.unloadSound()
 
     if (typeof this.treeGroup !== 'undefined') {
       this.scene.remove(this.treeGroup)
@@ -368,52 +161,49 @@ export default class Day {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
-    if (this.view === 'block') {
-      return
-    }
+    // if (this.state.view === 'block') {
+    // return
+    // }
 
     this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
 
-    this.dayGroups.forEach((group) => {
+    this.state.dayGroups.forEach((group) => {
       var intersects = this.raycaster.intersectObjects(group.children)
       if (intersects.length > 0) {
-
         let blockObject = intersects[0].object
 
-        this.currentBlockObject = blockObject
+        this.state.currentBlockObject = blockObject
 
         let lookAtPos = blockObject.getWorldPosition().clone()
 
         let blockDir = blockObject.getWorldPosition().clone().normalize()
-        //let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
+        // let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         let newCamPos = blockObject.getWorldPosition().clone()
         newCamPos.z += 150.0
 
         this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
           this.buildSingleTree(blockObject)
         })
-
       }
     })
   }
 
   toggleBlocks (visibility) {
-    /*this.dayGroups.forEach((group) => {
+    /* this.state.dayGroups.forEach((group) => {
       group.visible = visibility
     }, this)
 
-    this.lineGroups.forEach((group) => {
+    this.state.lineGroups.forEach((group) => {
       group.visible = visibility
-    }, this)*/
+    }, this) */
   }
 
   buildSingleTree (blockObject) {
-
     let block = blockObject.blockchainData
 
-    this.currentBlock = block
+    this.state.currentBlock = block
 
-    this.angle = 25.0 + (block.output % 60)
+    this.angle = 25.0 + (block.output % 100)
 
     this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
     this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
@@ -425,21 +215,21 @@ export default class Day {
 
     let sortedTree
 
-    let position = blockObject.getWorldPosition().clone()
+    let blockObjectPosition = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
 
     /*new TWEEN.Tween( blockObject.material )
     .to( { opacity: 0 }, 4000 )
     .onComplete(() => {
     })
-    .start()*/
+    .start() */
 
-    this.view = 'block'
+    this.state.view = 'block'
     this.toggleBlocks(false)
 
     this.removeTrees()
     this.treeGroup = new THREE.Group()
-    this.treeGroup.position.set(position.x, position.y, position.z)
+    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.scene.add(this.treeGroup)
 
@@ -457,8 +247,6 @@ export default class Day {
     // console.time('merkle')
     merkle.fromArray(args, function (err, tree) {
       if (!err) {
-        // console.log('Root hash: ' + tree.root)
-
         for (var key in tree) {
           if (tree.hasOwnProperty(key)) {
             var element = tree[key]
@@ -478,14 +266,13 @@ export default class Day {
         let startingPosition = new THREE.Vector3(0, 0, 0)
         let direction = new THREE.Vector3(0, 1, 0)
 
-        this.currentBlock.endNodes = []
+        this.state.currentBlock.endNodes = []
 
         this.build(sortedTree, startingPosition, direction, this, true)
 
         let seen = []
         let reducedArray = []
-        this.currentBlock.endNodes.forEach((nodePos, index) => {
-
+        this.state.currentBlock.endNodes.forEach((nodePos, index) => {
           let position = {
             x: Math.ceil(nodePos.x / 10) * 10,
             y: Math.ceil(nodePos.y / 10) * 10,
@@ -496,72 +283,18 @@ export default class Day {
 
           if (seen.indexOf(key) === -1) {
             seen.push(key)
-            nodePos.y = Math.abs(nodePos.y) * 20
+            nodePos.y = Math.abs(nodePos.y) * 10
             reducedArray.push(nodePos)
           }
-
         })
 
-        let noteTotal = 40
-        let noteCount = 0
-
-        reducedArray.forEach((point) => {
-          noteCount++
-          if (noteCount < noteTotal) {
-
-            let pointVector = new THREE.Vector3(point.x, point.y, point.z)
-            let offsetPosition = pointVector.add(position.clone())
-
-            // add positional audio
-            let panner = new Tone.Panner3D().chain(this.masterVol)
-            panner.refDistance = 1000
-            //panner.rolloffFactor = 50
-            panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
-
-            this.panners.push(panner)
-
-            // get closest note
-            let minDiff = Number.MAX_SAFE_INTEGER
-            let note = 'C1'
-
-            let mode = this.modes.locrian
-            for (var frequency in this.notes) {
-              if (this.notes.hasOwnProperty(frequency)) {
-                let noteName = this.notes[frequency].replace(/[0-9]/g, '')
-                if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-                  let diff = Math.abs(point.y - frequency)
-                  if (diff < minDiff) {
-                    minDiff = diff
-                    note = this.notes[frequency]
-                  }
-                }
-              }
-            }
-
-            let fileName = this.assetsDir + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
-
-            let sampler = new Tone.Sampler({
-              [note]: fileName
-            }, function () {
-              new Tone.Loop((time) => {
-                sampler.triggerAttack(note, '@16n', 1.0)
-              }, '1m').start(Math.random() * 100)
-            })
-
-            sampler.fan(panner)
-
-          }
-        })
-
+        this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
       }
     }.bind(this))
-    // console.timeEnd('merkle')
   }
 
   animateCamera (target, lookAt, duration) {
-
     return new Promise((resolve, reject) => {
-
       if (this.isAnimating) {
         console.log('animating')
         return
@@ -581,7 +314,7 @@ export default class Day {
 
       var tweenVars = { time: 0 }
 
-      this.transitionDuration = duration ? duration : 2000
+      this.transitionDuration = duration || 2000
       this.easing = TWEEN.Easing.Quartic.InOut
 
       new TWEEN.Tween(tweenVars)
@@ -594,12 +327,9 @@ export default class Day {
         this.isAnimating = false
 
         resolve()
-
       }.bind(this))
       .start()
-
     })
-
   }
 
   moveCamera (time) {
@@ -645,139 +375,131 @@ export default class Day {
   }
 
   addObjects () {
-    for (let daysIndex = 0; daysIndex < this.days.length; daysIndex++) {
-      let blocks = this.days[daysIndex]
-      let group = new THREE.Group()
+    this.addDay(this.state.blocks)
+  }
 
-      this.dayGroups.push(group)
+  addDay (blocks, index = 0) {
+    console.log( blocks.length > 0 )
+    if (blocks.length == 0) return
+    console.log('add day' + index)
+    let group = new THREE.Group()
 
-      let spiralPoints = []
-      this.scene.add(group)
+    this.state.dayGroups.push(group)
 
-      for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-        let block = blocks[blockIndex]
+    let spiralPoints = []
+    this.scene.add(group)
 
-        // TODO: set this from network health value
-        this.angle = 25.0 + (block.output % 60)
+    for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+      let block = blocks[blockIndex]
 
-        //blocks[blockIndex].angle = angle
+      // TODO: set this from network health value
+      this.angle = 25.0 + (block.output % 100)
 
-        //this.currentBlock = blocks[blockIndex]
+      // create an array of ints the same size as the number of transactions in this block
+      let tx = []
+      for (let index = 0; index < block.n_tx; index++) {
+        tx.push(index.toString())
+      }
 
-        //this.currentBlock.endNodes = []
+      let sortedTree
 
-        // create an array of ints the same size as the number of transactions in this block
-        let tx = []
-        for (let index = 0; index < block.n_tx; index++) {
-          tx.push(index.toString())
-        }
+      this.X = new THREE.Vector3(1, 0, 0)
+      this.Y = new THREE.Vector3(0, 1, 0)
+      this.Z = new THREE.Vector3(0, 0, 1)
 
-        let sortedTree
+      this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
+      this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
+      this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
+      this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
+      this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
+      this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
+      this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
 
-        this.X = new THREE.Vector3(1, 0, 0)
-        this.Y = new THREE.Vector3(0, 1, 0)
-        this.Z = new THREE.Vector3(0, 0, 1)
+      var args = {
+        array: tx,
+        hashalgo: 'md5',
+        hashlist: true
+      }
 
-        this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
-        this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
-        this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
-        this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
-        this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
-        this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
-        this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
-
-        var args = {
-          array: tx,
-          hashalgo: 'md5',
-          hashlist: true
-        }
-
-        // console.time('merkle')
-        merkle.fromArray(args, function (err, tree) {
-          if (!err) {
-            // console.log('Root hash: ' + tree.root)
-            // console.timeEnd('merkle')
-
-            this.totalLevels = tree.levels
-
-            for (var key in tree) {
-              if (tree.hasOwnProperty(key)) {
-                var element = tree[key]
-                if (element.type === 'root' || element.type === 'node') {
-                  tree[key].children = {}
-                  tree[key].children[element.left] = tree[element.left]
-                  tree[key].children[element.right] = tree[element.right]
-                  if (element.type === 'root') {
-                    sortedTree = element
-                  }
+      merkle.fromArray(args, function (err, tree) {
+        if (!err) {
+          this.totalLevels = tree.levels
+          for (var key in tree) {
+            if (tree.hasOwnProperty(key)) {
+              var element = tree[key]
+              if (element.type === 'root' || element.type === 'node') {
+                tree[key].children = {}
+                tree[key].children[element.left] = tree[element.left]
+                tree[key].children[element.right] = tree[element.right]
+                if (element.type === 'root') {
+                  sortedTree = element
                 }
               }
             }
-
-            this.points = []
-
-            let startingPosition = new THREE.Vector3(0, 0, 0)
-            let direction = new THREE.Vector3(0, 1, 0)
-
-            this.build(sortedTree, startingPosition, direction, this)
-
-            // Convex Hull
-            if (this.points.length > 3) {
-              // console.time('convex')
-              let CVgeometry = new ConvexGeometry(this.points)
-              // console.timeEnd('convex')
-              //let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
-              let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
-
-              CVmesh.blockchainData = block
-
-              let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-              CVmesh.rotation.z = rotation
-              CVmesh.translateY(700 + (blockIndex * 4))
-
-              CVmesh.rotation.z = 0
-              CVmesh.rotation.x = Math.PI / 2
-              CVmesh.rotation.y = rotation
-              //CVmesh.translateY(blockIndex * 5)
-
-              // add random rotation
-              /*CVmesh.rotation.y = Math.random()
-              CVmesh.rotation.x = Math.random()
-              CVmesh.rotation.z = Math.random()*/
-
-              group.add(CVmesh)
-
-              spiralPoints.push(CVmesh.position)
-            }
           }
-        }.bind(this))
 
-      }
+          this.points = []
 
-      let material = new THREE.LineBasicMaterial({
-        color: 0xefefef,
-        transparent: true,
-        opacity: 0.5
-      })
+          let startingPosition = new THREE.Vector3(0, 0, 0)
+          let direction = new THREE.Vector3(0, 1, 0)
 
-      let curve = new THREE.CatmullRomCurve3(spiralPoints)
-      let points = curve.getPoints(spiralPoints.length * 10)
-      let geometry = new THREE.Geometry()
-      geometry.vertices = points
-      let line = new THREE.Line(geometry, material)
+          this.build(sortedTree, startingPosition, direction, this)
 
-      group.translateZ(daysIndex * 500)
-      line.translateZ(daysIndex * 500)
+          // Convex Hull
+          let blockGeometry
+          let blockMesh
 
-      let lineGroup = new THREE.Group()
-      this.scene.add(lineGroup)
+          if (this.points.length > 3) {
+            blockGeometry = new ConvexGeometry(this.points)
+          } else {
+            blockGeometry = new BoxBufferGeometry(50, 20, 30)
+          }
 
-      lineGroup.add(line)
+          blockMesh = new THREE.Mesh(blockGeometry, this.crystalMaterial.clone())
 
-      this.lineGroups.push(lineGroup)
+          blockMesh.blockchainData = block
+
+          let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+          blockMesh.rotation.z = rotation
+          blockMesh.translateY(700 + (blockIndex * 4))
+
+          blockMesh.rotation.z = 0
+          blockMesh.rotation.x = Math.PI / 2
+          blockMesh.rotation.y = rotation
+
+          // add random rotation
+          /* blockMesh.rotation.y = Math.random()
+          blockMesh.rotation.x = Math.random()
+          blockMesh.rotation.z = Math.random() */
+
+          group.add(blockMesh)
+
+          spiralPoints.push(blockMesh.position)
+        }
+      }.bind(this))
     }
 
-    // document.getElementById('loading').style.display = 'none'
+    let material = new THREE.LineBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.5
+    })
+
+    let curve = new THREE.CatmullRomCurve3(spiralPoints)
+    let points = curve.getPoints(2000)
+    let geometry = new THREE.Geometry()
+    geometry.vertices = points
+    let line = new THREE.Line(geometry, material)
+
+    group.translateZ(-(index * 1000))
+    line.translateZ(-(index * 1000))
+
+    let lineGroup = new THREE.Group()
+    this.scene.add(lineGroup)
+
+    lineGroup.add(line)
+
+    this.state.lineGroups.push(lineGroup)
   }
 
   build (node, startingPosition, direction, context, visualise) {
@@ -792,7 +514,7 @@ export default class Day {
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
 
-      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 20), 6, false)
+      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 25), 6, false)
       var mesh = new THREE.Mesh(geometry, this.merkleMaterial.clone())
 
       this.treeGroup.add(mesh)
@@ -827,8 +549,8 @@ export default class Day {
             this.build(childNode, endPosition, newDirection, context, visualise)
           } else {
             // no child nodes
-            if (this.currentBlock) {
-              this.currentBlock.endNodes.push(
+            if (this.state.currentBlock) {
+              this.state.currentBlock.endNodes.push(
                 {
                   x: endPosition.x,
                   y: endPosition.y,
@@ -843,6 +565,8 @@ export default class Day {
   }
 
   setupMaterials () {
+    this.crystalOpacity = 0.5
+
     this.cubeMapUrls = [
       'px.png',
       'nx.png',
@@ -870,10 +594,10 @@ export default class Day {
       color: 0xafbfd9,
       metalness: 0.6,
       roughness: 0.0,
-      opacity: this.crystalOpacity,
+      opacity: 1.0,
       side: THREE.DoubleSide,
       transparent: false,
-      envMap: this.bgMap,
+      envMap: this.bgMap
     })
   }
 
@@ -885,76 +609,66 @@ export default class Day {
     this.renderer.setSize(this.width, this.height)
   }
 
-  render () {
-
-    TWEEN.update()
-
+  checkMouseIntersection () {
     var vector = new THREE.Vector3(this.targetMouseX, this.targetMouseY, 0.5)
     vector.unproject(this.camera)
     var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize())
 
-    this.dayGroups.forEach((group) => {
-      var intersects = ray.intersectObjects(group.children)
+    this.state.dayGroups.forEach((group, dayIndex) => {
+      let intersects = ray.intersectObjects(group.children)
       if (intersects.length > 0) {
-        this.focussed = true
+        this.state.focussed = true
         this.mouseStatic = false
-        if (intersects[0].object !== this.intersected) {
-          if (this.intersected) {
-            this.intersected.material.color.setHex(this.intersected.currentHex)
+        if (intersects[0].object !== this.intersected[dayIndex]) {
+          if (this.intersected[dayIndex]) {
+            this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
           }
-          this.intersected = intersects[0].object
-          this.intersected.currentHex = this.intersected.material.color.getHex()
-          this.intersected.material.color.setHex(0xffffff)
+          this.intersected[dayIndex] = intersects[0].object
+          this.intersected[dayIndex].currentHex = this.intersected[dayIndex].material.color.getHex()
+          this.intersected[dayIndex].material.color.setHex(0xffffff)
         }
       } else {
-        this.focussed = false
-        if (this.intersected) {
-          this.intersected.material.color.setHex(this.intersected.currentHex)
+        this.state.focussed = false
+        if (this.intersected[dayIndex]) {
+          this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
         }
-        this.intersected = null
+        this.intersected[dayIndex] = null
       }
     }, this)
+  }
 
-    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
-    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
+  animateBlock () {
+    if (this.state.view === 'block') {
+      this.state.currentBlockObject.rotation.z += 0.002
+      this.treeGroup.rotation.z += 0.002
+    }
+  }
 
-    if (this.view === 'day') {
-
+  ambientCameraMovement () {
+    if (this.state.view === 'day') {
       let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
-      let quat = (new THREE.Quaternion).setFromEuler(euler)
-
+      let quat = (new THREE.Quaternion()).setFromEuler(euler)
       this.camera.lookAt(this.lookAtPos)
-
       this.camera.position.x += -this.mousePos.x
       this.camera.position.y += -0.3 - this.mousePos.y
       this.camera.position.z += this.mousePos.y
       this.camera.quaternion.premultiply(quat)
-
-      document.dispatchEvent(this.cameraMoveEvent)
     }
 
-    this.scene.updateMatrixWorld(true)
+    document.dispatchEvent(this.cameraMoveEvent)
+  }
 
-    /*if (this.mouseStatic && !this.focussed) {
-      this.dayGroups.forEach((group) => {
-        group.rotation.y -= 0.0002
-      })
-      this.lineGroups.forEach((group) => {
-        group.rotation.y -= 0.0002
-      })
-    }*/
+  updateMouse () {
+    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
+    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
+  }
 
-    if (this.view === 'block') {
-      this.currentBlockObject.rotation.x -= 0.002
-      //this.currentBlockObject.rotation.y += 0.002
-      //this.currentBlockObject.rotation.z += 0.002
-
-      this.treeGroup.rotation.x -= 0.002
-      //this.treeGroup.rotation.y += 0.002
-      //this.treeGroup.rotation.z += 0.002
-    }
-
-
+  render () {
+    TWEEN.update()
+    this.checkMouseIntersection()
+    this.updateMouse()
+    this.ambientCameraMovement()
+    this.animateBlock()
     this.renderer.render(this.scene, this.camera)
   }
 

@@ -2,7 +2,7 @@
   <div class='graph'>
     <svg width='100%' :height='height' viewBox='0 0 100 100' preserveAspectRatio='none'>
       <!-- <rect x="0" y="0" width='100%' :height='height' stroke='black' fill='none'/> -->
-      <polyline fill="white" stroke="white" :points='graph.map((n, i) => [`${i/graph.length*100}`, n].join(","))'/>
+      <polyline fill="#333333" stroke="white" :points='graph.map((n, i) => [`${i/graph.length*100}`, n].join(","))'/>
       <text :x='width' y='10' >{{ this.max }}</text>
       <text :x='width' :y='height' >{{ this.min }}</text>
     </svg>

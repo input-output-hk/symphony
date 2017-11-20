@@ -42,6 +42,31 @@ export const getBlock = hash => blocks.where('hash', '==', hash)
 /*
   Returns all the blocks that occured on the current date 00:01 - 00:00
 */
+export const getBlocksOnDay = async (date, sortDateAsc) => {
+  const fromDay = new Date(date)
+  fromDay.setMilliseconds(0)
+  fromDay.setSeconds(0)
+  fromDay.setMinutes(0)
+  fromDay.setHours(0)
+
+  const toDay = new Date(fromDay.getTime())
+  toDay.setHours(toDay.getHours() + 24)
+
+  let blocksArr = await blocks.where('time', '>=', fromDay / 1000)
+    .where('time', '<', toDay / 1000)
+    .get()
+    .then(({ docs }) => docs.map(doc => Block(doc.data())))
+
+  if (sortDateAsc) {
+    console.log('hello')
+    blocksArr.sort((a, b) => {
+      return a.time - b.time
+    })
+  }
+
+  return blocksArr
+}
+
 export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
   .where('time', '>=', fromDate / 1000)
   .where('time', '<=', toDate / 1000)
@@ -54,7 +79,7 @@ export const getDay = async (date, toDate = new Date()) => {
   const input = blocks.reduce((a, { input }) => a + input, 0) || 0
   const output = blocks.reduce((a, { output }) => a + output, 0) || 0
   // const value = blocks.reduce((a, b => a + b.value, 0))
-  return { date, blocks, fee, input, output }
+  return { date, blocks, fee, input, output, index }
 }
 
 export const getLatestBlock = _ => blocks.orderBy('time', 'desc')
@@ -66,7 +91,7 @@ export const getTransactionsForBlock = async hash => blocks.where('hash', '==', 
   .then(({docs}) => docs[0].ref.collection('metadata').get())
   .then(transactions => transactions.docs[0].data().transaction)
 
-if(process.env.NODE_ENV === 'development'){
+if (process.env.NODE_ENV === 'development') {
   window.blocks = blocks
   window.btc = { getDay, getBlocksSince, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
 }

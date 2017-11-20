@@ -1,16 +1,20 @@
 <template>
-  <canvas id="stage"/>
+  <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
 </template>
 
 <script>
-import moment from 'moment'
+import DayScene from '../js/scenes/Day'
 
 export default {
   name: 'webgl',
   props: ['blocks', 'focusOnBlock'],
-  created(){ console.log('created webgl', this.blocks, this.focusOnBlock)},
+  mounted(){
+    // console.log('create webgl', this.blocks, this.focusOnBlock)
+    this.app = new DayScene(this.blocks, this.focusOnBlock)
+  },
   beforeUpdate(){
-    console.log('update webgl', this.blocks, this.focusOnBlock)
+    // console.log('update webgl', this.blocks, this.focusOnBlock)
+    this.app.addDay(this.blocks)
   }
 }
 </script>
