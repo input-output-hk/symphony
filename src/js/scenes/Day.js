@@ -7,6 +7,7 @@ import { ConvexGeometry } from '../../../functions/ConvexGeometry'
 import { getDay } from '../../data/btc'
 import moment from 'moment'
 import Audio from '../audio/audio'
+import { BoxBufferGeometry } from 'three'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -39,7 +40,7 @@ export default class Day {
     this.state.dayGroups = []
     this.state.lineGroups = []
     this.state.daysLoaded = 1
-    this.state.daysToLoad = 3 // how many days to load in the future?
+    this.state.daysToLoad = 1 // how many days to load in the future?
     this.state.currentBlock = null
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
@@ -378,7 +379,7 @@ export default class Day {
   loadPrevDay () {
     this.nextDay = moment(this.state.currentDate).subtract(this.state.daysLoaded, 'days').format('YYYY-MM-DD')
 
-    getDay(moment(this.nextDay).toDate(), this.state.daysLoaded)
+    getDay(moment(this.nextDay).toDate(), this.state.daysLoaded, true)
       .then(({ blocks, fee, date, input, output, index }) => {
         this.addDay(blocks, index)
       })
@@ -455,33 +456,35 @@ export default class Day {
           this.build(sortedTree, startingPosition, direction, this)
 
           // Convex Hull
+          let blockGeometry
+          let blockMesh
+
           if (this.points.length > 3) {
-            // console.time('convex')
-            let CVgeometry = new ConvexGeometry(this.points)
-            // console.timeEnd('convex')
-            // let CVmesh = new THREE.Mesh(this.templateGeometry, this.crystalMaterial.clone())
-            let CVmesh = new THREE.Mesh(CVgeometry, this.crystalMaterial.clone())
-
-            CVmesh.blockchainData = block
-
-            let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-            CVmesh.rotation.z = rotation
-            CVmesh.translateY(700 + (blockIndex * 4))
-
-            CVmesh.rotation.z = 0
-            CVmesh.rotation.x = Math.PI / 2
-            CVmesh.rotation.y = rotation
-            // CVmesh.translateY(blockIndex * 5)
-
-            // add random rotation
-            /* CVmesh.rotation.y = Math.random()
-            CVmesh.rotation.x = Math.random()
-            CVmesh.rotation.z = Math.random() */
-
-            group.add(CVmesh)
-
-            spiralPoints.push(CVmesh.position)
+            blockGeometry = new ConvexGeometry(this.points)
+          } else {
+            blockGeometry = new BoxBufferGeometry(50, 20, 30)
           }
+
+          blockMesh = new THREE.Mesh(blockGeometry, this.crystalMaterial.clone())
+
+          blockMesh.blockchainData = block
+
+          let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+          blockMesh.rotation.z = rotation
+          blockMesh.translateY(700 + (blockIndex * 4))
+
+          blockMesh.rotation.z = 0
+          blockMesh.rotation.x = Math.PI / 2
+          blockMesh.rotation.y = rotation
+
+          // add random rotation
+          /* blockMesh.rotation.y = Math.random()
+          blockMesh.rotation.x = Math.random()
+          blockMesh.rotation.z = Math.random() */
+
+          group.add(blockMesh)
+
+          spiralPoints.push(blockMesh.position)
         }
       }.bind(this))
     }
@@ -493,7 +496,7 @@ export default class Day {
     })
 
     let curve = new THREE.CatmullRomCurve3(spiralPoints)
-    let points = curve.getPoints(spiralPoints.length * 100)
+    let points = curve.getPoints(2000)
     let geometry = new THREE.Geometry()
     geometry.vertices = points
     let line = new THREE.Line(geometry, material)
@@ -507,7 +510,6 @@ export default class Day {
     lineGroup.add(line)
 
     this.state.lineGroups.push(lineGroup)
- // }
   }
 
   build (node, startingPosition, direction, context, visualise) {

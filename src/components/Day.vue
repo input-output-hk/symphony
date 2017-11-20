@@ -41,7 +41,7 @@ export default {
   methods: {
     asyncFetch: function(){
 
-      getDay(moment(this.date).toDate())
+      getDay(moment(this.date).toDate(), 0, true)
         .then(({ blocks, fee, date, input, output }) => {
           
           this.dateLiteral = moment(this.date).startOf('day').toDate()
