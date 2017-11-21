@@ -4,10 +4,11 @@
 import * as THREE from 'three'
 import Config from '../Config'
 import { ConvexGeometry } from '../../../functions/ConvexGeometry'
-import { getDay, getTransactionsForBlock } from '../../data/btc'
+import { getDay } from '../../data/btc'
 import moment from 'moment'
 import Audio from '../audio/audio'
 import _ from 'lodash'
+import EffectComposer, { RenderPass, ShaderPass, CopyShader } from 'three-effectcomposer-es6'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -19,6 +20,26 @@ export default class Day {
     this.initState(blocks, currentDate)
     this.initRenderer()
     this.initCamera()
+    this.initShaders()
+
+    this.composer = new EffectComposer(this.renderer)
+    this.composer.addPass(new RenderPass(this.scene, this.camera))
+
+    const RGBShiftPass = new ShaderPass(this.RGBShiftShader)
+    this.composer.addPass(RGBShiftPass)
+
+    const FilmShaderPass = new ShaderPass(this.FilmShader)
+    this.composer.addPass(FilmShaderPass)
+
+    const VignettePass = new ShaderPass(this.VignetteShader)
+    this.composer.addPass(VignettePass)
+
+    const BrightnessContrastPass = new ShaderPass(this.BrightnessContrastShader)
+    this.composer.addPass(BrightnessContrastPass)
+
+    const HueSaturationPass = new ShaderPass(this.HueSaturationShader)
+    HueSaturationPass.renderToScreen = true
+    this.composer.addPass(HueSaturationPass)
 
     this.audio = new Audio(this.camera)
 
@@ -32,6 +53,247 @@ export default class Day {
     })
   }
 
+  initShaders () {
+    this.RGBShiftShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'amount': { value: 0.0005 },
+        'angle': { value: 0.0 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D tDiffuse;',
+        'uniform float amount;',
+        'uniform float angle;',
+        'varying vec2 vUv;',
+        'void main() {',
+        'vec2 offset = amount * vec2( cos(angle), sin(angle));',
+        'vec4 cr = texture2D(tDiffuse, vUv + offset);',
+        'vec4 cga = texture2D(tDiffuse, vUv);',
+        'vec4 cb = texture2D(tDiffuse, vUv - offset);',
+        'gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);',
+        '}'
+      ].join('\n')
+    }
+
+    this.VignetteShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'offset': { value: 1.0 },
+        'darkness': { value: 1.0 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform float offset;',
+        'uniform float darkness;',
+        'uniform sampler2D tDiffuse;',
+        'varying vec2 vUv;',
+        'void main() {',
+        // Eskil's vignette
+        'vec4 texel = texture2D( tDiffuse, vUv );',
+        'vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );',
+        'gl_FragColor = vec4( mix( texel.rg, vec2( 1.0 - darkness ), dot( uv, uv ) ), mix( texel.b, 1.0 - (darkness * 0.8), dot( uv, uv ) ), texel.a );',
+        /*
+        // alternative version from glfx.js
+        // this one makes more "dusty" look (as opposed to "burned")
+
+        "vec4 color = texture2D( tDiffuse, vUv );",
+        "float dist = distance( vUv, vec2( 0.5 ) );",
+        "color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
+        "gl_FragColor = color;",
+        */
+        '}'
+      ].join('\n')
+    }
+
+    this.HueSaturationShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'hue': { value: 0 },
+        'saturation': { value: 0.5 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D tDiffuse;',
+        'uniform float hue;',
+        'uniform float saturation;',
+        'varying vec2 vUv;',
+        'void main() {',
+        'gl_FragColor = texture2D( tDiffuse, vUv );',
+
+        // hue
+        'float angle = hue * 3.14159265;',
+        'float s = sin(angle), c = cos(angle);',
+        'vec3 weights = (vec3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;',
+        'float len = length(gl_FragColor.rgb);',
+        'gl_FragColor.rgb = vec3(',
+        'dot(gl_FragColor.rgb, weights.xyz),',
+        'dot(gl_FragColor.rgb, weights.zxy),',
+        'dot(gl_FragColor.rgb, weights.yzx)',
+        ');',
+
+        // saturation
+        'float average = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;',
+        'if (saturation > 0.0) {',
+        'gl_FragColor.rgb += (average - gl_FragColor.rgb) * (1.0 - 1.0 / (1.001 - saturation));',
+        '} else {',
+        'gl_FragColor.rgb += (average - gl_FragColor.rgb) * (-saturation);',
+        '}',
+
+        '}'
+
+      ].join('\n')
+
+    }
+
+    this.FilmShader = {
+
+      uniforms: {
+
+        'tDiffuse': { value: null },
+        'time': { value: 0.0 },
+        'nIntensity': { value: 0.05 },
+        'sIntensity': { value: 0.0 },
+        'sCount': { value: 4096 },
+        'grayscale': { value: 0 }
+
+      },
+
+      vertexShader: [
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+        '}'
+
+      ].join('\n'),
+
+      fragmentShader: [
+
+        '#include <common>',
+
+          // control parameter
+        'uniform float time;',
+
+        'uniform bool grayscale;',
+
+          // noise effect intensity value (0 = no effect, 1 = full effect)
+        'uniform float nIntensity;',
+
+          // scanlines effect intensity value (0 = no effect, 1 = full effect)
+        'uniform float sIntensity;',
+
+          // scanlines effect count value (0 = no effect, 4096 = full effect)
+        'uniform float sCount;',
+
+        'uniform sampler2D tDiffuse;',
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+            // sample the source
+        'vec4 cTextureScreen = texture2D( tDiffuse, vUv );',
+
+            // make some noise
+        'float dx = rand( vUv + time );',
+
+            // add noise
+        'vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );',
+
+            // get us a sine and cosine
+        'vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );',
+
+            // add scanlines
+        'cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;',
+
+            // interpolate between source and result by intensity
+        'cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );',
+
+            // convert to grayscale if desired
+        'if( grayscale ) {',
+
+        'cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );',
+
+        '}',
+
+        'gl_FragColor =  vec4( cResult, cTextureScreen.a );',
+
+        '}'
+
+      ].join('\n')
+
+    }
+
+    this.BrightnessContrastShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'brightness': { value: 0.0 },
+        'contrast': { value: 0.1 }
+      },
+
+      vertexShader: [
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'vUv = uv;',
+
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+        '}'
+
+      ].join('\n'),
+
+      fragmentShader: [
+
+        'uniform sampler2D tDiffuse;',
+        'uniform float brightness;',
+        'uniform float contrast;',
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'gl_FragColor = texture2D( tDiffuse, vUv );',
+
+        'gl_FragColor.rgb += brightness;',
+
+        'if (contrast > 0.0) {',
+        'gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;',
+        '} else {',
+        'gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;',
+        '}',
+
+        '}'
+
+      ].join('\n')
+
+    }
+  }
+
   initState (blocks, currentDate) {
     this.state = {}
     this.state.focussed = false // are we focussed on a block?
@@ -40,7 +302,7 @@ export default class Day {
     this.state.dayGroups = []
     this.state.lineGroups = []
     this.state.daysLoaded = 1
-    this.state.daysToLoad = 0 // how many days to load in the future?
+    this.state.daysToLoad = 4 // how many days to load in the future?
     this.state.currentBlock = null
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
@@ -53,7 +315,8 @@ export default class Day {
 
     // scene
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.0002)
+    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.00015)
+    this.scene.background = new THREE.Color(Config.scene.bgColor)
 
     // renderer
     this.canvas = document.getElementById('stage')
@@ -75,7 +338,7 @@ export default class Day {
   }
 
   initCamera () {
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2600.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 3000.0)
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -185,7 +448,7 @@ export default class Day {
         let blockDir = blockObject.getWorldPosition().clone().normalize()
         // let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         let newCamPos = blockObject.getWorldPosition().clone()
-        newCamPos.z += 450.0
+        newCamPos.z += 550.0
 
         this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
           this.buildSingleTree(blockObject)
@@ -244,6 +507,8 @@ export default class Day {
 
     let sortedTree
 
+    blockObject.updateMatrixWorld()
+
     let blockObjectPosition = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
 
@@ -259,11 +524,8 @@ export default class Day {
     this.removeTrees()
 
     this.treeGroup = new THREE.Group()
-    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-    this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
 
     this.treeMesh = new THREE.Geometry()
-
     // this.treeGroup.add(this.treeMesh)
     this.scene.add(this.treeGroup)
 
@@ -303,30 +565,52 @@ export default class Day {
 
         this.build(sortedTree, startingPosition, direction, this, true)
 
-        let seen = []
-        let reducedArray = []
-        this.state.currentBlock.endNodes.forEach((nodePos, index) => {
-          let position = {
-            x: Math.ceil(nodePos.x / 10) * 10,
-            y: Math.ceil(nodePos.y / 10) * 10,
-            z: Math.ceil(nodePos.z / 10) * 10
-          }
+        // Convex Hull
+        let convexGeometry
+        let blockMesh
 
-          let key = JSON.stringify(position)
+        if (this.points.length > 3) {
+          convexGeometry = new ConvexGeometry(this.points)
+          convexGeometry.computeBoundingBox()
+          let boxDimensions = convexGeometry.boundingBox.getSize()
+          let boxCenter = convexGeometry.boundingBox.getCenter()
 
-          if (seen.indexOf(key) === -1) {
-            seen.push(key)
-            nodePos.y = Math.abs(nodePos.y) * 10
-            reducedArray.push(nodePos)
-          }
-        })
+          let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
 
-        this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+          blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
+
+          blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
+
+          this.treeGroup.add(blockMesh)
+
+          let seen = []
+          let reducedArray = []
+          this.state.currentBlock.endNodes.forEach((nodePos, index) => {
+            let position = {
+              x: Math.ceil(nodePos.x / 10) * 10,
+              y: Math.ceil(nodePos.y / 10) * 10,
+              z: Math.ceil(nodePos.z / 10) * 10
+            }
+
+            let key = JSON.stringify(position)
+
+            if (seen.indexOf(key) === -1) {
+              seen.push(key)
+              nodePos.y = Math.abs(nodePos.y) * 10
+              reducedArray.push(nodePos)
+            }
+          })
+
+          this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+
+          let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
+          this.treeGroup.add(mesh)
+
+          this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+          this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+        }
       }
     }.bind(this))
-
-    let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
-    this.treeGroup.add(mesh)
   }
 
   animateCamera (target, lookAt, duration) {
@@ -427,7 +711,10 @@ export default class Day {
   buildBlocks (blocks, index, group, spiralPoints) {
     return new Promise((resolve, reject) => {
       for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+      // for (let blockIndex = 0; blockIndex < 1; blockIndex++) {
         let block = blocks[blockIndex]
+
+        blocks[blockIndex].index = blockIndex
 
      //   getTransactionsForBlock(block.hash).then((transactions) => {
        /*   let totalFees = 0
@@ -505,12 +792,13 @@ export default class Day {
               convexGeometry = new ConvexGeometry(this.points)
               convexGeometry.computeBoundingBox()
               let boxDimensions = convexGeometry.boundingBox.getSize()
+              let boxCenter = convexGeometry.boundingBox.getCenter()
 
-              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x * Math.random(), boxDimensions.y * Math.random(), boxDimensions.z * Math.random())
               // let boundingBoxGeometry = new THREE.BoxBufferGeometry(Math.random() * 500, Math.random() * 200, Math.random() * 300)
 
               blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-                // blockMesh = new THREE.Mesh(convexGeometry, this.crystalMaterial.clone())
+              blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
 
               blockMesh.blockchainData = block
 
@@ -563,8 +851,8 @@ export default class Day {
       let geometry = new THREE.Geometry()
       geometry.vertices = points
       let line = new THREE.Line(geometry, material)
-
-      console.log(index) */
+*/
+      console.log(index)
 
       group.translateZ(-(index * 1000))
       // line.translateZ(-(index * 1000))
@@ -582,7 +870,6 @@ export default class Day {
 
   build (node, startingPosition, direction, context, visualise) {
     let magnitude = node.level * 5
-    // let magnitude = 30
 
     let startPosition = startingPosition.clone()
     let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
@@ -592,7 +879,7 @@ export default class Day {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-      let geometry = new THREE.TubeGeometry(path, 1, (magnitude / 25), 6, false)
+      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 25, 6, false)
       this.treeMesh.merge(geometry, geometry.matrix)
     }
 
@@ -657,26 +944,26 @@ export default class Day {
     // this.scene.background = this.bgMap
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xafbfd9,
-      metalness: 0.6,
+      color: 0xffffff,
+      metalness: 0.7,
       roughness: 0.0,
       opacity: this.crystalOpacity,
-      side: THREE.DoubleSide,
       transparent: true,
+      side: THREE.DoubleSide,
       envMap: this.bgMap,
-      depthTest: true,
-      depthWrite: false
-      // polygonOffset: true,
-      // polygonOffsetFactor: -Math.random()
+      // depthTest: true,
+      // depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -0.4
     })
 
-    this.merkleMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xafbfd9,
-      metalness: 0.6,
-      roughness: 0.0,
-      opacity: 1.0,
-      side: THREE.DoubleSide,
-      transparent: false,
+    this.merkleMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      opacity: 0.7,
+      transparent: true,
+      emissive: 0xffffff,
+      metalness: 1.0,
+      roughness: 0.5,
       envMap: this.bgMap
     })
   }
@@ -755,10 +1042,11 @@ export default class Day {
     TWEEN.update()
     this.checkMouseIntersection()
     this.updateMouse()
-    this.ambientCameraMovement()
+    // this.ambientCameraMovement()
     this.animateBlock()
     this.loadDays()
-    this.renderer.render(this.scene, this.camera)
+    this.composer.render()
+    // this.renderer.render(this.scene, this.camera)
   }
 
   animate () {
