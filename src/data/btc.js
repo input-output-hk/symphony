@@ -58,7 +58,6 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
     .then(({ docs }) => docs.map(doc => Block(doc.data())))
 
   if (sortDateAsc) {
-    console.log('hello')
     blocksArr.sort((a, b) => {
       return a.time - b.time
     })
