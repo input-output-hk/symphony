@@ -6,7 +6,7 @@ const Config = {
     orbitControls: false
   },
   scene: {
-    bgColor: 0xFFFFFF,
+    bgColor: 0x000022,
     shadowsOn: false,
     antialias: true
   },

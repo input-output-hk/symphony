@@ -8,7 +8,7 @@ import { getDay } from '../../data/btc'
 import moment from 'moment'
 import Audio from '../audio/audio'
 import _ from 'lodash'
-import EffectComposer, { RenderPass, ShaderPass, CopyShader } from 'three-effectcomposer-es6'
+import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -86,7 +86,7 @@ export default class Day {
       uniforms: {
         'tDiffuse': { value: null },
         'offset': { value: 1.0 },
-        'darkness': { value: 1.0 }
+        'darkness': { value: 1.1 }
       },
       vertexShader: [
         'varying vec2 vUv;',
@@ -104,7 +104,7 @@ export default class Day {
         // Eskil's vignette
         'vec4 texel = texture2D( tDiffuse, vUv );',
         'vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );',
-        'gl_FragColor = vec4( mix( texel.rg, vec2( 1.0 - darkness ), dot( uv, uv ) ), mix( texel.b, 1.0 - (darkness * 0.8), dot( uv, uv ) ), texel.a );',
+        'gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );',
         /*
         // alternative version from glfx.js
         // this one makes more "dusty" look (as opposed to "burned")
@@ -170,7 +170,7 @@ export default class Day {
 
         'tDiffuse': { value: null },
         'time': { value: 0.0 },
-        'nIntensity': { value: 0.05 },
+        'nIntensity': { value: 0.1 },
         'sIntensity': { value: 0.0 },
         'sCount': { value: 4096 },
         'grayscale': { value: 0 }
@@ -341,8 +341,8 @@ export default class Day {
     this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 3000.0)
 
     this.cameraDriftLimit = {}
-    this.cameraDriftLimit.x = 500.0
-    this.cameraDriftLimit.y = 500.0
+    this.cameraDriftLimit.x = 400.0
+    this.cameraDriftLimit.y = 400.0
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -967,10 +967,10 @@ export default class Day {
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap,
-      // depthTest: true,
-      // depthWrite: false,
-      polygonOffset: true,
-      polygonOffsetFactor: -0.4
+      depthTest: true,
+      depthWrite: false
+      // polygonOffset: true,
+      // polygonOffsetFactor: -0.4
     })
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
@@ -1055,7 +1055,7 @@ export default class Day {
     }
 
     if (this.targetPos.x < this.cameraDriftLimit.x && this.targetPos.y < this.cameraDriftLimit.y) {
-      this.camPos.lerp(this.targetPos, 0.1)
+      this.camPos.lerp(this.targetPos, 0.05)
       this.camera.position.copy(this.camPos)
     }
 
