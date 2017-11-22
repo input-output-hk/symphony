@@ -60,7 +60,7 @@ export default class Day {
     this.RGBShiftShader = {
       uniforms: {
         'tDiffuse': { value: null },
-        'amount': { value: 0.0005 },
+        'amount': { value: 0.0008 },
         'angle': { value: 0.0 }
       },
       vertexShader: [
@@ -959,10 +959,10 @@ export default class Day {
     // this.scene.background = this.bgMap
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: 0xaaaaaa,
       metalness: 0.7,
       roughness: 0.0,
-      opacity: this.crystalOpacity,
+      opacity: 0.5,//this.crystalOpacity,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap,

@@ -1,5 +1,11 @@
 <template>
-  <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
+  <div>
+    <div v-if='blocks.length === 0' id='loading'>
+      <h1>Project Orpheus</h1>
+      <h4>Project Orpheus is a sound and visual exploration of the block chain</h4>
+    </div>
+    <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
+  </div>
 </template>
 
 <script>
