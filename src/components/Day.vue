@@ -8,8 +8,7 @@
     <br/>
     <h4>Date - {{ calendar }}</h4>
     <br/>
-    <p>This is a visualisation of Bitcoin. It shows blocks from <b>{{ calendar.toLowerCase() }}</b>. Here blocks are represented by crystal structures distributed in a spiral.</p>
-    <p>Each revolution of the spiral is a day</p>
+    <p>This is a visualisation of Bitcoin. It shows blocks from <b>{{ calendar.toLowerCase() }}</b>. Here blocks are represented by crystal structures distributed in a spiral. Each revolution of the spiral represents a day</p>
     <hr/>
     <br/>
     <p>$ - There were <u>{{ totalNumTransaction }} transactions</u> made averaging <u>$1.5BTC in fees</u> per transaction. This is the </p>
