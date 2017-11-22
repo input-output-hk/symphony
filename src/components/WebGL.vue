@@ -1,9 +1,10 @@
 <template>
   <div>
     <div id='loading' v-if='blocks.length == 0'>
-      <div>
+      <div class='c'>
         <h1>Project Orpheus</h1>
-        <h4>Orpheus is an audio visual exploration of the block chain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day</h4>
+        <br/>
+        <h4>Orpheus is an audio visual exploration of the block chain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day in the blockchain</h4>
       </div>
     </div>
     <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
@@ -54,6 +55,10 @@ export default {
     justify-content: center;
     align-items: center;
     text-align: center;
+  }
+
+  .c{
+    width: 500px;
   }
 
 </style>

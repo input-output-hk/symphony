@@ -2,7 +2,7 @@
   <div>
     <div class='main'>
       <router-view class='big' :blocks='blocks' :focusOnBlock='focusOnBlock'/>
-      <graph/>
+      <graph v-if='blocks.length > 0'/>
     </div>
     <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>

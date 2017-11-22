@@ -1,5 +1,5 @@
 <template>
-  <div class='info'>
+  <div class='info' v-if='blocks.length > 0'>
     <div class='split'>
       <h1>BTC</h1>
       <h2>${{ Math.round(total).toLocaleString() }}</h2>
@@ -67,7 +67,7 @@ export default {
   @import "../assets/common.css";
 
   .info{
-    width: 500px;
+    width: 400px;
   }
 
   .split{
