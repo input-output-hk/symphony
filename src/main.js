@@ -4,21 +4,23 @@ import Block from './components/Block'
 import Day from './components/Day'
 import Main from './components/Main'
 import moment from 'moment'
+import AsyncComputed from 'vue-async-computed'
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter)
+Vue.use(AsyncComputed)
 
 const routes = [
   {
     path: '/',
     component: Main,
     props: true,
-    children:[
+    children: [
       { path: '', redirect: to => `/${moment().format('YYYY-MM-DD')}` },
       // { path: '/block/', component: Block, props: true },
-      { path: '/block/:blockhash', component: Block, props: true },
-      { path: '/:date', component: Day, props: true },
+      { path: '/block/:block', component: Block },
+      { path: '/:date', component: Day },
     ]
   }
 ]

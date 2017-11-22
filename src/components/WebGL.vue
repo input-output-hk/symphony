@@ -1,16 +1,43 @@
 <template>
   <div>
-    <div id="loading">Loading...</div>
-    <canvas id="stage" />
+    <div v-if='blocks.length === 0' id='loading'>
+      <h1>Project Orpheus</h1>
+      <h4>Project Orpheus is a sound and visual exploration of the block chain</h4>
+    </div>
+    <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>
 </template>
 
 <script>
-import { getDay } from '../data/btc'
+import DayScene from '../js/scenes/Day'
 import moment from 'moment'
 
+const getDayInMs = time => moment(time ).startOf('day').toDate().valueOf()
+
 export default {
-  name: 'webgl'
+  name: 'webgl',
+  props: ['blocks', 'focusOnBlock'],
+  mounted(){
+    // console.log('create webgl', this.blocks, this.focusOnBlock)
+    this.app = new DayScene(this.blocks, this.focusOnBlock)
+  },
+  beforeUpdate(){
+    // console.log('update webgl', this.blocks, this.focusOnBlock)
+    // if( this.blocks && this.blocks.length > 0 ){
+    //
+    // }
+    // console.log( moment(this.blocks[0].time * 1000 ).startOf('day').toDate().valueOf() )
+    const days = this.blocks.reduce((map, block) => {
+      const dayMs = getDayInMs(block.time * 1000)
+      if( map.has(dayMs)) map.get(dayMs).push(block)
+      else map.set(dayMs, [block])
+      return map
+    }, new Map())
+
+    // console.log(days)
+    let i = 0
+    days.forEach(day => this.app.addDay(day, i++))
+  }
 }
 </script>
 

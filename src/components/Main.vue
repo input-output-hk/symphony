@@ -1,25 +1,40 @@
 <template>
   <div>
     <div class='main'>
-      <router-view class='big'/>
+      <router-view class='big' :blocks='blocks' :focusOnBlock='focusOnBlock'/>
       <graph/>
     </div>
-    <webgl />
+    <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>
 </template>
 
 <script>
-import { getDay } from '../data/btc'
+import { getLatestBlock, getBlocksSince } from '../data/btc'
 import moment from 'moment'
 import webgl from './WebGL'
 import graph from './Graph'
+import cfg from '../js/Config'
 
 export default {
   name: 'home',
   components:{ webgl, graph },
+  props: ['date', 'block'],
+  asyncComputed: {
+
+    focusOnBlock: async ({ block }) => block && await getBlock(block),
+
+    blocks: {
+      async get({ date }){
+        if(!date) return []
+        const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
+        const b = moment(date).endOf('day').toDate()
+        return await getBlocksSince(a, b)
+      },
+      default: []
+    }
+  }
 }
 </script>
-
 <style scoped>
   @import "../assets/common.css";
 

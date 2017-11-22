@@ -18,11 +18,13 @@
     "lodash": "^4.17.4",
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.19.1",
+    "ouioui": "0.0.22",
     "three": "^0.87.1",
     "three-effectcomposer-es6": "0.0.4",
     "three-orbit-controls": "^82.1.0",
     "tone": "^0.11.11",
     "vue": "^2.4.2",
+    "vue-async-computed": "^3.3.1",
     "vue-router": "^2.7.0"
   },
   "devDependencies": {

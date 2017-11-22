@@ -66,8 +66,14 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
   return blocksArr
 }
 
-export const getDay = async (date, index, sortDateAsc) => {
-  const blocks = await getBlocksOnDay(date, sortDateAsc)
+export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
+  .where('time', '>=', fromDate / 1000)
+  .where('time', '<=', toDate / 1000)
+  .get()
+  .then(({ docs }) => docs.map(doc => Block(doc.data())))
+
+export const getDay = async (date, toDate = new Date()) => {
+  const blocks = await getBlocksSince(date, toDate)
   const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
   const input = blocks.reduce((a, { input }) => a + input, 0) || 0
   const output = blocks.reduce((a, { output }) => a + output, 0) || 0
@@ -86,5 +92,5 @@ export const getTransactionsForBlock = async hash => blocks.where('hash', '==', 
 
 if (process.env.NODE_ENV === 'development') {
   window.blocks = blocks
-  window.btc = { getDay, getBlocksOnDay, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
+  window.btc = { getDay, getBlocksSince, getBlock, getTransactionVolumeOverTime, getTransactionFeesOverTime, getLatestBlock, getTransactionsForBlock }
 }

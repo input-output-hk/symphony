@@ -12,15 +12,18 @@ import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
+import { oui } from 'ouioui'
 
 export default class Day {
-  constructor (blocks, currentDate) {
+  constructor (blocks = [], currentDate = new Date()) {
     this.textureLoader = new THREE.TextureLoader()
 
     this.initState(blocks, currentDate)
     this.initRenderer()
     this.initCamera()
     this.initShaders()
+
+
 
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
@@ -57,7 +60,7 @@ export default class Day {
     this.RGBShiftShader = {
       uniforms: {
         'tDiffuse': { value: null },
-        'amount': { value: 0.0005 },
+        'amount': { value: 0.0008 },
         'angle': { value: 0.0 }
       },
       vertexShader: [
@@ -301,8 +304,6 @@ export default class Day {
     this.state.currentDate = currentDate
     this.state.dayGroups = []
     this.state.lineGroups = []
-    this.state.daysLoaded = 1
-    this.state.daysToLoad = 4 // how many days to load in the future?
     this.state.currentBlock = null
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
@@ -369,6 +370,10 @@ export default class Day {
     this.brownianMotionCamera = new BrownianMotion()
 
     this.cameraMoveEvent = new Event('cameraMove')
+
+    oui({
+      putSomeGUIShitHere: 'boom'
+    })
   }
 
   addEvents () {
@@ -757,18 +762,8 @@ export default class Day {
     this.scene.add(ambLight)
   }
 
-  loadPrevDay () {
-    this.nextDay = moment(this.state.currentDate).subtract(this.state.daysLoaded, 'days').format('YYYY-MM-DD')
-
-    getDay(moment(this.nextDay).toDate(), this.state.daysLoaded, true)
-      .then(({ blocks, fee, date, input, output, index }) => {
-        this.addDay(blocks, index)
-      })
-  }
-
   addObjects () {
-    this.addDay(this.state.blocks, this.state.daysLoaded)
-    document.getElementById('loading').style.display = 'none'
+    this.addDay(this.state.blocks)
   }
 
   buildBlocks (blocks, index, group, spiralPoints) {
@@ -990,10 +985,10 @@ export default class Day {
     // this.scene.background = this.bgMap
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: 0xaaaaaa,
       metalness: 0.7,
       roughness: 0.0,
-      opacity: this.crystalOpacity,
+      opacity: 0.5,//this.crystalOpacity,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
@@ -1050,14 +1045,6 @@ export default class Day {
     }, this)
   }
 
-  loadDays () {
-    // load in prev day?
-    if (this.state.daysLoaded <= this.state.daysToLoad) {
-      this.state.daysLoaded++
-      this.loadPrevDay()
-    }
-  }
-
   updateMouse () {
     this.mousePos.lerp(new THREE.Vector2(this.targetMouseX, this.targetMouseY), this.cameraLerpSpeed)
   }
@@ -1093,7 +1080,6 @@ export default class Day {
     TWEEN.update()
     this.checkMouseIntersection()
     this.updateMouse()
-    this.loadDays()
     this.smoothCameraMovement()
     this.ambientCameraMovement()
     this.composer.render()

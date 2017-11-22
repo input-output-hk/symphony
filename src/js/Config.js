@@ -2,6 +2,7 @@
 
 const Config = {
   assetPath: '/static/assets/',
+  daysToLoad: 2,
   debug: {
     orbitControls: false
   },
