@@ -1,8 +1,11 @@
 <template>
   <div>
-    <div v-if='blocks.length === 0' id='loading'>
-      <h1>Project Orpheus</h1>
-      <h4>Project Orpheus is a sound and visual exploration of the block chain</h4>
+    <div id='loading' v-if='blocks.length == 0'>
+      <div class='c'>
+        <h1>Project Orpheus</h1>
+        <br/>
+        <h4>Orpheus is an audio visual exploration of the block chain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day in the blockchain</h4>
+      </div>
     </div>
     <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>
@@ -48,8 +51,14 @@ export default {
     position: absolute;
     width: 100vw;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    line-height: 100vh;
+  }
+
+  .c{
+    width: 500px;
   }
 
 </style>

@@ -2,7 +2,7 @@
   <div>
     <div class='main'>
       <router-view class='big' :blocks='blocks' :focusOnBlock='focusOnBlock'/>
-      <graph/>
+      <graph v-if='blocks.length > 0'/>
     </div>
     <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>
@@ -40,14 +40,19 @@ export default {
 
   .main{
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 90%;
-    padding: 1rem;
+    /*bottom: 0;*/
+    /*left: 0;*/
+    width: 90vw;
+    padding: 3rem;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
-    /*height: 100vh;*/
+    height: 90vh;
+  }
+
+  .flex{
+    display:flex;
+    flex-direction: column;
   }
 
   .big{

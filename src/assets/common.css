@@ -18,7 +18,17 @@ body {
   padding: 0;
   font-size: 14px;
   font-family: Inconsolata;
-  color: #cccccc;
+  color: #b6bcbe;
+  line-height: 1.3rem;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #b6bcbe;
+    margin: 1em 0;
+    padding: 0;
 }
 
 a {
