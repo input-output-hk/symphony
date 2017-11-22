@@ -214,25 +214,25 @@ export default class Day {
 
         'void main() {',
 
-            // sample the source
+        // sample the source
         'vec4 cTextureScreen = texture2D( tDiffuse, vUv );',
 
-            // make some noise
+        // make some noise
         'float dx = rand( vUv + time );',
 
-            // add noise
+        // add noise
         'vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );',
 
-            // get us a sine and cosine
+        // get us a sine and cosine
         'vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );',
 
-            // add scanlines
+        // add scanlines
         'cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;',
 
-            // interpolate between source and result by intensity
+        // interpolate between source and result by intensity
         'cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );',
 
-            // convert to grayscale if desired
+        // convert to grayscale if desired
         'if( grayscale ) {',
 
         'cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );',
@@ -338,16 +338,16 @@ export default class Day {
   }
 
   initCamera () {
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 3000.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 800.0)
 
     this.cameraDriftLimitMax = {}
-    this.cameraDriftLimitMax.x = 400.0
-    this.cameraDriftLimitMax.y = 400.0
+    this.cameraDriftLimitMax.x = 300.0
+    this.cameraDriftLimitMax.y = 300.0
     this.cameraDriftLimitMin = {}
-    this.cameraDriftLimitMin.x = -400.0
-    this.cameraDriftLimitMin.y = -400.0
+    this.cameraDriftLimitMin.x = -300.0
+    this.cameraDriftLimitMin.y = -300.0
     this.cameraMoveStep = 200.0
-    this.cameraLerpSpeed = 0.05
+    this.cameraLerpSpeed = 0.01
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -421,21 +421,14 @@ export default class Day {
   }
 
   resetDayView () {
-    this.state.view = 'day'
-
     this.removeTrees()
 
-    this.animateCamera(this.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
-
-    this.state.focussed = false
-    this.isAnimating = false
-    this.toggleBlocks(true)
-
-    if (this.state.currentBlockObject) {
-     /* new TWEEN.Tween( this.state.currentBlockObject.material )
-      .to( { opacity: this.crystalOpacity }, 1000 )
-      .start() */
-    }
+    this.animateBlockOut(this.state.currentBlockObject).then(() => {
+      this.state.view = 'day'
+      this.animateCamera(this.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
+      this.state.focussed = false
+      this.isAnimating = false
+    })
   }
 
   removeTrees () {
@@ -449,34 +442,130 @@ export default class Day {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
+    if (this.isAnimating) {
+      return
+    }
+
     document.dispatchEvent(this.selectBlock)
-
-    return
-
-    // if (this.state.view === 'block') {
-    // return
-    // }
 
     this.raycaster.setFromCamera({x: this.targetMouseX, y: this.targetMouseY}, this.camera)
 
-    this.state.dayGroups.forEach((group) => {
-      var intersects = this.raycaster.intersectObjects(group.children)
-      if (intersects.length > 0) {
-        let blockObject = intersects[0].object
+    const BreakException = {}
 
-        this.state.currentBlockObject = blockObject
+    try {
+      this.state.dayGroups.forEach((group) => {
+        var intersects = this.raycaster.intersectObjects(group.children)
+        if (intersects.length > 0) {
+          this.isAnimating = true
+          let blockObject = intersects[0].object
+          this.removeTrees()
+          this.animateBlockOut(this.state.currentBlockObject).then(() => {
+            this.animateBlockIn(blockObject).then(() => {
+              this.buildSingleTree(blockObject)
+              this.isAnimating = false
+            })
+          })
+          throw BreakException
+        }
+      })
+    } catch (error) {
+      // ¯\_(ツ)_/¯
+    }
+  }
 
-        let lookAtPos = blockObject.getWorldPosition().clone()
+  animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
+    return new Promise((resolve, reject) => {
+      let moveQuaternion = new THREE.Quaternion()
+      blockObject.quaternion.set(moveQuaternion)
 
-        let blockDir = blockObject.getWorldPosition().clone().normalize()
-        // let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
-        let newCamPos = blockObject.getWorldPosition().clone()
-        newCamPos.z += 550.0
+      this.easing = TWEEN.Easing.Quartic.InOut
 
-        this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
-          this.buildSingleTree(blockObject)
-        })
+      let tweenVars = {
+        blockPosX: fromPos.x,
+        blockPosY: fromPos.y,
+        time: 0
       }
+
+      new TWEEN.Tween(tweenVars)
+        .to(
+        {
+          blockPosX: toPos.x,
+          blockPosY: toPos.y,
+          time: 1
+        },
+          duration
+        )
+        .onUpdate(function () {
+          blockObject.position.x = tweenVars.blockPosX
+          blockObject.position.y = tweenVars.blockPosY
+
+          // slerp to target rotation
+          THREE.Quaternion.slerp(fromQuaternion, toQuaternion, moveQuaternion, tweenVars.time)
+          blockObject.quaternion.set(moveQuaternion.x, moveQuaternion.y, moveQuaternion.z, moveQuaternion.w)
+        })
+        .easing(this.easing)
+        .onComplete(function () {
+          resolve()
+        })
+        .start()
+    })
+  }
+
+  animateBlockOut (blockObject) {
+    return new Promise((resolve, reject) => {
+      if (blockObject) {
+        let fromPos = blockObject.position.clone()
+        let toPos = blockObject.initialPosition.clone()
+
+        let targetRotation = blockObject.initialRotation.clone()
+        let fromQuaternion = new THREE.Quaternion().copy(blockObject.quaternion)
+        let toQuaternion = new THREE.Quaternion().setFromEuler(targetRotation)
+
+        this.animateBlock(
+          blockObject,
+          fromPos,
+          fromQuaternion,
+          toPos,
+          toQuaternion,
+          500
+        ).then(() => {
+          resolve()
+        })
+      } else {
+        resolve()
+      }
+    })
+  }
+
+  animateBlockIn (blockObject) {
+    return new Promise((resolve, reject) => {
+      this.state.currentBlockObject = blockObject
+
+      let blockPos = blockObject.position.clone()
+
+      let targetRotation = new THREE.Euler(Math.PI, 0.0, Math.PI / 2)
+      let fromQuaternion = new THREE.Quaternion().copy(blockObject.quaternion)
+      let toQuaternion = new THREE.Quaternion().setFromEuler(targetRotation)
+
+      blockObject.initialPosition = blockObject.position.clone()
+      blockObject.initialRotation = blockObject.rotation.clone()
+
+      // focus camera on block
+      let blockWorldPos = blockObject.getWorldPosition()
+      this.targetLookAt.z = blockWorldPos.z
+      this.targetPos.z = blockWorldPos.z + 400
+
+      this.animateBlock(
+        blockObject,
+        blockPos,
+        fromQuaternion,
+        this.targetLookAt,
+        toQuaternion,
+        1000,
+        true
+      ).then(() => {
+        resolve()
+      })
     })
   }
 
@@ -502,22 +591,12 @@ export default class Day {
     }
   }
 
-  toggleBlocks (visibility) {
-    /* this.state.dayGroups.forEach((group) => {
-      group.visible = visibility
-    }, this)
-
-    this.state.lineGroups.forEach((group) => {
-      group.visible = visibility
-    }, this) */
-  }
-
   buildSingleTree (blockObject) {
     let block = blockObject.blockchainData
 
     this.state.currentBlock = block
 
-    this.angle = 5.0 + (block.output % 100)
+    this.angle = 5.0 + (block.output % 170)
     // this.angle = 90.0 + block.feeToValueRatio
 
     this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
@@ -535,14 +614,7 @@ export default class Day {
     let blockObjectPosition = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
 
-    /* new TWEEN.Tween( blockObject.material )
-    .to( { opacity: 0 }, 4000 )
-    .onComplete(() => {
-    })
-    .start() */
-
     this.state.view = 'block'
-    this.toggleBlocks(false)
 
     this.removeTrees()
 
@@ -588,24 +660,7 @@ export default class Day {
 
         this.build(sortedTree, startingPosition, direction, this, true)
 
-        // Convex Hull
-        let convexGeometry
-        let blockMesh
-
         if (this.points.length > 3) {
-          convexGeometry = new ConvexGeometry(this.points)
-          convexGeometry.computeBoundingBox()
-          let boxDimensions = convexGeometry.boundingBox.getSize()
-          let boxCenter = convexGeometry.boundingBox.getCenter()
-
-          let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
-
-          blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-
-          blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
-
-          this.treeGroup.add(blockMesh)
-
           let seen = []
           let reducedArray = []
           this.state.currentBlock.endNodes.forEach((nodePos, index) => {
@@ -700,19 +755,6 @@ export default class Day {
   addLights (scene) {
     let ambLight = new THREE.AmbientLight(0xffffff)
     this.scene.add(ambLight)
-
-    /* let light = new THREE.SpotLight(0xeee6a5)
-    light.position.set(100, 30, 0)
-    light.target.position.set(0, 0, 0)
-
-    if (Config.scene.shadowsOn) {
-      light.castShadow = true
-      light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(50, 1, 500, 15000))
-      light.shadow.mapSize.width = 2048
-      light.shadow.mapSize.height = 2048
-    }
-
-    this.scene.add(light) */
   }
 
   loadPrevDay () {
@@ -732,7 +774,6 @@ export default class Day {
   buildBlocks (blocks, index, group, spiralPoints) {
     return new Promise((resolve, reject) => {
       for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-      // for (let blockIndex = 0; blockIndex < 1; blockIndex++) {
         let block = blocks[blockIndex]
 
         blocks[blockIndex].index = blockIndex
@@ -752,10 +793,10 @@ export default class Day {
         blocks[blockIndex].feeToValueRatio = 0.01
 
           // TODO: set this from network health value
-        this.angle = 5.0 + (block.output % 100)
+        this.angle = 5.0 + (block.output % 170)
         // this.angle = 90.0 + blocks[blockIndex].feeToValueRatio
 
-          // create an array of ints the same size as the number of transactions in this block
+        // create an array of ints the same size as the number of transactions in this block
         let tx = []
         for (let index = 0; index < block.n_tx; index++) {
           tx.push(index.toString())
@@ -815,28 +856,34 @@ export default class Day {
               let boxDimensions = convexGeometry.boundingBox.getSize()
               let boxCenter = convexGeometry.boundingBox.getCenter()
 
-              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x * Math.random(), boxDimensions.y * Math.random(), boxDimensions.z * Math.random())
-              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(Math.random() * 500, Math.random() * 200, Math.random() * 300)
+              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x * Math.random(), boxDimensions.y * Math.random(), boxDimensions.z * Math.random())
+
+              let sortedDimensions = [
+                boxDimensions.x, boxDimensions.y, boxDimensions.z
+              ]
+
+              sortedDimensions.sort((a, b) => {
+                return Math.abs(a) - Math.abs(b)
+              })
+
+              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(sortedDimensions[1], sortedDimensions[0], sortedDimensions[2])
+              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+
+              boundingBoxGeometry.center()
 
               blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-              blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
+              // blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
+
+              // align all front faces
+              blockMesh.translateZ(-(boxDimensions.z / 2))
 
               blockMesh.blockchainData = block
 
               let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
               blockMesh.rotation.z = rotation
-              blockMesh.translateY(700 + (blockIndex * 4))
-
-              blockMesh.rotation.x = Math.PI / 2
-              blockMesh.rotation.y = rotation
-              blockMesh.rotation.z = 0
-
-              blockMesh.rotation.y += Math.PI / 2
-
-              // add random rotation
-              /* blockMesh.rotation.y = Math.random()
-              blockMesh.rotation.x = Math.random()
-              blockMesh.rotation.z = Math.random() */
+              blockMesh.translateY(700 + (blockIndex * 8))
+              blockMesh.rotation.z += Math.PI / 2
+              blockMesh.translateZ(blockIndex * 8)
 
               group.add(blockMesh)
 
@@ -861,36 +908,14 @@ export default class Day {
     this.scene.add(group)
 
     this.buildBlocks(blocks, index, group, spiralPoints).then(() => {
-      /* let material = new THREE.LineBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.0
-      })
-
-      let curve = new THREE.CatmullRomCurve3(spiralPoints)
-      let points = curve.getPoints(2000)
-      let geometry = new THREE.Geometry()
-      geometry.vertices = points
-      let line = new THREE.Line(geometry, material)
-*/
       console.log(index)
-
-      group.translateZ(-(index * 1000))
-      // line.translateZ(-(index * 1000))
-
-      // let lineGroup = new THREE.Group()
-      // this.scene.add(lineGroup)
-
-      // lineGroup.add(line)
-
-      // this.state.lineGroups.push(lineGroup)
-
+      group.translateZ(-(index * 1300))
       this.removeTrees()
     })
   }
 
   build (node, startingPosition, direction, context, visualise) {
-    let magnitude = node.level * 5
+    let magnitude = (node.level * 5)
 
     let startPosition = startingPosition.clone()
     let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
@@ -971,18 +996,18 @@ export default class Day {
       opacity: this.crystalOpacity,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap,
-      depthTest: true,
-      depthWrite: false
+      envMap: this.bgMap
+      // depthTest: true,
+      // depthWrite: false,
       // polygonOffset: true,
-      // polygonOffsetFactor: -0.4
+      // polygonOffsetFactor: -2.0
     })
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      opacity: 0.7,
-      transparent: true,
-      emissive: 0xffffff,
+      color: 0xcccccc,
+      // opacity: 0.5,
+      // transparent: true,
+      emissive: 0xcccccc,
       metalness: 1.0,
       roughness: 0.5,
       envMap: this.bgMap
@@ -1025,13 +1050,6 @@ export default class Day {
     }, this)
   }
 
-  animateBlock () {
-    // if (this.state.view === 'block') {
-//      this.state.currentBlockObject.rotation.z += 0.002
-  //    this.treeGroup.rotation.z += 0.002
-    // }
-  }
-
   loadDays () {
     // load in prev day?
     if (this.state.daysLoaded <= this.state.daysToLoad) {
@@ -1065,13 +1083,8 @@ export default class Day {
       this.targetPos.y = this.cameraDriftLimitMin.y + 1
     }
 
-    // if (
-//      this.targetPos.x < this.cameraDriftLimitMax.x &&
-  //    this.targetPos.y < this.cameraDriftLimitMax.y
-    // ) {
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
-//    }
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
@@ -1080,12 +1093,9 @@ export default class Day {
     TWEEN.update()
     this.checkMouseIntersection()
     this.updateMouse()
-    this.animateBlock()
     this.loadDays()
-
     this.smoothCameraMovement()
     this.ambientCameraMovement()
-
     this.composer.render()
     // this.renderer.render(this.scene, this.camera)
   }
