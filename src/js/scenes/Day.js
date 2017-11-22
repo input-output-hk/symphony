@@ -1026,14 +1026,6 @@ export default class Day {
     // }
   }
 
-  loadDays () {
-    // load in prev day?
-    if (this.state.daysLoaded <= this.state.daysToLoad) {
-      this.state.daysLoaded++
-      this.loadPrevDay()
-    }
-  }
-
   updateMouse () {
     this.mousePos.lerp(new THREE.Vector2(this.targetMouseX, this.targetMouseY), this.cameraLerpSpeed)
   }
@@ -1075,7 +1067,6 @@ export default class Day {
     this.checkMouseIntersection()
     this.updateMouse()
     this.animateBlock()
-    this.loadDays()
 
     this.smoothCameraMovement()
     this.ambientCameraMovement()

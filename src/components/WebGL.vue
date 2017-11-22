@@ -4,6 +4,9 @@
 
 <script>
 import DayScene from '../js/scenes/Day'
+import moment from 'moment'
+
+const getDayInMs = time => moment(time ).startOf('day').toDate().valueOf()
 
 export default {
   name: 'webgl',
@@ -14,7 +17,20 @@ export default {
   },
   beforeUpdate(){
     // console.log('update webgl', this.blocks, this.focusOnBlock)
-    this.app.addDay(this.blocks, 0)
+    // if( this.blocks && this.blocks.length > 0 ){
+    //
+    // }
+    // console.log( moment(this.blocks[0].time * 1000 ).startOf('day').toDate().valueOf() )
+    const days = this.blocks.reduce((map, block) => {
+      const dayMs = getDayInMs(block.time * 1000)
+      if( map.has(dayMs)) map.get(dayMs).push(block)
+      else map.set(dayMs, [block])
+      return map
+    }, new Map())
+
+    // console.log(days)
+    let i = 0
+    days.forEach(day => this.app.addDay(day, i++))
   }
 }
 </script>
