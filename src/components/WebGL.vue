@@ -14,7 +14,7 @@ export default {
   },
   beforeUpdate(){
     // console.log('update webgl', this.blocks, this.focusOnBlock)
-    this.app.addDay(this.blocks, block)
+    this.app.addDay(this.blocks, 0)
   }
 }
 </script>

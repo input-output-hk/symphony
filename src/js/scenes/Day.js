@@ -7,10 +7,12 @@ import { ConvexGeometry } from '../../../functions/ConvexGeometry'
 import { getDay } from '../../data/btc'
 import moment from 'moment'
 import Audio from '../audio/audio'
-import { BoxBufferGeometry } from 'three'
+import _ from 'lodash'
+import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
+import { oui } from 'ouioui'
 
 export default class Day {
   constructor (blocks = [], currentDate = new Date()) {
@@ -19,6 +21,28 @@ export default class Day {
     this.initState(blocks, currentDate)
     this.initRenderer()
     this.initCamera()
+    this.initShaders()
+
+
+
+    this.composer = new EffectComposer(this.renderer)
+    this.composer.addPass(new RenderPass(this.scene, this.camera))
+
+    const RGBShiftPass = new ShaderPass(this.RGBShiftShader)
+    this.composer.addPass(RGBShiftPass)
+
+    const FilmShaderPass = new ShaderPass(this.FilmShader)
+    this.composer.addPass(FilmShaderPass)
+
+    const VignettePass = new ShaderPass(this.VignetteShader)
+    this.composer.addPass(VignettePass)
+
+    const BrightnessContrastPass = new ShaderPass(this.BrightnessContrastShader)
+    this.composer.addPass(BrightnessContrastPass)
+
+    const HueSaturationPass = new ShaderPass(this.HueSaturationShader)
+    HueSaturationPass.renderToScreen = true
+    this.composer.addPass(HueSaturationPass)
 
     this.audio = new Audio(this.camera)
 
@@ -30,6 +54,247 @@ export default class Day {
       this.moveCamera()
       this.animate()
     })
+  }
+
+  initShaders () {
+    this.RGBShiftShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'amount': { value: 0.0005 },
+        'angle': { value: 0.0 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D tDiffuse;',
+        'uniform float amount;',
+        'uniform float angle;',
+        'varying vec2 vUv;',
+        'void main() {',
+        'vec2 offset = amount * vec2( cos(angle), sin(angle));',
+        'vec4 cr = texture2D(tDiffuse, vUv + offset);',
+        'vec4 cga = texture2D(tDiffuse, vUv);',
+        'vec4 cb = texture2D(tDiffuse, vUv - offset);',
+        'gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);',
+        '}'
+      ].join('\n')
+    }
+
+    this.VignetteShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'offset': { value: 1.0 },
+        'darkness': { value: 1.1 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform float offset;',
+        'uniform float darkness;',
+        'uniform sampler2D tDiffuse;',
+        'varying vec2 vUv;',
+        'void main() {',
+        // Eskil's vignette
+        'vec4 texel = texture2D( tDiffuse, vUv );',
+        'vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );',
+        'gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );',
+        /*
+        // alternative version from glfx.js
+        // this one makes more "dusty" look (as opposed to "burned")
+
+        "vec4 color = texture2D( tDiffuse, vUv );",
+        "float dist = distance( vUv, vec2( 0.5 ) );",
+        "color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
+        "gl_FragColor = color;",
+        */
+        '}'
+      ].join('\n')
+    }
+
+    this.HueSaturationShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'hue': { value: 0 },
+        'saturation': { value: 0.5 }
+      },
+      vertexShader: [
+        'varying vec2 vUv;',
+        'void main() {',
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D tDiffuse;',
+        'uniform float hue;',
+        'uniform float saturation;',
+        'varying vec2 vUv;',
+        'void main() {',
+        'gl_FragColor = texture2D( tDiffuse, vUv );',
+
+        // hue
+        'float angle = hue * 3.14159265;',
+        'float s = sin(angle), c = cos(angle);',
+        'vec3 weights = (vec3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;',
+        'float len = length(gl_FragColor.rgb);',
+        'gl_FragColor.rgb = vec3(',
+        'dot(gl_FragColor.rgb, weights.xyz),',
+        'dot(gl_FragColor.rgb, weights.zxy),',
+        'dot(gl_FragColor.rgb, weights.yzx)',
+        ');',
+
+        // saturation
+        'float average = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;',
+        'if (saturation > 0.0) {',
+        'gl_FragColor.rgb += (average - gl_FragColor.rgb) * (1.0 - 1.0 / (1.001 - saturation));',
+        '} else {',
+        'gl_FragColor.rgb += (average - gl_FragColor.rgb) * (-saturation);',
+        '}',
+
+        '}'
+
+      ].join('\n')
+
+    }
+
+    this.FilmShader = {
+
+      uniforms: {
+
+        'tDiffuse': { value: null },
+        'time': { value: 0.0 },
+        'nIntensity': { value: 0.1 },
+        'sIntensity': { value: 0.0 },
+        'sCount': { value: 4096 },
+        'grayscale': { value: 0 }
+
+      },
+
+      vertexShader: [
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'vUv = uv;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+        '}'
+
+      ].join('\n'),
+
+      fragmentShader: [
+
+        '#include <common>',
+
+          // control parameter
+        'uniform float time;',
+
+        'uniform bool grayscale;',
+
+          // noise effect intensity value (0 = no effect, 1 = full effect)
+        'uniform float nIntensity;',
+
+          // scanlines effect intensity value (0 = no effect, 1 = full effect)
+        'uniform float sIntensity;',
+
+          // scanlines effect count value (0 = no effect, 4096 = full effect)
+        'uniform float sCount;',
+
+        'uniform sampler2D tDiffuse;',
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+            // sample the source
+        'vec4 cTextureScreen = texture2D( tDiffuse, vUv );',
+
+            // make some noise
+        'float dx = rand( vUv + time );',
+
+            // add noise
+        'vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );',
+
+            // get us a sine and cosine
+        'vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );',
+
+            // add scanlines
+        'cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;',
+
+            // interpolate between source and result by intensity
+        'cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );',
+
+            // convert to grayscale if desired
+        'if( grayscale ) {',
+
+        'cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );',
+
+        '}',
+
+        'gl_FragColor =  vec4( cResult, cTextureScreen.a );',
+
+        '}'
+
+      ].join('\n')
+
+    }
+
+    this.BrightnessContrastShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'brightness': { value: 0.0 },
+        'contrast': { value: 0.1 }
+      },
+
+      vertexShader: [
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'vUv = uv;',
+
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+        '}'
+
+      ].join('\n'),
+
+      fragmentShader: [
+
+        'uniform sampler2D tDiffuse;',
+        'uniform float brightness;',
+        'uniform float contrast;',
+
+        'varying vec2 vUv;',
+
+        'void main() {',
+
+        'gl_FragColor = texture2D( tDiffuse, vUv );',
+
+        'gl_FragColor.rgb += brightness;',
+
+        'if (contrast > 0.0) {',
+        'gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;',
+        '} else {',
+        'gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;',
+        '}',
+
+        '}'
+
+      ].join('\n')
+
+    }
   }
 
   initState (blocks, currentDate) {
@@ -52,6 +317,7 @@ export default class Day {
     // scene
     this.scene = new THREE.Scene()
     this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, 0.00015)
+    this.scene.background = new THREE.Color(Config.scene.bgColor)
 
     // renderer
     this.canvas = document.getElementById('stage')
@@ -63,7 +329,7 @@ export default class Day {
 
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
     this.renderer.autoClear = false
-    this.renderer.setPixelRatio(window.devicePixelRatio)
+    // this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -73,7 +339,16 @@ export default class Day {
   }
 
   initCamera () {
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2300.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 3000.0)
+
+    this.cameraDriftLimitMax = {}
+    this.cameraDriftLimitMax.x = 400.0
+    this.cameraDriftLimitMax.y = 400.0
+    this.cameraDriftLimitMin = {}
+    this.cameraDriftLimitMin.x = -400.0
+    this.cameraDriftLimitMin.y = -400.0
+    this.cameraMoveStep = 200.0
+    this.cameraLerpSpeed = 0.05
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -95,6 +370,10 @@ export default class Day {
     this.brownianMotionCamera = new BrownianMotion()
 
     this.cameraMoveEvent = new Event('cameraMove')
+
+    oui({
+      putSomeGUIShitHere: 'boom'
+    })
   }
 
   addEvents () {
@@ -112,12 +391,26 @@ export default class Day {
 
     this.isAnimating = false
 
+    this.selectBlock = new Event('selectBlock')
+
     window.addEventListener('resize', this.resize.bind(this), false)
     this.resize()
 
+    document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onkeydown.bind(this), false)
+  }
+
+  onDocumentMouseWheel (event) {
+    event.preventDefault()
+    if (event.wheelDeltaY > 0) {
+      this.targetPos.z -= this.cameraMoveStep
+      this.targetLookAt.z -= this.cameraMoveStep
+    } else {
+      this.targetPos.z += this.cameraMoveStep
+      this.targetLookAt.z += this.cameraMoveStep
+    }
   }
 
   onkeydown (event) {
@@ -161,6 +454,10 @@ export default class Day {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
+    document.dispatchEvent(this.selectBlock)
+
+    return
+
     // if (this.state.view === 'block') {
     // return
     // }
@@ -179,13 +476,35 @@ export default class Day {
         let blockDir = blockObject.getWorldPosition().clone().normalize()
         // let newCamPos = blockObject.getWorldPosition().clone().add(blockDir.multiplyScalar(30))
         let newCamPos = blockObject.getWorldPosition().clone()
-        newCamPos.z += 150.0
+        newCamPos.z += 550.0
 
         this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
           this.buildSingleTree(blockObject)
         })
       }
     })
+  }
+
+  movetoBlock (hash) {
+    let foundBlock = false
+    this.state.dayGroups.forEach((group) => {
+      group.children.forEach((blockObject) => {
+        if (blockObject.blockchainData.hash === hash) {
+          foundBlock = true
+          this.state.currentBlockObject = blockObject
+          let lookAtPos = blockObject.getWorldPosition().clone()
+          let newCamPos = blockObject.getWorldPosition().clone()
+          newCamPos.z += 450.0
+          this.animateCamera(newCamPos, lookAtPos, 3000).then(() => {
+            this.buildSingleTree(blockObject)
+          })
+        }
+      })
+    })
+
+    if (!foundBlock) {
+      this.resetDayView()
+    }
   }
 
   toggleBlocks (visibility) {
@@ -202,7 +521,8 @@ export default class Day {
 
     this.state.currentBlock = block
 
-    this.angle = 25.0 + (block.output % 100)
+    this.angle = 5.0 + (block.output % 100)
+    // this.angle = 90.0 + block.feeToValueRatio
 
     this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
     this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
@@ -213,6 +533,8 @@ export default class Day {
     this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
 
     let sortedTree
+
+    blockObject.updateMatrixWorld()
 
     let blockObjectPosition = blockObject.getWorldPosition().clone()
     let rotation = blockObject.getWorldRotation().clone()
@@ -227,9 +549,11 @@ export default class Day {
     this.toggleBlocks(false)
 
     this.removeTrees()
+
     this.treeGroup = new THREE.Group()
-    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-    this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+
+    this.treeMesh = new THREE.Geometry()
+    // this.treeGroup.add(this.treeMesh)
     this.scene.add(this.treeGroup)
 
     // create an array of ints the same size as the number of transactions in this block
@@ -243,7 +567,6 @@ export default class Day {
       hashalgo: 'md5',
       hashlist: true
     }
-    // console.time('merkle')
     merkle.fromArray(args, function (err, tree) {
       if (!err) {
         for (var key in tree) {
@@ -269,25 +592,50 @@ export default class Day {
 
         this.build(sortedTree, startingPosition, direction, this, true)
 
-        let seen = []
-        let reducedArray = []
-        this.state.currentBlock.endNodes.forEach((nodePos, index) => {
-          let position = {
-            x: Math.ceil(nodePos.x / 10) * 10,
-            y: Math.ceil(nodePos.y / 10) * 10,
-            z: Math.ceil(nodePos.z / 10) * 10
-          }
+        // Convex Hull
+        let convexGeometry
+        let blockMesh
 
-          let key = JSON.stringify(position)
+        if (this.points.length > 3) {
+          convexGeometry = new ConvexGeometry(this.points)
+          convexGeometry.computeBoundingBox()
+          let boxDimensions = convexGeometry.boundingBox.getSize()
+          let boxCenter = convexGeometry.boundingBox.getCenter()
 
-          if (seen.indexOf(key) === -1) {
-            seen.push(key)
-            nodePos.y = Math.abs(nodePos.y) * 10
-            reducedArray.push(nodePos)
-          }
-        })
+          let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
 
-        this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+          blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
+
+          blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
+
+          this.treeGroup.add(blockMesh)
+
+          let seen = []
+          let reducedArray = []
+          this.state.currentBlock.endNodes.forEach((nodePos, index) => {
+            let position = {
+              x: Math.ceil(nodePos.x / 10) * 10,
+              y: Math.ceil(nodePos.y / 10) * 10,
+              z: Math.ceil(nodePos.z / 10) * 10
+            }
+
+            let key = JSON.stringify(position)
+
+            if (seen.indexOf(key) === -1) {
+              seen.push(key)
+              nodePos.y = Math.abs(nodePos.y) * 10
+              reducedArray.push(nodePos)
+            }
+          })
+
+          this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+
+          let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
+          this.treeGroup.add(mesh)
+
+          this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+          this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+        }
       }
     }.bind(this))
   }
@@ -305,8 +653,6 @@ export default class Day {
 
       // grab initial postion/rotation
       let fromPosition = new THREE.Vector3().copy(this.camera.position)
-
-      this.camera.position.set(this.targetPos.x, this.targetPos.y, this.targetPos.z)
 
       // reset original position and rotation
       this.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
@@ -332,9 +678,9 @@ export default class Day {
   }
 
   moveCamera (time) {
-    this.camPos.lerp(this.targetPos, 0.05)
+    this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
-    this.lookAtPos.lerp(this.targetLookAt, 0.05)
+    this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
 
   onDocumentMouseMove (event) {
@@ -356,10 +702,10 @@ export default class Day {
   }
 
   addLights (scene) {
-    let ambLight = new THREE.AmbientLight(0xf1d0c5)
+    let ambLight = new THREE.AmbientLight(0xffffff)
     this.scene.add(ambLight)
 
-    let light = new THREE.SpotLight(0xeee6a5)
+    /* let light = new THREE.SpotLight(0xeee6a5)
     light.position.set(100, 30, 0)
     light.target.position.set(0, 0, 0)
 
@@ -370,16 +716,137 @@ export default class Day {
       light.shadow.mapSize.height = 2048
     }
 
-    this.scene.add(light)
+    this.scene.add(light) */
   }
 
   addObjects () {
     this.addDay(this.state.blocks)
   }
 
-  addDay (blocks, block = 0) {
-    if (blocks.length == 0) return
-    console.log('add day' , block)
+  buildBlocks (blocks, index, group, spiralPoints) {
+    return new Promise((resolve, reject) => {
+      for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+      // for (let blockIndex = 0; blockIndex < 1; blockIndex++) {
+        let block = blocks[blockIndex]
+
+        blocks[blockIndex].index = blockIndex
+
+     //   getTransactionsForBlock(block.hash).then((transactions) => {
+       /*   let totalFees = 0
+          let totalInput = 0
+
+          transactions.forEach((tx, key) => {
+            if (key !== 0) { // ignore coinbase transactions
+              totalInput += tx.input
+              totalFees += (tx.input - tx.output)
+            }
+          }) */
+
+          // blocks[blockIndex].feeToValueRatio = totalFees / totalInput
+        blocks[blockIndex].feeToValueRatio = 0.01
+
+          // TODO: set this from network health value
+        this.angle = 5.0 + (block.output % 100)
+        // this.angle = 90.0 + blocks[blockIndex].feeToValueRatio
+
+          // create an array of ints the same size as the number of transactions in this block
+        let tx = []
+        for (let index = 0; index < block.n_tx; index++) {
+          tx.push(index.toString())
+        }
+
+        let sortedTree
+
+        this.X = new THREE.Vector3(1, 0, 0)
+        this.Y = new THREE.Vector3(0, 1, 0)
+        this.Z = new THREE.Vector3(0, 0, 1)
+
+        this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
+        this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
+        this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
+        this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
+        this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
+        this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
+        this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
+
+        var args = {
+          array: tx,
+          hashalgo: 'md5',
+          hashlist: true
+        }
+
+        merkle.fromArray(args, function (err, tree) {
+          if (!err) {
+            this.totalLevels = tree.levels
+            for (var key in tree) {
+              if (tree.hasOwnProperty(key)) {
+                var element = tree[key]
+                if (element.type === 'root' || element.type === 'node') {
+                  tree[key].children = {}
+                  tree[key].children[element.left] = tree[element.left]
+                  tree[key].children[element.right] = tree[element.right]
+                  if (element.type === 'root') {
+                    sortedTree = element
+                  }
+                }
+              }
+            }
+
+            this.points = []
+
+            let startingPosition = new THREE.Vector3(0, 0, 0)
+            let direction = new THREE.Vector3(0, 1, 0)
+
+            this.build(sortedTree, startingPosition, direction, this)
+
+            // Convex Hull
+            let convexGeometry
+            let blockMesh
+
+            if (this.points.length > 3) {
+              convexGeometry = new ConvexGeometry(this.points)
+              convexGeometry.computeBoundingBox()
+              let boxDimensions = convexGeometry.boundingBox.getSize()
+              let boxCenter = convexGeometry.boundingBox.getCenter()
+
+              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x * Math.random(), boxDimensions.y * Math.random(), boxDimensions.z * Math.random())
+              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(Math.random() * 500, Math.random() * 200, Math.random() * 300)
+
+              blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
+              blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
+
+              blockMesh.blockchainData = block
+
+              let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+              blockMesh.rotation.z = rotation
+              blockMesh.translateY(700 + (blockIndex * 4))
+
+              blockMesh.rotation.x = Math.PI / 2
+              blockMesh.rotation.y = rotation
+              blockMesh.rotation.z = 0
+
+              blockMesh.rotation.y += Math.PI / 2
+
+              // add random rotation
+              /* blockMesh.rotation.y = Math.random()
+              blockMesh.rotation.x = Math.random()
+              blockMesh.rotation.z = Math.random() */
+
+              group.add(blockMesh)
+
+              spiralPoints.push(blockMesh.position)
+            }
+          }
+        }.bind(this))
+       // })
+      }
+
+      resolve()
+    })
+  }
+
+  addDay (blocks, index) {
+    console.log('add day: ' + index)
     let group = new THREE.Group()
 
     this.state.dayGroups.push(group)
@@ -387,121 +854,37 @@ export default class Day {
     let spiralPoints = []
     this.scene.add(group)
 
-    for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-      let block = blocks[blockIndex]
+    this.buildBlocks(blocks, index, group, spiralPoints).then(() => {
+      /* let material = new THREE.LineBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.0
+      })
 
-      // TODO: set this from network health value
-      this.angle = 25.0 + (block.output % 100)
+      let curve = new THREE.CatmullRomCurve3(spiralPoints)
+      let points = curve.getPoints(2000)
+      let geometry = new THREE.Geometry()
+      geometry.vertices = points
+      let line = new THREE.Line(geometry, material)
+*/
+      console.log(index)
 
-      // create an array of ints the same size as the number of transactions in this block
-      let tx = []
-      for (let index = 0; index < block.n_tx; index++) {
-        tx.push(index.toString())
-      }
+      group.translateZ(-(index * 1000))
+      // line.translateZ(-(index * 1000))
 
-      let sortedTree
+      // let lineGroup = new THREE.Group()
+      // this.scene.add(lineGroup)
 
-      this.X = new THREE.Vector3(1, 0, 0)
-      this.Y = new THREE.Vector3(0, 1, 0)
-      this.Z = new THREE.Vector3(0, 0, 1)
+      // lineGroup.add(line)
 
-      this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
-      this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
-      this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
-      this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
-      this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
-      this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
-      this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
+      // this.state.lineGroups.push(lineGroup)
 
-      var args = {
-        array: tx,
-        hashalgo: 'md5',
-        hashlist: true
-      }
-
-      merkle.fromArray(args, function (err, tree) {
-        if (!err) {
-          this.totalLevels = tree.levels
-          for (var key in tree) {
-            if (tree.hasOwnProperty(key)) {
-              var element = tree[key]
-              if (element.type === 'root' || element.type === 'node') {
-                tree[key].children = {}
-                tree[key].children[element.left] = tree[element.left]
-                tree[key].children[element.right] = tree[element.right]
-                if (element.type === 'root') {
-                  sortedTree = element
-                }
-              }
-            }
-          }
-
-          this.points = []
-
-          let startingPosition = new THREE.Vector3(0, 0, 0)
-          let direction = new THREE.Vector3(0, 1, 0)
-
-          this.build(sortedTree, startingPosition, direction, this)
-
-          // Convex Hull
-          let blockGeometry
-          let blockMesh
-
-          if (this.points.length > 3) {
-            blockGeometry = new ConvexGeometry(this.points)
-          } else {
-            blockGeometry = new BoxBufferGeometry(50, 20, 30)
-          }
-
-          blockMesh = new THREE.Mesh(blockGeometry, this.crystalMaterial.clone())
-
-          blockMesh.blockchainData = block
-
-          let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-          blockMesh.rotation.z = rotation
-          blockMesh.translateY(700 + (blockIndex * 4))
-
-          blockMesh.rotation.z = 0
-          blockMesh.rotation.x = Math.PI / 2
-          blockMesh.rotation.y = rotation
-
-          // add random rotation
-          /* blockMesh.rotation.y = Math.random()
-          blockMesh.rotation.x = Math.random()
-          blockMesh.rotation.z = Math.random() */
-
-          group.add(blockMesh)
-
-          spiralPoints.push(blockMesh.position)
-        }
-      }.bind(this))
-    }
-
-    let material = new THREE.LineBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.5
+      this.removeTrees()
     })
-
-    let curve = new THREE.CatmullRomCurve3(spiralPoints)
-    let points = curve.getPoints(2000)
-    let geometry = new THREE.Geometry()
-    geometry.vertices = points
-    let line = new THREE.Line(geometry, material)
-
-    group.translateZ(-(index * 1000))
-    line.translateZ(-(index * 1000))
-
-    let lineGroup = new THREE.Group()
-    this.scene.add(lineGroup)
-
-    lineGroup.add(line)
-
-    this.state.lineGroups.push(lineGroup)
   }
 
   build (node, startingPosition, direction, context, visualise) {
-    let magnitude = node.level
+    let magnitude = node.level * 5
 
     let startPosition = startingPosition.clone()
     let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
@@ -511,11 +894,8 @@ export default class Day {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-
-      var geometry = new THREE.TubeBufferGeometry(path, 1, (magnitude / 25), 6, false)
-      var mesh = new THREE.Mesh(geometry, this.merkleMaterial.clone())
-
-      this.treeGroup.add(mesh)
+      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 25, 6, false)
+      this.treeMesh.merge(geometry, geometry.matrix)
     }
 
     let i = 0
@@ -563,7 +943,7 @@ export default class Day {
   }
 
   setupMaterials () {
-    this.crystalOpacity = 0.5
+    this.crystalOpacity = 0.7
 
     this.cubeMapUrls = [
       'px.png',
@@ -579,22 +959,26 @@ export default class Day {
     // this.scene.background = this.bgMap
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xafbfd9,
-      metalness: 0.6,
+      color: 0xffffff,
+      metalness: 0.7,
       roughness: 0.0,
       opacity: this.crystalOpacity,
-      side: THREE.DoubleSide,
       transparent: true,
-      envMap: this.bgMap
+      side: THREE.DoubleSide,
+      envMap: this.bgMap,
+      depthTest: true,
+      depthWrite: false
+      // polygonOffset: true,
+      // polygonOffsetFactor: -0.4
     })
 
-    this.merkleMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xafbfd9,
-      metalness: 0.6,
-      roughness: 0.0,
-      opacity: 1.0,
-      side: THREE.DoubleSide,
-      transparent: false,
+    this.merkleMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      opacity: 0.7,
+      transparent: true,
+      emissive: 0xffffff,
+      metalness: 1.0,
+      roughness: 0.5,
       envMap: this.bgMap
     })
   }
@@ -636,38 +1020,68 @@ export default class Day {
   }
 
   animateBlock () {
-    if (this.state.view === 'block') {
-      this.state.currentBlockObject.rotation.z += 0.002
-      this.treeGroup.rotation.z += 0.002
-    }
+    // if (this.state.view === 'block') {
+//      this.state.currentBlockObject.rotation.z += 0.002
+  //    this.treeGroup.rotation.z += 0.002
+    // }
   }
 
-  ambientCameraMovement () {
-    if (this.state.view === 'day') {
-      let euler = new THREE.Euler(this.mousePos.y * 0.2, -this.mousePos.x * 0.2, 0)
-      let quat = (new THREE.Quaternion()).setFromEuler(euler)
-      this.camera.lookAt(this.lookAtPos)
-      this.camera.position.x += -this.mousePos.x
-      this.camera.position.y += -0.3 - this.mousePos.y
-      this.camera.position.z += this.mousePos.y
-      this.camera.quaternion.premultiply(quat)
+  loadDays () {
+    // load in prev day?
+    if (this.state.daysLoaded <= this.state.daysToLoad) {
+      this.state.daysLoaded++
+      this.loadPrevDay()
     }
-
-    document.dispatchEvent(this.cameraMoveEvent)
   }
 
   updateMouse () {
-    this.mousePos.x += (this.targetMouseX - this.mousePos.x) * 0.002
-    this.mousePos.y += (this.targetMouseY - this.mousePos.y) * 0.002
+    this.mousePos.lerp(new THREE.Vector2(this.targetMouseX, this.targetMouseY), this.cameraLerpSpeed)
+  }
+
+  ambientCameraMovement () {
+    this.camera.lookAt(this.lookAtPos)
+    this.targetPos.x += this.mousePos.x
+    this.targetPos.y += this.mousePos.y
+    document.dispatchEvent(this.cameraMoveEvent)
+  }
+
+  smoothCameraMovement () {
+    if (this.targetPos.x > this.cameraDriftLimitMax.x) {
+      this.targetPos.x = this.cameraDriftLimitMax.x - 1
+    }
+    if (this.targetPos.y > this.cameraDriftLimitMax.y) {
+      this.targetPos.y = this.cameraDriftLimitMax.y - 1
+    }
+    if (this.targetPos.x < this.cameraDriftLimitMin.x) {
+      this.targetPos.x = this.cameraDriftLimitMin.x + 1
+    }
+    if (this.targetPos.y < this.cameraDriftLimitMin.y) {
+      this.targetPos.y = this.cameraDriftLimitMin.y + 1
+    }
+
+    // if (
+//      this.targetPos.x < this.cameraDriftLimitMax.x &&
+  //    this.targetPos.y < this.cameraDriftLimitMax.y
+    // ) {
+    this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
+    this.camera.position.copy(this.camPos)
+//    }
+
+    this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
 
   render () {
     TWEEN.update()
     this.checkMouseIntersection()
     this.updateMouse()
-    this.ambientCameraMovement()
     this.animateBlock()
-    this.renderer.render(this.scene, this.camera)
+    this.loadDays()
+
+    this.smoothCameraMovement()
+    this.ambientCameraMovement()
+
+    this.composer.render()
+    // this.renderer.render(this.scene, this.camera)
   }
 
   animate () {
