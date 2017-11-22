@@ -192,7 +192,6 @@ export default class Day {
     /* this.state.dayGroups.forEach((group) => {
       group.visible = visibility
     }, this)
-
     this.state.lineGroups.forEach((group) => {
       group.visible = visibility
     }, this) */
@@ -378,10 +377,9 @@ export default class Day {
     this.addDay(this.state.blocks)
   }
 
-  addDay (blocks, index = 0) {
-    console.log( blocks.length > 0 )
+  addDay (blocks, block = 0) {
     if (blocks.length == 0) return
-    console.log('add day' + index)
+    console.log('add day' , block)
     let group = new THREE.Group()
 
     this.state.dayGroups.push(group)

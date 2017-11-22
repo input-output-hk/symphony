@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class='main'>
-      <router-view class='big' :blocks='blocks'/>
+      <router-view class='big' :blocks='blocks' :focusOnBlock='focusOnBlock'/>
       <graph/>
     </div>
-    <webgl :blocks='blocks' focusOn='123'/>
+    <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
   </div>
 </template>
 
