@@ -1797,7 +1797,15 @@ export default class Day {
 
           this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
 
+          blockObject.geometry.computeBoundingBox()
+          let boxSize = blockObject.geometry.boundingBox.getSize()
+
           let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
+
+          //mesh.position.x -= boxSize.x / 2
+          mesh.position.y -= boxSize.y / 2
+          // mesh.position.z -= boxSize.z / 2
+
           this.treeGroup.add(mesh)
 
           this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
@@ -2194,6 +2202,10 @@ export default class Day {
     this.smoothCameraMovement()
     this.ambientCameraMovement()
     this.composer.render()
+    if (this.state.view === 'block') {
+      this.state.currentBlockObject.rotation.y += 0.001
+      this.treeGroup.rotation.y += 0.001
+    }
     // this.renderer.render(this.scene, this.camera)
   }
 
