@@ -340,9 +340,14 @@ export default class Day {
   initCamera () {
     this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 3000.0)
 
-    this.cameraDriftLimit = {}
-    this.cameraDriftLimit.x = 400.0
-    this.cameraDriftLimit.y = 400.0
+    this.cameraDriftLimitMax = {}
+    this.cameraDriftLimitMax.x = 400.0
+    this.cameraDriftLimitMax.y = 400.0
+    this.cameraDriftLimitMin = {}
+    this.cameraDriftLimitMin.x = -400.0
+    this.cameraDriftLimitMin.y = -400.0
+    this.cameraMoveStep = 200.0
+    this.cameraLerpSpeed = 0.05
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -395,11 +400,11 @@ export default class Day {
   onDocumentMouseWheel (event) {
     event.preventDefault()
     if (event.wheelDeltaY > 0) {
-      this.targetPos.z -= 200.0
-      this.targetLookAt.z -= 200.0
+      this.targetPos.z -= this.cameraMoveStep
+      this.targetLookAt.z -= this.cameraMoveStep
     } else {
-      this.targetPos.z += 200.0
-      this.targetLookAt.z += 200.0
+      this.targetPos.z += this.cameraMoveStep
+      this.targetLookAt.z += this.cameraMoveStep
     }
   }
 
@@ -669,9 +674,9 @@ export default class Day {
   }
 
   moveCamera (time) {
-    this.camPos.lerp(this.targetPos, 0.1)
+    this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
-    this.lookAtPos.lerp(this.targetLookAt, 0.1)
+    this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
 
   onDocumentMouseMove (event) {
@@ -693,10 +698,10 @@ export default class Day {
   }
 
   addLights (scene) {
-    let ambLight = new THREE.AmbientLight(0xf1d0c5)
+    let ambLight = new THREE.AmbientLight(0xffffff)
     this.scene.add(ambLight)
 
-    let light = new THREE.SpotLight(0xeee6a5)
+    /* let light = new THREE.SpotLight(0xeee6a5)
     light.position.set(100, 30, 0)
     light.target.position.set(0, 0, 0)
 
@@ -707,7 +712,7 @@ export default class Day {
       light.shadow.mapSize.height = 2048
     }
 
-    this.scene.add(light)
+    this.scene.add(light) */
   }
 
   loadPrevDay () {
@@ -1036,7 +1041,7 @@ export default class Day {
   }
 
   updateMouse () {
-    this.mousePos.lerp(new THREE.Vector2(this.targetMouseX, this.targetMouseY), 0.3)
+    this.mousePos.lerp(new THREE.Vector2(this.targetMouseX, this.targetMouseY), this.cameraLerpSpeed)
   }
 
   ambientCameraMovement () {
@@ -1047,19 +1052,28 @@ export default class Day {
   }
 
   smoothCameraMovement () {
-    if (this.targetPos.x > this.cameraDriftLimit.x) {
-      this.targetPos.x--
+    if (this.targetPos.x > this.cameraDriftLimitMax.x) {
+      this.targetPos.x = this.cameraDriftLimitMax.x - 1
     }
-    if (this.targetPos.y > this.cameraDriftLimit.y) {
-      this.targetPos.y--
+    if (this.targetPos.y > this.cameraDriftLimitMax.y) {
+      this.targetPos.y = this.cameraDriftLimitMax.y - 1
+    }
+    if (this.targetPos.x < this.cameraDriftLimitMin.x) {
+      this.targetPos.x = this.cameraDriftLimitMin.x + 1
+    }
+    if (this.targetPos.y < this.cameraDriftLimitMin.y) {
+      this.targetPos.y = this.cameraDriftLimitMin.y + 1
     }
 
-    if (this.targetPos.x < this.cameraDriftLimit.x && this.targetPos.y < this.cameraDriftLimit.y) {
-      this.camPos.lerp(this.targetPos, 0.05)
-      this.camera.position.copy(this.camPos)
-    }
+    // if (
+//      this.targetPos.x < this.cameraDriftLimitMax.x &&
+  //    this.targetPos.y < this.cameraDriftLimitMax.y
+    // ) {
+    this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
+    this.camera.position.copy(this.camPos)
+//    }
 
-    this.lookAtPos.lerp(this.targetLookAt, 0.1)
+    this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
 
   render () {
