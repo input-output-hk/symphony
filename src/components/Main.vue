@@ -40,14 +40,19 @@ export default {
 
   .main{
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 90%;
-    padding: 1rem;
+    /*bottom: 0;*/
+    /*left: 0;*/
+    width: 90vw;
+    padding: 5rem;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
-    /*height: 100vh;*/
+    height: 90vh;
+  }
+
+  .flex{
+    display:flex;
+    flex-direction: column;
   }
 
   .big{
