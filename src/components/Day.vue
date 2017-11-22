@@ -5,12 +5,12 @@
       <h2>${{ Math.round(total).toLocaleString() }}</h2>
     </div>
     <hr/>
-    <br/>
+    <!-- <br/> -->
     <h4>Date - {{ calendar }}</h4>
     <br/>
     <p>This is a visualisation of Bitcoin. It shows blocks from <b>{{ calendar.toLowerCase() }}</b>. Here blocks are represented by crystal structures distributed in a spiral. Each revolution of the spiral represents a day</p>
     <hr/>
-    <br/>
+    <!-- <br/> -->
     <p>$ - There were <u>{{ totalNumTransaction }} transactions</u> made averaging <u>$1.5BTC in fees</u> per transaction. This is the </p>
     <p>For that day each transcation cost around 215 kilowatt-hours of energy</p>
 

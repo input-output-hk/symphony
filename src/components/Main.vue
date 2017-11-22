@@ -43,7 +43,7 @@ export default {
     /*bottom: 0;*/
     /*left: 0;*/
     width: 90vw;
-    padding: 5rem;
+    padding: 3rem;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
