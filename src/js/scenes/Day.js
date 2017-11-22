@@ -12,7 +12,7 @@ import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
-import { oui } from 'ouioui'
+// import { oui } from 'ouioui'
 
 export default class Day {
   constructor (blocks = [], currentDate = new Date()) {
@@ -22,8 +22,6 @@ export default class Day {
     this.initRenderer()
     this.initCamera()
     this.initShaders()
-
-
 
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
@@ -371,9 +369,9 @@ export default class Day {
 
     this.cameraMoveEvent = new Event('cameraMove')
 
-    oui({
+    /**oui({
       putSomeGUIShitHere: 'boom'
-    })
+    }) */
   }
 
   addEvents () {
@@ -988,7 +986,7 @@ export default class Day {
       color: 0xaaaaaa,
       metalness: 0.7,
       roughness: 0.0,
-      opacity: 0.5,//this.crystalOpacity,
+      opacity: 0.5, // this.crystalOpacity,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
