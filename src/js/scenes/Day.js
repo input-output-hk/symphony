@@ -1562,6 +1562,9 @@ export default class Day {
       this.state.dayGroups.forEach((group) => {
         var intersects = this.raycaster.intersectObjects(group.children)
         if (intersects.length > 0) {
+          if (intersects[0].object === this.state.currentBlockObject) {
+            throw BreakException
+          }
           this.isAnimating = true
           let blockObject = intersects[0].object
           this.removeTrees()
@@ -2125,7 +2128,10 @@ export default class Day {
       if (intersects.length > 0) {
         this.state.focussed = true
         this.mouseStatic = false
-        if (intersects[0].object !== this.intersected[dayIndex]) {
+        if (
+          intersects[0].object !== this.intersected[dayIndex] &&
+          intersects[0].object !== this.state.currentBlockObject
+        ) {
           if (this.intersected[dayIndex]) {
             this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
           }
