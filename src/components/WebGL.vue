@@ -37,9 +37,18 @@ export default {
       return map
     }, new Map())
 
-    // console.log(days)
     let i = 0
-    days.forEach(day => this.app.addDay(day, i++))
+
+    const BreakException = {}
+
+    try {
+      days.forEach((day, index) => {
+        this.app.addDay(day, i++)
+        //throw BreakException
+      })
+    } catch (e) {
+      //
+    }
   }
 }
 </script>

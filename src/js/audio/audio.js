@@ -8,6 +8,8 @@ import _ from 'lodash'
 export default class Audio {
   constructor (camera) {
     this.camera = camera
+    this.quantize = 16
+
     this.bpm = 100
     this.notes = {
       55.000: 'A1',
@@ -209,7 +211,7 @@ export default class Audio {
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
 
-        let mode = this.modes.locrian
+        let mode = this.modes.mixolydian
         for (var frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
@@ -225,11 +227,13 @@ export default class Audio {
 
         let fileName = Config.assetPath + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
 
+        let that = this
+
         let sampler = new Tone.Sampler({
           [note]: fileName
         }, function () {
           new Tone.Loop((time) => {
-            sampler.triggerAttack(note, '@16n', 1.0)
+            sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
           }, '1m').start(Math.random() * 100)
         })
 

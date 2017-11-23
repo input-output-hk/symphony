@@ -63,27 +63,17 @@ export default class Day {
 
   initShaders () {
     this.FXAAShader = {
-
       uniforms: {
-
         'tDiffuse': { value: null },
         'resolution': { value: new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight) }
-
       },
-
       vertexShader: [
-
         'varying vec2 vUv;',
-
         'void main() {',
-
         'vUv = uv;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-
         '}'
-
       ].join('\n'),
-
       fragmentShader: [
         'precision highp float;',
         '',
@@ -1171,7 +1161,7 @@ export default class Day {
     this.RGBShiftShader = {
       uniforms: {
         'tDiffuse': { value: null },
-        'amount': { value: 0.0008 },
+        'amount': { value: 0.0005 },
         'angle': { value: 0.0 }
       },
       vertexShader: [
@@ -1199,8 +1189,8 @@ export default class Day {
     this.VignetteShader = {
       uniforms: {
         'tDiffuse': { value: null },
-        'offset': { value: 1.0 },
-        'darkness': { value: 1.1 }
+        'offset': { value: 1.2 },
+        'darkness': { value: 1.2 }
       },
       vertexShader: [
         'varying vec2 vUv;',
@@ -1284,9 +1274,9 @@ export default class Day {
 
         'tDiffuse': { value: null },
         'time': { value: 0.0 },
-        'nIntensity': { value: 0.1 },
+        'nIntensity': { value: 0.05 },
         'sIntensity': { value: 0.0 },
-        'sCount': { value: 4096 },
+        'sCount': { value: 0 },
         'grayscale': { value: 0 }
 
       },
@@ -1453,12 +1443,12 @@ export default class Day {
     this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 1600.0)
 
     this.cameraDriftLimitMax = {}
-    this.cameraDriftLimitMax.x = 200.0
-    this.cameraDriftLimitMax.y = 200.0
+    this.cameraDriftLimitMax.x = 150.0
+    this.cameraDriftLimitMax.y = 150.0
     this.cameraDriftLimitMin = {}
-    this.cameraDriftLimitMin.x = -200.0
-    this.cameraDriftLimitMin.y = -200.0
-    this.cameraMoveStep = 200.0
+    this.cameraDriftLimitMin.x = -150.0
+    this.cameraDriftLimitMin.y = -150.0
+    this.cameraMoveStep = 100.0
     this.cameraLerpSpeed = 0.01
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
@@ -1659,7 +1649,7 @@ export default class Day {
 
       let blockPos = blockObject.position.clone()
 
-      let targetRotation = new THREE.Euler(Math.PI, 0.0, Math.PI / 2)
+      let targetRotation = new THREE.Euler(0.0, 0.0, 0.0)
       let fromQuaternion = new THREE.Quaternion().copy(blockObject.quaternion)
       let toQuaternion = new THREE.Quaternion().setFromEuler(targetRotation)
 
@@ -1797,14 +1787,22 @@ export default class Day {
 
           this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
 
-          blockObject.geometry.computeBoundingBox()
-          let boxSize = blockObject.geometry.boundingBox.getSize()
+          this.treeMesh.computeBoundingBox()
+          let boxSize = this.treeMesh.boundingBox.getSize()
+          let boxCenter = this.treeMesh.boundingBox.getCenter()
+
+          let boxGeo = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z)
+          let boundingBoxMesh = new THREE.Mesh(boxGeo, new THREE.MeshBasicMaterial(0xff0000))
+
+          boundingBoxMesh.translateX(boxCenter.x)
+          boundingBoxMesh.translateY(boxCenter.y)
+          boundingBoxMesh.translateZ(boxCenter.z)
 
           let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
 
-          //mesh.position.x -= boxSize.x / 2
-          mesh.position.y -= boxSize.y / 2
-          // mesh.position.z -= boxSize.z / 2
+          mesh.translateX(-boxCenter.x)
+          mesh.translateY(-boxCenter.y)
+          mesh.translateZ(-boxCenter.z)
 
           this.treeGroup.add(mesh)
 
@@ -1968,25 +1966,10 @@ export default class Day {
               convexGeometry = new ConvexGeometry(this.points)
               convexGeometry.computeBoundingBox()
               let boxDimensions = convexGeometry.boundingBox.getSize()
-              let boxCenter = convexGeometry.boundingBox.getCenter()
 
-              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x * Math.random(), boxDimensions.y * Math.random(), boxDimensions.z * Math.random())
-
-              let sortedDimensions = [
-                boxDimensions.x, boxDimensions.y, boxDimensions.z
-              ]
-
-              sortedDimensions.sort((a, b) => {
-                return Math.abs(a) - Math.abs(b)
-              })
-
-              // let boundingBoxGeometry = new THREE.BoxBufferGeometry(sortedDimensions[1], sortedDimensions[0], sortedDimensions[2])
               let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
 
-              boundingBoxGeometry.center()
-
               blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-              // blockMesh.position.set(boxCenter.x, boxCenter.y, boxCenter.z)
 
               // align all front faces
               blockMesh.translateZ(-(boxDimensions.z / 2))
@@ -1995,7 +1978,7 @@ export default class Day {
 
               let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
               blockMesh.rotation.z = rotation
-              blockMesh.translateY(700 + (blockIndex * 8))
+              blockMesh.translateY(700 + (blockIndex))
               blockMesh.rotation.z += Math.PI / 2
               blockMesh.translateZ(blockIndex * 8)
 
@@ -2039,7 +2022,7 @@ export default class Day {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 25, 6, false)
+      let geometry = new THREE.TubeGeometry(path, 1, 0.5, 6, false)
       this.treeMesh.merge(geometry, geometry.matrix)
     }
 
@@ -2107,23 +2090,18 @@ export default class Day {
       color: 0xaaaaaa,
       metalness: 0.7,
       roughness: 0.0,
-      opacity: 0.5, // this.crystalOpacity,
+      opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
-      // depthTest: true,
-      // depthWrite: false,
-      // polygonOffset: true,
-      // polygonOffsetFactor: -2.0
     })
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
-      // opacity: 0.5,
-      // transparent: true,
-      emissive: 0xcccccc,
-      metalness: 1.0,
-      roughness: 0.5,
+      color: 0xffffff,
+      flatShading: true,
+      metalness: 0.5,
+      roughness: 0.4,
+      side: THREE.DoubleSide,
       envMap: this.bgMap
     })
   }
@@ -2134,6 +2112,7 @@ export default class Day {
     this.camera.aspect = this.width / this.height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(this.width, this.height)
+    this.FXAAShader.uniforms.resolution.value = new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight)
   }
 
   checkMouseIntersection () {
