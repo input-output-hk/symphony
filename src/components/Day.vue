@@ -52,7 +52,7 @@ export default {
     },
     total({ blocks, date }) {
       // const time = moment(date).startOf('day').toDate() / 1000
-      return blocks.reduce((value, block) => block.input + value, 0 ) / 10000000
+      return blocks.reduce((value, block) => block.input + value, 0) / 10000000
     },
     totalNumTransaction({ blocks, date }) {
       // const time = moment(date).startOf('day').toDate() / 1000
