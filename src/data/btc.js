@@ -42,7 +42,7 @@ export const getBlock = hash => blocks.where('hash', '==', hash)
 /*
   Returns all the blocks that occured on the current date 00:01 - 00:00
 */
-export const getBlocksOnDay = async (date, sortDateAsc) => {
+export const getBlocksOnDay = (date, sortDateAsc) => {
   const fromDay = new Date(date)
   fromDay.setMilliseconds(0)
   fromDay.setSeconds(0)
@@ -52,24 +52,13 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
   const toDay = new Date(fromDay.getTime())
   toDay.setHours(toDay.getHours() + 24)
 
-  let blocksArr = await blocks
-    .where('time', '>=', fromDay / 1000)
-    .where('time', '<', toDay / 1000)
-    .get()
-    .then(({ docs }) => docs.map(doc => Block(doc.data())))
-
-  if (sortDateAsc) {
-    blocksArr.sort((a, b) => {
-      return a.time - b.time
-    })
-  }
-
-  return blocksArr
+  return getBlocksSince(fromDay, toDay)
 }
 
 export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
-  .where('time', '>=', fromDate / 1000)
-  .where('time', '<=', toDate / 1000)
+  .orderBy('time')
+  .startAt(fromDate / 1000)
+  .endAt(toDate / 1000)
   .get()
   .then(({ docs }) => docs.map(doc => Block(doc.data())))
 

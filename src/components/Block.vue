@@ -21,33 +21,9 @@ import { getBlock, getTransactionsForBlock } from '../data/btc'
 
 export default {
   name: 'home',
-  // daata: {
-  //   default:{ hash: '', time: 0, prev_block: '', next_block: '', size: 0, height: 0, relayed_by: '', n_tx: 0, bits: 0, fee: 0, input: 0}
-  // }
   data: _ => ({
     block: { hash: '', time: 0, prev_block: '', next_block: '', size: 0, height: 0, relayed_by: '', n_tx: 0, bits: 0, fee: 0, input: 0}
-  }),
-  // created(){ this.asyncFetch() },
-  // components:{webgl},
-  // methods: {
-  //   asyncFetch: function(){
-  //     console.log('block')
-  //     // getBlock(this.blockhash)
-  //     //   .then((block) => {
-  //     //
-  //     //     this.block = block
-  //     //
-  //     //     getTransactionsForBlock(this.blockhash).then((tx) => {
-  //     //
-  //     //       this.block.tx = tx
-  //     //
-  //     //       new BlockScene(block)
-  //     //
-  //     //     })
-  //     //
-  //     //   })
-  //   }
-  // }
+  })
 }
 </script>
 

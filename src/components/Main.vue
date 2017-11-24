@@ -21,7 +21,10 @@ export default {
   props: ['date', 'block'],
   asyncComputed: {
 
-    focusOnBlock: ({ block }) => getBlock(block),
+    focusOnBlock: ({block}) => {
+      console.log( 'block', block )
+      return block && getBlock(block)
+    },
 
     blocks: {
       async get({ date }){
