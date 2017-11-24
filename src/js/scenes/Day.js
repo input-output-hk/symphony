@@ -16,7 +16,6 @@ import BrightnessContrastShader from '../shaders/BrightnessContrast'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
-// import { oui } from 'ouioui'
 
 export default class Day {
   constructor (blocks = [], currentDate = new Date()) {
@@ -842,6 +841,8 @@ export default class Day {
 
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
+
+    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
