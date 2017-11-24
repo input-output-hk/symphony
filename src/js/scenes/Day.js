@@ -16,6 +16,7 @@ import BrightnessContrastShader from '../shaders/BrightnessContrast'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
+import GenerateBlockMesh from './GenerateBlockGeometry'
 // import { oui } from 'ouioui'
 
 export default class Day {
@@ -58,7 +59,7 @@ export default class Day {
       this.addEvents()
       this.addLights()
       this.setupMaterials()
-      this.addObjects()
+      // this.addObjects()
       this.moveCamera()
       this.animate()
     })
@@ -534,100 +535,124 @@ export default class Day {
     this.scene.add(ambLight)
   }
 
-  addObjects () {
-    this.addDay(this.state.blocks)
-  }
+  // addObjects () {
+  //   this.addDay(this.state.blocks)
+  // }
 
   buildBlocks (blocks, index, group, spiralPoints) {
     return new Promise((resolve, reject) => {
-      for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-        let block = blocks[blockIndex]
 
-        blocks[blockIndex].index = blockIndex
+      const meshes = blocks.map(block => GenerateBlockMesh(block, this.crystalMaterial))
+      group.add(...meshes)
+      // this.spiralPoints = []
 
-     //   getTransactionsForBlock(block.hash).then((transactions) => {
-       /*   let totalFees = 0
-          let totalInput = 0
+      meshes.forEach((mesh, i) => {
+        let rotation = ((10 * Math.PI) / meshes.length) * i
+        mesh.rotation.z = rotation
+        mesh.translateY(700 + (i))
+        mesh.rotation.z += Math.PI / 2
+        mesh.translateZ(i * 8)
 
-          transactions.forEach((tx, key) => {
-            if (key !== 0) { // ignore coinbase transactions
-              totalInput += tx.input
-              totalFees += (tx.input - tx.output)
-            }
-          }) */
+        // group.add(blockMesh)
 
-          // blocks[blockIndex].feeToValueRatio = totalFees / totalInput
-        blocks[blockIndex].feeToValueRatio = 0.01
+        spiralPoints.push(mesh.position)
+      })
 
-          // TODO: set this from network health value
-        this.angle = 5.0 + (block.output % 170)
-        // this.angle = 90.0 + blocks[blockIndex].feeToValueRatio
 
-        // create an array of ints the same size as the number of transactions in this block
-        let tx = []
-        for (let index = 0; index < block.n_tx; index++) {
-          tx.push(index.toString())
-        }
 
-        let sortedTree
-
-        this.X = new THREE.Vector3(1, 0, 0)
-        this.Y = new THREE.Vector3(0, 1, 0)
-        this.Z = new THREE.Vector3(0, 0, 1)
-
-        this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
-        this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
-        this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
-        this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
-        this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
-        this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
-        this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
-
-        var args = {
-          array: tx,
-          hashalgo: 'md5',
-          hashlist: true
-        }
-
-        let tree = merkle.fromArray(args)
-
-        this.points = []
-
-        let startingPosition = new THREE.Vector3(0, 0, 0)
-        let direction = new THREE.Vector3(0, 1, 0)
-
-        this.build(tree, startingPosition, direction, this)
-
-        // Convex Hull
-        let convexGeometry
-        let blockMesh
-
-        if (this.points.length > 3) {
-          convexGeometry = new ConvexGeometry(this.points)
-          convexGeometry.computeBoundingBox()
-          let boxDimensions = convexGeometry.boundingBox.getSize()
-
-          let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
-
-          blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-
-          // align all front faces
-          blockMesh.translateZ(-(boxDimensions.z / 2))
-
-          blockMesh.blockchainData = block
-
-          let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-          blockMesh.rotation.z = rotation
-          blockMesh.translateY(700 + (blockIndex))
-          blockMesh.rotation.z += Math.PI / 2
-          blockMesh.translateZ(blockIndex * 8)
-
-          group.add(blockMesh)
-
-          spiralPoints.push(blockMesh.position)
-        }
+      // for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
+      //
+      //
+      //   let block = blocks[blockIndex]
+      //
+      //   let mesh = GenerateBlockMesh(block)
+      //   console.log( mesh )
+     //
+     //    blocks[blockIndex].index = blockIndex
+     //
+     // //   getTransactionsForBlock(block.hash).then((transactions) => {
+     //   /*   let totalFees = 0
+     //      let totalInput = 0
+     //
+     //      transactions.forEach((tx, key) => {
+     //        if (key !== 0) { // ignore coinbase transactions
+     //          totalInput += tx.input
+     //          totalFees += (tx.input - tx.output)
+     //        }
+     //      }) */
+     //
+     //      // blocks[blockIndex].feeToValueRatio = totalFees / totalInput
+     //    blocks[blockIndex].feeToValueRatio = 0.01
+     //
+     //      // TODO: set this from network health value
+     //    this.angle = 5.0 + (block.output % 170)
+     //    // this.angle = 90.0 + blocks[blockIndex].feeToValueRatio
+     //
+     //    // create an array of ints the same size as the number of transactions in this block
+     //    let tx = []
+     //    for (let index = 0; index < block.n_tx; index++) {
+     //      tx.push(index.toString())
+     //    }
+     //
+     //    this.X = new THREE.Vector3(1, 0, 0)
+     //    this.Y = new THREE.Vector3(0, 1, 0)
+     //    this.Z = new THREE.Vector3(0, 0, 1)
+     //
+     //    this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
+     //    this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)
+     //    this.yPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * this.angle)
+     //    this.yNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * -this.angle)
+     //    this.yReverseRotation = new THREE.Quaternion().setFromAxisAngle(this.Y, (Math.PI / 180) * 180)
+     //    this.zPosRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * this.angle)
+     //    this.zNegRotation = new THREE.Quaternion().setFromAxisAngle(this.Z, (Math.PI / 180) * -this.angle)
+     //
+     //    var args = {
+     //      array: tx,
+     //      hashalgo: 'md5',
+     //      hashlist: true
+     //    }
+     //
+     //    let tree = merkle.fromArray(args)
+     //
+     //    this.points = []
+     //
+     //    let startingPosition = new THREE.Vector3(0, 0, 0)
+     //    let direction = new THREE.Vector3(0, 1, 0)
+     //
+     //    this.build(tree, startingPosition, direction, this)
+     //
+     //    // Convex Hull
+     //    let convexGeometry
+     //    let blockMesh
+     //
+     //    // if (this.points.length > 3) {
+     //      // convexGeometry = new ConvexGeometry(this.points)
+     //      // convexGeometry.computeBoundingBox()
+     //    let box = new THREE.Box3().setFromPoints(this.points)
+     //    let boxDimensions = box.getSize()
+     //
+     //    let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+     //    // let boundingBoxGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+     //
+     //    blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
+     //    // blockMesh.scale.set(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+     //    // align all front faces
+     //    blockMesh.translateZ(-(boxDimensions.z / 2))
+     //
+     //    blockMesh.blockchainData = block
+     //
+     //    let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+     //    blockMesh.rotation.z = rotation
+     //    blockMesh.translateY(700 + (blockIndex))
+     //    blockMesh.rotation.z += Math.PI / 2
+     //    blockMesh.translateZ(blockIndex * 8)
+     //
+     //    group.add(blockMesh)
+     //
+     //    spiralPoints.push(blockMesh.position)
+        // }
        // })
-      }
+      // }
 
       resolve()
     })
