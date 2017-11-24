@@ -52,7 +52,8 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
   const toDay = new Date(fromDay.getTime())
   toDay.setHours(toDay.getHours() + 24)
 
-  let blocksArr = await blocks.where('time', '>=', fromDay / 1000)
+  let blocksArr = await blocks
+    .where('time', '>=', fromDay / 1000)
     .where('time', '<', toDay / 1000)
     .get()
     .then(({ docs }) => docs.map(doc => Block(doc.data())))
@@ -67,8 +68,6 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
 }
 
 export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
-  // .orderBy('time')
-  // .startAt()
   .where('time', '>=', fromDate / 1000)
   .where('time', '<=', toDate / 1000)
   .get()
