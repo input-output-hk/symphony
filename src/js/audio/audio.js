@@ -9,7 +9,9 @@ export default class Audio {
   constructor (camera) {
     this.camera = camera
     this.quantize = 16
-
+    this.masterVol = -6 // db
+    this.ambienceVol = -16 // db
+    this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
     this.bpm = 100
     this.notes = {
       55.000: 'A1',
@@ -130,6 +132,29 @@ export default class Audio {
     this.audioLoader = new THREE.AudioLoader()
   }
 
+  playAmbience () {
+    return new Promise((resolve, reject) => {
+      this.ambienceFilter = new Tone.Filter({
+        type: 'lowpass',
+        Q: 5
+      }).chain(this.ambienceBus)
+
+      this.ambiencePlayer = new Tone.Player({
+        'url': this.ambiencePath,
+        'loop': true,
+        onload: () => {
+          resolve()
+        }
+      }).chain(this.ambienceFilter)
+
+      this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
+    })
+  }
+
+  setAmbienceFilterCutoff (value) {
+    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 2)
+  }
+
   unloadSound () {
     this.panners.forEach((panner) => {
       panner.dispose()
@@ -138,7 +163,7 @@ export default class Audio {
     this.panners = []
   }
 
-  preload () {
+  preloadNotes () {
     return new Promise((resolve, reject) => {
       let loadCount = 0
       let self = this
@@ -150,7 +175,6 @@ export default class Audio {
           function (audioBuffer) {
             loadCount++
             if (loadCount === Object.keys(self.notes).length) {
-              console.log('sound loaded')
               resolve()
             }
           }
@@ -159,9 +183,32 @@ export default class Audio {
     })
   }
 
+  preloadAmbience () {
+    return new Promise((resolve, reject) => {
+      this.audioLoader.load(
+        this.ambiencePath,
+        function (audioBuffer) {
+          resolve()
+        }
+      )
+    })
+  }
+
+  preload () {
+    return new Promise((resolve, reject) => {
+      this.preloadNotes().then(() => {
+        this.preloadAmbience().then(() => {
+          console.log('sound loaded')
+          resolve()
+        })
+      })
+    })
+  }
+
   init () {
     return new Promise((resolve, reject) => {
-      this.masterVol = new Tone.Volume(0).toMaster()
+      this.masterBus = new Tone.Volume(this.masterVol).toMaster()
+      this.ambienceBus = new Tone.Volume(-96).toMaster()
 
       this.convolver = new Tone.Convolver(Config.assetPath + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0)
@@ -183,14 +230,17 @@ export default class Audio {
       Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
 
       this.preload().then(() => {
-        Tone.Transport.start()
-        resolve()
+        this.playAmbience().then(() => {
+          this.ambiencePlayer.start(0)
+          Tone.Transport.start()
+          resolve()
+        })
       })
     })
   }
 
   generateMerkleSound (positionsArray, blockObjectPosition) {
-    let noteTotal = 40
+    let noteTotal = 30
     let noteCount = 0
 
     positionsArray.forEach((point) => {
@@ -200,7 +250,7 @@ export default class Audio {
         let offsetPosition = pointVector.add(blockObjectPosition.clone())
 
         // add positional audio
-        let panner = new Tone.Panner3D().chain(this.masterVol)
+        let panner = new Tone.Panner3D().chain(this.masterBus)
         panner.refDistance = 500
         panner.rolloffFactor = 50
         panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)

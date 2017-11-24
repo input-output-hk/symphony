@@ -3,9 +3,7 @@
 // libs
 import * as THREE from 'three'
 import Config from '../Config'
-import { ConvexGeometry } from '../../../functions/ConvexGeometry'
 import Audio from '../audio/audio'
-import _ from 'lodash'
 import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
 import FXAAShader from '../shaders/FXAA'
 import HueSaturationShader from '../shaders/HueSaturation'
@@ -839,6 +837,8 @@ export default class Day {
 
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
+
+    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
