@@ -50,7 +50,21 @@
                 // Generate a Merkle Tree from the leaves
             const tree = genMerkle(fastMap, hashalgo);//, function (tree) {
                     // cb(null, tree);
-            return tree
+            let sortedTree
+            for (var key in tree) {
+              if (tree.hasOwnProperty(key)) {
+                var element = tree[key]
+                if (element.type === 'root' || element.type === 'node') {
+                  tree[key].children = {}
+                  tree[key].children[element.left] = tree[element.left]
+                  tree[key].children[element.right] = tree[element.right]
+                  if (element.type === 'root') {
+                    sortedTree = element
+                  }
+                }
+              }
+            }
+            return sortedTree
                 // });
             // });
         }

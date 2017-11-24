@@ -413,20 +413,6 @@ export default class Day {
 
     let tree = merkle.fromArray(args)
 
-    for (var key in tree) {
-      if (tree.hasOwnProperty(key)) {
-        var element = tree[key]
-        if (element.type === 'root' || element.type === 'node') {
-          tree[key].children = {}
-          tree[key].children[element.left] = tree[element.left]
-          tree[key].children[element.right] = tree[element.right]
-          if (element.type === 'root') {
-            sortedTree = element
-          }
-        }
-      }
-    }
-
     this.points = []
 
     let startingPosition = new THREE.Vector3(0, 0, 0)
@@ -434,7 +420,7 @@ export default class Day {
 
     this.state.currentBlock.endNodes = []
 
-    this.build(sortedTree, startingPosition, direction, this, true)
+    this.build(tree, startingPosition, direction, this, true)
 
     if (this.points.length > 3) {
       let seen = []
@@ -605,27 +591,12 @@ export default class Day {
 
         let tree = merkle.fromArray(args)
 
-        this.totalLevels = tree.levels
-        for (var key in tree) {
-          if (tree.hasOwnProperty(key)) {
-            var element = tree[key]
-            if (element.type === 'root' || element.type === 'node') {
-              tree[key].children = {}
-              tree[key].children[element.left] = tree[element.left]
-              tree[key].children[element.right] = tree[element.right]
-              if (element.type === 'root') {
-                sortedTree = element
-              }
-            }
-          }
-        }
-
         this.points = []
 
         let startingPosition = new THREE.Vector3(0, 0, 0)
         let direction = new THREE.Vector3(0, 1, 0)
 
-        this.build(sortedTree, startingPosition, direction, this)
+        this.build(tree, startingPosition, direction, this)
 
         // Convex Hull
         let convexGeometry
