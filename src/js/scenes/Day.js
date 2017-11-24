@@ -374,6 +374,9 @@ export default class Day {
 
     this.angle = 5.0 + (block.output % 170)
     // this.angle = 90.0 + block.feeToValueRatio
+    this.X = new THREE.Vector3(1, 0, 0)
+    this.Y = new THREE.Vector3(0, 1, 0)
+    this.Z = new THREE.Vector3(0, 0, 1)
 
     this.xPosRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * this.angle)
     this.xNegRotation = new THREE.Quaternion().setFromAxisAngle(this.X, (Math.PI / 180) * -this.angle)

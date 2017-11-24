@@ -75,7 +75,8 @@ const build = (node, startingPosition, direction, visualise, angle, points = [])
   return points
 }
 
-export default function ({ output, n_tx }, material) {
+export default function (block, material) {
+  const { output, n_tx } = block
   const angle = DEG2RAD * 5.0 + (output % 170)
 
   xPosRotation.setFromAxisAngle(X, angle)
@@ -111,7 +112,7 @@ export default function ({ output, n_tx }, material) {
   // align all front faces
   // blockMesh.translateZ(-(boxDimensions.z / 2))
 
-  // blockMesh.blockchainData = block
+  blockMesh.blockchainData = block
 
   return blockMesh
 
