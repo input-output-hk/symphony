@@ -67,6 +67,8 @@ export const getBlocksOnDay = async (date, sortDateAsc) => {
 }
 
 export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
+  // .orderBy('time')
+  // .startAt()
   .where('time', '>=', fromDate / 1000)
   .where('time', '<=', toDate / 1000)
   .get()

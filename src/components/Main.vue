@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class='main'>
-      <router-view class='big' :blocks='blocks' :focusOnBlock='focusOnBlock'/>
+      <router-view class='big' :blocks='blocks' :block='focusOnBlock'/>
       <graph v-if='blocks.length > 0'/>
     </div>
     <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getLatestBlock, getBlocksSince } from '../data/btc'
+import { getBlock, getBlocksSince } from '../data/btc'
 import moment from 'moment'
 import webgl from './WebGL'
 import graph from './Graph'
@@ -21,11 +21,14 @@ export default {
   props: ['date', 'block'],
   asyncComputed: {
 
-    focusOnBlock: async ({ block }) => block && await getBlock(block),
+    focusOnBlock: ({ block }) => getBlock(block),
 
     blocks: {
       async get({ date }){
-        if(!date) return []
+        console.log( date )
+        if(!date && !this.focusOnBlock) return []
+        if(!date) date = new Date(this.focusOnBlock.time * 1000)
+        console.log( date )
         const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
         const b = moment(date).endOf('day').toDate()
         return await getBlocksSince(a, b)

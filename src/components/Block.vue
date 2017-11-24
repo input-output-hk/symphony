@@ -1,6 +1,6 @@
 <template>
   <div>
-    <br><b>Block:</b> <a :href='"https://blockchain.info/block/"+block.hash' target='_blank'>{{ block.hash }}</a>
+    <br><b>Block:</b>{{ block.hash }}
     <br><b>Time:</b> {{ block.time }}
     <br><b>Previous Block:</b> <router-link :to='block.prev_block'>{{ block.prev_block }}</router-link>
     <br><b>Next Block:</b> <router-link :to='block.next_block'>{{ block.next_block }}</router-link>
@@ -21,31 +21,33 @@ import { getBlock, getTransactionsForBlock } from '../data/btc'
 
 export default {
   name: 'home',
-  props: ['blockhash'],
+  // daata: {
+  //   default:{ hash: '', time: 0, prev_block: '', next_block: '', size: 0, height: 0, relayed_by: '', n_tx: 0, bits: 0, fee: 0, input: 0}
+  // }
   data: _ => ({
     block: { hash: '', time: 0, prev_block: '', next_block: '', size: 0, height: 0, relayed_by: '', n_tx: 0, bits: 0, fee: 0, input: 0}
   }),
-  created(){ this.asyncFetch() },
+  // created(){ this.asyncFetch() },
   // components:{webgl},
-  methods: {
-    asyncFetch: function(){
-      console.log('block')
-      // getBlock(this.blockhash)
-      //   .then((block) => {
-      //
-      //     this.block = block
-      //
-      //     getTransactionsForBlock(this.blockhash).then((tx) => {
-      //
-      //       this.block.tx = tx
-      //
-      //       new BlockScene(block)
-      //
-      //     })
-      //
-      //   })
-    }
-  }
+  // methods: {
+  //   asyncFetch: function(){
+  //     console.log('block')
+  //     // getBlock(this.blockhash)
+  //     //   .then((block) => {
+  //     //
+  //     //     this.block = block
+  //     //
+  //     //     getTransactionsForBlock(this.blockhash).then((tx) => {
+  //     //
+  //     //       this.block.tx = tx
+  //     //
+  //     //       new BlockScene(block)
+  //     //
+  //     //     })
+  //     //
+  //     //   })
+  //   }
+  // }
 }
 </script>
 

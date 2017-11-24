@@ -49,6 +49,8 @@ export default {
     } catch (e) {
       //
     }
+
+    if(this.blocks && this.blocks.length > 0 && this.focusOnBlock) this.app.movetoBlock(this.focusOnBlock.hash)
   }
 }
 </script>
