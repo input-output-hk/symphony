@@ -410,76 +410,76 @@ export default class Day {
       hashalgo: 'md5',
       hashlist: true
     }
-    merkle.fromArray(args, function (err, tree) {
-      if (!err) {
-        for (var key in tree) {
-          if (tree.hasOwnProperty(key)) {
-            var element = tree[key]
-            if (element.type === 'root' || element.type === 'node') {
-              tree[key].children = {}
-              tree[key].children[element.left] = tree[element.left]
-              tree[key].children[element.right] = tree[element.right]
-              if (element.type === 'root') {
-                sortedTree = element
-              }
-            }
+
+    let tree = merkle.fromArray(args)
+
+    for (var key in tree) {
+      if (tree.hasOwnProperty(key)) {
+        var element = tree[key]
+        if (element.type === 'root' || element.type === 'node') {
+          tree[key].children = {}
+          tree[key].children[element.left] = tree[element.left]
+          tree[key].children[element.right] = tree[element.right]
+          if (element.type === 'root') {
+            sortedTree = element
           }
         }
-
-        this.points = []
-
-        let startingPosition = new THREE.Vector3(0, 0, 0)
-        let direction = new THREE.Vector3(0, 1, 0)
-
-        this.state.currentBlock.endNodes = []
-
-        this.build(sortedTree, startingPosition, direction, this, true)
-
-        if (this.points.length > 3) {
-          let seen = []
-          let reducedArray = []
-          this.state.currentBlock.endNodes.forEach((nodePos, index) => {
-            let position = {
-              x: Math.ceil(nodePos.x / 10) * 10,
-              y: Math.ceil(nodePos.y / 10) * 10,
-              z: Math.ceil(nodePos.z / 10) * 10
-            }
-
-            let key = JSON.stringify(position)
-
-            if (seen.indexOf(key) === -1) {
-              seen.push(key)
-              nodePos.y = Math.abs(nodePos.y) * 10
-              reducedArray.push(nodePos)
-            }
-          })
-
-          this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
-
-          this.treeMesh.computeBoundingBox()
-          let boxSize = this.treeMesh.boundingBox.getSize()
-          let boxCenter = this.treeMesh.boundingBox.getCenter()
-
-          let boxGeo = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z)
-          let boundingBoxMesh = new THREE.Mesh(boxGeo, new THREE.MeshBasicMaterial(0xff0000))
-
-          boundingBoxMesh.translateX(boxCenter.x)
-          boundingBoxMesh.translateY(boxCenter.y)
-          boundingBoxMesh.translateZ(boxCenter.z)
-
-          let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
-
-          mesh.translateX(-boxCenter.x)
-          mesh.translateY(-boxCenter.y)
-          mesh.translateZ(-boxCenter.z)
-
-          this.treeGroup.add(mesh)
-
-          this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
-          this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-        }
       }
-    }.bind(this))
+    }
+
+    this.points = []
+
+    let startingPosition = new THREE.Vector3(0, 0, 0)
+    let direction = new THREE.Vector3(0, 1, 0)
+
+    this.state.currentBlock.endNodes = []
+
+    this.build(sortedTree, startingPosition, direction, this, true)
+
+    if (this.points.length > 3) {
+      let seen = []
+      let reducedArray = []
+      this.state.currentBlock.endNodes.forEach((nodePos, index) => {
+        let position = {
+          x: Math.ceil(nodePos.x / 10) * 10,
+          y: Math.ceil(nodePos.y / 10) * 10,
+          z: Math.ceil(nodePos.z / 10) * 10
+        }
+
+        let key = JSON.stringify(position)
+
+        if (seen.indexOf(key) === -1) {
+          seen.push(key)
+          nodePos.y = Math.abs(nodePos.y) * 10
+          reducedArray.push(nodePos)
+        }
+      })
+
+      this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+
+      this.treeMesh.computeBoundingBox()
+      let boxSize = this.treeMesh.boundingBox.getSize()
+      let boxCenter = this.treeMesh.boundingBox.getCenter()
+
+      let boxGeo = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z)
+      let boundingBoxMesh = new THREE.Mesh(boxGeo, new THREE.MeshBasicMaterial(0xff0000))
+
+      boundingBoxMesh.translateX(boxCenter.x)
+      boundingBoxMesh.translateY(boxCenter.y)
+      boundingBoxMesh.translateZ(boxCenter.z)
+
+      let mesh = new THREE.Mesh(this.treeMesh, this.merkleMaterial)
+
+      mesh.translateX(-boxCenter.x)
+      mesh.translateY(-boxCenter.y)
+      mesh.translateZ(-boxCenter.z)
+
+      this.treeGroup.add(mesh)
+
+      this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+      this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+    }
+
   }
 
   animateCamera (target, lookAt, duration) {
@@ -603,60 +603,58 @@ export default class Day {
           hashlist: true
         }
 
-        merkle.fromArray(args, function (err, tree) {
-          if (!err) {
-            this.totalLevels = tree.levels
-            for (var key in tree) {
-              if (tree.hasOwnProperty(key)) {
-                var element = tree[key]
-                if (element.type === 'root' || element.type === 'node') {
-                  tree[key].children = {}
-                  tree[key].children[element.left] = tree[element.left]
-                  tree[key].children[element.right] = tree[element.right]
-                  if (element.type === 'root') {
-                    sortedTree = element
-                  }
-                }
+        let tree = merkle.fromArray(args)
+
+        this.totalLevels = tree.levels
+        for (var key in tree) {
+          if (tree.hasOwnProperty(key)) {
+            var element = tree[key]
+            if (element.type === 'root' || element.type === 'node') {
+              tree[key].children = {}
+              tree[key].children[element.left] = tree[element.left]
+              tree[key].children[element.right] = tree[element.right]
+              if (element.type === 'root') {
+                sortedTree = element
               }
             }
-
-            this.points = []
-
-            let startingPosition = new THREE.Vector3(0, 0, 0)
-            let direction = new THREE.Vector3(0, 1, 0)
-
-            this.build(sortedTree, startingPosition, direction, this)
-
-            // Convex Hull
-            let convexGeometry
-            let blockMesh
-
-            if (this.points.length > 3) {
-              convexGeometry = new ConvexGeometry(this.points)
-              convexGeometry.computeBoundingBox()
-              let boxDimensions = convexGeometry.boundingBox.getSize()
-
-              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
-
-              blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
-
-              // align all front faces
-              blockMesh.translateZ(-(boxDimensions.z / 2))
-
-              blockMesh.blockchainData = block
-
-              let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
-              blockMesh.rotation.z = rotation
-              blockMesh.translateY(700 + (blockIndex))
-              blockMesh.rotation.z += Math.PI / 2
-              blockMesh.translateZ(blockIndex * 8)
-
-              group.add(blockMesh)
-
-              spiralPoints.push(blockMesh.position)
-            }
           }
-        }.bind(this))
+        }
+
+        this.points = []
+
+        let startingPosition = new THREE.Vector3(0, 0, 0)
+        let direction = new THREE.Vector3(0, 1, 0)
+
+        this.build(sortedTree, startingPosition, direction, this)
+
+        // Convex Hull
+        let convexGeometry
+        let blockMesh
+
+        if (this.points.length > 3) {
+          convexGeometry = new ConvexGeometry(this.points)
+          convexGeometry.computeBoundingBox()
+          let boxDimensions = convexGeometry.boundingBox.getSize()
+
+          let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+
+          blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
+
+          // align all front faces
+          blockMesh.translateZ(-(boxDimensions.z / 2))
+
+          blockMesh.blockchainData = block
+
+          let rotation = ((10 * Math.PI) / blocks.length) * blockIndex
+          blockMesh.rotation.z = rotation
+          blockMesh.translateY(700 + (blockIndex))
+          blockMesh.rotation.z += Math.PI / 2
+          blockMesh.translateZ(blockIndex * 8)
+
+          group.add(blockMesh)
+
+          spiralPoints.push(blockMesh.position)
+        }
        // })
       }
 

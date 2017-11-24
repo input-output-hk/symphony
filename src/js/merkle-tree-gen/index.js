@@ -23,7 +23,7 @@
 
         if (!args.array || args.array.length === 0) {
             cb('An array with at least 1 element is required', null);
-
+            return null
         } else {
             array = args.array;
 
@@ -49,7 +49,8 @@
 
                 // Generate a Merkle Tree from the leaves
             const tree = genMerkle(fastMap, hashalgo);//, function (tree) {
-                    cb(null, tree);
+                    // cb(null, tree);
+            return tree
                 // });
             // });
         }
