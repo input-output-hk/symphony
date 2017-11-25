@@ -6,13 +6,9 @@ import Config from '../Config'
 import { ConvexGeometry } from '../../../functions/ConvexGeometry'
 import Audio from '../audio/audio'
 import _ from 'lodash'
-import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
-import FXAAShader from '../shaders/FXAA'
-import HueSaturationShader from '../shaders/HueSaturation'
-import RGBShiftShader from '../shaders/RGBShift'
-import VignetteShader from '../shaders/Vignette'
-import FilmShader from '../shaders/Film'
-import BrightnessContrastShader from '../shaders/BrightnessContrast'
+import RayMarcher from '../raymarcher/RayMarcher'
+
+let glslify = require('glslify')
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -25,31 +21,8 @@ export default class Day {
     this.initRenderer()
     this.initCamera()
 
-    this.composer = new EffectComposer(this.renderer)
-
-    this.composer.setSize(window.innerWidth, window.innerHeight)
-
-    this.renderPass = new RenderPass(this.scene, this.camera)
-    this.composer.addPass(this.renderPass)
-
-    this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    this.composer.addPass(this.RGBShiftPass)
-
-    this.FilmShaderPass = new ShaderPass(FilmShader)
-    this.composer.addPass(this.FilmShaderPass)
-
-    this.VignettePass = new ShaderPass(VignetteShader)
-    this.composer.addPass(this.VignettePass)
-
-    this.BrightnessContrastPass = new ShaderPass(BrightnessContrastShader)
-    this.composer.addPass(this.BrightnessContrastPass)
-
-    this.HueSaturationPass = new ShaderPass(HueSaturationShader)
-    this.composer.addPass(this.HueSaturationPass)
-
-    this.FXAAPass = new ShaderPass(FXAAShader)
-    this.FXAAPass.renderToScreen = true
-    this.composer.addPass(this.FXAAPass)
+    this.initPost()
+    this.initRayMarcher()
 
     this.audio = new Audio(this.camera)
 
@@ -63,6 +36,14 @@ export default class Day {
     })
   }
 
+  initRayMarcher () {
+    let params = {
+      canvas: this.canvas,
+      camera: this.camera
+    }
+    this.raymarcher = new RayMarcher(params)
+  }
+
   initState (blocks, currentDate) {
     this.state = {}
     this.state.focussed = false // are we focussed on a block?
@@ -73,6 +54,37 @@ export default class Day {
     this.state.currentBlock = null
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
+  }
+
+  initPost () {
+    this.postScene = new THREE.Scene()
+
+    this.lightRenderTarget = new THREE.WebGLRenderTarget(1, 1)
+
+    this.additiveCopyMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTexture: {
+          value: null
+        }
+      },
+      vertexShader: glslify('../glsl/quad.vert'),
+      fragmentShader: glslify('../glsl/quad.frag'),
+      transparent: true,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.OneFactor,
+      blendDst: THREE.OneFactor,
+      blendEquation: THREE.AddEquation,
+      blendSrcAlpha: THREE.OneFactor,
+      blendDstAlpha: THREE.ZeroFactor,
+      blendEquationAlpha: THREE.AddEquation
+    })
+
+    this.postQuadGeometry = new THREE.PlaneBufferGeometry(2, 2)
+    this.postQuad = new THREE.Mesh(this.postQuadGeometry, this.additiveCopyMaterial)
+    this.postScene.add(this.postQuad)
+
+    this.postCamera = new THREE.Camera()
+    this.postCamera.position.set(0, 0, 1)
   }
 
   initRenderer () {
@@ -97,9 +109,6 @@ export default class Day {
     this.renderer.autoClear = false
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
-    this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
-    this.renderer.shadowMap.soft = true
     this.renderer.autoClear = false
     this.renderer.sortObjects = false
   }
@@ -780,7 +789,10 @@ export default class Day {
     this.camera.aspect = this.width / this.height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(this.width, this.height)
-    this.FXAAPass.uniforms.resolution.value = new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight)
+
+    this.raymarcher.setSize(this.width, this.height)
+
+    this.lightRenderTarget.setSize(this.width, this.height)
   }
 
   checkMouseIntersection () {
@@ -842,7 +854,7 @@ export default class Day {
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
 
-    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
+    // this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
@@ -853,12 +865,31 @@ export default class Day {
     this.updateMouse()
     this.smoothCameraMovement()
     this.ambientCameraMovement()
-    this.composer.render()
+
+    this.raymarcher.renderer.setClearColor(Config.scene.bgColor, 1)
+
+    // render standard scene
+    this.raymarcher.renderer.render(this.scene, this.camera)
+
+    this.raymarcher.update()
+
+    this.raymarcher.renderer.autoClearColor = false
+
+    // render light
+    this.raymarcher.renderer.render(this.raymarcher.scene, this.postCamera, this.lightRenderTarget)
+
+    // render post quad
+    this.additiveCopyMaterial.uniforms.uTexture.value = this.lightRenderTarget.texture
+    this.raymarcher.renderer.render(this.postScene, this.postCamera)
+
+    this.raymarcher.renderer.autoClearColor = true
+    this.raymarcher.renderer.setClearColor(0, 0)
+    this.raymarcher.renderer.clearTarget(this.lightRenderTarget, true, true, true)
+
     if (this.state.view === 'block') {
       this.state.currentBlockObject.rotation.y += 0.001
       this.treeGroup.rotation.y += 0.001
     }
-    // this.renderer.render(this.scene, this.camera)
   }
 
   animate () {

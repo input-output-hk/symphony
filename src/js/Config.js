@@ -12,7 +12,7 @@ const Config = {
     antialias: true
   },
   postProcessing: {
-    effectDownscaleDivisor: 2
+    effectDownscaleDivisor: 1
   },
   camera: {
     fov: 80

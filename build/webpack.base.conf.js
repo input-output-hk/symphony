@@ -25,11 +25,15 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src'),
+      '@': resolve('src')
     }
   },
   module: {
     rules: [
+      /* {
+        test: /\.(glsl|frag|vert)(\?.*)?$/,
+        loader: 'webpack-glsl-loader'
+      }, */
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -39,6 +43,11 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
+      },
+      {
+        test: /\.js$/,
+        loader: 'ify-loader',
+        enforce: 'post'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

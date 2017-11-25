@@ -8,9 +8,9 @@ import _ from 'lodash'
 export default class Audio {
   constructor (camera) {
     this.camera = camera
-    this.quantize = 16
+    this.quantize = 12
     this.masterVol = -6 // db
-    this.ambienceVol = -16 // db
+    this.ambienceVol = -12 // db
     this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
     this.bpm = 100
     this.notes = {
@@ -262,6 +262,13 @@ export default class Audio {
         let note = 'C1'
 
         let mode = this.modes.mixolydian
+                    .concat(this.modes.aeolian)
+                    .concat(this.modes.dorian)
+                    .concat(this.modes.ionian)
+                    .concat(this.modes.locrian)
+                    .concat(this.modes.lydian)
+                    .concat(this.modes.phrygian)
+
         for (var frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')

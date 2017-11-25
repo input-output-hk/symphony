@@ -10,11 +10,18 @@
     "build": "node build/build.js",
     "test": "standard 'src/**/*.js'"
   },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
   "dependencies": {
     "@tweenjs/tween.js": "^17.1.1",
     "axios": "^0.16.2",
     "babel-runtime": "^6.26.0",
     "firebase": "^4.5.2",
+    "glslify": "^6.1.0",
+    "ify-loader": "^1.1.0",
     "lodash": "^4.17.4",
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.19.1",
@@ -63,6 +70,7 @@
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.2.1",
     "webpack-dev-middleware": "^1.10.0",
+    "webpack-glsl-loader": "^1.0.1",
     "webpack-hot-middleware": "^2.18.0",
     "webpack-merge": "^4.1.0"
   },
