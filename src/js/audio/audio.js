@@ -133,6 +133,7 @@ export default class Audio {
   }
 
   playAmbience () {
+    resolve()
     return new Promise((resolve, reject) => {
       this.ambienceFilter = new Tone.Filter({
         type: 'lowpass',

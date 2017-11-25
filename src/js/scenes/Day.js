@@ -854,7 +854,7 @@ export default class Day {
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
 
-    // this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
+    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
