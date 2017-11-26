@@ -32,15 +32,30 @@ export default class RayMarcher {
 
     // this.setSize(this.width, this.height)
 
-    this.setFragmentShader()
-
     return this
   }
 
-  setFragmentShader () {
+  setFragmentShader (params) {
     this.startTime = Date.now()
 
-    this.quad.material = this.material = new THREE.ShaderMaterial({
+    /* let boxes = [
+      {
+        position: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 0.0],
+        scale: [100.0, 100.0, 100.0]
+      }
+    ] */
+
+    let boxes = params.boxes
+    let boxSDF = 'float dist = 10000.0; '
+    for (let index = 0; index < boxes.length; index++) {
+      const box = boxes[index]
+      boxSDF += ` fBox(p + vec3(${parseFloat(box.position[0])}, ${parseFloat(box.position[1])}, ${parseFloat(box.position[2])}), vec3(${parseFloat(box.scale[0])}, ${parseFloat(box.scale[1])}, ${parseFloat(box.scale[2])}), dist); `
+    }
+
+    console.log(boxSDF)
+
+    this.quad.material = this.material = new THREE.RawShaderMaterial({
 
       uniforms: {
         resolution: {
@@ -52,13 +67,23 @@ export default class RayMarcher {
           value: new THREE.Matrix4()
         }
       },
-      vertexShader: 'void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+      vertexShader: `
+      
+      uniform mat4 projectionMatrix;
+      uniform mat4 modelViewMatrix;
+      attribute vec3 position;
+
+      void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }
+      
+      `,
       fragmentShader: `
 
-      #define DELTA 0.0001
-      #define RAY_COUNT 7
-      #define RAY_LENGTH_MAX 2000.0
-      #define RAY_STEP_MAX 100
+      precision lowp float;
+
+      #define DELTA 0.1
+      #define RAY_COUNT 3
+      #define RAY_LENGTH_MAX 5000.0
+      #define RAY_STEP_MAX 50
       #define LIGHT vec3 (1.0, 1.0, -1.0)
       #define REFRACT_FACTOR 0.6
       #define REFRACT_INDEX 1.6
@@ -67,11 +92,22 @@ export default class RayMarcher {
       #define SPECULAR_INTENSITY 0.5
       #define FADE_POWER 1.0
       #define M_PI 3.1415926535897932384626433832795
-      #define GLOW_FACTOR 1.5
+      #define GLOW_FACTOR 0.5
       #define LUMINOSITY_FACTOR 2.0
+      #define PI 3.1415926535897932384626433832795
+      #define TAU (2*PI)
+      #define PHI (sqrt(5)*0.5 + 0.5)
 
       uniform vec2 resolution;
       uniform mat4 invProjMat;
+
+      uniform float scales[100];
+
+      vec3 k;
+
+      float opU(float d1, float d2) {
+        return (d1 <= d2) ? d1 : d2;
+      }
 
       float vmax(vec3 v) {
         return max(max(v.x, v.y), v.z);
@@ -79,7 +115,6 @@ export default class RayMarcher {
 
       vec2 squareFrame(vec2 screenSize) {
         vec2 position = 2.0 * (gl_FragCoord.xy / screenSize.xy) - 1.0;
-        //position.x *= (screenSize.x / screenSize.y);
         return position;
       }
 
@@ -99,21 +134,70 @@ export default class RayMarcher {
         return rz * ry * rx;
       }
 
-      float fBoxCheap(vec3 p, vec3 b) {
+      vec3 BB;
+      vec3 P;
+
+      void fBox( vec3 p, vec3 b, inout float dist)
+      {
+        vec3 box = abs(p) - b;
+        float d = vmax(box);
+        if (d < dist) {
+          BB = box;
+          P = p;
+          dist = d;
+        }
+
+      }
+
+      /*float fBox(vec3 p, vec3 b) {
         return vmax(abs(p) - b);
+      }*/
+
+      float pModInterval1(inout float p, float size, float start, float stop) {
+        float halfsize = size*0.5;
+        float c = floor((p + halfsize)/size);
+        p = mod(p+halfsize, size) - halfsize;
+        if (c > stop) {
+          p += size*(c - stop);
+          c = stop;
+        }
+        if (c <start) {
+          p += size*(c - start);
+          c = start;
+        }
+        return c;
       }
 
-      vec3 k;
+      // Repeat around the origin by a fixed angle.
+      // For easier use, num of repetitions is use to specify the angle.
+      float pModPolar(inout vec2 p, float repetitions) {
+        float angle = 2.0*PI/repetitions;
+        float a = atan(p.y, p.x) + angle/2.0;
+        float r = length(p);
+        float c = floor(a/angle);
+        a = mod(a,angle) - angle/2.0;
+        p = vec2(cos(a), sin(a))*r;
+        // For an odd number of repetitions, fix cell index of the cell in -x direction
+        // (cell index would be e.g. -5 and 5 in the two halves of the cell):
+        if (abs(c) >= (repetitions/2.0)) c = abs(c);
+        return c;
+      }
+
       float getDistance (in vec3 p) {
-        //float repeat = 50.0;
-        //vec3 q = p + repeat * 0.5;
-        //k = floor (q / repeat);
-        //q -= repeat * (k + 0.5);
-        //p = q;
 
-        return fBoxCheap(p, vec3(100.0, 100.0, 100.0));
+        /*p.z += 1.0;
+
+        float c = pModPolar(p.xy, 30.0);
+        p -= vec3(10.0, 0.0, 0.0);
+        p.z += floor(p.xy / 30.0).x;
+        return fBox(p, vec3(0.5, 0.5, 0.5));*/
+
+        ${boxSDF}
+
+        return dist;
+
       }
-
+      
       vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
         vec3 lightDirection = normalize (LIGHT);
         vec2 delta = vec2 (DELTA, 0.0);
@@ -146,35 +230,51 @@ export default class RayMarcher {
             fragColor = fragColor * (1.0 - intensity) + backColor * intensity;
             break;
           }
-      
+
           // Get the normal
-          vec3 normal = normalize (distanceFactor * vec3 (
+         /* vec3 normal = normalize (distanceFactor * vec3 (
             getDistance (origin + delta.xyy) - getDistance (origin - delta.xyy),
             getDistance (origin + delta.yxy) - getDistance (origin - delta.yxy),
-            getDistance (origin + delta.yyx) - getDistance (origin - delta.yyx)));
-      
+            getDistance (origin + delta.yyx) - getDistance (origin - delta.yyx)));*/
+
+          float maxAxis = vmax(BB);
+            
+          vec3 N;
+
+          if (maxAxis == BB.x) {
+            N = normalize( vec3(P.z, 0.0, 0.0) );
+          }
+          if (maxAxis == BB.y) {
+            N = normalize( vec3(0.0, P.y, 0.0) );
+          } 
+          if (maxAxis == BB.z) {
+            N = normalize( vec3(0.0, 0.0, P.z) );
+          }
+
+          vec3 normal = normalize(distanceFactor * N);
+
           // Basic lighting
-          vec3 reflection = reflect (direction, normal);
+        /*  vec3 reflection = reflect (direction, normal);
           if (distanceFactor > 0.0) {
             float relfectionDiffuse = max (0.0, dot (normal, lightDirection));
             float relfectionSpecular = pow (max (0.0, dot (reflection, lightDirection)), SPECULAR_POWER) * SPECULAR_INTENSITY;
             float fade = pow (1.0 - rayLength / RAY_LENGTH_MAX, FADE_POWER);
       
-            vec3 localColor = max (sin (k * k), 0.2);
+            vec3 localColor = max (sin (k * k), 0.01);
             localColor = (AMBIENT + relfectionDiffuse) * localColor + relfectionSpecular;
             localColor = mix (backColor, localColor, fade);
       
             fragColor = fragColor * (1.0 - intensity) + localColor * intensity;
             intensity *= REFRACT_FACTOR;
-          }
+          }*/
       
           // Next ray...
           vec3 refraction = refract (direction, normal, refractionRatio);
           if (dot (refraction, refraction) < DELTA) {
-            direction = reflection;
-            origin += direction * DELTA * 2.0;
+ //           direction = reflection;
+   //         origin += direction * DELTA * 2.0;
           }
-          else {
+         else {
             direction = refraction;
             distanceFactor = -distanceFactor;
             refractionRatio = 1.0 / refractionRatio;

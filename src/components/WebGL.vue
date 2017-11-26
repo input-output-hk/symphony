@@ -44,7 +44,28 @@ export default {
     try {
       days.forEach((day, index) => {
         this.app.addDay(day, i++)
-        //throw BreakException
+
+        // pass box positions/scales/rotations to raymarcher
+        let boxes = []
+        this.app.state.dayGroups.forEach((group, dayIndex) => {
+          group.children.forEach((blockObject, blockIndex) => {
+            if (blockIndex < 50) {
+              const boxData = {
+                position: [parseInt(blockObject.position.x), parseInt(blockObject.position.y), parseInt(blockObject.position.z)],
+                rotation: [parseInt(blockObject.rotation.x), parseInt(blockObject.rotation.y), parseInt(blockObject.rotation.z)],
+                scale: [parseInt(blockObject.geometry.parameters.width/3), parseInt(blockObject.geometry.parameters.height/3), parseInt(blockObject.geometry.parameters.depth/3)]
+            }
+            boxes.push(boxData)
+            }
+          })
+        })
+    
+        let params = {
+          boxes: boxes
+        }
+        this.app.raymarcher.setFragmentShader(params)
+
+        throw BreakException
       })
     } catch (e) {
       //

@@ -117,13 +117,13 @@ export default class Day {
     this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 1600.0)
 
     this.cameraDriftLimitMax = {}
-    this.cameraDriftLimitMax.x = 150.0
-    this.cameraDriftLimitMax.y = 150.0
+    this.cameraDriftLimitMax.x = 1050.0
+    this.cameraDriftLimitMax.y = 1050.0
     this.cameraDriftLimitMin = {}
-    this.cameraDriftLimitMin.x = -150.0
-    this.cameraDriftLimitMin.y = -150.0
+    this.cameraDriftLimitMin.x = -1050.0
+    this.cameraDriftLimitMin.y = -1050.0
     this.cameraMoveStep = 100.0
-    this.cameraLerpSpeed = 0.01
+    this.cameraLerpSpeed = 0.5
 
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
@@ -557,7 +557,8 @@ export default class Day {
   }
 
   addObjects () {
-    this.addDay(this.state.blocks)
+//    this.addDay(this.state.blocks)
+
   }
 
   buildBlocks (blocks, index, group, spiralPoints) {
@@ -644,7 +645,7 @@ export default class Day {
               convexGeometry.computeBoundingBox()
               let boxDimensions = convexGeometry.boundingBox.getSize()
 
-              let boundingBoxGeometry = new THREE.BoxBufferGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
+              let boundingBoxGeometry = new THREE.BoxGeometry(boxDimensions.x, boxDimensions.y, boxDimensions.z)
 
               blockMesh = new THREE.Mesh(boundingBoxGeometry, this.crystalMaterial.clone())
 
@@ -657,7 +658,7 @@ export default class Day {
               blockMesh.rotation.z = rotation
               blockMesh.translateY(700 + (blockIndex))
               blockMesh.rotation.z += Math.PI / 2
-              blockMesh.translateZ(blockIndex * 8)
+              blockMesh.translateZ(blockIndex * 20)
 
               group.add(blockMesh)
 
@@ -854,7 +855,7 @@ export default class Day {
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
 
-    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
+    // this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
@@ -870,6 +871,8 @@ export default class Day {
 
     // render standard scene
     this.raymarcher.renderer.render(this.scene, this.camera)
+
+    // this.raymarcher.renderer.clearTarget(this.lightRenderTarget, true, true, true)
 
     this.raymarcher.update()
 

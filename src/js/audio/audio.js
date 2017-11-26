@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import Config from '../Config'
 import Tone from 'tone'
 import _ from 'lodash'
+import { resolve } from 'path'
 
 export default class Audio {
   constructor (camera) {

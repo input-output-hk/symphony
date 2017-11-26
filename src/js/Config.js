@@ -15,7 +15,7 @@ const Config = {
     effectDownscaleDivisor: 1
   },
   camera: {
-    fov: 80
+    fov: 50
   }
 }
 
