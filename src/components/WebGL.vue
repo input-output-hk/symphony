@@ -41,10 +41,18 @@ export default {
       return map
     }, new Map())
 
+    let daysArray = []
+    days.forEach((day, timeStamp) => {
+      let dayData = {
+        blocks: day,
+        timeStamp: timeStamp
+      }
+      daysArray.push(dayData)
+    })
+
     // sort by days desc
-    let daysArray = Array.from(days)
     daysArray.sort((a, b) => {
-      return b[0] - a[0]
+      return b.timeStamp - a.timeStamp
     })
 
     // assign hash rates to days
@@ -56,7 +64,7 @@ export default {
 
       try {
         daysArray.forEach((dayData) => {
-          this.app.addDay(dayData[1], i++)
+          this.app.addDay(dayData, i++)
           //throw BreakException
         })
       } catch (e) {

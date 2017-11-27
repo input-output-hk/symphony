@@ -40,7 +40,6 @@ export const getHashRateforDay = (startTimestamp) => {
     axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp}&cors=true`)
       .then((data) => {
         let hashRates = formatTimeSeries(data)
-        console.log(hashRates)
         if (typeof hashRates.values[0] !== 'undefined') {
           resolve(hashRates.values[0])
         } else {
@@ -61,22 +60,22 @@ export const assignHashRates = (daysArray) => {
   let daysProcessed = 0
   return new Promise((resolve, reject) => {
     daysArray.forEach((dayData) => {
-      let timestampInMs = dayData[0] / 1000
+      let timestampInMs = dayData.timeStamp / 1000
       getHashRateforDay(timestampInMs)
       .then((hashRate) => {
-        dayData[1].hashRate = hashRate
+        dayData.hashRate = hashRate
         daysProcessed++
         if (daysProcessed === numberOfDays) {
           // add hash rate from previous day to current day if it doesn't exist
-          if (daysArray[0][1].hashRate === null) {
-            daysArray[0][1].hashRate = daysArray[1][1].hashRate
+          if (daysArray[0].hashRate === null) {
+            daysArray[0].hashRate = daysArray[1].hashRate
           }
           resolve()
         }
       })
       .catch((error) => {
         daysProcessed++
-        dayData[1].hashRate = null
+        dayData.hashRate = null
         console.log(error)
       })
     })

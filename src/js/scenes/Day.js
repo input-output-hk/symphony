@@ -75,6 +75,8 @@ export default class Day {
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
     this.state.dayPositions = [] // positions of days on z-axis
+    this.state.days = [] // which day is the camera closest to
+    this.state.currentDay = null // which day is the camera closest to
   }
 
   initProperties () {
@@ -557,9 +559,6 @@ export default class Day {
         mesh.translateY(700 + (i))
         mesh.rotation.z += Math.PI / 2
         mesh.translateZ(i * 8)
-
-        // group.add(blockMesh)
-
         spiralPoints.push(mesh.position)
       })
 
@@ -661,11 +660,15 @@ export default class Day {
     })
   }
 
-  addDay (blocks, index) {
+  addDay (dayData, index) {
     console.log('add day: ' + index)
     let group = new THREE.Group()
 
     this.state.dayGroups.push(group)
+
+    let blocks = dayData.blocks
+
+    this.state.days[index] = dayData
 
     let spiralPoints = []
     this.scene.add(group)
@@ -852,6 +855,12 @@ export default class Day {
         closestDayIndex = index
       }
     })
+
+    this.state.currentDay = this.state.days[closestDayIndex]
+
+    this.state.hashRate = this.state.currentDay.hashRate
+
+
 
     this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 
