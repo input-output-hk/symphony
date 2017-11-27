@@ -29,8 +29,8 @@ export default {
     blocks: {
       async get({ date }){
         console.log( date )
-        if(!date && !this.focusOnBlock) return []
-        if(!date) date = new Date(this.focusOnBlock.time * 1000)
+        if (!date && !this.focusOnBlock) return []
+        if (!date) date = new Date(this.focusOnBlock.time * 1000)
         console.log( date )
         const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
         const b = moment(date).endOf('day').toDate()

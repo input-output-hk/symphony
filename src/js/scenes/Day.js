@@ -11,16 +11,17 @@ import RGBShiftShader from '../shaders/RGBShift'
 import VignetteShader from '../shaders/Vignette'
 import FilmShader from '../shaders/Film'
 import BrightnessContrastShader from '../shaders/BrightnessContrast'
+import GenerateBlockMesh from './GenerateBlockGeometry'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
-import GenerateBlockMesh from './GenerateBlockGeometry'
 // import { oui } from 'ouioui'
 
 export default class Day {
   constructor (blocks = [], currentDate = new Date()) {
     this.textureLoader = new THREE.TextureLoader()
 
+    this.initProperties() // class properties
     this.initState(blocks, currentDate)
     this.initRenderer()
     this.initCamera()
@@ -73,6 +74,11 @@ export default class Day {
     this.state.currentBlock = null
     this.state.currentBlockObject = null
     this.state.view = 'day' // can be 'day' or 'block'
+    this.state.dayPositions = [] // positions of days on z-axis
+  }
+
+  initProperties () {
+    this.dayZOffset = -1300 // offset for each day on z-axis
   }
 
   initRenderer () {
@@ -467,7 +473,6 @@ export default class Day {
       this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
       this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
     }
-
   }
 
   animateCamera (target, lookAt, duration) {
@@ -542,7 +547,6 @@ export default class Day {
 
   buildBlocks (blocks, index, group, spiralPoints) {
     return new Promise((resolve, reject) => {
-
       const meshes = blocks.map(block => GenerateBlockMesh(block, this.crystalMaterial))
       group.add(...meshes)
       // this.spiralPoints = []
@@ -558,8 +562,6 @@ export default class Day {
 
         spiralPoints.push(mesh.position)
       })
-
-
 
       // for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
       //
@@ -670,7 +672,9 @@ export default class Day {
 
     this.buildBlocks(blocks, index, group, spiralPoints).then(() => {
       console.log(index)
-      group.translateZ(-(index * 1300))
+      let dayZPos = index * this.dayZOffset
+      group.translateZ(dayZPos)
+      this.state.dayPositions[index] = dayZPos
       this.removeTrees()
     })
   }
@@ -837,6 +841,17 @@ export default class Day {
 
     this.camPos.lerp(this.targetPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.camPos)
+
+    // which day are we closest to?
+    let closest = Number.MAX_VALUE
+    let closestDayIndex = 0
+    this.state.dayPositions.forEach((pos, index) => {
+      let dist = Math.abs(pos - this.camera.position.z)
+      if (dist < closest) {
+        closest = dist
+        closestDayIndex = index
+      }
+    })
 
     this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
 

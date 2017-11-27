@@ -14,6 +14,7 @@
 <script>
 import DayScene from '../js/scenes/Day'
 import moment from 'moment'
+import {getHashRateforDay, assignHashRates} from '../data/btc'
 
 const getDayInMs = time => moment(time ).startOf('day').toDate().valueOf()
 
@@ -29,28 +30,43 @@ export default {
     // if( this.blocks && this.blocks.length > 0 ){
     //
     // }
-    // console.log( moment(this.blocks[0].time * 1000 ).startOf('day').toDate().valueOf() )
+    //console.log( moment(this.blocks[0].time * 1000 ).startOf('day').toDate().valueOf() )
     const days = this.blocks.reduce((map, block) => {
       const dayMs = getDayInMs(block.time * 1000)
-      if( map.has(dayMs)) map.get(dayMs).push(block)
-      else map.set(dayMs, [block])
+      if (map.has(dayMs)) {
+        map.get(dayMs).push(block)
+      } else {
+        map.set(dayMs, [block])
+      } 
       return map
     }, new Map())
 
-    let i = 0
+    // sort by days desc
+    let daysArray = Array.from(days)
+    daysArray.sort((a, b) => {
+      return b[0] - a[0]
+    })
 
-    const BreakException = {}
+    // assign hash rates to days
+    assignHashRates(daysArray).then(() => {
 
-    try {
-      days.forEach((day, index) => {
-        this.app.addDay(day, i++)
-        //throw BreakException
-      })
-    } catch (e) {
-      //
-    }
+      let i = 0
 
-    if(this.blocks && this.blocks.length > 0 && this.focusOnBlock) this.app.movetoBlock(this.focusOnBlock.hash)
+      const BreakException = {}
+
+      try {
+        daysArray.forEach((dayData) => {
+          this.app.addDay(dayData[1], i++)
+          //throw BreakException
+        })
+      } catch (e) {
+        //
+      }
+
+      if(this.blocks && this.blocks.length > 0 && this.focusOnBlock) this.app.movetoBlock(this.focusOnBlock.hash)
+
+  })
+
   }
 }
 </script>
