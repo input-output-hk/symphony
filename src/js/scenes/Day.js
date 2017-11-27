@@ -12,6 +12,7 @@ import VignetteShader from '../shaders/Vignette'
 import FilmShader from '../shaders/Film'
 import BrightnessContrastShader from '../shaders/BrightnessContrast'
 import GenerateBlockMesh from './GenerateBlockGeometry'
+import { map } from '../../utils/math'
 let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 const BrownianMotion = require('../motions/BrownianMotion')
@@ -860,9 +861,9 @@ export default class Day {
 
     this.state.hashRate = this.state.currentDay.hashRate
 
+    this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
-
-    this.audio.setAmbienceFilterCutoff(Math.abs(this.camPos.z))
+    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
