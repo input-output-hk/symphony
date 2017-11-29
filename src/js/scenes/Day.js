@@ -55,10 +55,11 @@ export default class Day {
 
     this.audio = new Audio(this.camera)
 
+    this.setupMaterials()
+
     this.audio.init().then(() => {
       this.addEvents()
       this.addLights()
-      this.setupMaterials()
       // this.addObjects()
       this.moveCamera()
       this.animate()
@@ -863,7 +864,8 @@ export default class Day {
 
     this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
-    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+    // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+    this.audio.setAmbienceFilterCutoff(Math.abs(this.camera.position.z))
 
     this.lookAtPos.lerp(this.targetLookAt, this.cameraLerpSpeed)
   }
