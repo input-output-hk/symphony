@@ -20,7 +20,7 @@ const routes = [
       { path: '', redirect: to => `/${moment().format('YYYY-MM-DD')}` },
       // { path: '/block/', component: Block, props: true },
       { path: '/block/:block', component: Block },
-      { path: '/:date', component: Day },
+      { path: '/:date', component: Day }
     ]
   }
 ]

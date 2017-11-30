@@ -284,7 +284,7 @@ export default class Audio {
         }, function () {
           new Tone.Loop((time) => {
             sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
-          }, '1m').start(Math.random() * 100)
+          }, '1m').start(Tone.Transport.seconds + (Math.random() * 100))
         })
 
         sampler.fan(panner)

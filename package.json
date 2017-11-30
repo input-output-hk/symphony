@@ -14,7 +14,7 @@
     "@tweenjs/tween.js": "^17.1.1",
     "axios": "^0.16.2",
     "babel-runtime": "^6.26.0",
-    "firebase": "^4.5.2",
+    "firebase": "^4.6.2",
     "lodash": "^4.17.4",
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.19.1",
@@ -25,7 +25,9 @@
     "tone": "^0.11.11",
     "vue": "^2.4.2",
     "vue-async-computed": "^3.3.1",
-    "vue-router": "^2.7.0"
+    "vue-router": "^2.7.0",
+    "vue-worker": "^1.2.1",
+    "worker-loader": "^1.1.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

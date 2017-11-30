@@ -2,39 +2,83 @@
   <div>
     <div class='main'>
       <router-view class='big' :blocks='blocks' :block='focusOnBlock'/>
-      <graph v-if='blocks.length > 0'/>
+      <!--<graph v-if='blocks.length > 0'/>-->
     </div>
-    <webgl :blocks='blocks' :focusOnBlock='focusOnBlock'/>
+    <webgl :date='date' />
   </div>
 </template>
 
 <script>
-import { getBlock, getBlocksSince } from '../data/btc'
 import moment from 'moment'
 import webgl from './WebGL'
 import graph from './Graph'
 import cfg from '../js/Config'
+import BTC from '../js/api/btc'
 
 export default {
   name: 'home',
   components:{ webgl, graph },
-  props: ['date', 'block'],
+  props: ['date'],
   asyncComputed: {
 
     focusOnBlock: ({block}) => {
-      console.log( 'block', block )
-      return block && getBlock(block)
+      //console.log( 'block', block )
+      //return block && getBlock(block)
     },
 
     blocks: {
+
       async get({ date }){
-        console.log( date )
-        if (!date && !this.focusOnBlock) return []
-        if (!date) date = new Date(this.focusOnBlock.time * 1000)
-        console.log( date )
+
+       /* if (!date && !this.focusOnBlock) {
+          return []
+        } 
+        if (!date) {
+          date = new Date(this.focusOnBlock.time * 1000)
+        } 
+        
         const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
         const b = moment(date).endOf('day').toDate()
-        return await getBlocksSince(a, b)
+
+        /*this.$worker.run((a, b, btc) => {
+
+          console.log(btc)
+
+          btc.getDay(a, b).then((blocks) => {
+            console.log(blocks)
+          })
+
+          //return `Hello, ${arg}!`
+        }, [a, b, btc])
+        .then(result => {
+          console.log(result)
+        })
+        .catch(e => {
+          console.error(e)
+        })*/
+
+        
+
+        /*if (window.Worker) {
+          let worker = new Worker()
+
+          worker.addEventListener('message', function(e) {
+            console.log(e.data)
+            return e.data
+          }, false)
+
+          worker.postMessage(
+            {
+              'cmd': 'start', 
+              'msg': {
+                start: a, 
+                end: b
+              }
+            }
+          )
+        }
+
+        return await BTC.getBlocksSince(a, b)*/
       },
       default: []
     }

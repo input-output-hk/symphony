@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { getTransactionFeesOverTime } from '../data/btc'
+import BTC from '../js/api/btc'
 import { map } from '../utils/math'
 
 export default {
@@ -24,7 +24,7 @@ export default {
   }),
   created(){
     // const height = this.height
-    getTransactionFeesOverTime()
+    BTC.getTransactionFeesOverTime()
       .then(({ values }) => {
 
         // Calculate the domain of the data

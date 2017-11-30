@@ -1,29 +1,34 @@
 <template>
   <div>
-    <div id='loading' v-if='blocks.length == 0'>
+    <!--<div id='loading' v-if='blocks.length == 0'>
       <div class='c'>
         <h1>Project Orpheus</h1>
         <br/>
-        <h4>Orpheus is an audio visual exploration of the block chain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day in the blockchain</h4>
+        <h4>Orpheus is an audio visual exploration of the blockchain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day in the blockchain</h4>
       </div>
-    </div>
-    <canvas id="stage" :blocks='blocks' :focusOnBlock='focusOnBlock'/>
+    </div>-->
+    <canvas id="stage" />
   </div>
 </template>
 
 <script>
-import DayScene from '../js/scenes/Day'
-import moment from 'moment'
-import {getHashRateforDay, assignHashRates} from '../data/btc'
 
-const getDayInMs = time => moment(time ).startOf('day').toDate().valueOf()
+import SceneManager from '../js/SceneManager'
+
+//import moment from 'moment'
+
+//const getDayInMs = time => moment(time).startOf('day').toDate().valueOf()
 
 export default {
   name: 'webgl',
-  props: ['blocks', 'focusOnBlock'],
+  props: ['date'],
   mounted(){
     // console.log('create webgl', this.blocks, this.focusOnBlock)
-    this.app = new DayScene(this.blocks, this.focusOnBlock)
+    this.app = new SceneManager({
+      params : {
+        date: this.date
+      }
+    })
   },
   beforeUpdate(){
     // console.log('update webgl', this.blocks, this.focusOnBlock)
@@ -31,7 +36,7 @@ export default {
     //
     // }
     //console.log( moment(this.blocks[0].time * 1000 ).startOf('day').toDate().valueOf() )
-    const days = this.blocks.reduce((map, block) => {
+    /*const days = this.blocks.reduce((map, block) => {
       const dayMs = getDayInMs(block.time * 1000)
       if (map.has(dayMs)) {
         map.get(dayMs).push(block)
@@ -71,9 +76,11 @@ export default {
         //
       }
 
-      if(this.blocks && this.blocks.length > 0 && this.focusOnBlock) this.app.movetoBlock(this.focusOnBlock.hash)
+      if (this.blocks && this.blocks.length > 0 && this.focusOnBlock) {
+        this.app.movetoBlock(this.focusOnBlock.hash)
+      }
 
-  })
+    })*/
 
   }
 }
