@@ -152,7 +152,7 @@ export default class Audio {
   }
 
   setAmbienceFilterCutoff (value) {
-    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 10)
+    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
   }
 
   unloadSound () {
