@@ -17,7 +17,6 @@ import API from '../api/btc'
 const DayBuilderWorker = require('worker-loader!../workers/dayBuilder.js')
 const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
-let merkle = require('../merkle-tree-gen')
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene {
@@ -49,13 +48,12 @@ export default class MainScene {
   loadBlocks () {
     if (window.Worker) {
       this.dayBuilderWorker = new DayBuilderWorker()
+      this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
 
       const a = moment(this.currentDate).subtract(Config.daysToLoad, 'days').startOf('day').toDate()
       const b = moment(this.currentDate).endOf('day').toDate()
 
-      let that = this
-
-      let geometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0)
+      this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0)
 
       const getDayInMs = time => moment(time).startOf('day').toDate().valueOf()
 
@@ -84,55 +82,6 @@ export default class MainScene {
           return b.timeStamp - a.timeStamp
         })
 
-        this.dayBuilderWorker.addEventListener('message', function (e) {
-          if (typeof e.data.sizes === 'undefined') {
-            return
-          }
-
-          try {
-            let workerData = e.data
-            let sizes = workerData.sizes
-            let blockCount = workerData.blockCount
-            let dayIndex = workerData.dayIndex
-            let blocks = workerData.blocks
-
-            let group = new THREE.Group()
-            that.state.dayGroups.push(group)
-            that.stage.scene.add(group)
-
-            for (let index = 0; index < sizes.length; index++) {
-              const size = sizes[index]
-
-              const block = blocks[index]
-
-              if (
-                size.x === 0 ||
-                size.y === 0 ||
-                size.z === 0
-              ) {
-                continue
-              }
-
-              let blockMesh = new THREE.Mesh(geometry, that.crystalMaterial.clone())
-              blockMesh.scale.set(size.x, size.y, size.z)
-
-              let rotation = ((10 * Math.PI) / blockCount) * index
-              blockMesh.rotation.z = rotation
-              blockMesh.translateY(700 + (index))
-              blockMesh.rotation.z += Math.PI / 2
-              blockMesh.translateZ(-(index * 8))
-
-              blockMesh.blockchainData = block
-
-              group.add(blockMesh)
-            }
-
-            group.translateZ(-(sizes.length * 8) * dayIndex)
-          } catch (error) {
-            console.log(error)
-          }
-        }, false)
-
         for (let dayIndex = 0; dayIndex < daysArray.length; dayIndex++) {
           const day = daysArray[dayIndex]
           this.dayBuilderWorker.postMessage(
@@ -149,6 +98,60 @@ export default class MainScene {
     }
   }
 
+  addBlocksToStage (e) {
+    if (typeof e.data.sizes === 'undefined') {
+      return
+    }
+
+    try {
+      let workerData = e.data
+      let sizes = workerData.sizes
+      let blockCount = workerData.blockCount
+      let dayIndex = workerData.dayIndex
+      let blocks = workerData.blocks
+
+      let group = new THREE.Group()
+      this.state.dayGroups.push(group)
+      this.stage.scene.add(group)
+      this.blocksToAnimate = []
+
+      for (let index = 0; index < sizes.length; index++) {
+        const size = sizes[index]
+        const block = blocks[index]
+
+        if (
+          size.x === 0 ||
+          size.y === 0 ||
+          size.z === 0
+        ) {
+          continue
+        }
+
+        let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial.clone())
+        blockMesh.material.opacity = 0.0
+        blockMesh.scale.set(size.x, size.y, size.z)
+
+        let rotation = ((10 * Math.PI) / blockCount) * index
+        blockMesh.rotation.z = rotation
+        blockMesh.translateY(700 + (index))
+        blockMesh.rotation.z += Math.PI / 2
+        blockMesh.translateZ(-(index * 8))
+        blockMesh.blockchainData = block
+
+        group.add(blockMesh)
+
+        if (typeof this.state.blocksToAnimate[index] === 'undefined') {
+          this.state.blocksToAnimate[index] = []
+        }
+        this.state.blocksToAnimate[index].push(blockMesh)
+      }
+
+      group.translateZ(-(sizes.length * 8) * dayIndex)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   initState (blocks, currentDate) {
     this.state = {
       focussed: false, // are we focussed on a block?
@@ -160,12 +163,14 @@ export default class MainScene {
       view: 'day', // can be 'day' or 'block'
       dayPositions: [], // positions of days on z-axis
       days: [],
-      currentDay: null // which day is the camera closest to
+      currentDay: null, // which day is the camera closest to
+      blocksToAnimate: []
     }
   }
 
   initProperties () {
     this.dayZOffset = -1300 // offset for each day on z-axis
+    this.treeGroup = null
   }
 
   addInteraction () {
@@ -257,7 +262,7 @@ export default class MainScene {
 
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
-      this.animateCamera(this.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
+      this.animateCamera(this.stage.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
       this.state.focussed = false
       this.isAnimating = false
     })
@@ -289,6 +294,7 @@ export default class MainScene {
           if (intersects[0].object === this.state.currentBlockObject) {
             throw BreakException
           }
+          this.state.view = 'block'
           this.removeTrees()
           this.isAnimating = true
           let blockObject = intersects[0].object
@@ -435,43 +441,6 @@ export default class MainScene {
 
       // reset original position and rotation
       this.stage.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-
-      var tweenVars = { time: 0 }
-
-      this.transitionDuration = duration || 2000
-      this.easing = TWEEN.Easing.Quartic.InOut
-
-      new TWEEN.Tween(tweenVars)
-      .to({time: 1}, this.transitionDuration)
-      .onUpdate(function () {
-        this.moveCamera(tweenVars.time)
-      }.bind(this))
-      .easing(this.easing)
-      .onComplete(function () {
-        this.isAnimating = false
-
-        resolve()
-      }.bind(this))
-      .start()
-    })
-  }
-
-  buildBlocks (blocks, index, group, spiralPoints) {
-    return new Promise((resolve, reject) => {
-      const meshes = blocks.map(block => GenerateBlockMesh(block, this.crystalMaterial))
-      group.add(...meshes)
-      // this.spiralPoints = []
-
-      meshes.forEach((mesh, i) => {
-        let rotation = ((10 * Math.PI) / meshes.length) * i
-        mesh.rotation.z = rotation
-        mesh.translateY(700 + (i))
-        mesh.rotation.z += Math.PI / 2
-        mesh.translateZ(i * 8)
-        spiralPoints.push(mesh.position)
-      })
-
-      resolve()
     })
   }
 
@@ -487,14 +456,6 @@ export default class MainScene {
 
     let spiralPoints = []
     this.stage.scene.add(group)
-
-    this.buildBlocks(blocks, index, group, spiralPoints).then(() => {
-      console.log(index)
-      let dayZPos = index * this.dayZOffset
-      group.translateZ(dayZPos)
-      this.state.dayPositions[index] = dayZPos
-      this.removeTrees()
-    })
   }
 
   build (node, startingPosition, direction, context, visualise) {
@@ -644,13 +605,34 @@ export default class MainScene {
     }
   }
 
+  animateTree () {
+    if (this.state.view === 'block') {
+      if (this.treeGroup) {
+        this.state.currentBlockObject.rotation.y += 0.001
+        this.treeGroup.rotation.y += 0.001
+      }
+    }
+  }
+
+  animateBlockOpacity () {
+    if (this.state.dayGroups.length) {
+      for (let dayIndex = 0; dayIndex < this.state.dayGroups.length; dayIndex++) {
+        const dayGroup = this.state.dayGroups[dayIndex]
+        for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
+          const mesh = dayGroup.children[meshIndex]
+          if (mesh.material.opacity < 0.5) {
+            mesh.material.opacity += 0.25
+            break
+          }
+        }
+      }
+    }
+  }
+
   onUpdate () {
     TWEEN.update()
     this.checkMouseIntersection()
-
-    if (this.state.view === 'block') {
-      this.state.currentBlockObject.rotation.y += 0.001
-      this.treeGroup.rotation.y += 0.001
-    }
+    this.animateTree()
+    this.animateBlockOpacity()
   }
 }
