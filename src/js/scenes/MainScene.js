@@ -182,62 +182,62 @@ export default class MainScene {
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onKeyDown.bind(this), false)
 
-    let that = this
-
     if (window.Worker) {
       this.treeBuilderWorker = new TreeBuilderWorker()
-      this.treeBuilderWorker.addEventListener('message', function (e) {
-        if (typeof e.data.vertices === 'undefined') {
-          return
-        }
-
-        that.treeGroup = new THREE.Group()
-        that.stage.scene.add(that.treeGroup)
-
-        let blockObjectPosition = that.state.currentBlockObject.getWorldPosition().clone()
-        let rotation = that.state.currentBlockObject.getWorldRotation().clone()
-
-        let boxCenter = e.data.boxCenter
-
-        let endNodes = e.data.endNodes
-
-
-        let vertices = e.data.vertices
-        let treeGeo = new THREE.BufferGeometry()
-        treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
-
-        let mesh = new THREE.Mesh(treeGeo, that.merkleMaterial)
-
-        mesh.translateX(-boxCenter.x)
-        mesh.translateY(-boxCenter.y)
-        mesh.translateZ(-boxCenter.z)
-
-        that.treeGroup.add(mesh)
-
-        that.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
-        that.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-
-        let seen = []
-        let reducedArray = []
-        endNodes.forEach((nodePos, index) => {
-          let position = {
-            x: Math.ceil(nodePos.x / 10) * 10,
-            y: Math.ceil(nodePos.y / 10) * 10,
-            z: Math.ceil(nodePos.z / 10) * 10
-          }
-
-          let key = JSON.stringify(position)
-
-          if (seen.indexOf(key) === -1) {
-            seen.push(key)
-            nodePos.y = Math.abs(nodePos.y) * 10
-            reducedArray.push(nodePos)
-          }
-        })
-
-        that.audio.generateMerkleSound(reducedArray, blockObjectPosition)
-      }, false)
+      this.treeBuilderWorker.addEventListener('message', this.addTreeToStage.bind(this), false)
     }
+  }
+
+  addTreeToStage (e) {
+    if (typeof e.data.vertices === 'undefined') {
+      return
+    }
+
+    let boxCenter = e.data.boxCenter
+    let endNodes = e.data.endNodes
+    let vertices = e.data.vertices
+
+    this.treeGroup = new THREE.Group()
+    this.stage.scene.add(this.treeGroup)
+
+    let blockObjectPosition = this.state.currentBlockObject.getWorldPosition().clone()
+    let rotation = this.state.currentBlockObject.getWorldRotation().clone()
+
+    let treeGeo = new THREE.BufferGeometry()
+    treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
+
+    let mesh = new THREE.Mesh(treeGeo, this.merkleMaterial)
+
+    mesh.translateX(-boxCenter.x)
+    mesh.translateY(-boxCenter.y)
+    mesh.translateZ(-boxCenter.z)
+
+    this.treeGroup.add(mesh)
+
+    this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+
+    let seen = []
+    let reducedArray = []
+
+    for (let index = 0; index < endNodes.length; index++) {
+      const nodePos = endNodes[index]
+      let position = {
+        x: Math.ceil(nodePos.x / 10) * 10,
+        y: Math.ceil(nodePos.y / 10) * 10,
+        z: Math.ceil(nodePos.z / 10) * 10
+      }
+
+      let key = JSON.stringify(position)
+
+      if (seen.indexOf(key) === -1) {
+        seen.push(key)
+        nodePos.y = Math.abs(nodePos.y) * 10
+        reducedArray.push(nodePos)
+      }
+    }
+
+    this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
   }
 
   onKeyDown (event) {
