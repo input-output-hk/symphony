@@ -197,35 +197,16 @@ export default class MainScene {
         let blockObjectPosition = that.state.currentBlockObject.getWorldPosition().clone()
         let rotation = that.state.currentBlockObject.getWorldRotation().clone()
 
-        // let boxDimensions = e.data.boxDimensions
         let boxCenter = e.data.boxCenter
 
         let endNodes = e.data.endNodes
 
-        let rawVertices = e.data.vertices
-        let vertices = []
-        for (let index = 0; index < rawVertices.length; index++) {
-          const vertex = rawVertices[index]
-          vertices.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z))
-        }
 
-        let rawFaces = e.data.faces
-        let faces = []
-        for (let index = 0; index < rawFaces.length; index++) {
-          const face = rawFaces[index]
-          let face3 = new THREE.Face3(face.a, face.b, face.c)
-          faces.push(face3)
-        }
+        let vertices = e.data.vertices
+        let treeGeo = new THREE.BufferGeometry()
+        treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
 
-        let containerGeo = new THREE.Geometry()
-
-        containerGeo.vertices = vertices
-        containerGeo.faces = faces
-
-        containerGeo.computeFaceNormals()
-        containerGeo.computeVertexNormals()
-
-        let mesh = new THREE.Mesh(containerGeo, that.merkleMaterial)
+        let mesh = new THREE.Mesh(treeGeo, that.merkleMaterial)
 
         mesh.translateX(-boxCenter.x)
         mesh.translateY(-boxCenter.y)

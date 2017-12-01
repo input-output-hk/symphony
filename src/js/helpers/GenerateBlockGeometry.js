@@ -51,8 +51,13 @@ export default class GenerateBlockGeometry {
     let returnData = {
       boxDimensions: boxDimensions,
       boxCenter: boxCenter,
-      treeGeo: this.treeGeo,
       endNodes: this.endNodes
+    }
+
+    if (visualise) {
+      let bufferTreeGeometry = new THREE.BufferGeometry()
+      bufferTreeGeometry.fromGeometry(this.treeGeo)
+      returnData.treeGeo = bufferTreeGeometry
     }
 
     return returnData
