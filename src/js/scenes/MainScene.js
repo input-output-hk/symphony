@@ -128,8 +128,12 @@ export default class MainScene {
         }
 
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial.clone())
+
         blockMesh.material.opacity = 0.0
         blockMesh.scale.set(size.x, size.y, size.z)
+
+        // align all front faces
+        blockMesh.translateZ(-(size.z / 2))
 
         let rotation = ((10 * Math.PI) / blockCount) * index
         blockMesh.rotation.z = rotation
