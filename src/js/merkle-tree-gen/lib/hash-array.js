@@ -1,15 +1,14 @@
 (function () {
-
-    'use strict';
+  'use strict'
 
     // This module hashes the elements in an array and returns a FastMap of the hashes
 
-    var hasha = require('hasha');
-    var FastMap = require('collections/fast-map');
+  var hasha = require('hasha')
+  var FastMap = require('collections/fast-map')
 
-    var hashAlgorithm;
-    var hashlist;
-    var fastMap;
+  var hashAlgorithm
+  var hashlist
+  var fastMap
 
     /**
      * Initialize the HashArray construtor
@@ -19,10 +18,10 @@
      *                      and false by default (just a regular array)
      *
      */
-    function HashArray(hA = 'sha256', hL = false) {
-        hashAlgorithm = hA;
-        hashlist = hL;
-    }
+  function HashArray (hA = 'sha256', hL = false) {
+    hashAlgorithm = hA
+    hashlist = hL
+  }
 
     /**
      * Hashes each of the elements in an array
@@ -31,41 +30,25 @@
      * @param {callback} cb The callback containing the populated fastMap
      *
      */
-    HashArray.prototype.hashElements = function hashElements(array, cb) {
+  HashArray.prototype.hashElements = function hashElements (array, cb) {
+    fastMap = new FastMap()
 
-        fastMap = new FastMap();
-
-        // If the array should be treated as a list of hashes
-        if (hashlist) {
-
-            // Iterate over each of the elements and add them to the fastMap
-            array.forEach(function (value, index) {
-                fastMap.add(value, index);
-            });
-
-        } else {
-
-            // Iterate over each of the elements
-            array.forEach(function (value, index) {
-
-                // If they are not a 'string', turn them into one. JSON.stringify()
-                // is used because toString() does not turn objects into strings
-                // if (typeof value !== 'string') {
-                //     value = JSON.stringify(value);
-                // }
-
-                // Hash the value and add it to the fastMap
-                fastMap.add(hasha(value, {algorithm: hashAlgorithm}), index);
-                // fastMap.add( Math.floor(Math.random() * 99999999999999).toString())
-            });
-        }
-
-        // Return the fastMap
-        // cb(fastMap);
-        return fastMap
+    // If the array should be treated as a list of hashes
+    if (hashlist) {
+      // Iterate over each of the elements and add them to the fastMap
+      for (let index = 0; index < array.length; index++) {
+        const value = array[index]
+        fastMap.add(value, index)
+      }
+    } else {
+      for (let index = 0; index < array.length; index++) {
+        const value = array[index]
+        fastMap.add(hasha(value, {algorithm: hashAlgorithm}), index)
+      }
     }
 
-    // Export the the HashArray function
-    module.exports = HashArray;
+    return fastMap
+  }
 
-})();
+  module.exports = HashArray
+})()
