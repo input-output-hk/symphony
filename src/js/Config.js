@@ -9,14 +9,14 @@ const Config = {
   scene: {
     bgColor: 0x000022,
     shadowsOn: false,
-    fogFar: 0.00015,
+    fogFar: 0.00020,
     antialias: true
   },
   postProcessing: {
     effectDownscaleDivisor: 2
   },
   camera: {
-    fov: 80
+    fov: 90
   }
 }
 

@@ -80,7 +80,7 @@ export default class Stage {
     this.height = window.innerHeight
 
     // initial position of camera in the scene
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2000.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2600.0)
 
     // xy bounds of the ambient camera movement
     this.cameraDriftLimitMax = {
