@@ -80,7 +80,7 @@ export default class Stage {
     this.height = window.innerHeight
 
     // initial position of camera in the scene
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2600.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 1000.0)
 
     // xy bounds of the ambient camera movement
     this.cameraDriftLimitMax = {
@@ -96,7 +96,7 @@ export default class Stage {
     this.cameraLerpSpeed = 0.01 // speed of camera lerp
 
     // scene camera
-    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 50000)
+    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 5000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 

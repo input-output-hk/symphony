@@ -16,7 +16,8 @@ self.addEventListener('message', function (e) {
         sizes: [],
         blockCount: blocks.length,
         dayIndex: data.dayIndex,
-        blocks: data.blocks
+        blocks: data.blocks,
+        timeStamp: data.timeStamp
       }
 
       for (let index = 0; index < blocks.length; index++) {

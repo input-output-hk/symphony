@@ -41,57 +41,49 @@ export default class MainScene {
     this.audio.init().then(() => {
       this.addEvents()
       this.setupMaterials()
+
+      this.state.loadDayRequested = true
+      this.dayBuilderWorker = new DayBuilderWorker()
+      this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
       this.loadBlocks() // load in new blocks via webworker
     })
   }
 
-  loadBlocks () {
+  initState (blocks, currentDate) {
+    this.state = {
+      focussed: false, // are we focussed on a block?
+      currentDate: currentDate,
+      dayGroups: [],
+      currentBlock: null,
+      currentBlockObject: null,
+      view: 'day', // can be 'day' or 'block'
+      dayData: [], // all blocks grouped by day
+      currentDay: null, // which day is the camera closest to
+      blocksToAnimate: []
+    }
+  }
+
+  /**
+   * Load in blocks for one day
+   */
+  loadBlocks (date = this.currentDate, dayIndex = 0) {
     if (window.Worker) {
-      this.dayBuilderWorker = new DayBuilderWorker()
-      this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
+      const fromDate = moment(date).startOf('day').toDate()
+      const toDate = moment(date).endOf('day').toDate()
+      const timeStamp = fromDate.valueOf()
 
-      const a = moment(this.currentDate).subtract(Config.daysToLoad, 'days').startOf('day').toDate()
-      const b = moment(this.currentDate).endOf('day').toDate()
-
-      this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0)
-
-      const getDayInMs = time => moment(time).startOf('day').toDate().valueOf()
-
-      this.api.getBlocksSince(a, b).then((blocks) => {
-        const days = blocks.reduce((map, block) => {
-          const dayMs = getDayInMs(block.time * 1000)
-          if (map.has(dayMs)) {
-            map.get(dayMs).push(block)
-          } else {
-            map.set(dayMs, [block])
-          }
-          return map
-        }, new Map())
-
-        let daysArray = []
-        days.forEach((day, timeStamp) => {
-          let dayData = {
-            blocks: day,
-            timeStamp: timeStamp
-          }
-          daysArray.push(dayData)
-        })
-
-        // sort by days desc
-        daysArray.sort((a, b) => {
-          return b.timeStamp - a.timeStamp
-        })
-
-        for (let dayIndex = 0; dayIndex < daysArray.length; dayIndex++) {
-          const day = daysArray[dayIndex]
-          this.dayBuilderWorker.postMessage(
-            {
-              cmd: 'build',
-              blocks: day.blocks,
-              dayIndex: dayIndex
-            }
-          )
+      this.api.getBlocksSince(fromDate, toDate).then((blocks) => {
+        const day = {
+          blocks: blocks,
+          timeStamp: timeStamp
         }
+
+        this.dayBuilderWorker.postMessage({
+          cmd: 'build',
+          blocks: day.blocks,
+          timeStamp: day.timeStamp,
+          dayIndex: dayIndex
+        })
       })
     } else {
       console.log('Webworkers not supported. Sad')
@@ -107,8 +99,14 @@ export default class MainScene {
       let workerData = e.data
       let sizes = workerData.sizes
       let blockCount = workerData.blockCount
+      let timeStamp = workerData.timeStamp
       let dayIndex = workerData.dayIndex
       let blocks = workerData.blocks
+
+      this.state.dayData[dayIndex] = {
+        blocks: blocks,
+        timeStamp: timeStamp
+      }
 
       let group = new THREE.Group()
       this.state.dayGroups.push(group)
@@ -143,38 +141,22 @@ export default class MainScene {
         blockMesh.blockchainData = block
 
         group.add(blockMesh)
-
-        if (typeof this.state.blocksToAnimate[index] === 'undefined') {
-          this.state.blocksToAnimate[index] = []
-        }
-        this.state.blocksToAnimate[index].push(blockMesh)
       }
 
-      group.translateZ(-(sizes.length * 8) * dayIndex)
+      let zPos = this.dayZOffset * dayIndex
+      group.translateZ(zPos)
+      this.state.dayData[dayIndex].zPos = zPos
+      this.state.loadDayRequested = false
     } catch (error) {
       console.log(error)
     }
   }
 
-  initState (blocks, currentDate) {
-    this.state = {
-      focussed: false, // are we focussed on a block?
-      blocks: blocks,
-      currentDate: currentDate,
-      dayGroups: [],
-      currentBlock: null,
-      currentBlockObject: null,
-      view: 'day', // can be 'day' or 'block'
-      dayPositions: [], // positions of days on z-axis
-      days: [],
-      currentDay: null, // which day is the camera closest to
-      blocksToAnimate: []
-    }
-  }
-
   initProperties () {
-    this.dayZOffset = -1300 // offset for each day on z-axis
+    this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
+    this.dayZOffset = -1400 // offset for each day on z-axis
     this.treeGroup = null
+    this.blockLoadZThreshold = 4000 // how far away from the last block until we load in another?
   }
 
   addInteraction () {
@@ -449,76 +431,7 @@ export default class MainScene {
   }
 
   addDay (dayData, index) {
-    console.log('add day ' + index)
-    let group = new THREE.Group()
 
-    this.state.dayGroups.push(group)
-
-    let blocks = dayData.blocks
-
-    this.state.days[index] = dayData
-
-    let spiralPoints = []
-    this.stage.scene.add(group)
-  }
-
-  build (node, startingPosition, direction, context, visualise) {
-    let magnitude = (node.level * 5)
-
-    let startPosition = startingPosition.clone()
-    let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
-
-    this.points.push(startPosition)
-    this.points.push(endPosition)
-
-    if (visualise) {
-      let path = new THREE.LineCurve3(startPosition, endPosition)
-      let geometry = new THREE.TubeGeometry(path, 1, 0.5, 6, false)
-      this.treeMesh.merge(geometry, geometry.matrix)
-    }
-
-    let i = 0
-    for (var key in node.children) {
-      if (node.children.hasOwnProperty(key)) {
-        i++
-
-        var childNode = node.children[key]
-
-        if (childNode) {
-          if (typeof childNode.children !== 'undefined') {
-            let newDirection
-
-            let yaxis
-            let yangle
-
-            if (i === 1) {
-              newDirection = direction.clone().applyQuaternion(this.xPosRotation)
-              yaxis = direction.multiply(this.Y).normalize()
-              yangle = (Math.PI / 180) * this.angle
-              newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(yaxis, yangle))
-            } else {
-              newDirection = direction.clone().applyQuaternion(this.xNegRotation)
-              yaxis = direction.multiply(this.Y).normalize()
-              yangle = (Math.PI / 180) * this.angle
-              newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(yaxis, yangle))
-            }
-
-            this.build(childNode, endPosition, newDirection, context, visualise)
-          } else {
-            // no child nodes
-            if (this.state.currentBlock) {
-              this.state.currentBlock.endNodes.push(
-                {
-                  x: endPosition.x,
-                  y: endPosition.y,
-                  z: endPosition.z
-                }
-              )
-            }
-          }
-        }
-      }
-    }
   }
 
   setupMaterials () {
@@ -560,7 +473,8 @@ export default class MainScene {
     vector.unproject(this.stage.camera)
     var ray = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
 
-    this.state.dayGroups.forEach((group, dayIndex) => {
+    for (let dayIndex = 0; dayIndex < this.state.dayGroups.length; dayIndex++) {
+      const group = this.state.dayGroups[dayIndex]
       let intersects = ray.intersectObjects(group.children)
       if (intersects.length > 0) {
         this.state.focussed = true
@@ -583,29 +497,46 @@ export default class MainScene {
         }
         this.intersected[dayIndex] = null
       }
-    }, this)
+    }
   }
 
   onCameraMove () {
-    if (this.state.days.length > 0) {
+    if (this.state.dayData.length) {
       // which day are we closest to?
       let closest = Number.MAX_VALUE
       let closestDayIndex = 0
-      this.state.dayPositions.forEach((pos, index) => {
-        let dist = Math.abs(pos - this.stage.camera.position.z)
+
+      for (let dayIndex = 0; dayIndex < this.state.dayData.length; dayIndex++) {
+        const day = this.state.dayData[dayIndex]
+        let dist = Math.abs(day.zPos - this.stage.camera.position.z)
         if (dist < closest) {
           closest = dist
-          closestDayIndex = index
+          closestDayIndex = dayIndex
         }
-      })
+      }
 
-      this.state.currentDay = this.state.days[closestDayIndex]
-      this.state.hashRate = this.state.currentDay.hashRate
+      this.state.currentDay = this.state.dayData[closestDayIndex]
+
+      if (this.state.loadDayRequested === false) {
+        // how far are we away from the zpos of the last loaded block?
+        let dayIndex = this.state.dayData.length - 1
+        let lastLoadedBlock = this.state.dayData[dayIndex]
+
+        let dist = Math.abs(lastLoadedBlock.zPos - this.stage.camera.position.z)
+        if (dist < this.blockLoadZThreshold) {
+          console.log('load')
+          this.state.loadDayRequested = true
+          let nextDay = moment(lastLoadedBlock.timeStamp).subtract(1, 'day').toDate().valueOf()
+          this.loadBlocks(nextDay, dayIndex + 1)
+        }
+      }
+
+      /* this.state.hashRate = this.state.currentDay.hashRate
       this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
       console.log(this.state.audioFreqCutoff)
 
-      this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+      this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff) */
     }
   }
 
@@ -624,8 +555,8 @@ export default class MainScene {
         const dayGroup = this.state.dayGroups[dayIndex]
         for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
           const mesh = dayGroup.children[meshIndex]
-          if (mesh.material.opacity < 0.5) {
-            mesh.material.opacity += 0.25
+          if (mesh.material.opacity === 0.0) {
+            mesh.material.opacity = 0.5
             break
           }
         }
