@@ -132,7 +132,7 @@ export default class Stage {
     // this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.renderer.autoClear = false
-    this.renderer.sortObjects = false
+    this.renderer.sortObjects = true
   }
 
   /**
