@@ -214,6 +214,8 @@ export default class MainScene {
     mesh.translateY(-boxCenter.y)
     mesh.translateZ(-boxCenter.z)
 
+    mesh.renderOrder = 9999
+
     this.treeGroup.add(mesh)
 
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
@@ -476,7 +478,11 @@ export default class MainScene {
       color: 0xffffff,
       flatShading: true,
       metalness: 0.5,
+      opacity: 0.2,
+      depthTest: false,
+      transparent: true,
       roughness: 0.4,
+      wireframe: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
     })

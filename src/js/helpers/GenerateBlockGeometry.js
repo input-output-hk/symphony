@@ -65,7 +65,7 @@ export default class GenerateBlockGeometry {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
+      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 20, 3, false)
       this.treeGeo.merge(geometry, geometry.matrix)
     }
 
