@@ -2,9 +2,6 @@
 
 const Config = {
   assetPath: '/static/assets/',
-  debug: {
-    orbitControls: false
-  },
   scene: {
     bgColor: 0x000022,
     shadowsOn: false,

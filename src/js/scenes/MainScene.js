@@ -38,15 +38,15 @@ export default class MainScene {
 
     this.audio = new Audio(this.stage.camera)
 
-    this.audio.init().then(() => {
-      this.addEvents()
-      this.setupMaterials()
+    this.audio.init()
 
-      this.state.loadDayRequested = true
-      this.dayBuilderWorker = new DayBuilderWorker()
-      this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
-      this.loadBlocks() // load in new blocks via webworker
-    })
+    this.addEvents()
+    this.setupMaterials()
+
+    this.state.loadDayRequested = true
+    this.dayBuilderWorker = new DayBuilderWorker()
+    this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
+    this.loadBlocks() // load in new blocks via webworker
   }
 
   initState (blocks, currentDate) {
@@ -59,7 +59,8 @@ export default class MainScene {
       view: 'day', // can be 'day' or 'block'
       dayData: [], // all blocks grouped by day
       currentDay: null, // which day is the camera closest to
-      blocksToAnimate: []
+      blocksToAnimate: [],
+      closestDayIndex: 0
     }
   }
 
@@ -67,6 +68,16 @@ export default class MainScene {
    * Load in blocks for one day
    */
   loadBlocks (date = this.currentDate, dayIndex = 0) {
+    // prune days too far away from viewer
+    for (const key in this.state.dayData) {
+      if (this.state.dayData.hasOwnProperty(key)) {
+        if (Math.abs(key - this.state.closestDayIndex) > 5) {
+          delete this.state.dayData[key]
+          this.stage.scene.remove(this.state.dayGroups[key])
+        }
+      }
+    }
+
     if (window.Worker) {
       const fromDate = moment(date).startOf('day').toDate()
       const toDate = moment(date).endOf('day').toDate()
@@ -109,7 +120,7 @@ export default class MainScene {
       }
 
       let group = new THREE.Group()
-      this.state.dayGroups.push(group)
+      this.state.dayGroups[dayIndex] = group
       this.stage.scene.add(group)
       this.blocksToAnimate = []
 
@@ -274,26 +285,29 @@ export default class MainScene {
     const BreakException = {}
 
     try {
-      this.state.dayGroups.forEach((group) => {
-        var intersects = this.raycaster.intersectObjects(group.children)
-        if (intersects.length > 0) {
-          if (intersects[0].object === this.state.currentBlockObject) {
+      for (const key in this.state.dayGroups) {
+        if (this.state.dayGroups.hasOwnProperty(key)) {
+          const group = this.state.dayGroups[key]
+          var intersects = this.raycaster.intersectObjects(group.children)
+          if (intersects.length > 0) {
+            if (intersects[0].object === this.state.currentBlockObject) {
+              throw BreakException
+            }
+            this.state.view = 'block'
+            this.removeTrees()
+            this.isAnimating = true
+            let blockObject = intersects[0].object
+            this.animateBlockOut(this.state.currentBlockObject).then(() => {
+              this.animateBlockIn(blockObject).then(() => {
+                this.buildTree(blockObject)
+                this.isAnimating = false
+                document.dispatchEvent(this.selectBlock)
+              })
+            })
             throw BreakException
           }
-          this.state.view = 'block'
-          this.removeTrees()
-          this.isAnimating = true
-          let blockObject = intersects[0].object
-          this.animateBlockOut(this.state.currentBlockObject).then(() => {
-            this.animateBlockIn(blockObject).then(() => {
-              this.buildTree(blockObject)
-              this.isAnimating = false
-              document.dispatchEvent(this.selectBlock)
-            })
-          })
-          throw BreakException
         }
-      })
+      }
     } catch (error) {
       // ¯\_(ツ)_/¯
     }
@@ -380,7 +394,7 @@ export default class MainScene {
       let blockWorldPos = blockObject.getWorldPosition()
 
       this.stage.targetCameraLookAt.z = blockWorldPos.z
-      this.stage.targetCameraPos.z = blockWorldPos.z + 400
+      this.stage.targetCameraPos.z = blockWorldPos.z + 300
 
       this.animateBlock(
         blockObject,
@@ -473,29 +487,31 @@ export default class MainScene {
     vector.unproject(this.stage.camera)
     var ray = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
 
-    for (let dayIndex = 0; dayIndex < this.state.dayGroups.length; dayIndex++) {
-      const group = this.state.dayGroups[dayIndex]
-      let intersects = ray.intersectObjects(group.children)
-      if (intersects.length > 0) {
-        this.state.focussed = true
-        this.mouseStatic = false
-        if (
-          intersects[0].object !== this.intersected[dayIndex] &&
-          intersects[0].object !== this.state.currentBlockObject
-        ) {
+    for (const dayIndex in this.state.dayGroups) {
+      if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
+        const group = this.state.dayGroups[dayIndex]
+        let intersects = ray.intersectObjects(group.children)
+        if (intersects.length > 0) {
+          this.state.focussed = true
+          this.mouseStatic = false
+          if (
+            intersects[0].object !== this.intersected[dayIndex] &&
+            intersects[0].object !== this.state.currentBlockObject
+          ) {
+            if (this.intersected[dayIndex]) {
+              this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
+            }
+            this.intersected[dayIndex] = intersects[0].object
+            this.intersected[dayIndex].currentHex = this.intersected[dayIndex].material.color.getHex()
+            this.intersected[dayIndex].material.color.setHex(0xffffff)
+          }
+        } else {
+          this.state.focussed = false
           if (this.intersected[dayIndex]) {
             this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
           }
-          this.intersected[dayIndex] = intersects[0].object
-          this.intersected[dayIndex].currentHex = this.intersected[dayIndex].material.color.getHex()
-          this.intersected[dayIndex].material.color.setHex(0xffffff)
+          this.intersected[dayIndex] = null
         }
-      } else {
-        this.state.focussed = false
-        if (this.intersected[dayIndex]) {
-          this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
-        }
-        this.intersected[dayIndex] = null
       }
     }
   }
@@ -506,28 +522,45 @@ export default class MainScene {
       let closest = Number.MAX_VALUE
       let closestDayIndex = 0
 
-      for (let dayIndex = 0; dayIndex < this.state.dayData.length; dayIndex++) {
-        const day = this.state.dayData[dayIndex]
-        let dist = Math.abs(day.zPos - this.stage.camera.position.z)
-        if (dist < closest) {
-          closest = dist
-          closestDayIndex = dayIndex
+      for (const dayIndex in this.state.dayData) {
+        if (this.state.dayData.hasOwnProperty(dayIndex)) {
+          const day = this.state.dayData[dayIndex]
+          let dist = Math.abs(day.zPos - this.stage.camera.position.z)
+          if (dist < closest) {
+            closest = dist
+            closestDayIndex = dayIndex
+          }
         }
       }
 
+      this.state.closestDayIndex = closestDayIndex
       this.state.currentDay = this.state.dayData[closestDayIndex]
 
       if (this.state.loadDayRequested === false) {
-        // how far are we away from the zpos of the last loaded block?
-        let dayIndex = this.state.dayData.length - 1
-        let lastLoadedBlock = this.state.dayData[dayIndex]
+        if (this.currentDate !== moment().format('YYYY-MM-DD')) {
+          let latestDayIndex = Math.min(...Object.keys(this.state.dayData))
+          let latestLoadedDay = this.state.dayData[latestDayIndex]
+          let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
+          if (latestDayDist < this.blockLoadZThreshold) {
+            console.log('load later')
+            this.state.loadDayRequested = true
+            let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
+            this.loadBlocks(nextDay, latestDayIndex - 1)
+          }
+        }
+      }
 
-        let dist = Math.abs(lastLoadedBlock.zPos - this.stage.camera.position.z)
+      if (this.state.loadDayRequested === false) {
+        // how far are we away from the zpos of the last loaded day?
+        let earliestDayIndex = Math.max(...Object.keys(this.state.dayData))
+        let earliestLoadedDay = this.state.dayData[earliestDayIndex]
+
+        let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
         if (dist < this.blockLoadZThreshold) {
-          console.log('load')
+          console.log('load earlier')
           this.state.loadDayRequested = true
-          let nextDay = moment(lastLoadedBlock.timeStamp).subtract(1, 'day').toDate().valueOf()
-          this.loadBlocks(nextDay, dayIndex + 1)
+          let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
+          this.loadBlocks(prevDay, earliestDayIndex + 1)
         }
       }
 
@@ -550,13 +583,13 @@ export default class MainScene {
   }
 
   animateBlockOpacity () {
-    if (this.state.dayGroups.length) {
-      for (let dayIndex = 0; dayIndex < this.state.dayGroups.length; dayIndex++) {
+    for (const dayIndex in this.state.dayGroups) {
+      if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
         const dayGroup = this.state.dayGroups[dayIndex]
         for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
           const mesh = dayGroup.children[meshIndex]
-          if (mesh.material.opacity === 0.0) {
-            mesh.material.opacity = 0.5
+          if (mesh.material.opacity < 0.5) {
+            mesh.material.opacity += 0.25
             break
           }
         }

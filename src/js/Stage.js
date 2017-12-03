@@ -84,16 +84,16 @@ export default class Stage {
 
     // xy bounds of the ambient camera movement
     this.cameraDriftLimitMax = {
-      x: 150.0,
-      y: 150.0
+      x: 50.0,
+      y: 50.0
     }
     this.cameraDriftLimitMin = {
-      x: -150.0,
-      y: -150.0
+      x: -50.0,
+      y: -50.0
     }
 
-    this.cameraMoveStep = 100.0 // how much to move the camera forward on z-axis
-    this.cameraLerpSpeed = 0.01 // speed of camera lerp
+    this.cameraMoveStep = 50.0 // how much to move the camera forward on z-axis
+    this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 5000)
