@@ -60,7 +60,8 @@ export default class MainScene {
       dayData: [], // all blocks grouped by day
       currentDay: null, // which day is the camera closest to
       blocksToAnimate: [],
-      closestDayIndex: 0
+      closestDayIndex: 0,
+      totalBlockCount: 0 // keep track of the total number of blocks loaded into the scene
     }
   }
 
@@ -119,6 +120,8 @@ export default class MainScene {
         timeStamp: timeStamp
       }
 
+      this.state.totalBlockCount += blocks.length
+
       let group = new THREE.Group()
       this.state.dayGroups[dayIndex] = group
       this.stage.scene.add(group)
@@ -138,6 +141,8 @@ export default class MainScene {
 
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial.clone())
 
+        blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
+
         blockMesh.material.opacity = 0.0
         blockMesh.scale.set(size.x, size.y, size.z)
 
@@ -148,7 +153,7 @@ export default class MainScene {
         blockMesh.rotation.z = rotation
         blockMesh.translateY(700 + (index))
         blockMesh.rotation.z += Math.PI / 2
-        blockMesh.translateZ(-(index * 8))
+        blockMesh.translateZ((index * 8))
         blockMesh.blockchainData = block
 
         group.add(blockMesh)
@@ -158,6 +163,26 @@ export default class MainScene {
       group.translateZ(zPos)
       this.state.dayData[dayIndex].zPos = zPos
       this.state.loadDayRequested = false
+
+      let that = this
+      Object.keys(this.state.dayGroups).reverse().forEach(function (key) {
+        let group = that.state.dayGroups[key]
+        that.stage.scene.remove(group)
+      })
+
+      Object.keys(this.state.dayGroups).reverse().forEach(function (key) {
+        console.log(key)
+        let group = that.state.dayGroups[key]
+        that.stage.scene.add(group)
+      })
+
+      // console.log(ordered.reverse())
+
+/*      for (const dayIndex in this.state.dayGroups) {
+        if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
+          const dayGroup = this.state.dayGroups[dayIndex]
+        }
+      } */
     } catch (error) {
       console.log(error)
     }
@@ -216,7 +241,7 @@ export default class MainScene {
     mesh.translateY(-boxCenter.y)
     mesh.translateZ(-boxCenter.z)
 
-    mesh.renderOrder = 9999
+    mesh.renderOrder = 10000000
 
     this.treeGroup.add(mesh)
 
@@ -263,18 +288,21 @@ export default class MainScene {
 
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
-      this.animateCamera(this.state.currentDay.zPos, this.state.currentDay.zPos + 400, 3000)
+      this.animateCamera(
+        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos + 400),
+        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos),
+        3000
+      )
       this.state.focussed = false
       this.isAnimating = false
     })
   }
 
   removeTrees () {
-    this.audio.unloadSound()
-
     if (typeof this.treeGroup !== 'undefined') {
       this.stage.scene.remove(this.treeGroup)
     }
+    this.audio.unloadSound()
   }
 
   onDocumentMouseDown (event) {
@@ -482,6 +510,7 @@ export default class MainScene {
       metalness: 0.5,
       opacity: 0.2,
       depthTest: false,
+      depthWrite: false,
       transparent: true,
       roughness: 0.4,
       wireframe: true,
