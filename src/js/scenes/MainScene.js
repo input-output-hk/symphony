@@ -263,7 +263,7 @@ export default class MainScene {
 
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
-      this.animateCamera(this.stage.defaultCameraPos, new THREE.Vector3(0.0, 0.0, 0.0), 3000)
+      this.animateCamera(this.state.currentDay.zPos, this.state.currentDay.zPos + 400, 3000)
       this.state.focussed = false
       this.isAnimating = false
     })
