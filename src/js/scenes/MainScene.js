@@ -181,6 +181,8 @@ export default class MainScene {
 
     this.selectBlock = new Event('selectBlock')
 
+    this.dayChangedEvent = document.createEvent('CustomEvent')
+
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onKeyDown.bind(this), false)
 
@@ -523,52 +525,59 @@ export default class MainScene {
   }
 
   onCameraMove () {
-    if (this.state.dayData.length) {
-      // which day are we closest to?
-      let closest = Number.MAX_VALUE
-      let closestDayIndex = 0
+    // which day are we closest to?
+    let closest = Number.MAX_VALUE
+    let closestDayIndex = 0
 
-      for (const dayIndex in this.state.dayData) {
-        if (this.state.dayData.hasOwnProperty(dayIndex)) {
-          const day = this.state.dayData[dayIndex]
-          let dist = Math.abs(day.zPos - this.stage.camera.position.z)
-          if (dist < closest) {
-            closest = dist
-            closestDayIndex = dayIndex
-          }
+    for (const dayIndex in this.state.dayData) {
+      if (this.state.dayData.hasOwnProperty(dayIndex)) {
+        const day = this.state.dayData[dayIndex]
+        let dist = Math.abs(day.zPos - this.stage.camera.position.z)
+        if (dist < closest) {
+          closest = dist
+          closestDayIndex = parseInt(dayIndex)
         }
       }
+    }
 
-      this.state.closestDayIndex = closestDayIndex
-      this.state.currentDay = this.state.dayData[closestDayIndex]
+    this.state.currentDay = this.state.dayData[closestDayIndex]
 
-      if (this.state.loadDayRequested === false) {
-        if (this.currentDate !== moment().format('YYYY-MM-DD')) {
-          let latestDayIndex = Math.min(...Object.keys(this.state.dayData))
-          let latestLoadedDay = this.state.dayData[latestDayIndex]
-          let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
-          if (latestDayDist < this.blockLoadZThreshold) {
-            console.log('load later')
-            this.state.loadDayRequested = true
-            let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
-            this.loadBlocks(nextDay, latestDayIndex - 1)
-          }
-        }
-      }
+    // bubble up event
+    if (this.state.closestDayIndex !== closestDayIndex) {
+      // Dispatch an event
+      this.dayChangedEvent.initCustomEvent('dayChanged', true, true, this.state.currentDay)
+      window.dispatchEvent(this.dayChangedEvent)
+    }
 
-      if (this.state.loadDayRequested === false) {
-        // how far are we away from the zpos of the last loaded day?
-        let earliestDayIndex = Math.max(...Object.keys(this.state.dayData))
-        let earliestLoadedDay = this.state.dayData[earliestDayIndex]
+    this.state.closestDayIndex = closestDayIndex
 
-        let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
-        if (dist < this.blockLoadZThreshold) {
-          console.log('load earlier')
+    if (this.state.loadDayRequested === false) {
+      if (this.currentDate !== moment().format('YYYY-MM-DD')) {
+        let latestDayIndex = Math.min(...Object.keys(this.state.dayData))
+        let latestLoadedDay = this.state.dayData[latestDayIndex]
+        let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
+        if (latestDayDist < this.blockLoadZThreshold) {
+          console.log('load later')
           this.state.loadDayRequested = true
-          let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
-          this.loadBlocks(prevDay, earliestDayIndex + 1)
+          let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
+          this.loadBlocks(nextDay, latestDayIndex - 1)
         }
       }
+    }
+
+    if (this.state.loadDayRequested === false) {
+        // how far are we away from the zpos of the last loaded day?
+      let earliestDayIndex = Math.max(...Object.keys(this.state.dayData))
+      let earliestLoadedDay = this.state.dayData[earliestDayIndex]
+
+      let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
+      if (dist < this.blockLoadZThreshold) {
+        console.log('load earlier')
+        this.state.loadDayRequested = true
+        let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
+        this.loadBlocks(prevDay, earliestDayIndex + 1)
+      }
+    }
 
       /* this.state.hashRate = this.state.currentDay.hashRate
       this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
@@ -576,7 +585,6 @@ export default class MainScene {
       console.log(this.state.audioFreqCutoff)
 
       this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff) */
-    }
   }
 
   animateTree () {

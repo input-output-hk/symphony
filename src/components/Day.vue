@@ -60,6 +60,13 @@ export default {
     }
   }
 }
+
+const dayChanged = (event) => {
+  console.log(event)
+}
+
+window.addEventListener('dayChanged', dayChanged.bind(this), false)
+
 </script>
 
 <style scoped>
