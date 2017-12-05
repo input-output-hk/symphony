@@ -220,6 +220,8 @@ export default class MainScene {
     let endNodes = e.data.endNodes
     let vertices = e.data.vertices
 
+    this.stage.scene.remove(this.treeGroup)
+
     this.treeGroup = new THREE.Group()
     this.stage.scene.add(this.treeGroup)
 
@@ -229,6 +231,9 @@ export default class MainScene {
     let treeGeo = new THREE.BufferGeometry()
     treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
 
+    treeGeo.computeVertexNormals()
+    treeGeo.computeFaceNormals()
+
     let mesh = new THREE.Mesh(treeGeo, this.merkleMaterial)
 
     mesh.translateX(-boxCenter.x)
@@ -236,6 +241,9 @@ export default class MainScene {
     mesh.translateZ(-boxCenter.z)
 
     mesh.renderOrder = 10000000
+    mesh.onBeforeRender = (renderer) => {
+      renderer.clearDepth()
+    }
 
     this.treeGroup.add(mesh)
 
@@ -420,7 +428,7 @@ export default class MainScene {
       let blockWorldPos = blockObject.getWorldPosition()
 
       this.stage.targetCameraLookAt.z = blockWorldPos.z
-      this.stage.targetCameraPos.z = blockWorldPos.z + 300
+      this.stage.targetCameraPos.z = blockWorldPos.z + 450
 
       this.animateBlock(
         blockObject,
