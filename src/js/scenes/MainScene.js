@@ -143,7 +143,8 @@ export default class MainScene {
 
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
 
-        blockMesh.material.opacity = 0.0
+        // blockMesh.material.opacity = 0.0
+        blockMesh.material.visible = false
         blockMesh.scale.set(size.x, size.y, size.z)
 
         // align all front faces
@@ -187,11 +188,13 @@ export default class MainScene {
     this.dayZOffset = -1400 // offset for each day on z-axis
     this.treeGroup = null
     this.blockLoadZThreshold = 4000 // how far away from the last block until we load in another?
+    this.crystalOpacity = 0.5
+    this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
   }
 
   addInteraction () {
     this.raycaster = new THREE.Raycaster()
-    this.intersected = []
+    this.intersected = null
   }
 
   addEvents () {
@@ -495,9 +498,9 @@ export default class MainScene {
 
     this.crystalMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
-      metalness: 0.7,
-      roughness: 0.0,
-      opacity: 0.5,
+      metalness: 0.9,
+      roughness: 0.2,
+      opacity: this.crystalOpacity,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
@@ -505,14 +508,14 @@ export default class MainScene {
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
+      emissive: 0x444444,
       flatShading: true,
-      metalness: 0.5,
-      opacity: 0.2,
-      depthTest: false,
-      depthWrite: false,
+      metalness: 0.8,
+      roughness: 0.3,
+      opacity: 0.3,
+      /* depthTest: false,
+      depthWrite: false, */
       transparent: true,
-      roughness: 0.4,
-      wireframe: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
     })
@@ -531,22 +534,32 @@ export default class MainScene {
           this.state.focussed = true
           this.mouseStatic = false
           if (
-            intersects[0].object !== this.intersected[dayIndex] &&
-            intersects[0].object !== this.state.currentBlockObject
-          ) {
-            if (this.intersected[dayIndex]) {
-              this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
+              intersects[0].object !== this.intersected &&
+              intersects[0].object !== this.state.currentBlockObject
+            ) {
+            if (this.intersected) {
+              this.intersected.material.color.setHex(this.intersected.currentHex)
+              this.intersected.material.opacity = this.crystalOpacity
             }
-            this.intersected[dayIndex] = intersects[0].object
-            this.intersected[dayIndex].currentHex = this.intersected[dayIndex].material.color.getHex()
-            this.intersected[dayIndex].material.color.setHex(0xffffff)
+
+            this.intersected = intersects[0].object
+            this.intersected.currentHex = this.intersected.material.color.getHex()
+            this.intersected.material.color.setHex(0xffffff)
+
+            this.intersected.material.opacity = 0.9
+
+            const blockWorldPos = intersects[0].object.getWorldPosition()
+
+            this.pointLightTarget = blockWorldPos
           }
+          break
         } else {
           this.state.focussed = false
-          if (this.intersected[dayIndex]) {
-            this.intersected[dayIndex].material.color.setHex(this.intersected[dayIndex].currentHex)
+          if (this.intersected) {
+            this.intersected.material.color.setHex(this.intersected.currentHex)
+            this.intersected.material.opacity = this.crystalOpacity
           }
-          this.intersected[dayIndex] = null
+          this.intersected = null
         }
       }
     }
@@ -630,8 +643,8 @@ export default class MainScene {
         const dayGroup = this.state.dayGroups[dayIndex]
         for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
           const mesh = dayGroup.children[meshIndex]
-          if (mesh.material.opacity < 0.5) {
-            mesh.material.opacity += 0.25
+          if (mesh.material.visible === false) {
+            mesh.material.visible = true
             break
           }
         }
@@ -639,8 +652,13 @@ export default class MainScene {
     }
   }
 
+  updateLights () {
+    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.5)
+  }
+
   onUpdate () {
     TWEEN.update()
+    this.updateLights()
     this.checkMouseIntersection()
     this.animateTree()
     this.animateBlockOpacity()

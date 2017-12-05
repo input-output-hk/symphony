@@ -43,11 +43,11 @@ export default class Stage {
     this.renderPass = new RenderPass(this.scene, this.camera)
     this.composer.addPass(this.renderPass)
 
-    this.RGBShiftPass = new ShaderPass(RGBShiftShader)
+    /* this.RGBShiftPass = new ShaderPass(RGBShiftShader)
     this.composer.addPass(this.RGBShiftPass)
 
     this.FilmShaderPass = new ShaderPass(FilmShader)
-    this.composer.addPass(this.FilmShaderPass)
+    this.composer.addPass(this.FilmShaderPass) */
 
     this.VignettePass = new ShaderPass(VignetteShader)
     this.composer.addPass(this.VignettePass)
@@ -80,7 +80,7 @@ export default class Stage {
     this.height = window.innerHeight
 
     // initial position of camera in the scene
-    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 1000.0)
+    this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2000.0)
 
     // xy bounds of the ambient camera movement
     this.cameraDriftLimitMax = {
@@ -166,8 +166,11 @@ export default class Stage {
    * Add lights to the stage
    */
   addLights () {
-    let ambLight = new THREE.AmbientLight(0xffffff)
-    this.scene.add(ambLight)
+    /* let ambLight = new THREE.AmbientLight(0xffffff)
+    this.scene.add(ambLight) */
+
+    this.pointLight = new THREE.PointLight(0xffffff, 5, 5000, 3)
+    this.scene.add(this.pointLight)
   }
 
   /**
