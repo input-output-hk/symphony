@@ -34,7 +34,7 @@ export default class GenerateBlockGeometry {
 
     const startingPosition = new THREE.Vector3(0, 0, 0)
     const direction = new THREE.Vector3(0, 1, 0)
-    const points = this.build(tree, startingPosition, direction, visualise)
+    const points = this.build(tree, startingPosition, direction, visualise, [])
 
     let box = new THREE.Box3().setFromPoints(points)
     let boxDimensions = box.getSize()
@@ -78,22 +78,17 @@ export default class GenerateBlockGeometry {
 
         if (childNode) {
           if (typeof childNode.children !== 'undefined') {
-            let newDirection
-
-            let yaxis
-            let yangle
+            let angle = (Math.PI / 180) * this.angle
+            let axis = this.Y
+            let newDirection = direction.clone()
 
             if (i === 1) {
-              newDirection = direction.clone().applyQuaternion(this.xPosRotation)
-              yaxis = direction.multiply(this.Y).normalize()
-              yangle = (Math.PI / 180) * this.angle
-              newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(yaxis, yangle))
+              newDirection.applyQuaternion(this.zPosRotation)
             } else {
-              newDirection = direction.clone().applyQuaternion(this.xNegRotation)
-              yaxis = direction.multiply(this.Y).normalize()
-              yangle = (Math.PI / 180) * this.angle
-              newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(yaxis, yangle))
+              newDirection.applyQuaternion(this.zNegRotation)
             }
+
+            newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(axis, angle))
 
             this.build(childNode, endPosition, newDirection, visualise, points)
           } else {

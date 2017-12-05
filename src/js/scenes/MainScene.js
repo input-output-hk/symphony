@@ -165,24 +165,18 @@ export default class MainScene {
       this.state.loadDayRequested = false
 
       let that = this
-      Object.keys(this.state.dayGroups).reverse().forEach(function (key) {
+      Object.keys(this.state.dayGroups).forEach(function (key) {
         let group = that.state.dayGroups[key]
         that.stage.scene.remove(group)
       })
 
       Object.keys(this.state.dayGroups).reverse().forEach(function (key) {
-        console.log(key)
         let group = that.state.dayGroups[key]
         that.stage.scene.add(group)
       })
 
-      // console.log(ordered.reverse())
-
-/*      for (const dayIndex in this.state.dayGroups) {
-        if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
-          const dayGroup = this.state.dayGroups[dayIndex]
-        }
-      } */
+      that.stage.scene.remove(this.treeGroup)
+      that.stage.scene.add(this.treeGroup)
     } catch (error) {
       console.log(error)
     }
@@ -444,11 +438,8 @@ export default class MainScene {
 
   buildTree (blockObject) {
     let block = blockObject.blockchainData
-
     this.state.currentBlock = block
-
     this.removeTrees()
-
     this.treeBuilderWorker.postMessage(
       {
         cmd: 'build',
