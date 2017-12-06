@@ -86,7 +86,6 @@ export default class MainScene {
 
   initState (blocks, currentDate) {
     this.state = {
-      focussed: false, // are we focussed on a block?
       currentDate: currentDate,
       dayGroups: [],
       currentBlock: null,
@@ -174,7 +173,7 @@ export default class MainScene {
           continue
         }
 
-        let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial.clone())
+        let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial)
 
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
 
@@ -335,7 +334,6 @@ export default class MainScene {
         new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos),
         3000
       )
-      this.state.focussed = false
       this.isAnimating = false
     })
   }
@@ -548,6 +546,9 @@ export default class MainScene {
       envMap: this.bgMap
     })
 
+    this.crystalMaterialHighlight = this.crystalMaterial.clone()
+    this.crystalMaterialHighlight.opacity = 1.0
+
     this.merkleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       emissive: 0x444444,
@@ -573,33 +574,26 @@ export default class MainScene {
         const group = this.state.dayGroups[dayIndex]
         let intersects = ray.intersectObjects(group.children)
         if (intersects.length > 0) {
-          this.state.focussed = true
-          this.mouseStatic = false
           if (
               intersects[0].object !== this.intersected &&
               intersects[0].object !== this.state.currentBlockObject
             ) {
             if (this.intersected) {
-              this.intersected.material.color.setHex(this.intersected.currentHex)
-              this.intersected.material.opacity = this.crystalOpacity
+              this.intersected.material = this.crystalMaterial
             }
 
             this.intersected = intersects[0].object
-            this.intersected.currentHex = this.intersected.material.color.getHex()
-            this.intersected.material.color.setHex(0xffffff)
 
-            this.intersected.material.opacity = 0.9
+            this.intersected.material = this.crystalMaterialHighlight
 
-            const blockWorldPos = intersects[0].object.getWorldPosition()
+            const blockWorldPos = this.intersected.getWorldPosition()
 
             this.pointLightTarget = blockWorldPos
           }
           break
         } else {
-          this.state.focussed = false
           if (this.intersected) {
-            this.intersected.material.color.setHex(this.intersected.currentHex)
-            this.intersected.material.opacity = this.crystalOpacity
+            this.intersected.material = this.crystalMaterial
           }
           this.intersected = null
         }
