@@ -132,10 +132,6 @@ export default class MainScene {
       this.stage.VignettePass.uniforms.darkness.value = val
     }.bind(this))
 
-    sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
-      this.stage.VignettePass.uniforms.darkness.value = val
-    }.bind(this))
-
     sceneFolder.add(param, 'cameraFOV', 45.0, 100.0).step(0.01).onChange(function (val) {
       this.stage.camera.fov = val
       this.stage.camera.updateProjectionMatrix()
