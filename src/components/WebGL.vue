@@ -13,22 +13,11 @@
 
 <script>
 
-import SceneManager from '../js/SceneManager'
-
-//import moment from 'moment'
-
-//const getDayInMs = time => moment(time).startOf('day').toDate().valueOf()
-
 export default {
   name: 'webgl',
   props: ['date'],
   mounted(){
     // console.log('create webgl', this.blocks, this.focusOnBlock)
-    this.app = new SceneManager({
-      params : {
-        date: this.date
-      }
-    })
   },
   beforeUpdate(){
     // console.log('update webgl', this.blocks, this.focusOnBlock)

@@ -185,11 +185,11 @@ export default class MainScene {
         // align all front faces
         blockMesh.translateZ(-(size.z / 2))
 
-        let rotation = ((10 * Math.PI) / blockCount) * index
+        let rotation = ((25 * Math.PI) / blockCount) * index
         blockMesh.rotation.z = rotation
         blockMesh.translateY(700 + (index))
         blockMesh.rotation.z += Math.PI / 2
-        blockMesh.translateZ((index * 8))
+        blockMesh.translateZ((index * 18))
         blockMesh.blockchainData = block
 
         group.add(blockMesh)
@@ -222,9 +222,9 @@ export default class MainScene {
 
   initProperties () {
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
-    this.dayZOffset = -1400 // offset for each day on z-axis
+    this.dayZOffset = -3500 // offset for each day on z-axis
     this.treeGroup = null
-    this.blockLoadZThreshold = 4000 // how far away from the last block until we load in another?
+    this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
     this.crystalOpacity = 0.5
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
   }
@@ -260,7 +260,7 @@ export default class MainScene {
     let endNodes = e.data.endNodes
     let vertices = e.data.vertices
 
-    this.stage.scene.remove(this.treeGroup)
+    this.removeTrees()
 
     this.treeGroup = new THREE.Group()
     this.stage.scene.add(this.treeGroup)
@@ -343,6 +343,7 @@ export default class MainScene {
   removeTrees () {
     if (typeof this.treeGroup !== 'undefined') {
       this.stage.scene.remove(this.treeGroup)
+      this.treeGroup = null
     }
     this.audio.unloadSound()
   }

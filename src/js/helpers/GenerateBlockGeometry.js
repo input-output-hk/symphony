@@ -9,7 +9,7 @@ export default class GenerateBlockGeometry {
   constructor (block, visualise = false) {
     const { output, n_tx } = block
 
-    this.angle = 5.0 + (block.output % 120)
+    this.angle = 5.0 + (block.output % 90)
 
     this.X = new THREE.Vector3(1, 0, 0)
     this.Y = new THREE.Vector3(0, 1, 0)

@@ -15,10 +15,19 @@ import graph from './Graph'
 import cfg from '../js/Config'
 import BTC from '../js/api/btc'
 
+import SceneManager from '../js/SceneManager'
+
 export default {
   name: 'home',
   components:{ webgl, graph },
   props: ['date'],
+  mounted () {
+    this.app = new SceneManager({
+      params : {
+        date: this.date
+      }
+    })
+  },
   asyncComputed: {
 
     focusOnBlock: ({block}) => {

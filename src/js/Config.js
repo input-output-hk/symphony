@@ -5,7 +5,7 @@ const Config = {
   scene: {
     bgColor: 0x000022,
     shadowsOn: false,
-    fogFar: 0.00030,
+    fogFar: 0.00040,
     antialias: true
   },
   postProcessing: {
