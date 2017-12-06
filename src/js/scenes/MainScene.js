@@ -14,6 +14,8 @@ import Audio from '../audio/audio'
 // API
 import API from '../api/btc'
 
+const dat = require('dat-gui')
+
 const DayBuilderWorker = require('worker-loader!../workers/dayBuilder.js')
 const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
@@ -42,11 +44,44 @@ export default class MainScene {
 
     this.addEvents()
     this.setupMaterials()
+    this.initGui()
 
     this.state.loadDayRequested = true
     this.dayBuilderWorker = new DayBuilderWorker()
     this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
     this.loadBlocks() // load in new blocks via webworker
+  }
+
+  initGui () {
+    this.gui = new dat.GUI({ width: 300 })
+    // this.gui.open()
+
+    let param = {
+      blockRoughness: 0.9,
+      blockMetalness: 0.2,
+      merkleMetalness: 0.9,
+      merkleRoughness: 0.1
+    }
+
+    let blockMaterialFolder = this.gui.addFolder('Block Material')
+
+    blockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.crystalMaterial.metalness = val
+    }.bind(this))
+
+    blockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.crystalMaterial.roughness = val
+    }.bind(this))
+
+    let merkleMaterialFolder = this.gui.addFolder('Merkle Material')
+
+    merkleMaterialFolder.add(param, 'merkleMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.merkleMaterial.metalness = val
+    }.bind(this))
+
+    merkleMaterialFolder.add(param, 'merkleRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.merkleMaterial.roughness = val
+    }.bind(this))
   }
 
   initState (blocks, currentDate) {
@@ -176,8 +211,10 @@ export default class MainScene {
         that.stage.scene.add(group)
       })
 
-      that.stage.scene.remove(this.treeGroup)
-      that.stage.scene.add(this.treeGroup)
+      if (this.treeGroup) {
+        that.stage.scene.remove(this.treeGroup)
+        that.stage.scene.add(this.treeGroup)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -312,6 +349,10 @@ export default class MainScene {
 
   onDocumentMouseDown (event) {
     event.preventDefault()
+
+    if (event.target.className !== 'main') {
+      return
+    }
 
     if (this.isAnimating) {
       return
@@ -500,7 +541,7 @@ export default class MainScene {
       color: 0xaaaaaa,
       metalness: 0.9,
       roughness: 0.2,
-      opacity: this.crystalOpacity,
+      opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
