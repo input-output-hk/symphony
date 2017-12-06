@@ -59,18 +59,30 @@ export default class MainScene {
     let param = {
       blockRoughness: 0.9,
       blockMetalness: 0.2,
+      blockColor: this.blockMaterial.color.getHex(),
+      blockEmissive: this.blockMaterial.emissive.getHex(),
       merkleMetalness: 0.9,
-      merkleRoughness: 0.1
+      merkleRoughness: 0.1,
+      merkleColor: this.merkleMaterial.color.getHex(),
+      merkleEmissive: this.merkleMaterial.emissive.getHex()
     }
 
     let blockMaterialFolder = this.gui.addFolder('Block Material')
 
     blockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.crystalMaterial.metalness = val
+      this.blockMaterial.metalness = val
     }.bind(this))
 
     blockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.crystalMaterial.roughness = val
+      this.blockMaterial.roughness = val
+    }.bind(this))
+
+    blockMaterialFolder.addColor(param, 'blockColor').onChange(function (val) {
+      this.blockMaterial.color.setHex(val)
+    }.bind(this))
+
+    blockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
+      this.blockMaterial.emissive.setHex(val)
     }.bind(this))
 
     let merkleMaterialFolder = this.gui.addFolder('Merkle Material')
@@ -81,6 +93,14 @@ export default class MainScene {
 
     merkleMaterialFolder.add(param, 'merkleRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
       this.merkleMaterial.roughness = val
+    }.bind(this))
+
+    merkleMaterialFolder.addColor(param, 'merkleColor').onChange(function (val) {
+      this.merkleMaterial.color.setHex(val)
+    }.bind(this))
+
+    merkleMaterialFolder.addColor(param, 'merkleEmissive').onChange(function (val) {
+      this.merkleMaterial.emissive.setHex(val)
     }.bind(this))
   }
 
@@ -173,7 +193,7 @@ export default class MainScene {
           continue
         }
 
-        let blockMesh = new THREE.Mesh(this.boxGeometry, this.crystalMaterial)
+        let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterial)
 
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
 
@@ -536,7 +556,7 @@ export default class MainScene {
 
     // this.stage.scene.background = this.bgMap
 
-    this.crystalMaterial = new THREE.MeshPhysicalMaterial({
+    this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       metalness: 0.9,
       roughness: 0.2,
@@ -546,9 +566,9 @@ export default class MainScene {
       envMap: this.bgMap
     })
 
-    this.crystalMaterialHighlight = this.crystalMaterial.clone()
-    this.crystalMaterialHighlight.opacity = 1.0
-    this.crystalMaterialHighlight.color.setHex(0xffffff)
+    this.blockMaterialHighlight = this.blockMaterial.clone()
+    this.blockMaterialHighlight.opacity = 1.0
+    this.blockMaterialHighlight.color.setHex(0xffffff)
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
@@ -580,12 +600,12 @@ export default class MainScene {
               intersects[0].object !== this.state.currentBlockObject
             ) {
             if (this.intersected) {
-              this.intersected.material = this.crystalMaterial
+              this.intersected.material = this.blockMaterial
             }
 
             this.intersected = intersects[0].object
 
-            this.intersected.material = this.crystalMaterialHighlight
+            this.intersected.material = this.blockMaterialHighlight
 
             const blockWorldPos = this.intersected.getWorldPosition()
 
@@ -594,7 +614,7 @@ export default class MainScene {
           break
         } else {
           if (this.intersected) {
-            this.intersected.material = this.crystalMaterial
+            this.intersected.material = this.blockMaterial
           }
           this.intersected = null
         }
