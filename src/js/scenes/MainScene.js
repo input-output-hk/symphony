@@ -54,7 +54,7 @@ export default class MainScene {
 
   initGui () {
     this.gui = new dat.GUI({ width: 300 })
-    // this.gui.open()
+    this.gui.open()
 
     let param = {
       blockRoughness: 0.9,
@@ -304,7 +304,7 @@ export default class MainScene {
 
       if (seen.indexOf(key) === -1) {
         seen.push(key)
-        nodePos.y = Math.abs(nodePos.y) * 10
+        nodePos.y = Math.abs(nodePos.y)
         reducedArray.push(nodePos)
       }
     }
@@ -548,6 +548,7 @@ export default class MainScene {
 
     this.crystalMaterialHighlight = this.crystalMaterial.clone()
     this.crystalMaterialHighlight.opacity = 1.0
+    this.crystalMaterialHighlight.color.setHex(0xffffff)
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
@@ -656,12 +657,13 @@ export default class MainScene {
       }
     }
 
-      /* this.state.hashRate = this.state.currentDay.hashRate
-      this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
+    /* this.state.hashRate = this.state.currentDay.hashRate
+    this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
-      console.log(this.state.audioFreqCutoff)
+    console.log(this.state.audioFreqCutoff)
 
-      this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff) */
+    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+    */
   }
 
   animateTree () {

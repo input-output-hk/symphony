@@ -10,7 +10,7 @@ export default class Audio {
     this.camera = camera
     this.quantize = 16
     this.masterVol = -6 // db
-    this.ambienceVol = -16 // db
+    this.ambienceVol = -20 // db
     this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
     this.bpm = 100
     this.notes = {
@@ -251,8 +251,8 @@ export default class Audio {
 
         // add positional audio
         let panner = new Tone.Panner3D().chain(this.masterBus)
-        panner.refDistance = 500
-        panner.rolloffFactor = 50
+        panner.refDistance = 5000
+        panner.rolloffFactor = 25
         panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
 
         this.panners.push(panner)
