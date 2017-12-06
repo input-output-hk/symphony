@@ -67,7 +67,8 @@ export default class MainScene {
       merkleColor: this.merkleMaterial.color.getHex(),
       merkleEmissive: this.merkleMaterial.emissive.getHex(),
       //
-      backgroundColor: Config.scene.bgColor
+      backgroundColor: Config.scene.bgColor,
+      vignetteAmount: 1.2
     }
 
     /**
@@ -119,6 +120,10 @@ export default class MainScene {
     sceneFolder.addColor(param, 'backgroundColor').onChange(function (val) {
       this.stage.scene.background = new THREE.Color(val)
       this.stage.scene.fog.color = new THREE.Color(val)
+    }.bind(this))
+
+    sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
+      this.stage.VignettePass.uniforms.darkness.value = val
     }.bind(this))
   }
 
