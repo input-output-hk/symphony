@@ -61,6 +61,7 @@ export default class MainScene {
       blockMetalness: 0.2,
       blockColor: this.blockMaterial.color.getHex(),
       blockEmissive: this.blockMaterial.emissive.getHex(),
+      blockLightIntesity: 5.0,
       //
       merkleMetalness: 0.9,
       merkleRoughness: 0.1,
@@ -90,6 +91,10 @@ export default class MainScene {
 
     blockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
       this.blockMaterial.emissive.setHex(val)
+    }.bind(this))
+
+    blockMaterialFolder.add(param, 'blockLightIntesity', 0.0, 10.0).step(0.01).onChange(function (val) {
+      this.stage.pointLight.intensity = val
     }.bind(this))
 
     /**
