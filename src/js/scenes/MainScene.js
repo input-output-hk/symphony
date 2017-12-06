@@ -61,12 +61,18 @@ export default class MainScene {
       blockMetalness: 0.2,
       blockColor: this.blockMaterial.color.getHex(),
       blockEmissive: this.blockMaterial.emissive.getHex(),
+      //
       merkleMetalness: 0.9,
       merkleRoughness: 0.1,
       merkleColor: this.merkleMaterial.color.getHex(),
-      merkleEmissive: this.merkleMaterial.emissive.getHex()
+      merkleEmissive: this.merkleMaterial.emissive.getHex(),
+      //
+      backgroundColor: Config.scene.bgColor
     }
 
+    /**
+     * Block Material
+     */
     let blockMaterialFolder = this.gui.addFolder('Block Material')
 
     blockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
@@ -85,6 +91,9 @@ export default class MainScene {
       this.blockMaterial.emissive.setHex(val)
     }.bind(this))
 
+    /**
+     * Merkle Material
+     */
     let merkleMaterialFolder = this.gui.addFolder('Merkle Material')
 
     merkleMaterialFolder.add(param, 'merkleMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
@@ -101,6 +110,15 @@ export default class MainScene {
 
     merkleMaterialFolder.addColor(param, 'merkleEmissive').onChange(function (val) {
       this.merkleMaterial.emissive.setHex(val)
+    }.bind(this))
+
+    /**
+     * Scene
+     */
+    let sceneFolder = this.gui.addFolder('Scene')
+    sceneFolder.addColor(param, 'backgroundColor').onChange(function (val) {
+      this.stage.scene.background = new THREE.Color(val)
+      this.stage.scene.fog.color = new THREE.Color(val)
     }.bind(this))
   }
 
