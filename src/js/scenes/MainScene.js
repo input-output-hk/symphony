@@ -229,6 +229,11 @@ export default class MainScene {
         blockMesh.translateZ((index * 18))
         blockMesh.blockchainData = block
 
+        let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
+
+        let wireframe = new THREE.LineSegments(edgeGeo, this.blockMaterialOutline)
+        blockMesh.add(wireframe)
+
         group.add(blockMesh)
       }
 
@@ -583,6 +588,12 @@ export default class MainScene {
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
+    })
+
+    this.blockMaterialOutline = new THREE.LineBasicMaterial({
+      color: 0xcccccc,
+      transparent: true,
+      opacity: 0.25
     })
 
     this.blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
