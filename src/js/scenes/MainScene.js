@@ -558,6 +558,7 @@ export default class MainScene {
 
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
+      emissive: 0x000000,
       metalness: 0.9,
       roughness: 0.2,
       opacity: 0.5,
@@ -566,9 +567,15 @@ export default class MainScene {
       envMap: this.bgMap
     })
 
-    this.blockMaterialHighlight = this.blockMaterial.clone()
-    this.blockMaterialHighlight.opacity = 1.0
-    this.blockMaterialHighlight.color.setHex(0xffffff)
+    this.blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      emissive: 0xffffff,
+      metalness: 0.9,
+      roughness: 0.2,
+      opacity: 0.8,
+      transparent: true,
+      side: THREE.DoubleSide
+    })
 
     this.merkleMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
