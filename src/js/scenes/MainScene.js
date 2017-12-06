@@ -69,7 +69,8 @@ export default class MainScene {
       merkleEmissive: this.merkleMaterial.emissive.getHex(),
       //
       backgroundColor: Config.scene.bgColor,
-      vignetteAmount: 1.2
+      vignetteAmount: 1.2,
+      cameraFOV: Config.camera.fov
     }
 
     /**
@@ -129,6 +130,15 @@ export default class MainScene {
 
     sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
       this.stage.VignettePass.uniforms.darkness.value = val
+    }.bind(this))
+
+    sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
+      this.stage.VignettePass.uniforms.darkness.value = val
+    }.bind(this))
+
+    sceneFolder.add(param, 'cameraFOV', 45.0, 100.0).step(0.01).onChange(function (val) {
+      this.stage.camera.fov = val
+      this.stage.camera.updateProjectionMatrix()
     }.bind(this))
   }
 
