@@ -28,6 +28,8 @@ export default class MainScene {
   ) {
     this.params = params
 
+    this.cubeCamera = null
+
     this.api = new API()
 
     this.stage = params.stage // reference to the stage
@@ -46,10 +48,30 @@ export default class MainScene {
     this.setupMaterials()
     this.initGui()
 
+    // this.initReflection()
+
     this.state.loadDayRequested = true
     this.dayBuilderWorker = new DayBuilderWorker()
     this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
     this.loadBlocks() // load in new blocks via webworker
+  }
+
+  initReflection () {
+    let CubeCamera = function (position) {
+      let camera = new THREE.CubeCamera(0.001, 1000, 1024)
+      camera.position.set(position.x, position.y, position.z)
+      camera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
+      this.camera = camera
+      this.textureCube = camera.renderTarget
+      this.update = (renderer, scene) => {
+        // camera.position.copy(position)
+        camera.update(renderer, scene)
+      }
+      this.updatePosition = () => {
+        this.camera.position.set(position.x, position.y, position.z + 400)
+      }
+    }
+    this.cubeCamera = new CubeCamera(new THREE.Vector3(0.0, 0.0, 0.0))
   }
 
   initGui () {
@@ -236,7 +258,7 @@ export default class MainScene {
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
 
         // blockMesh.material.opacity = 0.0
-        blockMesh.material.visible = false
+        blockMesh.visible = false
         blockMesh.scale.set(size.x, size.y, size.z)
 
         // align all front faces
@@ -250,7 +272,6 @@ export default class MainScene {
         blockMesh.blockchainData = block
 
         let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
-
         let wireframe = new THREE.LineSegments(edgeGeo, this.blockMaterialOutline)
         blockMesh.add(wireframe)
 
@@ -351,6 +372,8 @@ export default class MainScene {
 
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+
+    // this.cubeCamera.updatePosition(blockObjectPosition)
 
     let seen = []
     let reducedArray = []
@@ -731,10 +754,11 @@ export default class MainScene {
     /* this.state.hashRate = this.state.currentDay.hashRate
     this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
-    console.log(this.state.audioFreqCutoff)
+    console.log(this.state.audioFreqCutoff) */
 
-    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
-    */
+   // this.state.audioFreqCutoff = 20000
+
+    // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
   }
 
   animateTree () {
@@ -752,8 +776,8 @@ export default class MainScene {
         const dayGroup = this.state.dayGroups[dayIndex]
         for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
           const mesh = dayGroup.children[meshIndex]
-          if (mesh.material.visible === false) {
-            mesh.material.visible = true
+          if (mesh.visible === false) {
+            mesh.visible = true
             break
           }
         }
@@ -771,5 +795,12 @@ export default class MainScene {
     this.checkMouseIntersection()
     this.animateTree()
     this.animateBlockOpacity()
+
+    if (this.cubeCamera) {
+      this.cubeCamera.update(this.stage.renderer, this.stage.scene)
+      this.cubeCamera.updatePosition(this.stage.camera.position)
+      this.blockMaterial.envMap = this.cubeCamera.textureCube
+      // this.merkleMaterial.envMap = this.cubeCamera.textureCube
+    }
   }
 }
