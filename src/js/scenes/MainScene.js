@@ -53,6 +53,10 @@ export default class MainScene {
   }
 
   initGui () {
+    if (!Config.showGUI) {
+      return
+    }
+
     this.gui = new dat.GUI({ width: 300 })
     this.gui.open()
 
@@ -363,7 +367,7 @@ export default class MainScene {
 
       if (seen.indexOf(key) === -1) {
         seen.push(key)
-        nodePos.y = Math.abs(nodePos.y)
+        nodePos.y = Math.abs(nodePos.y) * 1.2
         reducedArray.push(nodePos)
       }
     }
@@ -389,7 +393,7 @@ export default class MainScene {
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
       this.animateCamera(
-        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos + 400),
+        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos + 500),
         new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos),
         3000
       )
@@ -418,34 +422,29 @@ export default class MainScene {
 
     this.raycaster.setFromCamera({x: this.stage.targetMousePos.x, y: this.stage.targetMousePos.y}, this.stage.camera)
 
-    const BreakException = {}
-
-    try {
-      for (const key in this.state.dayGroups) {
-        if (this.state.dayGroups.hasOwnProperty(key)) {
-          const group = this.state.dayGroups[key]
-          var intersects = this.raycaster.intersectObjects(group.children)
-          if (intersects.length > 0) {
-            if (intersects[0].object === this.state.currentBlockObject) {
-              throw BreakException
-            }
-            this.state.view = 'block'
-            this.removeTrees()
-            this.isAnimating = true
-            let blockObject = intersects[0].object
-            this.animateBlockOut(this.state.currentBlockObject).then(() => {
-              this.animateBlockIn(blockObject).then(() => {
-                this.buildTree(blockObject)
-                this.isAnimating = false
-                document.dispatchEvent(this.selectBlock)
-              })
-            })
-            throw BreakException
+    for (const key in this.state.dayGroups) {
+      if (this.state.dayGroups.hasOwnProperty(key)) {
+        const group = this.state.dayGroups[key]
+        var intersects = this.raycaster.intersectObjects(group.children)
+        if (intersects.length > 0) {
+          if (intersects[0].object === this.state.currentBlockObject) {
+            this.resetDayView()
+            break
           }
+          this.state.view = 'block'
+          this.removeTrees()
+          this.isAnimating = true
+          let blockObject = intersects[0].object
+          this.animateBlockOut(this.state.currentBlockObject).then(() => {
+            this.animateBlockIn(blockObject).then(() => {
+              this.buildTree(blockObject)
+              this.isAnimating = false
+              document.dispatchEvent(this.selectBlock)
+            })
+          })
+          break
         }
       }
-    } catch (error) {
-      // ¯\_(ツ)_/¯
     }
   }
 

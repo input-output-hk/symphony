@@ -2,6 +2,7 @@
 
 const Config = {
   assetPath: '/static/assets/',
+  showGUI: true,
   scene: {
     bgColor: 0x000022,
     shadowsOn: false,
