@@ -24,11 +24,7 @@ export default class BTC {
     // Initialize Cloud Firestore through Firebase
     this.blocks = firebase.firestore().collection('block')
   }
-
-  block (block) {
-    return { ...block, fee: block.output - block.input }
-  }
-
+  
   formatTimeSeries ({ data }) {
     const times = []
     const values = []
@@ -108,7 +104,7 @@ export default class BTC {
   getBlock (hash) {
     this.blocks.where('hash', '==', hash)
     .get()
-    .then(({ docs }) => this.block(docs[0].data()))
+    .then(({ docs }) => docs[0].data())
   }
 
   /**

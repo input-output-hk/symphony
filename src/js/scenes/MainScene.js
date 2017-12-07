@@ -4,6 +4,7 @@
 import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
+import EventEmitter from 'eventemitter3'
 
 // Global config
 import Config from '../Config'
@@ -21,11 +22,12 @@ const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
 const TWEEN = require('@tweenjs/tween.js')
 
-export default class MainScene {
+export default class MainScene extends EventEmitter{
   constructor ({
       params = {}
     } = {}
   ) {
+    super()
     this.params = params
 
     this.cubeCamera = null
@@ -124,50 +126,31 @@ export default class MainScene {
     }
 
     /**
-     * Block Material
+     * Create a GUI for a material
      */
-    let blockMaterialFolder = this.gui.addFolder('Block Material')
+    const createGuiForMaterial = (mat, title) => {
+      let f = this.gui.addFolder(title)
+      f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
+      f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
+      f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
+      if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
+      f.addColor({emissive:mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
+    }
 
-    blockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.blockMaterial.metalness = val
-    }.bind(this))
-
-    blockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.blockMaterial.roughness = val
-    }.bind(this))
-
-    blockMaterialFolder.addColor(param, 'blockColor').onChange(function (val) {
-      this.blockMaterial.color.setHex(val)
-    }.bind(this))
-
-    blockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
-      this.blockMaterial.emissive.setHex(val)
-    }.bind(this))
-
-    blockMaterialFolder.add(param, 'blockLightIntesity', 0.0, 10.0).step(0.01).onChange(function (val) {
-      this.stage.pointLight.intensity = val
-    }.bind(this))
-
-    /**
-     * Merkle Material
+     /**
+     * Gui for Material
      */
-    let merkleMaterialFolder = this.gui.addFolder('Merkle Material')
+    createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
+    createGuiForMaterial(this.blockMaterial, 'Block Material')
+    createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
-    merkleMaterialFolder.add(param, 'merkleMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.merkleMaterial.metalness = val
-    }.bind(this))
 
-    merkleMaterialFolder.add(param, 'merkleRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.merkleMaterial.roughness = val
-    }.bind(this))
-
-    merkleMaterialFolder.addColor(param, 'merkleColor').onChange(function (val) {
-      this.merkleMaterial.color.setHex(val)
-    }.bind(this))
-
-    merkleMaterialFolder.addColor(param, 'merkleEmissive').onChange(function (val) {
-      this.merkleMaterial.emissive.setHex(val)
-    }.bind(this))
+    /*
+      Light GUI
+    */
+    let lightFolder = this.gui.addFolder('Lighting')
+    lightFolder.add(this.stage.pointLight, 'intensity', 0.0, 10.0).step(0.01)
 
     /**
      * Scene
@@ -232,7 +215,7 @@ export default class MainScene {
           blocks: blocks,
           timeStamp: timeStamp
         }
-
+        
         this.dayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
@@ -484,7 +467,7 @@ export default class MainScene {
             this.animateBlockIn(blockObject).then(() => {
               this.buildTree(blockObject)
               this.isAnimating = false
-              document.dispatchEvent(this.selectBlock)
+              this.emit('blockSelected', blockObject.blockchainData)
             })
           })
           break
@@ -628,9 +611,10 @@ export default class MainScene {
       'nz.png'
     ]
 
+    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
-
+    
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
@@ -639,7 +623,9 @@ export default class MainScene {
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap
+      envMap: this.bgMap,
+      bumpMap,
+      bumpScale: 0.03
     })
 
     this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
@@ -650,7 +636,9 @@ export default class MainScene {
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap
+      envMap: this.bgMap,
+      bumpMap,
+      bumpScale: 0.03
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
@@ -750,8 +738,7 @@ export default class MainScene {
     // bubble up event
     if (this.state.closestDayIndex !== closestDayIndex) {
       // Dispatch an event
-      this.dayChangedEvent.initCustomEvent('dayChanged', true, true, this.state.currentDay)
-      window.dispatchEvent(this.dayChangedEvent)
+      this.emit(this.dayChangedEvent, this.state.currentDay)
     }
 
     this.state.closestDayIndex = closestDayIndex
