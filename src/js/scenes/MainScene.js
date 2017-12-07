@@ -102,77 +102,32 @@ export default class MainScene extends EventEmitter{
       cameraFOV: Config.camera.fov
     }
 
+    /**
+     * Create a GUI for a material
+     */
+    const createGuiForMaterial = (mat, title) => {
+      let f = this.gui.addFolder(title)
+      f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
+      f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
+      f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
+      if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
+      f.addColor({emissive:mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
+    }
+
      /**
-     * Central Block Material
+     * Gui for Material
      */
-    let centralBlockMaterialFolder = this.gui.addFolder('Central Block Material')
-    centralBlockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.centralBlockMaterial.metalness = val
-    }.bind(this))
+    createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
+    createGuiForMaterial(this.blockMaterial, 'Block Material')
+    createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
-    centralBlockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.centralBlockMaterial.roughness = val
-    }.bind(this))
 
-    centralBlockMaterialFolder.addColor(param, 'blockColor').onChange(function (val) {
-      this.centralBlockMaterial.color.setHex(val)
-    }.bind(this))
-
-    centralBlockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
-      this.centralBlockMaterial.emissive.setHex(val)
-    }.bind(this))
-
-    centralBlockMaterialFolder.add(this.centralBlockMaterial, 'bumpScale', 0.0, 1.0)
-    centralBlockMaterialFolder.add(this.centralBlockMaterial, 'reflectivity', 0.0, 1.0)
-
-    /**
-     * Block Material
-     */
-    let blockMaterialFolder = this.gui.addFolder('Block Material')
-
-    blockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.blockMaterial.metalness = val
-    }.bind(this))
-
-    blockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.blockMaterial.roughness = val
-    }.bind(this))
-
-    blockMaterialFolder.addColor(param, 'blockColor').onChange(function (val) {
-      this.blockMaterial.color.setHex(val)
-    }.bind(this))
-
-    blockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
-      this.blockMaterial.emissive.setHex(val)
-    }.bind(this))
-
-    blockMaterialFolder.add(param, 'blockLightIntesity', 0.0, 10.0).step(0.01).onChange(function (val) {
-      this.stage.pointLight.intensity = val
-    }.bind(this))
-
-    blockMaterialFolder.add(this.blockMaterial, 'bumpScale', 0.0, 1.0)
-    blockMaterialFolder.add(this.blockMaterial, 'reflectivity', 0.0, 1.0)
-
-    /**
-     * Merkle Material
-     */
-    let merkleMaterialFolder = this.gui.addFolder('Merkle Material')
-
-    merkleMaterialFolder.add(param, 'merkleMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.merkleMaterial.metalness = val
-    }.bind(this))
-
-    merkleMaterialFolder.add(param, 'merkleRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
-      this.merkleMaterial.roughness = val
-    }.bind(this))
-
-    merkleMaterialFolder.addColor(param, 'merkleColor').onChange(function (val) {
-      this.merkleMaterial.color.setHex(val)
-    }.bind(this))
-
-    merkleMaterialFolder.addColor(param, 'merkleEmissive').onChange(function (val) {
-      this.merkleMaterial.emissive.setHex(val)
-    }.bind(this))
+    /*
+      Light GUI
+    */
+    let lightFolder = this.gui.addFolder('Lighting')
+    lightFolder.add(this.stage.pointLight, 'intensity', 0.0, 10.0).step(0.01)
 
     /**
      * Scene
