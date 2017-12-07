@@ -50,7 +50,7 @@ export default class MainScene extends EventEmitter{
     this.setupMaterials()
     this.initGui()
 
-    // this.initReflection()
+    this.initReflection()
 
     this.state.loadDayRequested = true
     this.dayBuilderWorker = new DayBuilderWorker()
@@ -60,17 +60,18 @@ export default class MainScene extends EventEmitter{
 
   initReflection () {
     let CubeCamera = function (position) {
-      let camera = new THREE.CubeCamera(0.001, 1000, 1024)
+      let camera = new THREE.CubeCamera(100.0, 5000, 2048)
       camera.position.set(position.x, position.y, position.z)
       camera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       this.camera = camera
-      this.textureCube = camera.renderTarget
-      this.update = (renderer, scene) => {
-        // camera.position.copy(position)
+      this.textureCube = camera.renderTarget.texture
+
+      this.update = function (renderer, scene) {
         camera.update(renderer, scene)
       }
-      this.updatePosition = () => {
-        this.camera.position.set(position.x, position.y, position.z + 400)
+
+      this.updatePosition = function (position) {
+        camera.position.set(position.x, position.y, position.z)
       }
     }
     this.cubeCamera = new CubeCamera(new THREE.Vector3(0.0, 0.0, 0.0))
@@ -85,8 +86,8 @@ export default class MainScene extends EventEmitter{
     this.gui.open()
 
     let param = {
-      blockRoughness: 0.9,
-      blockMetalness: 0.2,
+      blockMetalness: 0.9,
+      blockRoughness: 0.2,
       blockColor: this.blockMaterial.color.getHex(),
       blockEmissive: this.blockMaterial.emissive.getHex(),
       blockLightIntesity: 5.0,
@@ -312,6 +313,7 @@ export default class MainScene extends EventEmitter{
     this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
     this.crystalOpacity = 0.5
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
+    this.cameraBlockFocusDistance = 300
   }
 
   addInteraction () {
@@ -375,8 +377,6 @@ export default class MainScene extends EventEmitter{
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
 
-    // this.cubeCamera.updatePosition(blockObjectPosition)
-
     let seen = []
     let reducedArray = []
 
@@ -417,11 +417,6 @@ export default class MainScene extends EventEmitter{
 
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
-      this.animateCamera(
-        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos + 500),
-        new THREE.Vector3(0.0, 0.0, this.state.currentDay.zPos),
-        3000
-      )
       this.isAnimating = false
     })
   }
@@ -460,6 +455,7 @@ export default class MainScene extends EventEmitter{
           this.removeTrees()
           this.isAnimating = true
           let blockObject = intersects[0].object
+          this.refreshCubeMap(blockObject)
           this.animateBlockOut(this.state.currentBlockObject).then(() => {
             this.animateBlockIn(blockObject).then(() => {
               this.buildTree(blockObject)
@@ -470,6 +466,22 @@ export default class MainScene extends EventEmitter{
           break
         }
       }
+    }
+  }
+
+  refreshCubeMap (blockObject) {
+    if (this.cubeCamera) {
+      this.cubeCamera.updatePosition(new THREE.Vector3(0.0, 0.0, blockObject.getWorldPosition().z))
+      this.cubeCamera.update(this.stage.renderer, this.stage.scene)
+
+      this.centralBlockMaterial.envMap = this.cubeCamera.textureCube
+
+      blockObject.material = this.centralBlockMaterial
+
+      this.merkleMaterial.envMap = this.cubeCamera.textureCube
+
+      /* this.blockMaterial.envMap = this.cubeCamera.textureCube
+      this.blockMaterial.color.setHex(0xffffff) */
     }
   }
 
@@ -554,7 +566,7 @@ export default class MainScene extends EventEmitter{
       let blockWorldPos = blockObject.getWorldPosition()
 
       this.stage.targetCameraLookAt.z = blockWorldPos.z
-      this.stage.targetCameraPos.z = blockWorldPos.z + 450
+      this.stage.targetCameraPos.z = blockWorldPos.z + this.cameraBlockFocusDistance
 
       this.animateBlock(
         blockObject,
@@ -585,7 +597,6 @@ export default class MainScene extends EventEmitter{
   animateCamera (target, lookAt, duration) {
     return new Promise((resolve, reject) => {
       if (this.isAnimating) {
-        console.log('animating')
         return
       }
       this.isAnimating = true
@@ -616,13 +627,23 @@ export default class MainScene extends EventEmitter{
     ]
 
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
-
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
       metalness: 0.9,
+      roughness: 0.2,
+      opacity: 0.5,
+      transparent: true,
+      side: THREE.DoubleSide,
+      envMap: this.bgMap
+    })
+
+    this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      emissive: 0x333333,
+      metalness: 0.8,
       roughness: 0.2,
       opacity: 0.5,
       transparent: true,
@@ -675,13 +696,18 @@ export default class MainScene extends EventEmitter{
               intersects[0].object !== this.intersected &&
               intersects[0].object !== this.state.currentBlockObject
             ) {
-            if (this.intersected) {
+            if (
+              this.intersected &&
+              this.intersected.material.uuid !== this.centralBlockMaterial.uuid
+            ) {
               this.intersected.material = this.blockMaterial
             }
 
             this.intersected = intersects[0].object
 
-            this.intersected.material = this.blockMaterialHighlight
+            if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
+              this.intersected.material = this.blockMaterialHighlight
+            }
 
             const blockWorldPos = this.intersected.getWorldPosition()
 
@@ -689,7 +715,10 @@ export default class MainScene extends EventEmitter{
           }
           break
         } else {
-          if (this.intersected) {
+          if (
+            this.intersected &&
+            this.intersected.material.uuid !== this.centralBlockMaterial.uuid
+          ) {
             this.intersected.material = this.blockMaterial
           }
           this.intersected = null
@@ -730,7 +759,6 @@ export default class MainScene extends EventEmitter{
         let latestLoadedDay = this.state.dayData[latestDayIndex]
         let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
         if (latestDayDist < this.blockLoadZThreshold) {
-          console.log('load later')
           this.state.loadDayRequested = true
           let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
           this.loadBlocks(nextDay, latestDayIndex - 1)
@@ -745,7 +773,6 @@ export default class MainScene extends EventEmitter{
 
       let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
       if (dist < this.blockLoadZThreshold) {
-        console.log('load earlier')
         this.state.loadDayRequested = true
         let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
         this.loadBlocks(prevDay, earliestDayIndex + 1)
@@ -796,12 +823,5 @@ export default class MainScene extends EventEmitter{
     this.checkMouseIntersection()
     this.animateTree()
     this.animateBlockOpacity()
-
-    if (this.cubeCamera) {
-      this.cubeCamera.update(this.stage.renderer, this.stage.scene)
-      this.cubeCamera.updatePosition(this.stage.camera.position)
-      this.blockMaterial.envMap = this.cubeCamera.textureCube
-      // this.merkleMaterial.envMap = this.cubeCamera.textureCube
-    }
   }
 }
