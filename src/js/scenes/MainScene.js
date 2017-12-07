@@ -311,6 +311,7 @@ export default class MainScene {
     this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
     this.crystalOpacity = 0.5
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
+    this.cameraBlockFocusDistance = 300
   }
 
   addInteraction () {
@@ -477,7 +478,7 @@ export default class MainScene {
 
       this.merkleMaterial.envMap = this.cubeCamera.textureCube
 
-      /*this.blockMaterial.envMap = this.cubeCamera.textureCube
+      /* this.blockMaterial.envMap = this.cubeCamera.textureCube
       this.blockMaterial.color.setHex(0xffffff) */
     }
   }
@@ -563,7 +564,7 @@ export default class MainScene {
       let blockWorldPos = blockObject.getWorldPosition()
 
       this.stage.targetCameraLookAt.z = blockWorldPos.z
-      this.stage.targetCameraPos.z = blockWorldPos.z + 450
+      this.stage.targetCameraPos.z = blockWorldPos.z + this.cameraBlockFocusDistance
 
       this.animateBlock(
         blockObject,
