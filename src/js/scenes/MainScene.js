@@ -102,6 +102,29 @@ export default class MainScene extends EventEmitter{
       cameraFOV: Config.camera.fov
     }
 
+     /**
+     * Central Block Material
+     */
+    let centralBlockMaterialFolder = this.gui.addFolder('Central Block Material')
+    centralBlockMaterialFolder.add(param, 'blockMetalness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.centralBlockMaterial.metalness = val
+    }.bind(this))
+
+    centralBlockMaterialFolder.add(param, 'blockRoughness', 0.0, 1.0).step(0.01).onChange(function (val) {
+      this.centralBlockMaterial.roughness = val
+    }.bind(this))
+
+    centralBlockMaterialFolder.addColor(param, 'blockColor').onChange(function (val) {
+      this.centralBlockMaterial.color.setHex(val)
+    }.bind(this))
+
+    centralBlockMaterialFolder.addColor(param, 'blockEmissive').onChange(function (val) {
+      this.centralBlockMaterial.emissive.setHex(val)
+    }.bind(this))
+
+    centralBlockMaterialFolder.add(this.centralBlockMaterial, 'bumpScale', 0.0, 1.0)
+    centralBlockMaterialFolder.add(this.centralBlockMaterial, 'reflectivity', 0.0, 1.0)
+
     /**
      * Block Material
      */
@@ -126,6 +149,9 @@ export default class MainScene extends EventEmitter{
     blockMaterialFolder.add(param, 'blockLightIntesity', 0.0, 10.0).step(0.01).onChange(function (val) {
       this.stage.pointLight.intensity = val
     }.bind(this))
+
+    blockMaterialFolder.add(this.blockMaterial, 'bumpScale', 0.0, 1.0)
+    blockMaterialFolder.add(this.blockMaterial, 'reflectivity', 0.0, 1.0)
 
     /**
      * Merkle Material
@@ -626,9 +652,10 @@ export default class MainScene extends EventEmitter{
       'nz.png'
     ]
 
+    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
-
+    
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
@@ -637,7 +664,9 @@ export default class MainScene extends EventEmitter{
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap
+      envMap: this.bgMap,
+      bumpMap,
+      bumpScale: 0.03
     })
 
     this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
@@ -648,7 +677,9 @@ export default class MainScene extends EventEmitter{
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap
+      envMap: this.bgMap,
+      bumpMap,
+      bumpScale: 0.03
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
