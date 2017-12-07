@@ -4,6 +4,7 @@
 import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
+import EventEmitter from 'eventemitter3'
 
 // Global config
 import Config from '../Config'
@@ -21,11 +22,12 @@ const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
 const TWEEN = require('@tweenjs/tween.js')
 
-export default class MainScene {
+export default class MainScene extends EventEmitter{
   constructor ({
       params = {}
     } = {}
   ) {
+    super()
     this.params = params
 
     this.cubeCamera = null
@@ -203,7 +205,7 @@ export default class MainScene {
           blocks: blocks,
           timeStamp: timeStamp
         }
-
+        
         this.dayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
@@ -462,7 +464,7 @@ export default class MainScene {
             this.animateBlockIn(blockObject).then(() => {
               this.buildTree(blockObject)
               this.isAnimating = false
-              document.dispatchEvent(this.selectBlock)
+              this.emit('blockSelected', blockObject.blockchainData)
             })
           })
           break
@@ -717,8 +719,7 @@ export default class MainScene {
     // bubble up event
     if (this.state.closestDayIndex !== closestDayIndex) {
       // Dispatch an event
-      this.dayChangedEvent.initCustomEvent('dayChanged', true, true, this.state.currentDay)
-      window.dispatchEvent(this.dayChangedEvent)
+      this.emit(this.dayChangedEvent, this.state.currentDay)
     }
 
     this.state.closestDayIndex = closestDayIndex
