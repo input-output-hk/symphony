@@ -131,7 +131,7 @@ export default class Stage {
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
     // this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
-    this.renderer.autoClear = false
+    this.renderer.autoClear = true
     this.renderer.sortObjects = false
   }
 
