@@ -22,7 +22,7 @@ const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
 const TWEEN = require('@tweenjs/tween.js')
 
-export default class MainScene extends EventEmitter{
+export default class MainScene extends EventEmitter {
   constructor ({
       params = {}
     } = {}
@@ -133,9 +133,9 @@ export default class MainScene extends EventEmitter{
       f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
       f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
-      if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
-      f.addColor({emissive:mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
+      f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
     }
 
      /**
@@ -144,7 +144,6 @@ export default class MainScene extends EventEmitter{
     createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
     createGuiForMaterial(this.blockMaterial, 'Block Material')
     createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
-
 
     /*
       Light GUI
@@ -215,7 +214,7 @@ export default class MainScene extends EventEmitter{
           blocks: blocks,
           timeStamp: timeStamp
         }
-        
+
         this.dayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
@@ -614,7 +613,7 @@ export default class MainScene extends EventEmitter{
     let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
-    
+
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
@@ -808,9 +807,9 @@ export default class MainScene extends EventEmitter{
   onUpdate () {
     this.state.frameCount++
 
-    /*if (this.state.frameCount === 300) {
+    /* if (this.state.frameCount === 300) {
       this.setDate('2017-12-01')
-    }*/
+    } */
 
     TWEEN.update()
     this.updateLights()
