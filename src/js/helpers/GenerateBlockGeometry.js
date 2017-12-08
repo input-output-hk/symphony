@@ -11,6 +11,8 @@ export default class GenerateBlockGeometry {
 
     this.angle = 5.0 + (block.output % 90)
 
+    this.treeVertices = new Float32Array()
+
     this.X = new THREE.Vector3(1, 0, 0)
     this.Y = new THREE.Vector3(0, 1, 0)
     this.Z = new THREE.Vector3(0, 0, 1)
@@ -65,8 +67,16 @@ export default class GenerateBlockGeometry {
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)
-      let geometry = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
-      this.treeGeo.merge(geometry, geometry.matrix)
+      let tubeGeo = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
+
+      /* let tubeGeo = new THREE.TubeBufferGeometry(path, 1, magnitude / 20, 6, false)
+      let tubePosArray = tubeGeo.attributes.position.array
+      var newPosArray = new Float32Array(this.treeVertices.length + tubePosArray.length)
+      newPosArray.set(this.treeVertices)
+      newPosArray.set(tubePosArray, this.treeVertices.length)
+      this.treeVertices = newPosArray */
+
+      this.treeGeo.merge(tubeGeo, tubeGeo.matrix)
     }
 
     let i = 0

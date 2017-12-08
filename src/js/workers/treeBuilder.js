@@ -15,6 +15,7 @@ self.addEventListener('message', function (e) {
       let geoData = new GenerateBlockGeometry(block, true)
 
       let returnData = {
+        // vertices: geoData.treeVertices,
         vertices: geoData.treeGeo.attributes.position.array,
         boxDimensions: geoData.boxDimensions,
         boxCenter: geoData.boxCenter,
