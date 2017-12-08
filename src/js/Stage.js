@@ -92,7 +92,7 @@ export default class Stage {
       y: -50.0
     }
 
-    this.cameraMoveStep = 50.0 // how much to move the camera forward on z-axis
+    this.cameraMoveStep = 150.0 // how much to move the camera forward on z-axis
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
@@ -200,11 +200,23 @@ export default class Stage {
    * @param {*} event
    */
   onDocumentMouseWheel (event) {
+    if (this.scrollBlocked) {
+      return
+    }
+
     event.preventDefault()
+
+    if (Math.abs(event.wheelDeltaY) > 0) {
+      this.scrollBlocked = true
+      setTimeout(() => {
+        this.scrollBlocked = false
+      }, 100)
+    }
+
     if (event.wheelDeltaY > 0) {
       this.targetCameraPos.z -= this.cameraMoveStep
       this.targetCameraLookAt.z -= this.cameraMoveStep
-    } else {
+    } else if (event.wheelDeltaY < 0) {
       this.targetCameraPos.z += this.cameraMoveStep
       this.targetCameraLookAt.z += this.cameraMoveStep
     }
