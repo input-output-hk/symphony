@@ -126,7 +126,8 @@ export default class MainScene extends EventEmitter {
       f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
       f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
-      if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
+      if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
       f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
     }
@@ -482,8 +483,8 @@ export default class MainScene extends EventEmitter {
 
       this.merkleMaterial.envMap = this.cubeCamera.textureCube
 
-      /* this.blockMaterial.envMap = this.cubeCamera.textureCube
-      this.blockMaterial.color.setHex(0xffffff) */
+      this.blockMaterial.envMap = this.cubeCamera.textureCube
+      //this.blockMaterial.color.setHex(0xffffff)
     }
   }
 
