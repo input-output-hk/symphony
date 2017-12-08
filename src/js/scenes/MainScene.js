@@ -176,7 +176,9 @@ export default class MainScene extends EventEmitter {
       dayData: [], // all blocks grouped by day
       currentDay: null, // which day is the camera closest to
       blocksToAnimate: [],
-      closestDayIndex: 0
+      closestDayIndex: 0,
+      minCameraZPos: 0,
+      maxCameraZPos: 0
     }
   }
 
@@ -338,6 +340,9 @@ export default class MainScene extends EventEmitter {
     this.selectBlock = new Event('selectBlock')
 
     this.dayChangedEvent = document.createEvent('CustomEvent')
+
+    // mousewheel controls camera z position
+    document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('keydown', this.onKeyDown.bind(this), false)
@@ -748,6 +753,26 @@ export default class MainScene extends EventEmitter {
         let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
         if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
           this.loadBlocks(day, (closestDayIndex + index))
+          let latestDayIndex = Number.MAX_SAFE_INTEGER
+          let earliestDayIndex = 0
+
+          for (const key in this.state.dayData) {
+            if (this.state.dayData.hasOwnProperty(key)) {
+              const data = this.state.dayData[key]
+              if (data.blocks.length > 0) {
+                latestDayIndex = Math.min(latestDayIndex, parseInt(key))
+                earliestDayIndex = Math.max(earliestDayIndex, parseInt(key))
+              }
+            }
+          }
+
+          if (
+            typeof this.state.dayData[latestDayIndex] !== 'undefined' &&
+            typeof this.state.dayData[earliestDayIndex] !== 'undefined'
+          ) {
+            this.state.maxCameraZPos = this.state.dayData[latestDayIndex].zPos + this.stage.defaultCameraPos.z
+            this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos
+          }
           break
         }
       }
@@ -761,6 +786,39 @@ export default class MainScene extends EventEmitter {
    // this.state.audioFreqCutoff = 20000
 
     // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+  }
+
+  onDocumentMouseWheel (event) {
+    if (this.scrollBlocked) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (Math.abs(event.wheelDeltaY) > 0) {
+      this.scrollBlocked = true
+      setTimeout(() => {
+        this.scrollBlocked = false
+      }, 100)
+    }
+
+    if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {
+      this.stage.targetCameraPos.z = this.state.minCameraZPos
+      return
+    }
+
+    if (this.stage.targetCameraPos.z > this.state.maxCameraZPos) {
+      this.stage.targetCameraPos.z = this.state.maxCameraZPos
+      return
+    }
+
+    if (event.wheelDeltaY > 0) {
+      this.stage.targetCameraPos.z -= this.stage.cameraMoveStep
+      this.stage.targetCameraLookAt.z -= this.stage.cameraMoveStep
+    } else if (event.wheelDeltaY < 0) {
+      this.stage.targetCameraPos.z += this.stage.cameraMoveStep
+      this.stage.targetCameraLookAt.z += this.stage.cameraMoveStep
+    }
   }
 
   loadBlock (hash = null) {

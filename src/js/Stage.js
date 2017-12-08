@@ -157,9 +157,6 @@ export default class Stage {
 
     // window resize event
     window.addEventListener('resize', this.resize.bind(this), false)
-
-    // mousewheel controls camera z position
-    document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
   }
 
   /**
@@ -193,33 +190,6 @@ export default class Stage {
     let y = event.clientY - rect.top
     this.targetMousePos.x = x / this.width * 2 - 1
     this.targetMousePos.y = 1 - y / this.height * 2
-  }
-
-  /**
-   *
-   * @param {*} event
-   */
-  onDocumentMouseWheel (event) {
-    if (this.scrollBlocked) {
-      return
-    }
-
-    event.preventDefault()
-
-    if (Math.abs(event.wheelDeltaY) > 0) {
-      this.scrollBlocked = true
-      setTimeout(() => {
-        this.scrollBlocked = false
-      }, 100)
-    }
-
-    if (event.wheelDeltaY > 0) {
-      this.targetCameraPos.z -= this.cameraMoveStep
-      this.targetCameraLookAt.z -= this.cameraMoveStep
-    } else if (event.wheelDeltaY < 0) {
-      this.targetCameraPos.z += this.cameraMoveStep
-      this.targetCameraLookAt.z += this.cameraMoveStep
-    }
   }
 
   /**
