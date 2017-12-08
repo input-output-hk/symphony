@@ -52,10 +52,9 @@ export default class MainScene extends EventEmitter {
 
     this.dayBuilderWorker = new DayBuilderWorker()
     this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
-    // this.loadBlocks() // load in new blocks via webworker
   }
 
-  setDate (date) {
+  setDate (date, focusOnBlock = false) {
     if (this.state.currentDate === null) {
       this.state.currentDate = date
     }
@@ -65,16 +64,14 @@ export default class MainScene extends EventEmitter {
 
     let dayIndex = currentDate.diff(inputDate, 'days')
 
-    // move camera
+      // move camera
     let newOffset = this.dayZOffset * dayIndex
     this.stage.targetCameraLookAt.z = newOffset
     this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
 
     this.state.closestDayIndex = dayIndex
 
-    this.loadBlocks(inputDate.valueOf(), dayIndex)
-
-    this.state.currentDate = inputDate
+    this.loadBlocks(inputDate.valueOf(), dayIndex, focusOnBlock, dayIndex)
   }
 
   initReflection () {
@@ -130,7 +127,7 @@ export default class MainScene extends EventEmitter {
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
       f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
       f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
-      if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
       f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
     }
@@ -186,10 +183,8 @@ export default class MainScene extends EventEmitter {
   /**
    * Load in blocks for one day
    */
-  loadBlocks (date = this.state.currentDate, dayIndex = 0) {
+  loadBlocks (date, dayIndex = 0, focusOnBlock = false) {
     this.state.loadDayRequested = true
-
-    console.log(this.state)
 
     // prune days too far away from viewer
     for (const key in this.state.dayData) {
@@ -216,7 +211,8 @@ export default class MainScene extends EventEmitter {
           cmd: 'build',
           blocks: day.blocks,
           timeStamp: day.timeStamp,
-          dayIndex: dayIndex
+          dayIndex: dayIndex,
+          focusOnBlock: focusOnBlock
         })
       })
     } else {
@@ -236,6 +232,7 @@ export default class MainScene extends EventEmitter {
       let timeStamp = workerData.timeStamp
       let dayIndex = workerData.dayIndex
       let blocks = workerData.blocks
+      let focusOnBlock = workerData.focusOnBlock
 
       this.state.dayData[dayIndex] = {
         blocks: blocks,
@@ -303,6 +300,16 @@ export default class MainScene extends EventEmitter {
       if (this.treeGroup) {
         that.stage.scene.remove(this.treeGroup)
         that.stage.scene.add(this.treeGroup)
+      }
+
+      if (focusOnBlock) {
+        for (let index = 0; index < this.state.dayGroups[dayIndex].children.length; index++) {
+          const mesh = this.state.dayGroups[dayIndex].children[index]
+          if (mesh.blockchainData.hash === this.state.currentHash) {
+            this.focusOnBlock(mesh)
+            break
+          }
+        }
       }
     } catch (error) {
       console.log(error)
@@ -454,18 +461,11 @@ export default class MainScene extends EventEmitter {
             this.resetDayView()
             break
           }
-          this.state.view = 'block'
+
           this.removeTrees()
           this.isAnimating = true
           let blockObject = intersects[0].object
-          this.refreshCubeMap(blockObject)
-          this.animateBlockOut(this.state.currentBlockObject).then(() => {
-            this.animateBlockIn(blockObject).then(() => {
-              this.buildTree(blockObject)
-              this.isAnimating = false
-              this.emit('blockSelected', blockObject.blockchainData)
-            })
-          })
+          this.focusOnBlock(blockObject)
           break
         }
       }
@@ -474,6 +474,7 @@ export default class MainScene extends EventEmitter {
 
   refreshCubeMap (blockObject) {
     if (this.cubeCamera) {
+      this.blockMaterial.envMap = this.bgMap
       this.cubeCamera.updatePosition(new THREE.Vector3(0.0, 0.0, blockObject.getWorldPosition().z))
       this.cubeCamera.update(this.stage.renderer, this.stage.scene)
 
@@ -484,7 +485,7 @@ export default class MainScene extends EventEmitter {
       this.merkleMaterial.envMap = this.cubeCamera.textureCube
 
       this.blockMaterial.envMap = this.cubeCamera.textureCube
-      //this.blockMaterial.color.setHex(0xffffff)
+      this.blockMaterial.color.setHex(0xffffff)
     }
   }
 
@@ -733,7 +734,6 @@ export default class MainScene extends EventEmitter {
 
     // bubble up event
     if (this.state.closestDayIndex !== closestDayIndex) {
-      // Dispatch an event
       this.emit(this.dayChangedEvent, this.state.currentDay)
     }
 
@@ -761,6 +761,27 @@ export default class MainScene extends EventEmitter {
    // this.state.audioFreqCutoff = 20000
 
     // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+  }
+
+  loadBlock (hash = null) {
+    this.api.getBlock(hash).then((block) => {
+      let blockDay = moment(block.time * 1000).format('YYYY-MM-DD')
+      this.state.currentHash = block.hash
+      this.setDate(blockDay, true)
+    })
+  }
+
+  focusOnBlock (blockObject) {
+    blockObject.visible = true
+    this.state.view = 'block'
+    this.refreshCubeMap(blockObject)
+    this.animateBlockOut(this.state.currentBlockObject).then(() => {
+      this.animateBlockIn(blockObject).then(() => {
+        this.buildTree(blockObject)
+        this.isAnimating = false
+        this.emit('blockSelected', blockObject.blockchainData)
+      })
+    })
   }
 
   animateTree () {
