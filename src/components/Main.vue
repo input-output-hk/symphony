@@ -24,7 +24,6 @@ export default {
   mounted () {
     this.app = new SceneManager()
     this.app.scene.setDate(this.date)
-    this.app.scene.loadBlocks()
   },
   asyncComputed: {
 

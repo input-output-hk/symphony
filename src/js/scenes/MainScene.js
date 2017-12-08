@@ -65,20 +65,16 @@ export default class MainScene extends EventEmitter {
 
     let dayIndex = currentDate.diff(inputDate, 'days')
 
-    // move camera?
-    if (Math.abs(dayIndex) > 0) {
-      // this.stage.cameraLerpSpeed = 0.01
+    // move camera
+    let newOffset = this.dayZOffset * dayIndex
+    this.stage.targetCameraLookAt.z = newOffset
+    this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
 
-      let newOffset = this.dayZOffset * dayIndex
-      this.stage.targetCameraLookAt.z = newOffset
-      this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
+    this.state.closestDayIndex = dayIndex
 
-      this.state.closestDayIndex = dayIndex
+    this.loadBlocks(inputDate.valueOf(), dayIndex)
 
-      this.loadBlocks(inputDate.valueOf(), dayIndex)
-
-      this.state.currentDate = inputDate
-    }
+    this.state.currentDate = inputDate
   }
 
   initReflection () {
@@ -796,11 +792,6 @@ export default class MainScene extends EventEmitter {
 
   onUpdate () {
     this.state.frameCount++
-
-    if (this.state.frameCount === 300) {
-      this.setDate('2017-12-01')
-    }
-
     TWEEN.update()
     this.updateLights()
     this.checkMouseIntersection()
