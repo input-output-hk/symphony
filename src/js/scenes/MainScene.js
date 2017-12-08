@@ -742,27 +742,17 @@ export default class MainScene extends EventEmitter {
 
     this.state.closestDayIndex = closestDayIndex
 
-    if (this.state.loadDayRequested === false) {
-      if (this.state.currentDate !== moment().format('YYYY-MM-DD')) {
-        let latestDayIndex = Math.min(...Object.keys(this.state.dayData))
-        let latestLoadedDay = this.state.dayData[latestDayIndex]
-        let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
-        if (latestDayDist < this.blockLoadZThreshold) {
-          let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
-          this.loadBlocks(nextDay, latestDayIndex - 1)
+    if (
+      this.state.loadDayRequested === false &&
+      this.state.currentDay !== undefined
+    ) {
+      // count 5 either side of current day
+      for (let index = -5; index <= 5; index++) {
+        let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
+        if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
+          this.loadBlocks(day, (closestDayIndex + index))
+          break
         }
-      }
-    }
-
-    if (this.state.loadDayRequested === false) {
-        // how far are we away from the zpos of the last loaded day?
-      let earliestDayIndex = Math.max(...Object.keys(this.state.dayData))
-      let earliestLoadedDay = this.state.dayData[earliestDayIndex]
-
-      let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
-      if (dist < this.blockLoadZThreshold) {
-        let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
-        this.loadBlocks(prevDay, earliestDayIndex + 1)
       }
     }
 
@@ -807,9 +797,9 @@ export default class MainScene extends EventEmitter {
   onUpdate () {
     this.state.frameCount++
 
-    /* if (this.state.frameCount === 300) {
+    if (this.state.frameCount === 300) {
       this.setDate('2017-12-01')
-    } */
+    }
 
     TWEEN.update()
     this.updateLights()
