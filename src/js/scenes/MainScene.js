@@ -22,7 +22,7 @@ const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
 
 const TWEEN = require('@tweenjs/tween.js')
 
-export default class MainScene extends EventEmitter{
+export default class MainScene extends EventEmitter {
   constructor ({
       params = {}
     } = {}
@@ -36,10 +36,8 @@ export default class MainScene extends EventEmitter{
 
     this.stage = params.stage // reference to the stage
 
-    this.currentDate = this.params.date
-
     this.initProperties() // class properties
-    this.initState(this.params.date)
+    this.initState()
     this.addInteraction()
 
     this.audio = new Audio(this.stage.camera)
@@ -52,10 +50,31 @@ export default class MainScene extends EventEmitter{
 
     this.initReflection()
 
-    this.state.loadDayRequested = true
     this.dayBuilderWorker = new DayBuilderWorker()
     this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
-    this.loadBlocks() // load in new blocks via webworker
+    // this.loadBlocks() // load in new blocks via webworker
+  }
+
+  setDate (date) {
+    if (this.state.currentDate === null) {
+      this.state.currentDate = date
+    }
+    let currentDate = moment(this.state.currentDate)
+
+    let inputDate = moment(date)
+
+    let dayIndex = currentDate.diff(inputDate, 'days')
+
+    // move camera
+    let newOffset = this.dayZOffset * dayIndex
+    this.stage.targetCameraLookAt.z = newOffset
+    this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
+
+    this.state.closestDayIndex = dayIndex
+
+    this.loadBlocks(inputDate.valueOf(), dayIndex)
+
+    this.state.currentDate = inputDate
   }
 
   initReflection () {
@@ -113,7 +132,7 @@ export default class MainScene extends EventEmitter{
       f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
       if( mat.reflectivity ) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
-      f.addColor({emissive:mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
+      f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
     }
 
      /**
@@ -122,7 +141,6 @@ export default class MainScene extends EventEmitter{
     createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
     createGuiForMaterial(this.blockMaterial, 'Block Material')
     createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
-
 
     /*
       Light GUI
@@ -151,23 +169,28 @@ export default class MainScene extends EventEmitter{
 
   initState (blocks, currentDate) {
     this.state = {
-      currentDate: currentDate,
+      frameCount: 0,
+      currentDate: null,
       dayGroups: [],
+      loadDayRequested: false,
       currentBlock: null,
       currentBlockObject: null,
       view: 'day', // can be 'day' or 'block'
       dayData: [], // all blocks grouped by day
       currentDay: null, // which day is the camera closest to
       blocksToAnimate: [],
-      closestDayIndex: 0,
-      totalBlockCount: 0 // keep track of the total number of blocks loaded into the scene
+      closestDayIndex: 0
     }
   }
 
   /**
    * Load in blocks for one day
    */
-  loadBlocks (date = this.currentDate, dayIndex = 0) {
+  loadBlocks (date = this.state.currentDate, dayIndex = 0) {
+    this.state.loadDayRequested = true
+
+    console.log(this.state)
+
     // prune days too far away from viewer
     for (const key in this.state.dayData) {
       if (this.state.dayData.hasOwnProperty(key)) {
@@ -188,7 +211,7 @@ export default class MainScene extends EventEmitter{
           blocks: blocks,
           timeStamp: timeStamp
         }
-        
+
         this.dayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
@@ -218,8 +241,6 @@ export default class MainScene extends EventEmitter{
         blocks: blocks,
         timeStamp: timeStamp
       }
-
-      this.state.totalBlockCount += blocks.length
 
       let group = new THREE.Group()
       this.state.dayGroups[dayIndex] = group
@@ -576,28 +597,6 @@ export default class MainScene extends EventEmitter{
     )
   }
 
-  animateCamera (target, lookAt, duration) {
-    return new Promise((resolve, reject) => {
-      if (this.isAnimating) {
-        return
-      }
-      this.isAnimating = true
-
-      this.stage.targetCameraPos = target.clone()
-      this.stage.targetCameraLookAt = lookAt.clone()
-
-      // grab initial postion/rotation
-      let fromPosition = new THREE.Vector3().copy(this.stage.camera.position)
-
-      // reset original position and rotation
-      this.stage.camera.position.set(fromPosition.x, fromPosition.y, fromPosition.z)
-    })
-  }
-
-  addDay (dayData, index) {
-
-  }
-
   setupMaterials () {
     this.cubeMapUrls = [
       'px.png',
@@ -611,7 +610,7 @@ export default class MainScene extends EventEmitter{
     let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
-    
+
     this.blockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
@@ -740,29 +739,17 @@ export default class MainScene extends EventEmitter{
 
     this.state.closestDayIndex = closestDayIndex
 
-    if (this.state.loadDayRequested === false) {
-      if (this.currentDate !== moment().format('YYYY-MM-DD')) {
-        let latestDayIndex = Math.min(...Object.keys(this.state.dayData))
-        let latestLoadedDay = this.state.dayData[latestDayIndex]
-        let latestDayDist = Math.abs(latestLoadedDay.zPos - this.stage.camera.position.z)
-        if (latestDayDist < this.blockLoadZThreshold) {
-          this.state.loadDayRequested = true
-          let nextDay = moment(latestLoadedDay.timeStamp).add(1, 'day').toDate().valueOf()
-          this.loadBlocks(nextDay, latestDayIndex - 1)
+    if (
+      this.state.loadDayRequested === false &&
+      this.state.currentDay !== undefined
+    ) {
+      // count 5 either side of current day
+      for (let index = -5; index <= 5; index++) {
+        let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
+        if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
+          this.loadBlocks(day, (closestDayIndex + index))
+          break
         }
-      }
-    }
-
-    if (this.state.loadDayRequested === false) {
-        // how far are we away from the zpos of the last loaded day?
-      let earliestDayIndex = Math.max(...Object.keys(this.state.dayData))
-      let earliestLoadedDay = this.state.dayData[earliestDayIndex]
-
-      let dist = Math.abs(earliestLoadedDay.zPos - this.stage.camera.position.z)
-      if (dist < this.blockLoadZThreshold) {
-        this.state.loadDayRequested = true
-        let prevDay = moment(earliestLoadedDay.timeStamp).subtract(1, 'day').toDate().valueOf()
-        this.loadBlocks(prevDay, earliestDayIndex + 1)
       }
     }
 
@@ -805,6 +792,7 @@ export default class MainScene extends EventEmitter{
   }
 
   onUpdate () {
+    this.state.frameCount++
     TWEEN.update()
     this.updateLights()
     this.checkMouseIntersection()

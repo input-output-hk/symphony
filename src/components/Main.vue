@@ -22,11 +22,8 @@ export default {
   components:{ webgl, graph },
   props: ['date'],
   mounted () {
-    this.app = new SceneManager({
-      params : {
-        date: this.date
-      }
-    })
+    this.app = new SceneManager()
+    this.app.scene.setDate(this.date)
   },
   asyncComputed: {
 
