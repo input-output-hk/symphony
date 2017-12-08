@@ -17,7 +17,8 @@ self.addEventListener('message', function (e) {
         blockCount: blocks.length,
         dayIndex: data.dayIndex,
         blocks: data.blocks,
-        timeStamp: data.timeStamp
+        timeStamp: data.timeStamp,
+        focusOnBlock: data.focusOnBlock
       }
 
       for (let index = 0; index < blocks.length; index++) {
