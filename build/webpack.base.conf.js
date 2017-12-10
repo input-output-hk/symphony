@@ -41,6 +41,11 @@ module.exports = {
         include: [resolve('src'), resolve('test')]
       },
       {
+        test: /\.js$/,
+        loader: 'ify-loader',
+        enforce: 'post'
+      },
+      {
         test: /\.worker\.js$/,
         use: { loader: 'worker-loader' }
       },

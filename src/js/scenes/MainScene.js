@@ -15,11 +15,13 @@ import Audio from '../audio/audio'
 // API
 import API from '../api/btc'
 
+// Custom Materials
+import BlockMaterial from '../materials/BlockMaterial'
+
 const dat = require('dat-gui')
 
 const DayBuilderWorker = require('worker-loader!../workers/dayBuilder.js')
 const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
-
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
@@ -617,7 +619,7 @@ export default class MainScene extends EventEmitter {
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
-    this.blockMaterial = new THREE.MeshPhysicalMaterial({
+    this.blockMaterial = new BlockMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
       metalness: 0.9,
