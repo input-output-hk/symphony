@@ -84,19 +84,26 @@ class EffectComposer {
     if(!renderer) return
 
     this.renderer = renderer
+
+    this.camera = new THREE.OrthographicCamera()
+
     this.depthTexture = new THREE.DepthTexture()
     this.depthTexture.type = hasWebGL2 ? THREE.FloatType : THREE.UnsignedShortType
-
-    // const gl = this.renderer.getContext()
 
     this.sceneRenderTarget = createRenderTarget(supportsMultiRenderTargets)
     this.sceneRenderTarget.depthBuffer = true
     this.sceneRenderTarget.stencilBuffer = true
 
-    this.fromRenderTarget = createRenderTarget()
-    this.toRenderTarget = createRenderTarget()
+    // const gl = this.renderer.getContext()
 
-    this.renderTargets = [createRenderTarget(), createRenderTarget()]
+    if ( supportsDepthTextures /*&& exports.useDepthTexture*/) {
+      sceneRenderTarget.depthTexture = depthTexture
+    }
+
+    this.read = createRenderTarget()
+    this.write = createRenderTarget()
+
+    // this.renderTargets = [createRenderTarget(), createRenderTarget()]
 
     this.resolution = new THREE.Vector2()
     this.viewportResolution = new THREE.Vector2()
@@ -106,57 +113,48 @@ class EffectComposer {
     this.sceneRenderTarget.setSize(w, h)
     this.fromRenderTarget.setSize(w, h)
     this.toRenderTarget.setSize(w, h)
+
+    this.camera.left = w / -2
+    this.camera.right = w / 2
+    this.camera.top = h / 2
+    this.camera.bottom = h / -2
   }
 
-  render (queue, dt) {
-    hijackRenderer(this.renderer)
+  render (stack, dt) {
+    // hijackRenderer(this.renderer)
 
-    let renderableQueue = queue.filter(effect => effect.enabled && effect.needsRender())
+    let renderableStack = stack.filter(effect => effect.enabled && effect.needsRender())
 
-    if (renderableQueue.length > 0) {
+    if (renderableStack.length === 0) {
+      this.renderer.render(this.scene, this.camera)
+      return
+    }
 
       // _resizeRenderTargets()
 
-      if (sceneRenderTarget.depthBuffer && supportsDepthTextures /*&& exports.useDepthTexture*/) {
-        depthTexture.width = sceneRenderTarget.width
-        depthTexture.height = sceneRenderTarget.height
-        sceneRenderTarget.depthTexture = depthTexture
-      }
+    this.renderer.render(scene, camera, sceneRenderTarget)
 
-      this.renderer.render(scene, camera, sceneRenderTarget)
+    // sceneRenderTarget.depthTexture = null
 
-      sceneRenderTarget.depthTexture = null
+    // fboHelper.renderer.setViewport(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
+    // fboHelper.renderer.setScissor(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
 
-      fboHelper.renderer.setViewport(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
-      fboHelper.renderer.setScissor(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
+    // let [read, write] = [this.write, this.read]
+    
+    // swapRenderTarget()
+    // let scene = this.scene
+    // let autoUpdate = scene.autoUpdate
+    // let effect, renderTarget
 
-      const [fromRenderTarget, toRenderTarget] = this.renderTargets//[toRenderTarget, fromRenderTarget]
-      
-      // swapRenderTarget()
-      let scene = this.scene
-      let autoUpdate = scene.autoUpdate
-      let effect, renderTarget
+    const lastEffect = renderableStack[renderableStack.length - 1]
 
-      for (let i = 0, len = renderableQueue.length; i < len; i++) {
-        effect = renderableQueue[i]
-        if (i) {
-          renderTarget = fromRenderTarget
-        } else if (supportsMultiRenderTargets) {
-          renderTarget = sceneRenderTarget.attachments[0] // assume it is using the first attachment for the scene
-        } else {
-          renderTarget = sceneRenderTarget
-        }
-        effect.render(dt, renderTarget, (i === len - 1))
-      }
-
-      scene.autoUpdate = autoUpdate
-
-    } else {
-
-      this.renderer.render(scene, camera)
-
+    for (let effect in renderableStack) {
+      let [read, write] = [write, read]
+      let renderToScreen = effect === lastEffect
+      effect.render(dt, read, renderToScreen)
     }
 
+    // scene.autoUpdate = autoUpdate
     // if (exports.renderMethod) {
     //   exports.renderMethod.afterRendering()
     // }
@@ -173,11 +171,11 @@ class EffectComposer {
   //   }
   // }
 
-  render (material, toScreen, swap) {
+  render (material, toScreen) {
     fboHelper.render(material, toScreen ? undef : toRenderTarget)
-    if (swap !== false) {
-      swapRenderTarget()
-    }
+    // if (swap !== false) {
+    //   swapRenderTarget()
+    // }
     return fromRenderTarget
   }
 

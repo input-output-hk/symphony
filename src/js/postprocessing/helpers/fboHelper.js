@@ -149,11 +149,11 @@ export function renderObject (obj, renderTarget, forceClear) {
 
 export function render (material, renderTarget, forceClear) {
   _quad.material = material
-  if (renderTarget) {
+  // if (renderTarget) {
     renderer.render(_scene, _camera, renderTarget, forceClear)
-  } else {
-    renderer.render(_scene, _camera, undefined, forceClear)
-  }
+  // } else {
+  //   renderer.render(_scene, _camera, undefined, forceClear)
+  // }
 }
 
 export function resizeRenderTarget (renderTarget, width, height) {
@@ -179,23 +179,23 @@ export function createRenderTarget (width, height, format, type, minFilter, magF
   return renderTarget
 }
 
-export function createMultiRenderTarget (count, width, height, format, type, minFilter, magFilter) {
-  var renderTarget = new THREE.WebGLMultiRenderTarget(width || 1, height || 1, {
-    format: format || THREE.RGBFormat,
-    type: type || THREE.UnsignedByteType,
-    minFilter: minFilter || THREE.LinearFilter,
-    magFilter: magFilter || THREE.LinearFilter,
-    depthBuffer: false,
-    stencilBuffer: false
-  })
+// export function createMultiRenderTarget (count, width, height, format, type, minFilter, magFilter) {
+//   var renderTarget = new THREE.WebGLMultiRenderTarget(width || 1, height || 1, {
+//     format: format || THREE.RGBFormat,
+//     type: type || THREE.UnsignedByteType,
+//     minFilter: minFilter || THREE.LinearFilter,
+//     magFilter: magFilter || THREE.LinearFilter,
+//     depthBuffer: false,
+//     stencilBuffer: false
+//   })
 
-  renderTarget.texture.generateMipMaps = false
-  for (var i = 1; i < count; i++) {
-    renderTarget.attachments.push(renderTarget.texture.clone())
-  }
+//   renderTarget.texture.generateMipMaps = false
+//   for (var i = 1; i < count; i++) {
+//     renderTarget.attachments.push(renderTarget.texture.clone())
+//   }
 
-  return renderTarget
-}
+//   return renderTarget
+// }
 
 export function getColorState () {
   return {
