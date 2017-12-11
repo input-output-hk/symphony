@@ -33,6 +33,20 @@ export default {
     if(this.date) this.app.scene.setDate(this.date)
     if(this.block) this.app.scene.loadBlock(this.block)
 
+    document.addEventListener('keydown', event => {
+        let isEscape = false
+        if ('key' in event) {
+          isEscape = (event.key === 'Escape' || event.key === 'Esc')
+        } else {
+          isEscape = (event.keyCode === 27)
+        }
+        if (isEscape) {
+          const date = new Date(this.app.scene.state.currentBlock.time * 1000)
+          this.onDayChanged(date)
+          this.app.scene.resetDayView()
+        }
+    }, false)
+
     
     const dayChanged = (event) => {
       console.log('Fuck Nuggets')

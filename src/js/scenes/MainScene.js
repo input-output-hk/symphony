@@ -360,7 +360,6 @@ export default class MainScene extends EventEmitter {
     document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
-    document.addEventListener('keydown', this.onKeyDown.bind(this), false)
 
     if (window.Worker) {
       this.treeBuilderWorker = new TreeBuilderWorker()
