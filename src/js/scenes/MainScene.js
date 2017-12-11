@@ -106,8 +106,8 @@ export default class MainScene extends EventEmitter {
     let param = {
       blockMetalness: 0.9,
       blockRoughness: 0.2,
-      blockColor: this.blockMaterial.color.getHex(),
-      blockEmissive: this.blockMaterial.emissive.getHex(),
+      blockColor: this.blockMaterialFront.color.getHex(),
+      blockEmissive: this.blockMaterialFront.emissive.getHex(),
       blockLightIntesity: 5.0,
       //
       merkleMetalness: 0.9,
@@ -138,7 +138,7 @@ export default class MainScene extends EventEmitter {
      * Gui for Material
      */
     createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
-    createGuiForMaterial(this.blockMaterial, 'Block Material')
+    createGuiForMaterial(this.blockMaterialFront, 'Block Material')
     createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
     /*
@@ -260,18 +260,29 @@ export default class MainScene extends EventEmitter {
           continue
         }
 
-        let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterial)
+        // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
+        let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterialFront)
 
+        // blockMeshBack.renderOrder = ((index * -dayIndex) + 1000000)
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
 
-        // blockMesh.material.opacity = 0.0
         blockMesh.visible = false
+        // blockMeshBack.visible = false
+        // blockMeshBack.scale.set(size.x, size.y, size.z)
+        // blockMeshFront.visible = false
         blockMesh.scale.set(size.x, size.y, size.z)
 
         // align all front faces
+        // blockMeshBack.translateZ(-(size.z / 2))
         blockMesh.translateZ(-(size.z / 2))
 
         let rotation = ((25 * Math.PI) / blockCount) * index
+        // blockMeshBack.rotation.z = rotation
+        // blockMeshBack.translateY(700 + (index))
+        // blockMeshBack.rotation.z += Math.PI / 2
+        // blockMeshBack.translateZ((index * 18))
+        // blockMeshBack.blockchainData = block
+
         blockMesh.rotation.z = rotation
         blockMesh.translateY(700 + (index))
         blockMesh.rotation.z += Math.PI / 2
@@ -283,6 +294,8 @@ export default class MainScene extends EventEmitter {
         blockMesh.add(wireframe)
 
         group.add(blockMesh)
+        /* group.add(blockMeshBack)
+        group.add(blockMeshFront) */
       }
 
       let zPos = this.dayZOffset * dayIndex
@@ -481,7 +494,7 @@ export default class MainScene extends EventEmitter {
 
   refreshCubeMap (blockObject) {
     if (this.cubeCamera) {
-      this.blockMaterial.envMap = this.bgMap
+      this.blockMaterialFront.envMap = this.bgMap
       this.cubeCamera.updatePosition(new THREE.Vector3(0.0, 0.0, blockObject.getWorldPosition().z))
       this.cubeCamera.update(this.stage.renderer, this.stage.scene)
 
@@ -491,8 +504,8 @@ export default class MainScene extends EventEmitter {
 
       this.merkleMaterial.envMap = this.cubeCamera.textureCube
 
-      this.blockMaterial.envMap = this.cubeCamera.textureCube
-      this.blockMaterial.color.setHex(0xffffff)
+      this.blockMaterialFront.envMap = this.cubeCamera.textureCube
+      this.blockMaterialFront.color.setHex(0xffffff)
     }
   }
 
@@ -619,7 +632,20 @@ export default class MainScene extends EventEmitter {
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
-    this.blockMaterial = new BlockMaterial({
+    this.blockMaterialBack = new BlockMaterial({
+      color: 0xaaaaaa,
+      emissive: 0x000000,
+      metalness: 0.9,
+      roughness: 0.2,
+      opacity: 0.5,
+      transparent: true,
+      side: THREE.BackSide,
+      envMap: this.bgMap,
+      bumpMap,
+      bumpScale: 0.03
+    })
+
+    this.blockMaterialFront = new THREE.MeshPhysicalMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
       metalness: 0.9,
@@ -694,7 +720,7 @@ export default class MainScene extends EventEmitter {
               this.intersected &&
               this.intersected.material.uuid !== this.centralBlockMaterial.uuid
             ) {
-              this.intersected.material = this.blockMaterial
+              this.intersected.material = this.blockMaterialFront
             }
 
             this.intersected = intersects[0].object
@@ -713,7 +739,7 @@ export default class MainScene extends EventEmitter {
             this.intersected &&
             this.intersected.material.uuid !== this.centralBlockMaterial.uuid
           ) {
-            this.intersected.material = this.blockMaterial
+            this.intersected.material = this.blockMaterialFront
           }
           this.intersected = null
         }
@@ -879,5 +905,10 @@ export default class MainScene extends EventEmitter {
     this.checkMouseIntersection()
     this.animateTree()
     this.animateBlockOpacity()
+
+    // pass camera position to shader
+    if (this.blockMaterialBack) {
+      this.blockMaterialBack.uniforms.worldSpaceCameraPos.value = this.stage.camera.position
+    }
   }
 }

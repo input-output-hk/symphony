@@ -2,7 +2,9 @@
 
 // 3rd party libs
 import * as THREE from 'three'
-import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
+
+import {EffectComposer, ShaderPass, RenderPass} from './postprocessing/EffectComposer'
+
 import FXAAShader from './shaders/FXAA'
 import HueSaturationShader from './shaders/HueSaturation'
 import RGBShiftShader from './shaders/RGBShift'
@@ -37,16 +39,13 @@ export default class Stage {
 
   initPost () {
     this.composer = new EffectComposer(this.renderer)
-
-    this.composer.setSize(window.innerWidth, window.innerHeight)
-
-    this.renderPass = new RenderPass(this.scene, this.camera)
-    this.composer.addPass(this.renderPass)
+    this.composer.addPass(new RenderPass(this.scene, this.camera))
 
     /* this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    this.composer.addPass(this.RGBShiftPass)
+    this.RGBShiftPass.renderToScreen = true
+    this.composer.addPass(this.RGBShiftPass) */
 
-    this.FilmShaderPass = new ShaderPass(FilmShader)
+    /* this.FilmShaderPass = new ShaderPass(FilmShader)
     this.composer.addPass(this.FilmShaderPass) */
 
     this.VignettePass = new ShaderPass(VignetteShader)
@@ -76,9 +75,6 @@ export default class Stage {
    * Set up stage camera with defaults
    */
   initCamera () {
-    this.width = window.innerWidth
-    this.height = window.innerHeight
-
     // initial position of camera in the scene
     this.defaultCameraPos = new THREE.Vector3(0.0, 0.0, 2500.0)
 
@@ -96,7 +92,7 @@ export default class Stage {
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
-    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, this.width / this.height, 1, 5000)
+    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 5000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 
@@ -118,9 +114,6 @@ export default class Stage {
    * Set up default stage renderer
    */
   initRenderer () {
-    this.width = window.innerWidth
-    this.height = window.innerHeight
-
     this.canvas = document.getElementById('stage')
     this.renderer = new THREE.WebGLRenderer({
       antialias: Config.scene.antialias,
@@ -129,8 +122,8 @@ export default class Stage {
     })
 
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
-    // this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(this.width, this.height)
+    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.autoClear = true
     this.renderer.sortObjects = false
   }
@@ -174,11 +167,13 @@ export default class Stage {
    * Window resize
    */
   resize () {
-    this.width = window.innerWidth
-    this.height = window.innerHeight
-    this.camera.aspect = this.width / this.height
+    this.camera.aspect = window.innerWidth / window.innerHeight
     this.camera.updateProjectionMatrix()
-    this.renderer.setSize(this.width, this.height)
+
+    this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight)
+
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.composer.setSize(window.innerWidth, window.innerHeight)
   }
 
   /**
@@ -188,8 +183,8 @@ export default class Stage {
     const rect = this.renderer.domElement.getBoundingClientRect()
     let x = event.clientX - rect.left
     let y = event.clientY - rect.top
-    this.targetMousePos.x = x / this.width * 2 - 1
-    this.targetMousePos.y = 1 - y / this.height * 2
+    this.targetMousePos.x = x / window.innerWidth * 2 - 1
+    this.targetMousePos.y = 1 - y / window.innerHeight * 2
   }
 
   /**
@@ -245,9 +240,6 @@ export default class Stage {
   }
 
   render () {
-    // this.scene.updateMatrixWorld()
-
-    // this.renderer.render(this.scene, this.camera)
     this.composer.render()
   }
 
