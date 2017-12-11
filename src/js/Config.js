@@ -1,6 +1,7 @@
 'use strict'
 
 const Config = {
+  daysEitherSide: 4,
   assetPath: '/static/assets/',
   showGUI: true,
   scene: {
