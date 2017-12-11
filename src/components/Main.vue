@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class='main'>
-      <router-view class='big' :blocks='blocks' :block='focusOnBlock'/>
+      <router-view class='big' :block='block'/>
       <!--<graph v-if='blocks.length > 0'/>-->
     </div>
-    <webgl :date='date' />
+    <webgl :date='date' :block='block' :onBlockSelected='changeToBlockView' :onDayChanged='changeDate'/>
   </div>
 </template>
 
@@ -14,79 +14,19 @@ import webgl from './WebGL'
 import graph from './Graph'
 import cfg from '../js/Config'
 import BTC from '../js/api/btc'
-
 import SceneManager from '../js/SceneManager'
 
 export default {
   name: 'home',
   components:{ webgl, graph },
-  props: ['date'],
-  mounted () {
-    this.app = new SceneManager()
-    this.app.scene.setDate(this.date)
-  },
-  asyncComputed: {
-
-    focusOnBlock: ({block}) => {
-      //console.log( 'block', block )
-      //return block && getBlock(block)
+  props: ['date', 'block'],
+  methods:{
+    changeToBlockView({ hash }){
+      this.$router.push('block/'+hash)
     },
-
-    blocks: {
-
-      async get({ date }){
-
-       /* if (!date && !this.focusOnBlock) {
-          return []
-        } 
-        if (!date) {
-          date = new Date(this.focusOnBlock.time * 1000)
-        } 
-        
-        const a = moment(date).subtract(cfg.daysToLoad, 'days').startOf('day').toDate()
-        const b = moment(date).endOf('day').toDate()
-
-        /*this.$worker.run((a, b, btc) => {
-
-          console.log(btc)
-
-          btc.getDay(a, b).then((blocks) => {
-            console.log(blocks)
-          })
-
-          //return `Hello, ${arg}!`
-        }, [a, b, btc])
-        .then(result => {
-          console.log(result)
-        })
-        .catch(e => {
-          console.error(e)
-        })*/
-
-        
-
-        /*if (window.Worker) {
-          let worker = new Worker()
-
-          worker.addEventListener('message', function(e) {
-            console.log(e.data)
-            return e.data
-          }, false)
-
-          worker.postMessage(
-            {
-              'cmd': 'start', 
-              'msg': {
-                start: a, 
-                end: b
-              }
-            }
-          )
-        }
-
-        return await BTC.getBlocksSince(a, b)*/
-      },
-      default: []
+    changeDate(date){
+      const dateStr = moment(date).format('YYYY-MM-DD')
+      this.$router.push('/' + dateStr)
     }
   }
 }

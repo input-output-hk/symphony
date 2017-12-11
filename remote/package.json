@@ -4,8 +4,8 @@
   "description": "Cloudbase functions for populating Blockchain",
   "main": "index.js",
   "scripts": {
-    "transpile": "babel 'src' --out-dir 'functions' --presets=env --plugins transform-object-rest-spread --copy-files --ignore 'node_modules'",
-    "posttranspile": "cd functions && npm install",
+    "transpile": "babel src --out-dir functions --presets=env --plugins transform-object-rest-spread --copy-files --ignore 'node_modules'",
+    "posttranspile__": "cd functions && npm install",
     "populate": "npm run transpile && node functions/populate.js",
     "deploy": "npm run transpile && firebase deploy --only functions"
   },
@@ -22,7 +22,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.0"
+    "babel-preset-env": "^1.6.1"
   },
   "dependencies": {}
 }

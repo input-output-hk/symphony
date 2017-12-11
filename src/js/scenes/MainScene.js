@@ -360,9 +360,8 @@ export default class MainScene extends EventEmitter {
     document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
-    document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
 
-    document.addEventListener('keydown', this.onKeyDown.bind(this), false)
+    document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
       this.treeBuilderWorker = new TreeBuilderWorker()
@@ -464,7 +463,7 @@ export default class MainScene extends EventEmitter {
   onDocumentMouseDown (event) {
     event.preventDefault()
 
-    if (event.target.className !== 'main') {
+    if (document.querySelector('.dg.ac').contains(event.target)) {
       return
     }
 
@@ -769,7 +768,7 @@ export default class MainScene extends EventEmitter {
 
     // bubble up event
     if (this.state.closestDayIndex !== closestDayIndex) {
-      this.emit(this.dayChangedEvent, this.state.currentDay)
+      this.emit('dayChanged', this.state.currentDay)
     }
 
     this.state.closestDayIndex = closestDayIndex
