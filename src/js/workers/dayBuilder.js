@@ -22,9 +22,15 @@ self.addEventListener('message', function (e) {
       }
 
       for (let index = 0; index < blocks.length; index++) {
-        const block = blocks[index]
+        let block = blocks[index]
         let blockGeoData = new GenerateBlockGeometry(block)
         returnData.sizes.push(blockGeoData.boxDimensions)
+
+        let feeToInputRatio = 0
+        if (block.fee && block.input) {
+          feeToInputRatio = block.fee / block.input
+        }
+        returnData.blocks[index].feeToInputRatio = feeToInputRatio
       }
 
       self.postMessage(returnData)

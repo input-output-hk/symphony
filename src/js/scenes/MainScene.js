@@ -777,7 +777,7 @@ export default class MainScene extends EventEmitter {
       this.state.loadDayRequested === false &&
       this.state.currentDay !== undefined
     ) {
-      // count 5 either side of current day
+      // count n either side of current day
       for (let index = -Config.daysEitherSide; index <= Config.daysEitherSide; index++) {
         let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
         if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
