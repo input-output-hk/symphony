@@ -16,6 +16,8 @@ export let copyMaterial
 export let multiColorMaterials = []
 export let multiCopyMaterials = []
 
+//console.log(glslify)
+
 export function init (refRenderer, refRenderTargetFloatType) {
   if (renderer) return
 
@@ -30,7 +32,7 @@ export function init (refRenderer, refRenderTargetFloatType) {
   _camera = new THREE.Camera()
   _camera.position.z = 1
 
-  vertexShader = precisionPrefix + glslify('../glsl/quad.vert')
+  vertexShader = precisionPrefix + glslify('./../glsl/quad.vert')
 
   _color = new THREE.Color()
   colorMaterial = new THREE.RawShaderMaterial({
@@ -41,7 +43,7 @@ export function init (refRenderer, refRenderTargetFloatType) {
     depthWrite: false,
     blending: THREE.NoBlending,
     vertexShader: vertexShader,
-    fragmentShader: precisionPrefix + glslify('../glsl/quadColor.frag')
+    fragmentShader: precisionPrefix + glslify('./../glsl/quadColor.frag')
   })
 
   copyMaterial = new THREE.RawShaderMaterial({
@@ -52,7 +54,7 @@ export function init (refRenderer, refRenderTargetFloatType) {
     depthWrite: false,
     blending: THREE.NoBlending,
     vertexShader: vertexShader,
-    fragmentShader: precisionPrefix + glslify('../glsl/quad.frag')
+    fragmentShader: precisionPrefix + glslify('./../glsl/quad.frag')
   })
 
   planeGeometry = new THREE.PlaneBufferGeometry(2, 2)
