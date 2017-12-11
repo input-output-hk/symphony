@@ -360,6 +360,8 @@ export default class MainScene extends EventEmitter {
     document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
+    document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
+
     document.addEventListener('keydown', this.onKeyDown.bind(this), false)
 
     if (window.Worker) {
@@ -777,7 +779,7 @@ export default class MainScene extends EventEmitter {
       this.state.currentDay !== undefined
     ) {
       // count 5 either side of current day
-      for (let index = -5; index <= 5; index++) {
+      for (let index = -Config.daysEitherSide; index <= Config.daysEitherSide; index++) {
         let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
         if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
           this.loadBlocks(day, (closestDayIndex + index))

@@ -148,6 +148,13 @@ export default class Stage {
     // event fired when mouse is moved
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
 
+    function _getTouchBound (fn) {
+      return function (evt) {
+        fn.call(this, evt.changedTouches[0] || evt.touches[0])
+      }
+    }
+    document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
+
     // window resize event
     window.addEventListener('resize', this.resize.bind(this), false)
   }
