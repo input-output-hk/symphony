@@ -8,7 +8,7 @@ try {
 catch (error) {
   console.log('No Firebase config available. Using IAM Service Account')
   admin.initializeApp({
-    credential: admin.credential.cert(require('./iohk-orpheus-firebase-adminsdk-h3mtt-db8c7a2957.json')),
+    credential: admin.credential.cert(require('./Orpheus-aa43993dd965.json')),
     databaseURL: 'https://iohk-orpheus.firebaseio.com'
   })
 }
