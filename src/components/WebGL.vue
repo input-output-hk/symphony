@@ -43,7 +43,7 @@ export default {
         if (isEscape) {
           const date = new Date(this.app.scene.state.currentBlock.time * 1000)
           this.onDayChanged(date)
-          this.app.scene.resetDayView()
+          this.resetDayView()
         }
     }, false)
 
@@ -57,7 +57,7 @@ export default {
         this.onBlockSelected(block)
       }
     })
-    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(timeStamp)))
+    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(Math.min(Date.now(), timeStamp))))
     // console.log('create webgl', this.blocks, this.focusOnBlock)
   },
   beforeUpdate(){
