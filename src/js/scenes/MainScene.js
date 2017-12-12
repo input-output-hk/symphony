@@ -260,6 +260,11 @@ export default class MainScene extends EventEmitter {
           continue
         }
 
+        // make box size slightly larger than the merkle tree it contains
+        size.x += 10.0
+        size.y += 10.0
+        size.z += 10.0
+
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterialFront)
 
@@ -828,7 +833,7 @@ export default class MainScene extends EventEmitter {
       this.scrollBlocked = true
       setTimeout(() => {
         this.scrollBlocked = false
-      }, 100)
+      }, 50)
     }
 
     if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {

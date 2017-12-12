@@ -1,15 +1,20 @@
 import * as THREE from 'three'
 import merkle from '../merkle-tree-gen'
 
-const DEG2RAD = Math.PI / 180
+let seedrandom = require('seedrandom')
 
 const merkleDefaults = { hashalgo: 'md5', hashlist: true }
 
 export default class GenerateBlockGeometry {
   constructor (block, visualise = false) {
-    const { output, n_tx } = block
+    const { n_tx } = block
 
-    this.angle = 5.0 + (block.output % 90)
+    this.block = block
+
+    let signatureAngle = 5.0 + (this.block.output % 85)
+    signatureAngle = Math.ceil(signatureAngle / 5) * 5
+
+    this.angle = signatureAngle // get unique structure for this block
 
     this.treeVertices = new Float32Array()
 
@@ -64,6 +69,14 @@ export default class GenerateBlockGeometry {
 
     points.push(startPosition)
     points.push(endPosition)
+
+    // add some randomness based on block network health
+    let rng = seedrandom(this.block.hash + node.level)
+    let random = rng()
+
+    let randomness = ((random * 10000) - 5000) * this.block.feeToInputRatio
+
+    this.angle += randomness
 
     if (visualise) {
       let path = new THREE.LineCurve3(startPosition, endPosition)

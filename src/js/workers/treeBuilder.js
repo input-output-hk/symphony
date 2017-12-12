@@ -12,6 +12,12 @@ self.addEventListener('message', function (e) {
       console.log('building merkle tree...')
       let block = data.block
 
+      let feeToInputRatio = 0
+      if (block.fee && block.input) {
+        feeToInputRatio = block.fee / block.input
+      }
+      block.feeToInputRatio = feeToInputRatio
+
       let geoData = new GenerateBlockGeometry(block, true)
 
       let returnData = {

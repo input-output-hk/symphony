@@ -28,6 +28,7 @@
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.19.1",
     "ouioui": "0.0.22",
+    "seedrandom": "^2.4.3",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
     "tone": "^0.11.11",
