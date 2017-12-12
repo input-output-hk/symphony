@@ -169,8 +169,12 @@ export default class BTC {
   }
 
   getTransactionsForBlock (hash) {
-    this.blocks.where('hash', '==', hash).get()
-      .then(({docs}) => docs[0].ref.collection('metadata').get())
-      .then(transactions => transactions.docs[0].data().transaction)
+    return new Promise((resolve, reject) => {
+      this.blocks.where('hash', '==', hash).get()
+        .then(({docs}) => docs[0].ref.collection('metadata').get())
+        .then((transactions) => {
+          resolve(transactions.docs[0].data().transaction)
+        })
+    })
   }
 }

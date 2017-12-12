@@ -383,6 +383,8 @@ export default class MainScene extends EventEmitter {
     let endNodes = e.data.endNodes
     let vertices = e.data.vertices
 
+    let block = e.data.block
+
     this.removeTrees()
 
     this.treeGroup = new THREE.Group()
@@ -433,7 +435,7 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    this.audio.generateMerkleSound(reducedArray, blockObjectPosition)
+    this.audio.generateMerkleSound(reducedArray, blockObjectPosition, block)
   }
 
   onKeyDown (event) {
@@ -616,12 +618,16 @@ export default class MainScene extends EventEmitter {
     let block = blockObject.blockchainData
     this.state.currentBlock = block
     this.removeTrees()
-    this.treeBuilderWorker.postMessage(
-      {
-        cmd: 'build',
-        block: block
-      }
-    )
+
+    this.api.getTransactionsForBlock(block.hash).then((transactions) => {
+      block.transactions = transactions
+      this.treeBuilderWorker.postMessage(
+        {
+          cmd: 'build',
+          block: block
+        }
+      )
+    })
   }
 
   setupMaterials () {
