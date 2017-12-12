@@ -7,57 +7,16 @@ import {
   depthTexture as supportsDepthTextures } from '../utils/supports'
 
 
-function createRenderTarget (isMultiRenderTarget) {
-  if (isMultiRenderTarget) {
-    return fboHelper.createMultiRenderTarget(exports.multiRenderTargetCount, 1, 1, THREE.RGBFormat, THREE.UnsignedByteType)
-  }
-  return fboHelper.createRenderTarget(1, 1, THREE.RGBFormat, THREE.UnsignedByteType)
-}
+// function createRenderTarget (isMultiRenderTarget) {
+//   if (isMultiRenderTarget) {
+//     return fboHelper.createMultiRenderTarget(/*exports.multiRenderTargetCount*/ 2, 1, 1, THREE.RGBFormat, THREE.UnsignedByteType)
+//   }
+//   return fboHelper.createRenderTarget(1, 1, THREE.RGBFormat, THREE.UnsignedByteType)
+// }
 
 
-// const MinSignal = require('min-signal')
-// const mixIn = require('mout/object/mixIn')
-
-// let undef
-
-// // functions
-// exports.init = init
-// exports.hijackRenderer = hijackRenderer
-// exports.resize = resize
-// exports.updateSizeFromRenderMethod = updateSizeFromRenderMethod
-// exports.renderQueue = renderQueue
-// exports.renderScene = renderScene
-// exports.render = render
-// exports.swapRenderTarget = swapRenderTarget
-
-// // properties
-// exports.queue = []
-// exports.gl = undef
-// exports.renderer = undef
-// exports.scene = undef
-// exports.camera = undef
-// exports.renderMethod = undef
-
-// read only properties
-let beforeRendered = exports.beforeRendered = new MinSignal()
-let afterRendered = exports.afterRendered = new MinSignal()
-
-let sceneRenderTarget = exports.sceneRenderTarget = undef
-let fromRenderTarget = exports.fromRenderTarget = undef
-let toRenderTarget = exports.toRenderTarget = undef
-let resolution = exports.resolution = undef
-let viewportResolution = exports.viewportResolution = undef
-let depthTexture = exports.depthTexture = undef
-
-let _isWebGL2 = exports._isWebGL2 = undef
-let _isSupportMultiRenderTarget = exports._isSupportMultiRenderTarget = undef
-let _isSupportDepthTexture = exports._isSupportDepthTexture = undef
-
-let width = exports.width = 0
-let height = exports.height = 0
-
-let _renderTargetWidth = 0
-let _renderTargetHeight = 0
+// let _renderTargetWidth = 0
+// let _renderTargetHeight = 0
 
  
 function hijackRenderer (renderer) {
@@ -67,133 +26,135 @@ function hijackRenderer (renderer) {
   }
 }
 
-function rendererActualRender (scene, camera, renderTarget, forceClear) {
-  beforeRendered.dispatch(scene, camera, renderTarget, forceClear)
-  exports.renderer._actualRender(scene, camera, renderTarget, forceClear)
-  afterRendered.dispatch(scene, camera, renderTarget, forceClear)
-}
-
-
-
-
-
-function resize (w, h) {
-  // width = exports.width = refWidth
-  // height = exports.height = refHeight
-
-  // let renderer = exports.renderer
-  // let camera = exports.camera
-
-  if (this.camera.type === 'OrthographicCamera') {
-    this.camera.left = w / -2
-    this.camera.right = w / 2
-    this.camera.top = h / 2
-    this.camera.bottom = h / -2
-  } else {
-    this.camera.aspect = w / h
-  }
-
-  this.camera.updateProjectionMatrix()
-  // let renderMethod = exports.renderMethod || exports.renderer
-
-  renderer.setRenderTarget(null)
-  renderer.setSize(width, height)
-
-  // if (renderMethod === exports.renderer) {
-    // updateSizeFromRenderMethod()
-  // }
-}
-
-// function updateSizeFromRenderMethod () {
-//   // let renderer = exports.renderer
-//   let rendererSize = this.renderer.getSize()
-//   // width = exports.width = rendererSize.width
-//   // height = exports.height = rendererSize.height
-
-//   let renderMethod = exports.renderMethod
-//   let viewportScaleX = renderMethod ? renderMethod.viewportScaleX : 1
-//   let viewportScaleY = renderMethod ? renderMethod.viewportScaleY : 1
-
-//   resolution.set(width, height)
-//   viewportResolution.set(width * viewportScaleX, height * viewportScaleY)
+// function rendererActualRender (scene, camera, renderTarget, forceClear) {
+//   // beforeRendered.dispatch(scene, camera, renderTarget, forceClear)
+//   // exports.renderer._actualRender(scene, camera, renderTarget, forceClear)
+//   // afterRendered.dispatch(scene, camera, renderTarget, forceClear)
 // }
 
 
-class EffectComposer{
 
-  constructor(renderer){
+
+
+// function resize (w, h) {
+//   // width = exports.width = refWidth
+//   // height = exports.height = refHeight
+
+//   // let renderer = exports.renderer
+//   // let camera = exports.camera
+
+//   if (this.camera.type === 'OrthographicCamera') {
+//     this.camera.left = w / -2
+//     this.camera.right = w / 2
+//     this.camera.top = h / 2
+//     this.camera.bottom = h / -2
+//   } else {
+//     this.camera.aspect = w / h
+//   }
+
+//   this.camera.updateProjectionMatrix()
+//   // let renderMethod = exports.renderMethod || exports.renderer
+
+//   renderer.setRenderTarget(null)
+//   renderer.setSize(width, height)
+
+//   // if (renderMethod === exports.renderer) {
+//     // updateSizeFromRenderMethod()
+//   // }
+// }
+
+// // function updateSizeFromRenderMethod () {
+// //   // let renderer = exports.renderer
+// //   let rendererSize = this.renderer.getSize()
+// //   // width = exports.width = rendererSize.width
+// //   // height = exports.height = rendererSize.height
+
+// //   let renderMethod = exports.renderMethod
+// //   let viewportScaleX = renderMethod ? renderMethod.viewportScaleX : 1
+// //   let viewportScaleY = renderMethod ? renderMethod.viewportScaleY : 1
+
+// //   resolution.set(width, height)
+// //   viewportResolution.set(width * viewportScaleX, height * viewportScaleY)
+// // }
+
+
+class EffectComposer {
+
+  constructor (renderer) {
+    if(!renderer) return
+
     this.renderer = renderer
-    const depthTexture = new THREE.DepthTexture()
-    depthTexture.type = hasWebGL2 ? THREE.FloatType : THREE.UnsignedShortType
 
-    const gl = renderer.getContext()
+    this.camera = new THREE.OrthographicCamera()
 
-    const sceneRenderTarget = createRenderTarget(supportsMultiRenderTargets)
-    sceneRenderTarget.depthBuffer = true
-    sceneRenderTarget.stencilBuffer = true
+    this.depthTexture = new THREE.DepthTexture()
+    this.depthTexture.type = hasWebGL2 ? THREE.FloatType : THREE.UnsignedShortType
 
-    const fromRenderTarget = createRenderTarget()
-    const toRenderTarget =  createRenderTarget()
+    this.sceneRenderTarget = createRenderTarget(supportsMultiRenderTargets)
+    this.sceneRenderTarget.depthBuffer = true
+    this.sceneRenderTarget.stencilBuffer = true
 
-    const resolution = new THREE.Vector2()
-    const viewportResolution = exports.viewportResolution = new THREE.Vector2()
+    // const gl = this.renderer.getContext()
+
+    if ( supportsDepthTextures /*&& exports.useDepthTexture*/) {
+      sceneRenderTarget.depthTexture = depthTexture
+    }
+
+    this.read = createRenderTarget()
+    this.write = createRenderTarget()
+
+    // this.renderTargets = [createRenderTarget(), createRenderTarget()]
+
+    this.resolution = new THREE.Vector2()
+    this.viewportResolution = new THREE.Vector2()
   }
 
   setSize(w, h){
     this.sceneRenderTarget.setSize(w, h)
     this.fromRenderTarget.setSize(w, h)
     this.toRenderTarget.setSize(w, h)
+
+    this.camera.left = w / -2
+    this.camera.right = w / 2
+    this.camera.top = h / 2
+    this.camera.bottom = h / -2
   }
 
-  render (queue, dt) {
-    hijackRenderer(this.renderer)
+  render (stack, dt) {
+    // hijackRenderer(this.renderer)
 
-    let renderableQueue = queue.filter(effect => effect.enabled && effect.needsRender())
+    let renderableStack = stack.filter(effect => effect.enabled && effect.needsRender())
 
-    if (renderableQueue.length > 0) {
+    if (renderableStack.length === 0) {
+      this.renderer.render(this.scene, this.camera)
+      return
+    }
 
       // _resizeRenderTargets()
 
-      if (sceneRenderTarget.depthBuffer && supportsDepthTextures /*&& exports.useDepthTexture*/) {
-        depthTexture.width = sceneRenderTarget.width
-        depthTexture.height = sceneRenderTarget.height
-        sceneRenderTarget.depthTexture = depthTexture
-      }
+    this.renderer.render(scene, camera, sceneRenderTarget)
 
-      this.renderer.render(scene, camera, sceneRenderTarget)
+    // sceneRenderTarget.depthTexture = null
 
-      sceneRenderTarget.depthTexture = null
+    // fboHelper.renderer.setViewport(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
+    // fboHelper.renderer.setScissor(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
 
-      fboHelper.renderer.setViewport(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
-      fboHelper.renderer.setScissor(0, 0, sceneRenderTarget.width, sceneRenderTarget.height)
+    // let [read, write] = [this.write, this.read]
+    
+    // swapRenderTarget()
+    // let scene = this.scene
+    // let autoUpdate = scene.autoUpdate
+    // let effect, renderTarget
 
-      const [fromRenderTarget, toRenderTarget] = [toRenderTarget, fromRenderTarget]
-      
-      // swapRenderTarget()
-      let scene = exports.scene
-      let autoUpdate = scene.autoUpdate
-      let effect, renderTarget
+    const lastEffect = renderableStack[renderableStack.length - 1]
 
-      for (let i = 0, len = renderableQueue.length; i < len; i++) {
-        effect = renderableQueue[i]
-        if (i) {
-          renderTarget = fromRenderTarget
-        } else if (supportsMultiRenderTargets) {
-          renderTarget = sceneRenderTarget.attachments[0] // assume it is using the first attachment for the scene
-        } else {
-          renderTarget = sceneRenderTarget
-        }
-        effect.render(dt, renderTarget, (i === len - 1))
-      }
-
-      scene.autoUpdate = autoUpdate
-
-    } else {
-
-      this.renderer.render(scene, camera)
-
+    for (let effect in renderableStack) {
+      let [read, write] = [write, read]
+      let renderToScreen = effect === lastEffect
+      effect.render(dt, read, renderToScreen)
     }
 
+    // scene.autoUpdate = autoUpdate
     // if (exports.renderMethod) {
     //   exports.renderMethod.afterRendering()
     // }
@@ -210,11 +171,11 @@ class EffectComposer{
   //   }
   // }
 
-  render (material, toScreen, swap) {
+  render (material, toScreen) {
     fboHelper.render(material, toScreen ? undef : toRenderTarget)
-    if (swap !== false) {
-      swapRenderTarget()
-    }
+    // if (swap !== false) {
+    //   swapRenderTarget()
+    // }
     return fromRenderTarget
   }
 
@@ -222,8 +183,8 @@ class EffectComposer{
  
 }
 
-function swapRenderTarget () {
-  let tmp = toRenderTarget
-  toRenderTarget = toRenderTarget = fromRenderTarget
-  fromRenderTarget = fromRenderTarget = tmp
-}
+// function swapRenderTarget () {
+//   let tmp = toRenderTarget
+//   toRenderTarget = toRenderTarget = fromRenderTarget
+//   fromRenderTarget = fromRenderTarget = tmp
+// }
