@@ -12,7 +12,7 @@ import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
 import * as fboHelper from './helpers/fboHelper'
-import EffectComposer2 from './EffectComposer'
+// import EffectComposer2 from './EffectComposer'
 
 // Global config
 import Config from './Config'
@@ -131,7 +131,6 @@ export default class Stage {
 
     fboHelper.init(this.renderer)
     this.composer = new EffectComposer(this.renderer)
-
   }
 
   /**
