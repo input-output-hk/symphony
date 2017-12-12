@@ -421,16 +421,16 @@ export default class MainScene extends EventEmitter {
     for (let index = 0; index < endNodes.length; index++) {
       const nodePos = endNodes[index]
       let position = {
-        x: Math.ceil(nodePos.x / 10) * 10,
-        y: Math.ceil(nodePos.y / 10) * 10,
-        z: Math.ceil(nodePos.z / 10) * 10
+        x: Math.ceil(nodePos.x / 1) * 1,
+        y: Math.ceil(nodePos.y / 1) * 1,
+        z: Math.ceil(nodePos.z / 1) * 1
       }
 
       let key = JSON.stringify(position)
 
       if (seen.indexOf(key) === -1) {
         seen.push(key)
-        nodePos.y = Math.abs(nodePos.y) * 1.2
+        nodePos.y = Math.abs(nodePos.y) * 1.4
         reducedArray.push(nodePos)
       }
     }
@@ -830,6 +830,10 @@ export default class MainScene extends EventEmitter {
 
   onDocumentMouseWheel (event) {
     if (this.scrollBlocked) {
+      return
+    }
+
+    if (this.state.view === 'block') {
       return
     }
 

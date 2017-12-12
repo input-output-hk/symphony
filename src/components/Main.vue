@@ -36,8 +36,8 @@ export default {
 
   .main{
     position: absolute;
-    /*bottom: 0;*/
-    /*left: 0;*/
+    bottom: 0;
+    left: 0;
     width: 90vw;
     padding: 3rem;
     display: flex;

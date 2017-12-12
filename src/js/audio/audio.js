@@ -52,11 +52,11 @@ export default class Audio {
       349.228: 'F3',
       369.994: 'F#3',
       391.995: 'G3',
-      415.305: 'G#3'
-      /* 440.000: 'A4',
+      415.305: 'G#3',
+      440.000: 'A4',
       466.164: 'A#4',
       493.883: 'B4',
-      523.251: 'C4' */
+      523.251: 'C4'
     }
 
     this.modes = {
@@ -174,6 +174,7 @@ export default class Audio {
     return new Promise((resolve, reject) => {
       let loadCount = 0
       let self = this
+      resolve()
       _.forIn(this.notes, (note, key) => {
         this.audioLoader.load(
           // resource URL
@@ -333,7 +334,7 @@ export default class Audio {
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
 
-        let mode = this.modes.mixolydian
+        let mode = this.modes.aeolian
         for (var frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
@@ -355,7 +356,7 @@ export default class Audio {
           '2m'
         ).start(Tone.Transport.seconds + time)
 
-        loop.humanize = true
+        loop.humanize = '64n'
 
         this.loops.push(loop)
       }
