@@ -231,6 +231,8 @@ export default class MainScene extends EventEmitter {
       return
     }
 
+    document.getElementById('loading').style.display = 'none'
+
     try {
       let workerData = e.data
       let sizes = workerData.sizes
@@ -386,6 +388,15 @@ export default class MainScene extends EventEmitter {
     let endPoints = e.data.endPoints
 
     let block = e.data.block
+
+    document.getElementById('block-data-hash').innerHTML = block.hash
+    document.getElementById('block-data-time').innerHTML = block.time
+    document.getElementById('block-data-size').innerHTML = block.size
+    document.getElementById('block-data-height').innerHTML = block.height
+    document.getElementById('block-data-tx').innerHTML = block.transactions.length
+    document.getElementById('block-data-bits').innerHTML = block.bits
+    document.getElementById('block-data-fee').innerHTML = block.fee
+    document.getElementById('block-data-value').innerHTML = block.output
 
     this.removeTrees()
 
@@ -716,7 +727,7 @@ export default class MainScene extends EventEmitter {
 
     this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
-      size: 70.0,
+      size: 60.0,
       alphaTest: 0.0001,
       map: this.sprite,
       transparent: true,
@@ -882,6 +893,7 @@ export default class MainScene extends EventEmitter {
     this.api.getBlock(hash).then((block) => {
       let blockDay = moment(block.time * 1000).format('YYYY-MM-DD')
       this.state.currentHash = block.hash
+
       this.setDate(blockDay, true)
     })
   }
