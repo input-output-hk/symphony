@@ -4,15 +4,17 @@ import * as THREE from 'three'
 import Config from '../Config'
 import Tone from 'tone'
 import _ from 'lodash'
+import { map } from '../../utils/math'
 
 export default class Audio {
   constructor (camera) {
     this.camera = camera
-    this.quantize = 16
-    this.masterVol = -6 // db
-    this.ambienceVol = -20 // db
+    this.loops = []
+    this.quantize = 32
+    this.masterVol = -18 // db
+    this.ambienceVol = -15 // db
     this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
-    this.bpm = 100
+    this.bpm = 60
     this.notes = {
       55.000: 'A1',
       58.270: 'A#1',
@@ -50,9 +52,9 @@ export default class Audio {
       369.994: 'F#3',
       391.995: 'G3',
       415.305: 'G#3',
-      440.000: 'A3',
-      466.164: 'A#3',
-      493.883: 'B3',
+      440.000: 'A4',
+      466.164: 'A#4',
+      493.883: 'B4',
       523.251: 'C4'
     }
 
@@ -128,7 +130,7 @@ export default class Audio {
         'C'
       ]
     }
-    this.panners = []
+
     this.audioLoader = new THREE.AudioLoader()
   }
 
@@ -145,28 +147,33 @@ export default class Audio {
         onload: () => {
           resolve()
         }
-      }).chain(this.ambienceFilter)
+      // }).chain(this.ambienceFilter)
+      }).chain(this.ambienceBus)
 
       this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
     })
   }
 
   setAmbienceFilterCutoff (value) {
-    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
+    // this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
   }
 
   unloadSound () {
-    this.panners.forEach((panner) => {
-      panner.dispose()
-    })
-
-    this.panners = []
+    if (this.loops.length) {
+      for (let index = 0; index < this.loops.length; index++) {
+        const loop = this.loops[index]
+        loop.cancel()
+        loop.dispose()
+      }
+      this.loops = []
+    }
   }
 
   preloadNotes () {
     return new Promise((resolve, reject) => {
       let loadCount = 0
       let self = this
+      resolve()
       _.forIn(this.notes, (note, key) => {
         this.audioLoader.load(
           // resource URL
@@ -229,6 +236,49 @@ export default class Audio {
 
       Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z)
 
+      this.sampler = new Tone.Sampler({
+        'A1': Config.assetPath + 'sounds/kalimba/A1.mp3',
+        'A#1': Config.assetPath + 'sounds/kalimba/AS1.mp3',
+        'B1': Config.assetPath + 'sounds/kalimba/B1.mp3',
+        'C1': Config.assetPath + 'sounds/kalimba/C1.mp3',
+        'C#1': Config.assetPath + 'sounds/kalimba/CS1.mp3',
+        'D1': Config.assetPath + 'sounds/kalimba/D1.mp3',
+        'D#1': Config.assetPath + 'sounds/kalimba/DS1.mp3',
+        'E1': Config.assetPath + 'sounds/kalimba/E1.mp3',
+        'F1': Config.assetPath + 'sounds/kalimba/F1.mp3',
+        'F#1': Config.assetPath + 'sounds/kalimba/FS1.mp3',
+        'G1': Config.assetPath + 'sounds/kalimba/G1.mp3',
+        'G#1': Config.assetPath + 'sounds/kalimba/GS1.mp3',
+        'A2': Config.assetPath + 'sounds/kalimba/A2.mp3',
+        'A#2': Config.assetPath + 'sounds/kalimba/AS2.mp3',
+        'B2': Config.assetPath + 'sounds/kalimba/B2.mp3',
+        'C2': Config.assetPath + 'sounds/kalimba/C2.mp3',
+        'C#2': Config.assetPath + 'sounds/kalimba/CS2.mp3',
+        'D2': Config.assetPath + 'sounds/kalimba/D2.mp3',
+        'D#2': Config.assetPath + 'sounds/kalimba/DS2.mp3',
+        'E2': Config.assetPath + 'sounds/kalimba/E2.mp3',
+        'F2': Config.assetPath + 'sounds/kalimba/F2.mp3',
+        'F#2': Config.assetPath + 'sounds/kalimba/FS2.mp3',
+        'G2': Config.assetPath + 'sounds/kalimba/G2.mp3',
+        'G#2': Config.assetPath + 'sounds/kalimba/GS2.mp3',
+        'A3': Config.assetPath + 'sounds/kalimba/A3.mp3',
+        'A#3': Config.assetPath + 'sounds/kalimba/AS3.mp3',
+        'B3': Config.assetPath + 'sounds/kalimba/B3.mp3',
+        'C3': Config.assetPath + 'sounds/kalimba/C3.mp3',
+        'C#3': Config.assetPath + 'sounds/kalimba/CS3.mp3',
+        'D3': Config.assetPath + 'sounds/kalimba/D3.mp3',
+        'D#3': Config.assetPath + 'sounds/kalimba/DS3.mp3',
+        'E3': Config.assetPath + 'sounds/kalimba/E3.mp3',
+        'F3': Config.assetPath + 'sounds/kalimba/F3.mp3',
+        'F#3': Config.assetPath + 'sounds/kalimba/FS3.mp3',
+        'G3': Config.assetPath + 'sounds/kalimba/G3.mp3',
+        'G#3': Config.assetPath + 'sounds/kalimba/GS3.mp3'
+    /*    'A4': Config.assetPath + 'sounds/kalimba/A4.mp3',
+        'A#4': Config.assetPath + 'sounds/kalimba/AS4.mp3',
+        'B4': Config.assetPath + 'sounds/kalimba/B4.mp3',
+        'C4': Config.assetPath + 'sounds/kalimba/C4.mp3' */
+      }).chain(this.masterBus)
+
       this.preload().then(() => {
         this.playAmbience().then(() => {
           this.ambiencePlayer.start(0)
@@ -239,34 +289,50 @@ export default class Audio {
     })
   }
 
-  generateMerkleSound (positionsArray, blockObjectPosition) {
-    let noteTotal = 30
+  generateMerkleSound (positionsArray, blockObjectPosition, block, pointsMaterial, pointsMesh) {
+    let noteTotal = 200
     let noteCount = 0
 
-    positionsArray.forEach((point) => {
-      noteCount++
-      if (noteCount < noteTotal) {
-        let pointVector = new THREE.Vector3(point.x, point.y, point.z)
-        let offsetPosition = pointVector.add(blockObjectPosition.clone())
+    this.black = new THREE.Color(0x000000)
+    this.white = new THREE.Color(0xffffff)
 
-        // add positional audio
-        let panner = new Tone.Panner3D().chain(this.masterBus)
-        panner.refDistance = 5000
-        panner.rolloffFactor = 25
-        panner.setPosition(offsetPosition.x, offsetPosition.y, offsetPosition.z)
+    this.pointsMaterial = pointsMaterial
 
-        this.panners.push(panner)
+    let minTime = Number.MAX_SAFE_INTEGER
+    let maxTime = 0
 
+    for (let index = 0; index < block.transactions.length; index++) {
+      const transaction = block.transactions[index]
+      minTime = Math.min(transaction.time, minTime)
+      maxTime = Math.max(transaction.time, maxTime)
+    }
+
+    block.transactions.sort((a, b) => {
+      return a.time > b.time
+    })
+
+    for (let index = 0; index < positionsArray.length; index++) {
+      const point = positionsArray[index]
+
+      /**
+       * Map transaction time to new range
+       */
+      if (typeof block.transactions[index] !== 'undefined') {
+        const transaction = block.transactions[index]
+        let time = map(transaction.time, minTime, maxTime, 0, 20)
+
+        noteCount++
+      //  if (noteCount < noteTotal) {
         // get closest note
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
 
-        let mode = this.modes.mixolydian
+        let mode = this.modes.aeolian
         for (var frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs(point.y - frequency)
+              let diff = Math.abs((point.y * 1.2) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -275,20 +341,45 @@ export default class Audio {
           }
         }
 
-        let fileName = Config.assetPath + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3'
-
         let that = this
+        let loop
 
-        let sampler = new Tone.Sampler({
-          [note]: fileName
-        }, function () {
-          new Tone.Loop((time) => {
-            sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
-          }, '1m').start(Tone.Transport.seconds + (Math.random() * 100))
-        })
+        if (noteCount < noteTotal) {
+          loop = new Tone.Loop(
+          (time) => {
+            this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
 
-        sampler.fan(panner)
+            pointsMesh.geometry.colors[index] = this.white
+            pointsMesh.geometry.colorsNeedUpdate = true
+            setTimeout(() => {
+              pointsMesh.geometry.colors[index] = this.black
+              pointsMesh.geometry.colorsNeedUpdate = true
+            }, 500)
+          },
+            '1m'
+          ).start(Tone.Transport.seconds + (time + 0.5))
+        } else {
+          loop = new Tone.Loop(
+            (time) => {
+              pointsMesh.geometry.colors[index] = this.white
+              pointsMesh.geometry.colorsNeedUpdate = true
+              setTimeout(() => {
+                pointsMesh.geometry.colors[index] = this.black
+                pointsMesh.geometry.colorsNeedUpdate = true
+              }, 500)
+            },
+              '1m'
+            ).start(Tone.Transport.seconds + (time + 0.5))
+        }
+
+        loop.humanize = '64n'
+
+        this.loops.push(loop)
+       // } else {
+         // pointsMesh.geometry.colors[index] = this.black
+          // pointsMesh.geometry.colorsNeedUpdate = true
+      //  }
       }
-    })
+    }
   }
 }

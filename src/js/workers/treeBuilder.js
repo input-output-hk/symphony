@@ -26,7 +26,7 @@ self.addEventListener('message', function (e) {
         boxDimensions: geoData.boxDimensions,
         boxCenter: geoData.boxCenter,
         block: block,
-        endNodes: geoData.endNodes
+        endPoints: geoData.endPoints
       }
 
       self.postMessage(returnData)
