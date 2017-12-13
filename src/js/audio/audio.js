@@ -4,15 +4,14 @@ import * as THREE from 'three'
 import Config from '../Config'
 import Tone from 'tone'
 import _ from 'lodash'
-import moment from 'moment'
 import { map } from '../../utils/math'
 
 export default class Audio {
   constructor (camera) {
     this.camera = camera
     this.loops = []
-    this.quantize = 24
-    this.masterVol = -15 // db
+    this.quantize = 32
+    this.masterVol = -18 // db
     this.ambienceVol = -15 // db
     this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
     this.bpm = 60
@@ -131,7 +130,7 @@ export default class Audio {
         'C'
       ]
     }
-    this.panners = []
+
     this.audioLoader = new THREE.AudioLoader()
   }
 
@@ -290,12 +289,14 @@ export default class Audio {
     })
   }
 
-  generateMerkleSound (positionsArray, blockObjectPosition, block) {
-    let noteTotal = 300
+  generateMerkleSound (positionsArray, blockObjectPosition, block, pointsMaterial, pointsMesh) {
+    let noteTotal = 200
     let noteCount = 0
 
-    /* const fromDate = moment(block.time * 1000).startOf('day').valueOf()
-    const toDate = moment(block.time * 1000).endOf('day').valueOf() */
+    this.black = new THREE.Color(0x000000)
+    this.white = new THREE.Color(0xffffff)
+
+    this.pointsMaterial = pointsMaterial
 
     let minTime = Number.MAX_SAFE_INTEGER
     let maxTime = 0
@@ -310,26 +311,18 @@ export default class Audio {
       return a.time > b.time
     })
 
-    /* let panner = new Tone.Panner3D().chain(this.masterBus)
-    panner.refDistance = 5000
-    panner.rolloffFactor = 25
-    panner.setPosition(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-    this.panners.push(panner) */
-
     for (let index = 0; index < positionsArray.length; index++) {
       const point = positionsArray[index]
 
       /**
        * Map transaction time to new range
        */
-      const transaction = block.transactions[index]
-      let time = map(transaction.time, minTime, maxTime, 0, 10)
+      if (typeof block.transactions[index] !== 'undefined') {
+        const transaction = block.transactions[index]
+        let time = map(transaction.time, minTime, maxTime, 0, 20)
 
-      noteCount++
-      if (noteCount < noteTotal) {
-        let pointVector = new THREE.Vector3(point.x, point.y, point.z)
-        let offsetPosition = pointVector.add(blockObjectPosition.clone())
-
+        noteCount++
+      //  if (noteCount < noteTotal) {
         // get closest note
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
@@ -339,7 +332,7 @@ export default class Audio {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs(point.y - frequency)
+              let diff = Math.abs((point.y * 1.2) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -349,16 +342,43 @@ export default class Audio {
         }
 
         let that = this
-        let loop = new Tone.Loop(
+        let loop
+
+        if (noteCount < noteTotal) {
+          loop = new Tone.Loop(
           (time) => {
             this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+
+            pointsMesh.geometry.colors[index] = this.white
+            pointsMesh.geometry.colorsNeedUpdate = true
+            setTimeout(() => {
+              pointsMesh.geometry.colors[index] = this.black
+              pointsMesh.geometry.colorsNeedUpdate = true
+            }, 500)
           },
-          '2m'
-        ).start(Tone.Transport.seconds + time)
+            '1m'
+          ).start(Tone.Transport.seconds + (time + 0.5))
+        } else {
+          loop = new Tone.Loop(
+            (time) => {
+              pointsMesh.geometry.colors[index] = this.white
+              pointsMesh.geometry.colorsNeedUpdate = true
+              setTimeout(() => {
+                pointsMesh.geometry.colors[index] = this.black
+                pointsMesh.geometry.colorsNeedUpdate = true
+              }, 500)
+            },
+              '1m'
+            ).start(Tone.Transport.seconds + (time + 0.5))
+        }
 
         loop.humanize = '64n'
 
         this.loops.push(loop)
+       // } else {
+         // pointsMesh.geometry.colors[index] = this.black
+          // pointsMesh.geometry.colorsNeedUpdate = true
+      //  }
       }
     }
   }

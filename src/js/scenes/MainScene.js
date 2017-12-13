@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
+import _ from 'lodash'
 
 // Global config
 import Config from '../Config'
@@ -16,7 +17,8 @@ import Audio from '../audio/audio'
 import API from '../api/btc'
 
 // Custom Materials
-import BlockMaterial from '../materials/BlockMaterial'
+import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
+import PointsMaterial from '../materials/PointsMaterial/PointsMaterial'
 
 const dat = require('dat-gui')
 
@@ -380,8 +382,8 @@ export default class MainScene extends EventEmitter {
     }
 
     let boxCenter = e.data.boxCenter
-    let endNodes = e.data.endNodes
     let vertices = e.data.vertices
+    let endPoints = e.data.endPoints
 
     let block = e.data.block
 
@@ -410,32 +412,31 @@ export default class MainScene extends EventEmitter {
       renderer.clearDepth()
     }
 
+    let colors = []
+    let color = new THREE.Color(0x000000)
+    for (let index = 0; index < endPoints.length; index++) {
+      colors[ 3 * index ] = 1
+      colors[ 3 * index + 1 ] = 1
+      colors[ 3 * index + 2 ] = 1
+      colors[ index ] = color
+    }
+
+    let geometry = new THREE.Geometry()
+    geometry.vertices = endPoints
+    geometry.colors = colors
+
+    let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
+    pointsMesh.translateX(-boxCenter.x)
+    pointsMesh.translateY(-boxCenter.y)
+    pointsMesh.translateZ(-boxCenter.z)
+
+    this.treeGroup.add(pointsMesh)
     this.treeGroup.add(mesh)
 
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
 
-    let seen = []
-    let reducedArray = []
-
-    for (let index = 0; index < endNodes.length; index++) {
-      const nodePos = endNodes[index]
-      let position = {
-        x: Math.ceil(nodePos.x / 1) * 1,
-        y: Math.ceil(nodePos.y / 1) * 1,
-        z: Math.ceil(nodePos.z / 1) * 1
-      }
-
-      let key = JSON.stringify(position)
-
-      if (seen.indexOf(key) === -1) {
-        seen.push(key)
-        nodePos.y = Math.abs(nodePos.y) * 1.4
-        reducedArray.push(nodePos)
-      }
-    }
-
-    this.audio.generateMerkleSound(reducedArray, blockObjectPosition, block)
+    this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
 
   onKeyDown (event) {
@@ -711,6 +712,18 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
+    })
+
+    this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
+    this.pointsMaterial = new PointsMaterial({
+      size: 70.0,
+      alphaTest: 0.0001,
+      map: this.sprite,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      opacity: 0.3,
+      depthTest: false,
+      vertexColors: THREE.VertexColors
     })
   }
 

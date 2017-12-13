@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import merkle from '../merkle-tree-gen'
+import _ from 'lodash'
 
 let seedrandom = require('seedrandom')
 
@@ -32,8 +33,6 @@ export default class GenerateBlockGeometry {
 
     this.treeGeo = new THREE.Geometry()
 
-    this.endNodes = []
-
     // Generate an incremental array of `n_tx` length [0, 1, 2, 3, 4, ...n_tx]
     const array = new Array(n_tx).fill(0).map((v, i) => i.toString())
 
@@ -41,16 +40,16 @@ export default class GenerateBlockGeometry {
 
     const startingPosition = new THREE.Vector3(0, 0, 0)
     const direction = new THREE.Vector3(0, 1, 0)
-    const points = this.build(tree, startingPosition, direction, visualise, [])
+    let pointData = this.build(tree, startingPosition, direction, visualise, [], [])
 
-    let box = new THREE.Box3().setFromPoints(points)
+    let box = new THREE.Box3().setFromPoints(pointData.points)
     let boxDimensions = box.getSize()
     let boxCenter = box.getCenter()
 
     let returnData = {
       boxDimensions: boxDimensions,
       boxCenter: boxCenter,
-      endNodes: this.endNodes
+      endPoints: pointData.endPoints
     }
 
     if (visualise) {
@@ -62,13 +61,17 @@ export default class GenerateBlockGeometry {
     return returnData
   }
 
-  build (node, startingPosition, direction, visualise, points = []) {
-    let magnitude = (node.level * 5)
+  build (node, startingPosition, direction, visualise, points = [], endPoints = []) {
+    let magnitude = ((node.level + 1) * 5)
     let startPosition = startingPosition.clone()
     let endPosition = startPosition.clone().add(direction.clone().multiplyScalar(magnitude))
 
     points.push(startPosition)
     points.push(endPosition)
+
+    if (node.level === 0) {
+      endPoints.push(endPosition.clone())
+    }
 
     // add some randomness based on block network health
     let rng = seedrandom(this.block.hash + node.level)
@@ -100,34 +103,26 @@ export default class GenerateBlockGeometry {
         var childNode = node.children[key]
 
         if (childNode) {
-          if (typeof childNode.children !== 'undefined') {
-            let angle = (Math.PI / 180) * this.angle
-            let axis = this.Y
-            let newDirection = direction.clone()
+          let angle = (Math.PI / 180) * this.angle
+          let axis = this.Y
+          let newDirection = direction.clone()
 
-            if (i === 1) {
-              newDirection.applyQuaternion(this.zPosRotation)
-            } else {
-              newDirection.applyQuaternion(this.zNegRotation)
-            }
-
-            newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(axis, angle))
-
-            this.build(childNode, endPosition, newDirection, visualise, points)
+          if (i === 1) {
+            newDirection.applyQuaternion(this.zPosRotation)
           } else {
-            // no child nodes
-            this.endNodes.push(
-              {
-                x: endPosition.x,
-                y: endPosition.y,
-                z: endPosition.z
-              }
-             )
+            newDirection.applyQuaternion(this.zNegRotation)
           }
+
+          newDirection.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(axis, angle))
+
+          this.build(childNode, endPosition, newDirection, visualise, points, endPoints)
         }
       }
     }
 
-    return points
+    return {
+      points: points,
+      endPoints: endPoints
+    }
   }
 }
