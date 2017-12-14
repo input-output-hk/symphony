@@ -47,21 +47,24 @@ export default class Stage {
     this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass) */
 
-    /* this.FilmShaderPass = new ShaderPass(FilmShader)
-    this.composer.addPass(this.FilmShaderPass) */
-
-    this.VignettePass = new ShaderPass(VignetteShader)
-    this.composer.addPass(this.VignettePass)
-
+  
     this.BrightnessContrastPass = new ShaderPass(BrightnessContrastShader)
     this.composer.addPass(this.BrightnessContrastPass)
 
     this.HueSaturationPass = new ShaderPass(HueSaturationShader)
     this.composer.addPass(this.HueSaturationPass)
 
+
     this.FXAAPass = new ShaderPass(FXAAShader)
     this.FXAAPass.renderToScreen = true
     this.composer.addPass(this.FXAAPass)
+
+    //  this.FilmShaderPass = new ShaderPass(FilmShader)
+    // this.composer.addPass(this.FilmShaderPass)
+
+    // this.VignettePass = new ShaderPass(VignetteShader)
+    // this.VignettePass.renderToScreen = true
+    // this.composer.addPass(this.VignettePass)
   }
 
   /**
@@ -161,7 +164,7 @@ export default class Stage {
     document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
 
     // window resize event
-    window.addEventListener('resize', this.resize.bind(this), false)
+    // window.addEventListener('resize', this.resize.bind(this), false)
   }
 
   /**

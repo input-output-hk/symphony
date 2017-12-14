@@ -129,9 +129,12 @@ export default class MainScene extends EventEmitter {
       let f = this.gui.addFolder(title)
       f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
-      f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
+      if( mat.normalScale) f.add(mat.normalScale, 'x', 0.0, 5.0).step(0.01).name('Normal Scale X')
+      if( mat.normalScale) f.add(mat.normalScale, 'y', 0.0, 5.0).step(0.01).name('Normal Scale Y')
       f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
+      f.add(mat, 'refractionRatio', 0.0, 1.0).step(0.01)
       if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
+      f.add(mat, 'envMapIntensity', 0.0, 5.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
       f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
     }
@@ -148,6 +151,7 @@ export default class MainScene extends EventEmitter {
     */
     let lightFolder = this.gui.addFolder('Lighting')
     lightFolder.add(this.stage.pointLight, 'intensity', 0.0, 10.0).step(0.01)
+    lightFolder.addColor(this.stage.pointLight, 'color')
 
     /**
      * Scene
@@ -158,6 +162,7 @@ export default class MainScene extends EventEmitter {
       this.stage.scene.fog.color = new THREE.Color(val)
     }.bind(this))
 
+    sceneFolder.add( this.stage.renderer, 'toneMappingExposure', 0, 10)
     sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
       this.stage.VignettePass.uniforms.darkness.value = val
     }.bind(this))
@@ -641,9 +646,21 @@ export default class MainScene extends EventEmitter {
       'nz.png'
     ]
 
-    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
+    
+    let map = new THREE.TextureLoader().load('/static/assets/textures/Marble068_COL_1K.jpg')
+    let metalnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_REFL_1K.jpg')
+    let roughnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let glossMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_NRM_1K.jpg')
+    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
+    bumpMap.magFilter = THREE.LinearFilter
+    bumpMap.minFilter = THREE.LinearMipMapLinearFilter
+    // bumpMap.wrapS = THREE.
+    // bumpMap.repeat.set(2, 2)
+
+    
 
     this.blockMaterialBack = new BlockMaterial({
       color: 0xaaaaaa,
@@ -668,20 +685,27 @@ export default class MainScene extends EventEmitter {
       side: THREE.DoubleSide,
       envMap: this.bgMap,
       bumpMap,
-      bumpScale: 0.03
+      bumpScale: 0.03,
+      
     })
 
     this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: 0x333333,
-      metalness: 0.8,
-      roughness: 0.2,
-      opacity: 0.5,
+      color: 0xb66d6d,
+      emissive: 0xd9d59b,
+      metalness: 0.33,
+      roughness: 1,
+      opacity: 0.47,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03
+      envMapIntensity: 2.3,
+      // bumpMap,
+      // bumpScale: 0.03,
+      roughnessMap,
+      metalnessMap,
+      normalMap,
+      premultipliedAlpha: true
+      // map
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
