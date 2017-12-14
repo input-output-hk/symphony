@@ -620,7 +620,7 @@ export default class MainScene extends EventEmitter {
         fromQuaternion,
         this.stage.targetCameraLookAt,
         toQuaternion,
-        1000,
+        2000,
         true
       ).then(() => {
         resolve()
@@ -727,11 +727,10 @@ export default class MainScene extends EventEmitter {
       envMap: this.bgMap
     })
 
-    this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
+    // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
-      size: 60.0,
+      size: 50.0,
       alphaTest: 0.0001,
-      map: this.sprite,
       transparent: true,
       blending: THREE.AdditiveBlending,
       opacity: 0.1,
