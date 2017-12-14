@@ -375,10 +375,6 @@ export default class Audio {
         loop.humanize = '64n'
 
         this.loops.push(loop)
-       // } else {
-         // pointsMesh.geometry.colors[index] = this.black
-          // pointsMesh.geometry.colorsNeedUpdate = true
-      //  }
       }
     }
   }

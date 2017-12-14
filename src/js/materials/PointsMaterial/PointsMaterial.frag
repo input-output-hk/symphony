@@ -1,5 +1,6 @@
 uniform vec3 diffuse;
 uniform float opacity;
+uniform float uTime;
 
 #include <common>
 #include <packing>
@@ -9,6 +10,14 @@ uniform float opacity;
 #include <shadowmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+
+float circle(in float dist, in float radius) {
+	return 1.0 - smoothstep(
+		radius - (radius * 4.0),
+		radius + (radius * 0.01),
+        dot(dist, dist) * 4.0
+	);
+}
 
 void main() {
 
@@ -20,15 +29,29 @@ void main() {
 	#include <logdepthbuf_fragment>
 	#include <map_particle_fragment>
 	#include <color_fragment>
-	#include <alphatest_fragment>
+//	#include <alphatest_fragment>
+
+	vec2 uv = ( vec3( gl_PointCoord.x, 1.0 - gl_PointCoord.y, 1 ) ).xy;
+
+	vec2 pos = uv;
+	pos -= 0.5;
+
+	float dist = length(pos);
 
 	outgoingLight = diffuseColor.rgb;
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	vec3 color = vec3(circle(dist, 0.9));
+
+	color *= sin((dist * 150.0) - (uTime * 30.0));
+
+	color *= outgoingLight;	
+
+	//gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( color, 1.0 );
 
 	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
-	#include <fog_fragment>
+	//#include <fog_fragment>
 
 }

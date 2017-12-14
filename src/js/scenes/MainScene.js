@@ -54,6 +54,8 @@ export default class MainScene extends EventEmitter {
 
     this.initReflection()
 
+    this.clock = new THREE.Clock()
+
     this.dayBuilderWorker = new DayBuilderWorker()
     this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
@@ -732,7 +734,7 @@ export default class MainScene extends EventEmitter {
       map: this.sprite,
       transparent: true,
       blending: THREE.AdditiveBlending,
-      opacity: 0.3,
+      opacity: 0.1,
       depthTest: false,
       vertexColors: THREE.VertexColors
     })
@@ -946,6 +948,8 @@ export default class MainScene extends EventEmitter {
     this.checkMouseIntersection()
     this.animateTree()
     this.animateBlockOpacity()
+
+    this.pointsMaterial.uniforms.uTime.value = this.clock.getElapsedTime()
 
     // pass camera position to shader
     if (this.blockMaterialBack) {
