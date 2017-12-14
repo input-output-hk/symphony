@@ -1,6 +1,8 @@
 uniform float size;
 uniform float scale;
 
+uniform float uTime;
+
 #include <common>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
