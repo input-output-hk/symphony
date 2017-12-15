@@ -268,9 +268,9 @@ export default class MainScene extends EventEmitter {
         }
 
         // make box size slightly larger than the merkle tree it contains
-        size.x += 3.0
-        size.y += 3.0
-        size.z += 3.0
+        size.x += 1.0
+        size.y += 1.0
+        size.z += 1.0
 
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterialFront)
@@ -288,7 +288,7 @@ export default class MainScene extends EventEmitter {
         // blockMeshBack.translateZ(-(size.z / 2))
         blockMesh.translateZ(-(size.z / 2))
 
-        let rotation = ((25 * Math.PI) / blockCount) * index
+        let rotation = ((25 * Math.PI) / 200) * index
         // blockMeshBack.rotation.z = rotation
         // blockMeshBack.translateY(700 + (index))
         // blockMeshBack.rotation.z += Math.PI / 2
@@ -296,9 +296,9 @@ export default class MainScene extends EventEmitter {
         // blockMeshBack.blockchainData = block
 
         blockMesh.rotation.z = rotation
-        blockMesh.translateY(700 + (index))
+        blockMesh.translateY(800 + (index))
         blockMesh.rotation.z += Math.PI / 2
-        blockMesh.translateZ((index * 18))
+        blockMesh.translateZ((index * 20))
         blockMesh.blockchainData = block
 
         /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
@@ -347,7 +347,7 @@ export default class MainScene extends EventEmitter {
 
   initProperties () {
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
-    this.dayZOffset = -3500 // offset for each day on z-axis
+    this.dayZOffset = -4000 // offset for each day on z-axis
     this.treeGroup = null
     this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
     this.crystalOpacity = 0.5
