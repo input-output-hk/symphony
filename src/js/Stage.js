@@ -174,7 +174,7 @@ export default class Stage {
     /* let ambLight = new THREE.AmbientLight(0xffffff)
     this.scene.add(ambLight) */
 
-    this.pointLight = new THREE.PointLight(0xffffff, 5, 5000, 3)
+    this.pointLight = new THREE.PointLight(0xffffff, 0.6, 5000, 3)
     this.scene.add(this.pointLight)
   }
 

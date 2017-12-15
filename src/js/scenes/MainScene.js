@@ -688,7 +688,7 @@ export default class MainScene extends EventEmitter {
       bumpScale: 0.03
     })
 
-    this.blockMaterialFront = new THREE.MeshPhysicalMaterial({
+    this.blockMaterialFront = new BlockMaterial({
       color: 0xaaaaaa,
       emissive: 0x000000,
       metalness: 0.9,
