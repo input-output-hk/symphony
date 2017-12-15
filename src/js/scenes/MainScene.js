@@ -866,16 +866,16 @@ export default class MainScene extends EventEmitter {
     }
 
     if (this.state.view === 'block') {
-    //  return
+      return
     }
 
     event.preventDefault()
 
     if (Math.abs(event.wheelDeltaY) > 0) {
-      // this.scrollBlocked = true
-      /* setTimeout(() => {
+      this.scrollBlocked = true
+      setTimeout(() => {
         this.scrollBlocked = false
-      }, 50) */
+      }, 50)
     }
 
     if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {

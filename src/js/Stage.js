@@ -90,7 +90,7 @@ export default class Stage {
       y: -50.0
     }
 
-    this.cameraMoveStep = 150.0 // how much to move the camera forward on z-axis
+    this.cameraMoveStep = 200.0 // how much to move the camera forward on z-axis
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
