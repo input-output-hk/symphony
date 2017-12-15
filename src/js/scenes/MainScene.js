@@ -268,9 +268,9 @@ export default class MainScene extends EventEmitter {
         }
 
         // make box size slightly larger than the merkle tree it contains
-        size.x += 10.0
-        size.y += 10.0
-        size.z += 10.0
+        size.x += 3.0
+        size.y += 3.0
+        size.z += 3.0
 
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterialFront)
@@ -301,9 +301,9 @@ export default class MainScene extends EventEmitter {
         blockMesh.translateZ((index * 18))
         blockMesh.blockchainData = block
 
-        let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
+        /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
         let wireframe = new THREE.LineSegments(edgeGeo, this.blockMaterialOutline)
-        blockMesh.add(wireframe)
+        blockMesh.add(wireframe) */
 
         group.add(blockMesh)
         /* group.add(blockMeshBack)
@@ -649,7 +649,12 @@ export default class MainScene extends EventEmitter {
       'nz.png'
     ]
 
-    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/noise-bump-2.jpg')
+    let map = new THREE.TextureLoader().load('/static/assets/textures/Marble068_COL_1K.jpg')
+    let metalnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_REFL_1K.jpg')
+    let roughnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let glossMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_NRM_1K.jpg')
+    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
@@ -688,8 +693,14 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03
+      envMapIntensity: 2.3,
+      // bumpMap,
+      // bumpScale: 0.03,
+      roughnessMap,
+      metalnessMap,
+      normalMap,
+      premultipliedAlpha: true
+      // map
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
