@@ -366,7 +366,7 @@ export default class Audio {
               setTimeout(() => {
                 pointsMesh.geometry.colors[index] = this.black
                 pointsMesh.geometry.colorsNeedUpdate = true
-              }, 500)
+              }, 100)
             },
               '1m'
             ).start(Tone.Transport.seconds + (time + 0.5))

@@ -13,7 +13,7 @@ uniform float uTime;
 
 float circle(in float dist, in float radius) {
 	return 1.0 - smoothstep(
-		radius - (radius * 5.0),
+		radius - (radius * 6.0),
 		radius + (radius * 0.01),
         dot(dist, dist) * 3.0
 	);
@@ -44,7 +44,7 @@ void main() {
 
 	color *= sin((dist * 100.0) - (uTime * 30.0));
 
-	color *= outgoingLight;	
+	color *= outgoingLight;
 
 	//gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 	gl_FragColor = vec4( color, 1.0 );

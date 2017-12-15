@@ -19,6 +19,7 @@ import API from '../api/btc'
 // Custom Materials
 import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
 import PointsMaterial from '../materials/PointsMaterial/PointsMaterial'
+import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
 const dat = require('dat-gui')
 
@@ -391,15 +392,6 @@ export default class MainScene extends EventEmitter {
 
     let block = e.data.block
 
-    document.getElementById('block-data-hash').innerHTML = block.hash
-    document.getElementById('block-data-time').innerHTML = block.time
-    document.getElementById('block-data-size').innerHTML = block.size
-    document.getElementById('block-data-height').innerHTML = block.height
-    document.getElementById('block-data-tx').innerHTML = block.transactions.length
-    document.getElementById('block-data-bits').innerHTML = block.bits
-    document.getElementById('block-data-fee').innerHTML = block.fee
-    document.getElementById('block-data-value').innerHTML = block.output
-
     this.removeTrees()
 
     this.treeGroup = new THREE.Group()
@@ -445,6 +437,9 @@ export default class MainScene extends EventEmitter {
 
     this.treeGroup.add(pointsMesh)
     this.treeGroup.add(mesh)
+
+    // start animation
+    this.merkleMaterial.uniforms.uAnimTime.value = 0.0
 
     this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
@@ -713,7 +708,7 @@ export default class MainScene extends EventEmitter {
       side: THREE.DoubleSide
     })
 
-    this.merkleMaterial = new THREE.MeshStandardMaterial({
+    this.merkleMaterial = new MerkleMaterial({
       color: 0xffffff,
       emissive: 0x444444,
       flatShading: true,
@@ -729,12 +724,13 @@ export default class MainScene extends EventEmitter {
 
     // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
-      size: 50.0,
+      size: 40.0,
       alphaTest: 0.0001,
       transparent: true,
       blending: THREE.AdditiveBlending,
-      opacity: 0.1,
+      opacity: 1.0,
       depthTest: false,
+      // depthWrite: false,
       vertexColors: THREE.VertexColors
     })
   }
@@ -859,16 +855,16 @@ export default class MainScene extends EventEmitter {
     }
 
     if (this.state.view === 'block') {
-      return
+    //  return
     }
 
     event.preventDefault()
 
     if (Math.abs(event.wheelDeltaY) > 0) {
-      this.scrollBlocked = true
-      setTimeout(() => {
+      // this.scrollBlocked = true
+      /* setTimeout(() => {
         this.scrollBlocked = false
-      }, 50)
+      }, 50) */
     }
 
     if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {
@@ -948,11 +944,18 @@ export default class MainScene extends EventEmitter {
     this.animateTree()
     this.animateBlockOpacity()
 
-    this.pointsMaterial.uniforms.uTime.value = this.clock.getElapsedTime()
+    let uTime = this.clock.getElapsedTime()
+
+    this.pointsMaterial.uniforms.uTime.value = uTime
 
     // pass camera position to shader
     if (this.blockMaterialBack) {
       this.blockMaterialBack.uniforms.worldSpaceCameraPos.value = this.stage.camera.position
+    }
+
+    if (this.merkleMaterial) {
+      this.merkleMaterial.uniforms.uAnimTime.value += 0.01
+      this.merkleMaterial.uniforms.uTime.value = uTime
     }
   }
 }
