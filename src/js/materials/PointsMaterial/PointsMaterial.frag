@@ -1,6 +1,9 @@
 uniform vec3 diffuse;
 uniform float opacity;
 uniform float uTime;
+uniform sampler2D uColor;
+
+varying float display;
 
 #include <common>
 #include <packing>
@@ -44,9 +47,8 @@ void main() {
 
 	color *= sin((dist * 100.0) - (uTime * 30.0));
 
-	color *= outgoingLight;
+	color *= display;
 
-	//gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 	gl_FragColor = vec4( color, 1.0 );
 
 	#include <premultiplied_alpha_fragment>

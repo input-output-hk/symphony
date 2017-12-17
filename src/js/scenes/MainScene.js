@@ -82,22 +82,7 @@ export default class MainScene extends EventEmitter {
   }
 
   initReflection () {
-    let CubeCamera = function (position) {
-      let camera = new THREE.CubeCamera(100.0, 5000, 2048)
-      camera.position.set(position.x, position.y, position.z)
-      camera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
-      this.camera = camera
-      this.textureCube = camera.renderTarget.texture
 
-      this.update = function (renderer, scene) {
-        camera.update(renderer, scene)
-      }
-
-      this.updatePosition = function (position) {
-        camera.position.set(position.x, position.y, position.z)
-      }
-    }
-    this.cubeCamera = new CubeCamera(new THREE.Vector3(0.0, 0.0, 0.0))
   }
 
   initGui () {
@@ -247,7 +232,10 @@ export default class MainScene extends EventEmitter {
 
       this.state.dayData[dayIndex] = {
         blocks: blocks,
-        timeStamp: timeStamp
+        timeStamp: timeStamp,
+        blockMaterial: this.blockMaterialFront.clone(), // each day has it's own material
+        merkleMaterial: this.merkleMaterial.clone(),
+        visibleCount: 0
       }
 
       let group = new THREE.Group()
@@ -273,7 +261,7 @@ export default class MainScene extends EventEmitter {
         size.z += 1.0
 
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
-        let blockMesh = new THREE.Mesh(this.boxGeometry, this.blockMaterialFront)
+        let blockMesh = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterial)
 
         // blockMeshBack.renderOrder = ((index * -dayIndex) + 1000000)
         blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
@@ -294,6 +282,8 @@ export default class MainScene extends EventEmitter {
         // blockMeshBack.rotation.z += Math.PI / 2
         // blockMeshBack.translateZ((index * 18))
         // blockMeshBack.blockchainData = block
+
+        block.dayIndex = dayIndex
 
         blockMesh.rotation.z = rotation
         blockMesh.translateY(800 + (index))
@@ -406,7 +396,7 @@ export default class MainScene extends EventEmitter {
     treeGeo.computeVertexNormals()
     treeGeo.computeFaceNormals()
 
-    let mesh = new THREE.Mesh(treeGeo, this.merkleMaterial)
+    let mesh = new THREE.Mesh(treeGeo, this.state.dayData[block.dayIndex].merkleMaterial)
 
     mesh.translateX(-boxCenter.x)
     mesh.translateY(-boxCenter.y)
@@ -417,18 +407,26 @@ export default class MainScene extends EventEmitter {
       renderer.clearDepth()
     }
 
-    let colors = []
-    let color = new THREE.Color(0x000000)
-    for (let index = 0; index < endPoints.length; index++) {
-      colors[ 3 * index ] = 1
-      colors[ 3 * index + 1 ] = 1
-      colors[ 3 * index + 2 ] = 1
-      colors[ index ] = color
-    }
+    let geometry = new THREE.BufferGeometry()
 
-    let geometry = new THREE.Geometry()
-    geometry.vertices = endPoints
-    geometry.colors = colors
+    let positions = new THREE.BufferAttribute(new Float32Array(endPoints.length * 3), 3, 1)
+    for (let index = 0; index < endPoints.length; index++) {
+      const pos = endPoints[index]
+      positions.setXYZ(
+        index,
+        pos.x,
+        pos.y,
+        pos.z
+      )
+    }
+    geometry.addAttribute('position', positions)
+
+    // per instance data
+    let indexes = new THREE.BufferAttribute(new Float32Array(endPoints.length), 1, 1)
+    for (let i = 0, l = indexes.count; i < l; i++) {
+      indexes.setXYZ(i, i)
+    }
+    geometry.addAttribute('id', indexes)
 
     let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
     pointsMesh.translateX(-boxCenter.x)
@@ -509,20 +507,18 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  refreshCubeMap (blockObject) {
-    if (this.cubeCamera) {
-      this.blockMaterialFront.envMap = this.bgMap
-      this.cubeCamera.updatePosition(new THREE.Vector3(0.0, 0.0, blockObject.getWorldPosition().z))
-      this.cubeCamera.update(this.stage.renderer, this.stage.scene)
+  createCubeMap (position, dayIndex) {
+    if (
+      typeof this.state.dayData[dayIndex] !== 'undefined'
+    ) {
+      this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
+      let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
+      cubeCamera.position.set(position.x, position.y, position.z)
+      cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
+      cubeCamera.update(this.stage.renderer, this.stage.scene)
 
-      this.centralBlockMaterial.envMap = this.cubeCamera.textureCube
-
-      blockObject.material = this.centralBlockMaterial
-
-      this.merkleMaterial.envMap = this.cubeCamera.textureCube
-
-      this.blockMaterialFront.envMap = this.cubeCamera.textureCube
-      this.blockMaterialFront.color.setHex(0xffffff)
+      this.state.dayData[dayIndex].blockMaterial.envMap = cubeCamera.renderTarget.texture
+      this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
     }
   }
 
@@ -736,13 +732,13 @@ export default class MainScene extends EventEmitter {
     // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
       size: 40.0,
-      alphaTest: 0.0001,
+      // alphaTest: 0.0001,
       transparent: true,
       blending: THREE.AdditiveBlending,
       opacity: 1.0,
-      depthTest: false,
+      depthTest: false
       // depthWrite: false,
-      vertexColors: THREE.VertexColors
+      // vertexColors: THREE.VertexColors
     })
   }
 
@@ -764,7 +760,7 @@ export default class MainScene extends EventEmitter {
               this.intersected &&
               this.intersected.material.uuid !== this.centralBlockMaterial.uuid
             ) {
-              this.intersected.material = this.blockMaterialFront
+              this.intersected.material = this.state.dayData[dayIndex].blockMaterial
             }
 
             this.intersected = intersects[0].object
@@ -783,7 +779,7 @@ export default class MainScene extends EventEmitter {
             this.intersected &&
             this.intersected.material.uuid !== this.centralBlockMaterial.uuid
           ) {
-            this.intersected.material = this.blockMaterialFront
+            this.intersected.material = this.state.dayData[dayIndex].blockMaterial
           }
           this.intersected = null
         }
@@ -909,7 +905,7 @@ export default class MainScene extends EventEmitter {
   focusOnBlock (blockObject) {
     blockObject.visible = true
     this.state.view = 'block'
-    this.refreshCubeMap(blockObject)
+    // this.createCubeMap(blockObject)
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.animateBlockIn(blockObject).then(() => {
         this.buildTree(blockObject)
@@ -928,15 +924,27 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  animateBlockOpacity () {
+  animateBlockVisibility () {
     for (const dayIndex in this.state.dayGroups) {
       if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
         const dayGroup = this.state.dayGroups[dayIndex]
-        for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
-          const mesh = dayGroup.children[meshIndex]
-          if (mesh.visible === false) {
-            mesh.visible = true
-            break
+        if (typeof this.state.dayData[dayIndex] !== 'undefined') {
+          if (this.state.dayData[dayIndex].visibleCount < dayGroup.children.length) {
+            for (let meshIndex = 0; meshIndex < dayGroup.children.length; meshIndex++) {
+              const mesh = dayGroup.children[meshIndex]
+              if (mesh.visible === false) {
+                mesh.visible = true
+                this.state.dayData[dayIndex].visibleCount++
+                break
+              }
+            }
+            if (this.state.dayData[dayIndex].visibleCount === dayGroup.children.length) {
+              // take a cube map of blocks once all are visible
+              this.createCubeMap(
+                dayGroup.getWorldPosition(),
+                dayIndex
+              )
+            }
           }
         }
       }
@@ -953,7 +961,7 @@ export default class MainScene extends EventEmitter {
     this.updateLights()
     this.checkMouseIntersection()
     this.animateTree()
-    this.animateBlockOpacity()
+    this.animateBlockVisibility()
 
     let uTime = this.clock.getElapsedTime()
 
@@ -967,6 +975,23 @@ export default class MainScene extends EventEmitter {
     if (this.merkleMaterial) {
       this.merkleMaterial.uniforms.uAnimTime.value += 0.01
       this.merkleMaterial.uniforms.uTime.value = uTime
+    }
+
+    if (
+      typeof this.audio.pointColors !== 'undefined' &&
+      this.audio.pointColors.length > 0
+    ) {
+      let pointColors = Uint8Array.from(this.audio.pointColors)
+
+      let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
+
+      pointColorsTexture.minFilter = THREE.NearestFilter
+      pointColorsTexture.magFilter = THREE.NearestFilter
+
+      pointColorsTexture.needsUpdate = true
+
+      this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
+      this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
     }
   }
 }

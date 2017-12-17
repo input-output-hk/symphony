@@ -58,6 +58,8 @@ export default class Audio {
       523.251: 'C4'
     }
 
+    this.pointColors = []
+
     this.modes = {
       'ionian': [
         'C',
@@ -311,6 +313,11 @@ export default class Audio {
       return a.time > b.time
     })
 
+    this.pointColors = []
+    for (let index = 0; index < positionsArray.length * 3; index++) {
+      this.pointColors.push(0)
+    }
+
     for (let index = 0; index < positionsArray.length; index++) {
       const point = positionsArray[index]
 
@@ -348,12 +355,9 @@ export default class Audio {
           loop = new Tone.Loop(
           (time) => {
             this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
-
-            pointsMesh.geometry.colors[index] = this.white
-            pointsMesh.geometry.colorsNeedUpdate = true
+            this.pointColors[index * 3] = 255
             setTimeout(() => {
-              pointsMesh.geometry.colors[index] = this.black
-              pointsMesh.geometry.colorsNeedUpdate = true
+              this.pointColors[index * 3] = 0
             }, 500)
           },
             '1m'
@@ -361,12 +365,10 @@ export default class Audio {
         } else {
           loop = new Tone.Loop(
             (time) => {
-              pointsMesh.geometry.colors[index] = this.white
-              pointsMesh.geometry.colorsNeedUpdate = true
+              this.pointColors[index * 3] = 255
               setTimeout(() => {
-                pointsMesh.geometry.colors[index] = this.black
-                pointsMesh.geometry.colorsNeedUpdate = true
-              }, 100)
+                this.pointColors[index * 3] = 0
+              }, 500)
             },
               '1m'
             ).start(Tone.Transport.seconds + (time + 0.5))

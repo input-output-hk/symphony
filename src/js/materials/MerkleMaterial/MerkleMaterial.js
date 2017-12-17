@@ -9,13 +9,13 @@ export default class MerkleMaterial extends THREE.MeshStandardMaterial {
     this.uniforms = THREE.ShaderLib.standard.uniforms
 
     this.uniforms.uTime = {
-      type: 'f',
-      value: 0.0
+      type: 'f'
+    //  value: 0.0
     }
 
     this.uniforms.uAnimTime = {
-      type: 'f',
-      value: 0.0
+      type: 'f'
+   //   value: 0.0
     }
 
     this.vertexShader = glslify('./MerkleMaterial.vert')

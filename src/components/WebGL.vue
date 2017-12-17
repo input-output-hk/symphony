@@ -58,12 +58,12 @@ export default {
       console.log(event)
     }
 
-    this.app.scene.on('blockSelected', block => {
+    /*this.app.scene.on('blockSelected', block => {
       if(!this.block){
         this.onBlockSelected(block)
       }
     })
-    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(timeStamp)))
+    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(timeStamp)))*/
     
   },
   beforeUpdate(){
