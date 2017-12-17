@@ -9,7 +9,6 @@ self.addEventListener('message', function (e) {
   let data = e.data
   switch (data.cmd) {
     case 'build':
-      console.log('building merkle trees...')
       let blocks = data.blocks
 
       let returnData = {

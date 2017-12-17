@@ -183,9 +183,10 @@ export default class MainScene extends EventEmitter {
     // prune days too far away from viewer
     for (const key in this.state.dayData) {
       if (this.state.dayData.hasOwnProperty(key)) {
-        if (Math.abs(key - this.state.closestDayIndex) > 5) {
+        if (Math.abs(key - this.state.closestDayIndex) > Config.daysEitherSide) {
           delete this.state.dayData[key]
           this.stage.scene.remove(this.state.dayGroups[key])
+          delete this.state.dayGroups[key]
         }
       }
     }
@@ -276,7 +277,7 @@ export default class MainScene extends EventEmitter {
         // blockMeshBack.translateZ(-(size.z / 2))
         blockMesh.translateZ(-(size.z / 2))
 
-        let rotation = ((25 * Math.PI) / 200) * index
+        let rotation = -(((25 * Math.PI) / 200) * index)
         // blockMeshBack.rotation.z = rotation
         // blockMeshBack.translateY(700 + (index))
         // blockMeshBack.rotation.z += Math.PI / 2
@@ -758,7 +759,8 @@ export default class MainScene extends EventEmitter {
             ) {
             if (
               this.intersected &&
-              this.intersected.material.uuid !== this.centralBlockMaterial.uuid
+              this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
+              typeof this.state.dayData[dayIndex] !== 'undefined'
             ) {
               this.intersected.material = this.state.dayData[dayIndex].blockMaterial
             }
@@ -777,7 +779,8 @@ export default class MainScene extends EventEmitter {
         } else {
           if (
             this.intersected &&
-            this.intersected.material.uuid !== this.centralBlockMaterial.uuid
+            this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
+            typeof this.state.dayData[dayIndex] !== 'undefined'
           ) {
             this.intersected.material = this.state.dayData[dayIndex].blockMaterial
           }
@@ -817,7 +820,7 @@ export default class MainScene extends EventEmitter {
       this.state.currentDay !== undefined
     ) {
       // count n either side of current day
-      for (let index = -Config.daysEitherSide; index <= Config.daysEitherSide; index++) {
+      for (let index = Config.daysEitherSide; index >= -Config.daysEitherSide; index--) {
         let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
         if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
           this.loadBlocks(day, (closestDayIndex + index))
@@ -839,7 +842,7 @@ export default class MainScene extends EventEmitter {
             typeof this.state.dayData[earliestDayIndex] !== 'undefined'
           ) {
             this.state.maxCameraZPos = this.state.dayData[latestDayIndex].zPos + this.stage.defaultCameraPos.z
-            this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos
+            this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos + 1000.0
           }
           break
         }
