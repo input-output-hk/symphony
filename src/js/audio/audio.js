@@ -283,7 +283,7 @@ export default class Audio {
 
       this.preload().then(() => {
         this.playAmbience().then(() => {
-          this.ambiencePlayer.start(0)
+          this.ambiencePlayer.start()
           Tone.Transport.start()
           resolve()
         })
@@ -292,8 +292,10 @@ export default class Audio {
   }
 
   generateMerkleSound (positionsArray, blockObjectPosition, block, pointsMaterial, pointsMesh) {
-    let noteTotal = 200
+    let noteTotal = 2000
     let noteCount = 0
+
+    this.loopMap = []
 
     this.black = new THREE.Color(0x000000)
     this.white = new THREE.Color(0xffffff)
@@ -326,10 +328,10 @@ export default class Audio {
        */
       if (typeof block.transactions[index] !== 'undefined') {
         const transaction = block.transactions[index]
-        let time = map(transaction.time, minTime, maxTime, 0, 20)
+        let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
 
-        noteCount++
-      //  if (noteCount < noteTotal) {
+        // noteCount++
+
         // get closest note
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
@@ -351,32 +353,33 @@ export default class Audio {
         let that = this
         let loop
 
-        if (noteCount < noteTotal) {
+        let timeLowRes = time.toFixed(1)
+
+        if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(
-          (time) => {
-            this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
-            this.pointColors[index * 3] = 255
-            setTimeout(() => {
-              this.pointColors[index * 3] = 0
-            }, 500)
-          },
+            () => {
+              this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+              this.pointColors[index * 3] = 255
+              setTimeout(() => {
+                this.pointColors[index * 3] = 0
+              }, 500)
+            },
             '1m'
-          ).start(Tone.Transport.seconds + (time + 0.5))
+          ).start(Tone.Transport.seconds + time)
         } else {
           loop = new Tone.Loop(
-            (time) => {
+            () => {
               this.pointColors[index * 3] = 255
               setTimeout(() => {
                 this.pointColors[index * 3] = 0
               }, 500)
             },
               '1m'
-            ).start(Tone.Transport.seconds + (time + 0.5))
+          ).start(Tone.Transport.seconds + time)
         }
-
         loop.humanize = '64n'
-
         this.loops.push(loop)
+        this.loopMap[timeLowRes] = true
       }
     }
   }

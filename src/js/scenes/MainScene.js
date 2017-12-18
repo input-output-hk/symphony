@@ -514,7 +514,7 @@ export default class MainScene extends EventEmitter {
     ) {
       this.stage.scene.background = this.bgMap
       // this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
-      let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
+      let cubeCamera = new THREE.CubeCamera(100.0, 4000, 1024)
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
@@ -735,7 +735,7 @@ export default class MainScene extends EventEmitter {
 
     // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
-      size: 40.0,
+      size: 30.0,
       // alphaTest: 0.0001,
       transparent: true,
       blending: THREE.AdditiveBlending,

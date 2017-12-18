@@ -69,7 +69,7 @@ export default class GenerateBlockGeometry {
     points.push(startPosition)
     points.push(endPosition)
 
-    endPoints.push(endPosition.clone())
+    // endPoints.push(endPosition.clone())
 
     // add some randomness based on block network health
     let rng = seedrandom(this.block.hash + node.level)
