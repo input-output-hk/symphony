@@ -817,33 +817,28 @@ export default class MainScene extends EventEmitter {
 
     if (
       this.state.loadDayRequested === false &&
-      this.state.currentDay !== undefined
+      typeof this.state.currentDay !== 'undefined'
     ) {
-      // count n either side of current day
-      for (let index = Config.daysEitherSide; index >= -Config.daysEitherSide; index--) {
-        let day = moment(this.state.currentDay.timeStamp).subtract(index, 'day').format('YYYY-MM-DD')
-        if (typeof this.state.dayData[closestDayIndex + index] === 'undefined') {
-          this.loadBlocks(day, (closestDayIndex + index))
-          let latestDayIndex = Number.MAX_SAFE_INTEGER
-          let earliestDayIndex = 0
+      for (let index = 0; index <= Config.daysEitherSide; index++) {
+        let dayLoading = false
 
-          for (const key in this.state.dayData) {
-            if (this.state.dayData.hasOwnProperty(key)) {
-              const data = this.state.dayData[key]
-              if (data.blocks.length > 0) {
-                latestDayIndex = Math.min(latestDayIndex, parseInt(key))
-                earliestDayIndex = Math.max(earliestDayIndex, parseInt(key))
-              }
-            }
+        for (let innerIndex = 0; innerIndex <= 1; innerIndex++) {
+          let signedIndex
+          if (innerIndex === 0 && index !== 0) {
+            signedIndex = index * -1
+          } else {
+            signedIndex = parseFloat(index)
           }
 
-          if (
-            typeof this.state.dayData[latestDayIndex] !== 'undefined' &&
-            typeof this.state.dayData[earliestDayIndex] !== 'undefined'
-          ) {
-            this.state.maxCameraZPos = this.state.dayData[latestDayIndex].zPos + this.stage.defaultCameraPos.z
-            this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos + 1000.0
+          if (typeof this.state.dayData[closestDayIndex + signedIndex] === 'undefined') {
+            let day = moment(this.state.currentDay.timeStamp).subtract(signedIndex, 'day').format('YYYY-MM-DD')
+            this.loadDay(day, closestDayIndex, signedIndex)
+            dayLoading = true
+            break
           }
+        }
+
+        if (dayLoading) {
           break
         }
       }
@@ -857,6 +852,30 @@ export default class MainScene extends EventEmitter {
    // this.state.audioFreqCutoff = 20000
 
     // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+  }
+
+  loadDay (day, closestDayIndex, index) {
+    this.loadBlocks(day, (closestDayIndex + index))
+    let latestDayIndex = Number.MAX_SAFE_INTEGER
+    let earliestDayIndex = 0
+
+    for (const key in this.state.dayData) {
+      if (this.state.dayData.hasOwnProperty(key)) {
+        const data = this.state.dayData[key]
+        if (data.blocks.length > 0) {
+          latestDayIndex = Math.min(latestDayIndex, parseInt(key))
+          earliestDayIndex = Math.max(earliestDayIndex, parseInt(key))
+        }
+      }
+    }
+
+    if (
+      typeof this.state.dayData[latestDayIndex] !== 'undefined' &&
+      typeof this.state.dayData[earliestDayIndex] !== 'undefined'
+    ) {
+      this.state.maxCameraZPos = this.state.dayData[latestDayIndex].zPos + this.stage.defaultCameraPos.z
+      this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos + 1000.0
+    }
   }
 
   onDocumentMouseWheel (event) {
