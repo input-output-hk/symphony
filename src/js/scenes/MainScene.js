@@ -512,7 +512,8 @@ export default class MainScene extends EventEmitter {
     if (
       typeof this.state.dayData[dayIndex] !== 'undefined'
     ) {
-      this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
+      this.stage.scene.background = this.bgMap
+      // this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
       let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
@@ -520,6 +521,8 @@ export default class MainScene extends EventEmitter {
 
       this.state.dayData[dayIndex].blockMaterial.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
+
+      this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
     }
   }
 
@@ -985,9 +988,9 @@ export default class MainScene extends EventEmitter {
     this.animateTree()
     this.animateBlockVisibility()
 
-    let uTime = this.clock.getElapsedTime()
+    this.uTime = this.clock.getElapsedTime()
 
-    this.pointsMaterial.uniforms.uTime.value = uTime
+    this.pointsMaterial.uniforms.uTime.value = this.uTime
 
     // pass camera position to shader
     if (this.blockMaterialBack) {
@@ -996,7 +999,7 @@ export default class MainScene extends EventEmitter {
 
     if (this.merkleMaterial) {
       this.merkleMaterial.uniforms.uAnimTime.value += 0.01
-      this.merkleMaterial.uniforms.uTime.value = uTime
+      this.merkleMaterial.uniforms.uTime.value = this.uTime
     }
 
     if (
