@@ -2,7 +2,7 @@ const RGBShiftShader = {
   uniforms: {
     tDiffuse: { value: null },
     amount: { value: 0.0005 },
-    angle: { value: 0.0 }
+    angle: { value: 0.1 }
   },
   vertexShader: `
     varying vec2 vUv;

@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 const glslify = require('glslify')
 
-export default class BlockMaterial extends THREE.PointsMaterial {
+export default class PointsMaterial extends THREE.PointsMaterial {
   constructor (cfg) {
     super(cfg)
     this.type = 'ShaderMaterial'
@@ -11,6 +11,14 @@ export default class BlockMaterial extends THREE.PointsMaterial {
     this.uniforms.uTime = {
       type: 'f',
       value: 0.0
+    }
+
+    this.uniforms.uColor = {
+      type: 't'
+    }
+
+    this.uniforms.pointCount = {
+      type: 'f'
     }
 
     this.vertexShader = glslify('./PointsMaterial.vert')

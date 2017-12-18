@@ -69,9 +69,7 @@ export default class GenerateBlockGeometry {
     points.push(startPosition)
     points.push(endPosition)
 
-    if (node.level === 0) {
-      endPoints.push(endPosition.clone())
-    }
+    endPoints.push(endPosition.clone())
 
     // add some randomness based on block network health
     let rng = seedrandom(this.block.hash + node.level)
@@ -82,6 +80,10 @@ export default class GenerateBlockGeometry {
     this.angle += randomness
 
     if (visualise) {
+      if (node.level === 0) {
+        endPoints.push(endPosition.clone())
+      }
+
       let path = new THREE.LineCurve3(startPosition, endPosition)
       let tubeGeo = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
 
@@ -93,6 +95,17 @@ export default class GenerateBlockGeometry {
       this.treeVertices = newPosArray */
 
       this.treeGeo.merge(tubeGeo, tubeGeo.matrix)
+    } else {
+      if (node.level === 1) {
+        endPoints.push(endPosition.clone())
+      }
+
+      // stop here if we are just rendering the bounding box
+      if (node.level === 0) {
+        return {
+          points: points
+        }
+      }
     }
 
     let i = 0

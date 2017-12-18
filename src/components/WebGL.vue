@@ -4,8 +4,12 @@
       <div class='c'>
         <h1>Project Orpheus</h1>
         <br/>
-        <h4>Orpheus is an audio visual exploration of the blockchain. Blocks are represented as crystal strucures distributed in a spiral. Each rotation of the spiral represents a day in the blockchain</h4>
-        <h4></h4>
+        <h4>
+          Orpheus is an audio-visual exploration of the blockchain. 
+          Blocks are represented as crystal structures distributed in a spiral. 
+          Each rotation of the spiral represents a day in the blockchain.
+        </h4>
+        <p>&nbsp;</p>
         <h4>... Loading ...</h4>
       </div>
     </div>
@@ -58,13 +62,15 @@ export default {
       console.log(event)
     }
 
-    this.app.scene.on('blockSelected', block => {
+    /*this.app.scene.on('blockSelected', block => {
       if(!this.block){
         this.onBlockSelected(block)
       }
     })
 
-    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(Math.min(Date.now(), timeStamp))))
+    this.app.scene.on('dayChanged', ({ timeStamp }) => this.onDayChanged(new Date(timeStamp)))*/
+    
+
   },
   beforeUpdate(){
 

@@ -43,11 +43,9 @@ export default class Stage {
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
 
-    /* this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    this.RGBShiftPass.renderToScreen = true
-    this.composer.addPass(this.RGBShiftPass) */
+    this.VignettePass = new ShaderPass(VignetteShader)
+    this.composer.addPass(this.VignettePass)
 
-  
     this.BrightnessContrastPass = new ShaderPass(BrightnessContrastShader)
     this.composer.addPass(this.BrightnessContrastPass)
 
@@ -56,15 +54,16 @@ export default class Stage {
 
 
     this.FXAAPass = new ShaderPass(FXAAShader)
-    this.FXAAPass.renderToScreen = true
+    // this.FXAAPass.renderToScreen = true
     this.composer.addPass(this.FXAAPass)
 
-    //  this.FilmShaderPass = new ShaderPass(FilmShader)
-    // this.composer.addPass(this.FilmShaderPass)
+    this.RGBShiftPass = new ShaderPass(RGBShiftShader)
+    // this.RGBShiftPass.renderToScreen = true
+    this.composer.addPass(this.RGBShiftPass)
 
-    // this.VignettePass = new ShaderPass(VignetteShader)
-    // this.VignettePass.renderToScreen = true
-    // this.composer.addPass(this.VignettePass)
+    this.FilmShaderPass = new ShaderPass(FilmShader)
+    this.FilmShaderPass.renderToScreen = true
+    this.composer.addPass(this.FilmShaderPass)
   }
 
   /**
@@ -93,7 +92,7 @@ export default class Stage {
       y: -50.0
     }
 
-    this.cameraMoveStep = 150.0 // how much to move the camera forward on z-axis
+    this.cameraMoveStep = 200.0 // how much to move the camera forward on z-axis
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
@@ -171,8 +170,8 @@ export default class Stage {
    * Add lights to the stage
    */
   addLights () {
-    /* let ambLight = new THREE.AmbientLight(0xffffff)
-    this.scene.add(ambLight) */
+    let ambLight = new THREE.AmbientLight(0xffffff)
+    this.scene.add(ambLight)
 
     this.pointLight = new THREE.PointLight(0xffffff, 0.6, 5000, 3)
     this.scene.add(this.pointLight)
