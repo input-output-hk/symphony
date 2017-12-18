@@ -106,7 +106,7 @@ export default class MainScene extends EventEmitter {
       merkleEmissive: this.merkleMaterial.emissive.getHex(),
       //
       backgroundColor: Config.scene.bgColor,
-      vignetteAmount: 1.2,
+      vignetteAmount: 1.4,
       cameraFOV: Config.camera.fov
     }
 
@@ -257,9 +257,9 @@ export default class MainScene extends EventEmitter {
         }
 
         // make box size slightly larger than the merkle tree it contains
-        size.x += 1.0
-        size.y += 1.0
-        size.z += 1.0
+        size.x += 20.0
+        size.y += 20.0
+        size.z += 20.0
 
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterial)

@@ -43,13 +43,6 @@ export default class Stage {
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
 
-    /* this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    this.RGBShiftPass.renderToScreen = true
-    this.composer.addPass(this.RGBShiftPass) */
-
-    /* this.FilmShaderPass = new ShaderPass(FilmShader)
-    this.composer.addPass(this.FilmShaderPass) */
-
     this.VignettePass = new ShaderPass(VignetteShader)
     this.composer.addPass(this.VignettePass)
 
@@ -60,8 +53,16 @@ export default class Stage {
     this.composer.addPass(this.HueSaturationPass)
 
     this.FXAAPass = new ShaderPass(FXAAShader)
-    this.FXAAPass.renderToScreen = true
+    // this.FXAAPass.renderToScreen = true
     this.composer.addPass(this.FXAAPass)
+
+    this.RGBShiftPass = new ShaderPass(RGBShiftShader)
+    // this.RGBShiftPass.renderToScreen = true
+    this.composer.addPass(this.RGBShiftPass)
+
+    this.FilmShaderPass = new ShaderPass(FilmShader)
+    this.FilmShaderPass.renderToScreen = true
+    this.composer.addPass(this.FilmShaderPass)
   }
 
   /**
