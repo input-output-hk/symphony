@@ -257,9 +257,9 @@ export default class MainScene extends EventEmitter {
         }
 
         // make box size slightly larger than the merkle tree it contains
-        size.x += 20.0
+        /* size.x += 20.0
         size.y += 20.0
-        size.z += 20.0
+        size.z += 20.0 */
 
         // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
         let blockMesh = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterial)
@@ -289,7 +289,7 @@ export default class MainScene extends EventEmitter {
         blockMesh.rotation.z = rotation
         blockMesh.translateY(800 + (index))
         blockMesh.rotation.z += Math.PI / 2
-        blockMesh.translateZ((index * 20))
+        blockMesh.translateZ((index * 30))
         blockMesh.blockchainData = block
 
         /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
@@ -338,7 +338,7 @@ export default class MainScene extends EventEmitter {
 
   initProperties () {
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
-    this.dayZOffset = -4000 // offset for each day on z-axis
+    this.dayZOffset = -5500 // offset for each day on z-axis
     this.treeGroup = null
     this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
     this.crystalOpacity = 0.5
@@ -826,11 +826,9 @@ export default class MainScene extends EventEmitter {
         let dayLoading = false
 
         for (let innerIndex = 0; innerIndex <= 1; innerIndex++) {
-          let signedIndex
-          if (innerIndex === 0 && index !== 0) {
+          let signedIndex = parseFloat(index)
+          if (innerIndex === 1 && index !== 0) {
             signedIndex = index * -1
-          } else {
-            signedIndex = parseFloat(index)
           }
 
           if (typeof this.state.dayData[closestDayIndex + signedIndex] === 'undefined') {

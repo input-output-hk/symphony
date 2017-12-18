@@ -100,8 +100,8 @@ export default class GenerateBlockGeometry {
         endPoints.push(endPosition.clone())
       }
 
-      // stop here if we are just rendering the boudning box
-      if (node.level === 1) {
+      // stop here if we are just rendering the bounding box
+      if (node.level === 0) {
         return {
           points: points
         }
