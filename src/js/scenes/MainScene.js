@@ -500,7 +500,10 @@ export default class MainScene extends EventEmitter {
 
           let intersects = this.raycaster.intersectObjects(blockGroup.children)
           if (intersects.length > 0) {
-            if (intersects[0].object === this.state.currentBlockObject) {
+            if (
+              intersects[0].object === this.state.currentBlockObject ||
+              intersects[1].object === this.state.currentBlockObject
+            ) {
               this.resetDayView()
               return
             }
@@ -945,6 +948,10 @@ export default class MainScene extends EventEmitter {
     let blockGroup = blockObject.parent
     blockGroup.visible = true
     this.state.view = 'block'
+
+    if (this.state.currentBlockObject) {
+      this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
+    }
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.animateBlockIn(blockGroup.children[0])
 
