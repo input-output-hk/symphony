@@ -685,7 +685,7 @@ export default class MainScene extends EventEmitter {
 
     this.blockMaterialFront = new BlockMaterial({
       color: 0xeeeeee,
-      emissive: 0x000000,
+      emissive: 0x980000,
       metalness: 0.9,
       roughness: 0.2,
       opacity: 0.5,
