@@ -1,7 +1,8 @@
 import * as THREE from 'three'
+import BlockMaterial from '../BlockMaterial/BlockMaterial'
 const glslify = require('glslify')
 
-export default class MerkleMaterial extends THREE.MeshStandardMaterial {
+export default class MerkleMaterial extends BlockMaterial {
   constructor (cfg) {
     super(cfg)
     this.type = 'ShaderMaterial'

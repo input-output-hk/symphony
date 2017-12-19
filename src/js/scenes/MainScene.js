@@ -127,9 +127,9 @@ export default class MainScene extends EventEmitter {
      /**
      * Gui for Material
      */
-    createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
-    createGuiForMaterial(this.blockMaterialFront, 'Block Material')
-    createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
+    // createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
+    // createGuiForMaterial(this.blockMaterialFront, 'Block Material')
+    // createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
     /*
       Light GUI
@@ -234,7 +234,8 @@ export default class MainScene extends EventEmitter {
       this.state.dayData[dayIndex] = {
         blocks: blocks,
         timeStamp: timeStamp,
-        blockMaterial: this.blockMaterialFront.clone(), // each day has it's own material
+        blockMaterialFront: this.blockMaterialFront.clone(), // each day has it's own material
+        blockMaterialBack: this.blockMaterialBack.clone(),
         merkleMaterial: this.merkleMaterial.clone(),
         visibleCount: 0
       }
@@ -261,44 +262,45 @@ export default class MainScene extends EventEmitter {
         size.y += 20.0
         size.z += 20.0 */
 
-        // let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.blockMaterialBack)
-        let blockMesh = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterial)
+        let blockMeshFront = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialFront)
+        let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialBack)
 
-        // blockMeshBack.renderOrder = ((index * -dayIndex) + 1000000)
-        blockMesh.renderOrder = ((index * -dayIndex) + 1000000)
+        blockMeshBack.renderOrder = ((index - 1 * -dayIndex) + 1000000)
+        blockMeshFront.renderOrder = ((index * -dayIndex) + 1000000)
 
-        blockMesh.visible = false
-        // blockMeshBack.visible = false
-        // blockMeshBack.scale.set(size.x, size.y, size.z)
-        // blockMeshFront.visible = false
-        blockMesh.scale.set(size.x, size.y, size.z)
+        blockMeshFront.scale.set(size.x, size.y, size.z)
+        blockMeshBack.scale.set(size.x, size.y, size.z)
 
         // align all front faces
-        // blockMeshBack.translateZ(-(size.z / 2))
-        blockMesh.translateZ(-(size.z / 2))
+        blockMeshFront.translateZ(-(size.z / 2))
+        blockMeshBack.translateZ(-(size.z / 2))
 
         let rotation = -(((25 * Math.PI) / 200) * index)
-        // blockMeshBack.rotation.z = rotation
-        // blockMeshBack.translateY(700 + (index))
-        // blockMeshBack.rotation.z += Math.PI / 2
-        // blockMeshBack.translateZ((index * 18))
-        // blockMeshBack.blockchainData = block
 
         block.dayIndex = dayIndex
 
-        blockMesh.rotation.z = rotation
-        blockMesh.translateY(800 + (index))
-        blockMesh.rotation.z += Math.PI / 2
-        blockMesh.translateZ((index * 30))
-        blockMesh.blockchainData = block
+        blockMeshFront.rotation.z = rotation
+        blockMeshFront.translateY(800 + (index))
+        blockMeshFront.rotation.z += Math.PI / 2
+        blockMeshFront.translateZ((index * 30))
+        blockMeshFront.blockchainData = block
+        blockMeshBack.rotation.z = rotation
+        blockMeshBack.translateY(800 + (index))
+        blockMeshBack.rotation.z += Math.PI / 2
+        blockMeshBack.translateZ((index * 30))
+        // lockMeshBack.blockchainData = block
 
         /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
         let wireframe = new THREE.LineSegments(edgeGeo, this.blockMaterialOutline)
         blockMesh.add(wireframe) */
 
-        group.add(blockMesh)
-        /* group.add(blockMeshBack)
-        group.add(blockMeshFront) */
+        let blockGroup = new THREE.Group()
+        blockGroup.visible = false
+
+        blockGroup.add(blockMeshBack)
+        blockGroup.add(blockMeshFront)
+
+        group.add(blockGroup)
       }
 
       let zPos = this.dayZOffset * dayIndex
@@ -461,6 +463,7 @@ export default class MainScene extends EventEmitter {
   resetDayView () {
     this.removeTrees()
 
+    this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       this.state.view = 'day'
       this.isAnimating = false
@@ -491,18 +494,23 @@ export default class MainScene extends EventEmitter {
     for (const key in this.state.dayGroups) {
       if (this.state.dayGroups.hasOwnProperty(key)) {
         const group = this.state.dayGroups[key]
-        var intersects = this.raycaster.intersectObjects(group.children)
-        if (intersects.length > 0) {
-          if (intersects[0].object === this.state.currentBlockObject) {
-            this.resetDayView()
-            break
-          }
 
-          this.removeTrees()
-          this.isAnimating = true
-          let blockObject = intersects[0].object
-          this.focusOnBlock(blockObject)
-          break
+        for (let index = 0; index < group.children.length; index++) {
+          const blockGroup = group.children[index]
+
+          let intersects = this.raycaster.intersectObjects(blockGroup.children)
+          if (intersects.length > 0) {
+            if (intersects[0].object === this.state.currentBlockObject) {
+              this.resetDayView()
+              return
+            }
+
+            this.removeTrees()
+            this.isAnimating = true
+            let blockObject = intersects[0].object
+            this.focusOnBlock(blockObject)
+            return
+          }
         }
       }
     }
@@ -513,13 +521,14 @@ export default class MainScene extends EventEmitter {
       typeof this.state.dayData[dayIndex] !== 'undefined'
     ) {
       this.stage.scene.background = this.bgMap
-      this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
+      this.state.dayData[dayIndex].blockMaterialFront.color.setHex(0xffffff)
       let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
 
-      this.state.dayData[dayIndex].blockMaterial.envMap = cubeCamera.renderTarget.texture
+      this.state.dayData[dayIndex].blockMaterialFront.envMap = cubeCamera.renderTarget.texture
+      this.state.dayData[dayIndex].blockMaterialBack.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
 
       this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
@@ -659,7 +668,7 @@ export default class MainScene extends EventEmitter {
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
-      color: 0xaaaaaa,
+      color: 0xeeeeee,
       emissive: 0x000000,
       metalness: 0.9,
       roughness: 0.2,
@@ -678,7 +687,7 @@ export default class MainScene extends EventEmitter {
       roughness: 0.2,
       opacity: 0.5,
       transparent: true,
-      side: THREE.DoubleSide,
+      side: THREE.FrontSide,
       envMap: this.bgMap,
       bumpMap,
       bumpScale: 0.03
@@ -704,9 +713,9 @@ export default class MainScene extends EventEmitter {
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
-      color: 0xcccccc,
+      color: 0xaaaaaa,
       transparent: true,
-      opacity: 0.25
+      opacity: 0.5
     })
 
     this.blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
@@ -735,6 +744,8 @@ export default class MainScene extends EventEmitter {
 
     // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
+      color: 0xfff900,
+      emissive: 0xfff900,
       size: 30.0,
       // alphaTest: 0.0001,
       transparent: true,
@@ -754,40 +765,45 @@ export default class MainScene extends EventEmitter {
     for (const dayIndex in this.state.dayGroups) {
       if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
         const group = this.state.dayGroups[dayIndex]
-        let intersects = ray.intersectObjects(group.children)
-        if (intersects.length > 0) {
-          if (
+
+        for (let index = 0; index < group.children.length; index++) {
+          const blockGroup = group.children[index]
+
+          let intersects = ray.intersectObjects(blockGroup.children)
+          if (intersects.length > 0) {
+            if (
               intersects[0].object !== this.intersected &&
               intersects[0].object !== this.state.currentBlockObject
             ) {
-            if (
+              if (
               this.intersected &&
               this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
               typeof this.state.dayData[dayIndex] !== 'undefined'
             ) {
-              this.intersected.material = this.state.dayData[dayIndex].blockMaterial
+                this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
+              }
+
+              this.intersected = intersects[0].object
+
+              if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
+                this.intersected.material = this.blockMaterialHighlight
+              }
+
+              const blockWorldPos = this.intersected.getWorldPosition()
+
+              this.pointLightTarget = blockWorldPos
             }
-
-            this.intersected = intersects[0].object
-
-            if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
-              this.intersected.material = this.blockMaterialHighlight
-            }
-
-            const blockWorldPos = this.intersected.getWorldPosition()
-
-            this.pointLightTarget = blockWorldPos
-          }
-          break
-        } else {
-          if (
+            return
+          } else {
+            if (
             this.intersected &&
             this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
             typeof this.state.dayData[dayIndex] !== 'undefined'
           ) {
-            this.intersected.material = this.state.dayData[dayIndex].blockMaterial
+              this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
+            }
+            this.intersected = null
           }
-          this.intersected = null
         }
       }
     }
@@ -926,10 +942,12 @@ export default class MainScene extends EventEmitter {
   }
 
   focusOnBlock (blockObject) {
-    blockObject.visible = true
+    let blockGroup = blockObject.parent
+    blockGroup.visible = true
     this.state.view = 'block'
-    // this.createCubeMap(blockObject)
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
+      this.animateBlockIn(blockGroup.children[0])
+
       this.animateBlockIn(blockObject).then(() => {
         this.buildTree(blockObject)
         this.isAnimating = false
@@ -942,6 +960,7 @@ export default class MainScene extends EventEmitter {
     if (this.state.view === 'block') {
       if (this.treeGroup) {
         this.state.currentBlockObject.rotation.y += 0.001
+        this.state.currentBlockObject.parent.children[0].rotation.y += 0.001
         this.treeGroup.rotation.y += 0.001
       }
     }

@@ -10,7 +10,7 @@ export default class BlockMaterial extends THREE.MeshStandardMaterial {
 
     this.uniforms.uRefractionRatio = {
       type: 'f',
-      value: 0.72
+      value: 0.8
     }
 
     this.uniforms.uFresnelBias = {

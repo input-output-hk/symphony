@@ -47,7 +47,10 @@ void main() {
 
 	color *= sin((dist * 100.0) - (uTime * 30.0));
 
+	color *= diffuseColor.rgb;
+
 	color *= display;
+
 
 	gl_FragColor = vec4( color, 1.0 );
 
