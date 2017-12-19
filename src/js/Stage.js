@@ -3,7 +3,7 @@
 // 3rd party libs
 import * as THREE from 'three'
 
-import {EffectComposer, ShaderPass, RenderPass} from './postprocessing/EffectComposer'
+import {EffectComposer, ShaderPass, RenderPass, UnrealBloomPass} from './postprocessing/EffectComposer'
 
 import FXAAShader from './shaders/FXAA'
 import HueSaturationShader from './shaders/HueSaturation'
@@ -11,6 +11,7 @@ import RGBShiftShader from './shaders/RGBShift'
 import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
+import HorizontalTiltShiftShader from './shaders/HorizontalTiltShiftShader'
 import * as fboHelper from './helpers/fboHelper'
 // import EffectComposer2 from './EffectComposer'
 
@@ -60,9 +61,13 @@ export default class Stage {
     // this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass)
 
-    this.FilmShaderPass = new ShaderPass(FilmShader)
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.3, 0.85) // 1.0, 9, 0.5, 512);
+    this.bloomPass.renderToScreen = true
+    this.composer.addPass(this.bloomPass)
+
+    /* this.FilmShaderPass = new ShaderPass(FilmShader)
     this.FilmShaderPass.renderToScreen = true
-    this.composer.addPass(this.FilmShaderPass)
+    this.composer.addPass(this.FilmShaderPass) */
   }
 
   /**
