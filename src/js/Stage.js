@@ -58,12 +58,12 @@ export default class Stage {
     this.composer.addPass(this.FXAAPass)
 
     this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    // this.RGBShiftPass.renderToScreen = true
+    this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass)
 
     this.FilmShaderPass = new ShaderPass(FilmShader)
     this.FilmShaderPass.renderToScreen = true
-    this.composer.addPass(this.FilmShaderPass)
+    // this.composer.addPass(this.FilmShaderPass)
   }
 
   /**
@@ -246,7 +246,7 @@ export default class Stage {
     document.dispatchEvent(this.preUpdate)
 
     this.updateMouse()
-    this.cameraFollowMouse()
+    // this.cameraFollowMouse()
 
     this.render()
 

@@ -18,6 +18,7 @@ import API from '../api/btc'
 
 // Custom Materials
 import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
+import BlockMaterialHighlight from '../materials/BlockMaterialHighlight/BlockMaterialHighlight'
 import PointsMaterial from '../materials/PointsMaterial/PointsMaterial'
 import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
@@ -675,11 +676,16 @@ export default class MainScene extends EventEmitter {
       metalness: 0.9,
       roughness: 0.2,
       opacity: 0.5,
-      transparent: true,
-      side: THREE.BackSide,
+      // transparent: true,
+      side: THREE.DoubleSide,
       envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03
+      envMapIntensity: 2.3,
+      // bumpMap,
+      // bumpScale: 0.03,
+      roughnessMap,
+      metalnessMap,
+      normalMap,
+      premultipliedAlpha: true
     })
 
     this.blockMaterialFront = new BlockMaterial({
@@ -691,10 +697,19 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03,
+      envMapIntensity: 2.3,
+      // bumpMap,
+      // bumpScale: 0.03,
+      roughnessMap,
+      metalnessMap,
+      normalMap,
+      premultipliedAlpha: true
       
     })
+
+    window.testB = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), this.blockMaterialBack)
+    // window.testBBack = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), this.blockMaterialBack)
+    this.stage.scene.add(window.testB)
 
     this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xb66d6d,
@@ -721,7 +736,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.25
     })
 
-    this.blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
+    this.blockMaterialHighlight = new BlockMaterialHighlight({
       color: 0xffffff,
       emissive: 0xffffff,
       metalness: 0.9,
@@ -991,6 +1006,9 @@ export default class MainScene extends EventEmitter {
   }
 
   onUpdate () {
+
+    
+
     this.state.frameCount++
     TWEEN.update()
     this.updateLights()
@@ -1028,5 +1046,17 @@ export default class MainScene extends EventEmitter {
       this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
       this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
     }
+
+    // // this.stage.camera.position.set(0, 0, 0 )
+
+    // testB.rotation.y += 0.01
+    
+    // testB.position.copy( this.stage.camera.position )
+    
+    // testB.position.z -= 5
+    // testB.position.y = Math.sin(this.state.frameCount* 0.01) * 3
+
+    // // this.stage.camera.lookAt(testB.position)
+
   }
 }
