@@ -1,3 +1,7 @@
+varying vec3 vReflect;
+varying vec3 vRefract[3];
+varying float vReflectionFactor;
+
 #define PHYSICAL
 
 uniform vec3 diffuse;
@@ -71,7 +75,19 @@ void main() {
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+
+	vec4 reflectedColor = textureCube( envMap, vec3( -vReflect.x, vReflect.yz ) );
+	vec4 refractedColor = vec4( 1.0 );
+
+	refractedColor.r = textureCube( envMap, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;
+	refractedColor.g = textureCube( envMap, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;
+	refractedColor.b = textureCube( envMap, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;
+
+	//vec4 fresnelColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );
+	vec3 finalColor = outgoingLight * refractedColor.rgb;
+
+
+	gl_FragColor = vec4( finalColor.rgb, diffuseColor.a );
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

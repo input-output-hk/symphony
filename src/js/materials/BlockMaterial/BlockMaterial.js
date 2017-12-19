@@ -8,14 +8,24 @@ export default class BlockMaterial extends THREE.MeshStandardMaterial {
 
     this.uniforms = THREE.ShaderLib.standard.uniforms
 
-    this.uniforms.worldSpaceCameraPos = {
-      type: 'v3',
-      value: new THREE.Vector3()
+    this.uniforms.uRefractionRatio = {
+      type: 'f',
+      value: 0.72
     }
 
-    this.uniforms.invProjMat = {
-      type: 'm4',
-      value: new THREE.Matrix4()
+    this.uniforms.uFresnelBias = {
+      type: 'f',
+      value: 0.1
+    }
+
+    this.uniforms.uFresnelScale = {
+      type: 'f',
+      value: 0.1
+    }
+
+    this.uniforms.uFresnelPower = {
+      type: 'f',
+      value: 20.0
     }
 
     this.vertexShader = glslify('./BlockMaterial.vert')

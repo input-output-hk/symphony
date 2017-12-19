@@ -513,8 +513,8 @@ export default class MainScene extends EventEmitter {
       typeof this.state.dayData[dayIndex] !== 'undefined'
     ) {
       this.stage.scene.background = this.bgMap
-      // this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
-      let cubeCamera = new THREE.CubeCamera(100.0, 4000, 1024)
+      this.state.dayData[dayIndex].blockMaterial.color.setHex(0xffffff)
+      let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
@@ -671,8 +671,8 @@ export default class MainScene extends EventEmitter {
       bumpScale: 0.03
     })
 
-    this.blockMaterialFront = new THREE.MeshPhysicalMaterial({
-      color: 0xaaaaaa,
+    this.blockMaterialFront = new BlockMaterial({
+      color: 0xeeeeee,
       emissive: 0x000000,
       metalness: 0.9,
       roughness: 0.2,
@@ -989,11 +989,6 @@ export default class MainScene extends EventEmitter {
     this.uTime = this.clock.getElapsedTime()
 
     this.pointsMaterial.uniforms.uTime.value = this.uTime
-
-    // pass camera position to shader
-    if (this.blockMaterialBack) {
-      this.blockMaterialBack.uniforms.worldSpaceCameraPos.value = this.stage.camera.position
-    }
 
     if (this.merkleMaterial) {
       this.merkleMaterial.uniforms.uAnimTime.value += 0.01
