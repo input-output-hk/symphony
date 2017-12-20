@@ -5,7 +5,7 @@ const Config = {
   assetPath: '/static/assets/',
   showGUI: true,
   scene: {
-    bgColor: 0x000022,
+    bgColor: 0x26263c,
     shadowsOn: false,
     fogFar: 0.00040,
     antialias: true
