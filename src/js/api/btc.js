@@ -168,12 +168,27 @@ export default class BTC {
       .then(({ docs }) => docs[0].data())
   }
 
-  getTransactionsForBlock (hash) {
+  getTransactionsForBlock (hash, tryCount = 0) {
     return new Promise((resolve, reject) => {
       this.blocks.where('hash', '==', hash).get()
         .then(({docs}) => docs[0].ref.collection('metadata').get())
         .then((transactions) => {
-          resolve(transactions.docs[0].data().transaction)
+          try {
+            resolve(transactions.docs[0].data().transaction)
+          } catch (error) {
+            console.log('Block: ' + hash + ' has no transactions in the DB!')
+            reject(error)
+          }
+        }).catch((error) => {
+          if (tryCount < 5) {
+            console.log('Couldn\'t get transactions for block, retrying...')
+            this.getTransactionsForBlock(hash, tryCount + 1).catch((error) => {
+              reject(error)
+            })
+          } else {
+            console.log('Couldn\'t get transactions for block, retry limit reached')
+            reject(error)
+          }
         })
     })
   }

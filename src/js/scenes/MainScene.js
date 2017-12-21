@@ -640,15 +640,18 @@ export default class MainScene extends EventEmitter {
     this.state.currentBlock = block
     this.removeTrees()
 
-    this.api.getTransactionsForBlock(block.hash).then((transactions) => {
-      block.transactions = transactions
-      this.treeBuilderWorker.postMessage(
-        {
-          cmd: 'build',
-          block: block
-        }
-      )
-    })
+    this.api.getTransactionsForBlock(block.hash)
+      .then((transactions) => {
+        block.transactions = transactions
+        this.treeBuilderWorker.postMessage(
+          {
+            cmd: 'build',
+            block: block
+          }
+        )
+      }).catch((error) => {
+        console.log(error)
+      })
   }
 
   setupMaterials () {
@@ -748,7 +751,6 @@ export default class MainScene extends EventEmitter {
     // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
       color: 0xfff900,
-      emissive: 0xfff900,
       size: 30.0,
       // alphaTest: 0.0001,
       transparent: true,
