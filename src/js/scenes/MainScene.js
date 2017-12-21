@@ -925,6 +925,7 @@ export default class MainScene extends EventEmitter {
 
     if (this.stage.targetCameraPos.z > this.state.maxCameraZPos) {
       this.stage.targetCameraPos.z = this.state.maxCameraZPos
+      this.stage.targetCameraLookAt.z = this.state.maxCameraZPos - 1000
       return
     }
 
