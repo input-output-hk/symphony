@@ -448,26 +448,22 @@ export default class MainScene extends EventEmitter {
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
 
-  onKeyDown (event) {
-    let isEscape = false
-    if ('key' in event) {
-      isEscape = (event.key === 'Escape' || event.key === 'Esc')
-    } else {
-      isEscape = (event.keyCode === 27)
-    }
-    if (isEscape) {
-      this.resetDayView()
-    }
-  }
-
   resetDayView () {
+    if (this.state.isAnimating) {
+      return
+    }
+
     this.removeTrees()
 
-    this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
-    this.animateBlockOut(this.state.currentBlockObject).then(() => {
+    if (this.state.currentBlockObject) {
+      this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
+      this.animateBlockOut(this.state.currentBlockObject).then(() => {
+        this.state.currentBlockObject = null
+        this.state.view = 'day'
+      })
+    } else {
       this.state.view = 'day'
-      this.isAnimating = false
-    })
+    }
   }
 
   removeTrees () {
@@ -485,7 +481,7 @@ export default class MainScene extends EventEmitter {
       return
     }
 
-    if (this.isAnimating) {
+    if (this.state.isAnimating) {
       return
     }
 
@@ -509,7 +505,7 @@ export default class MainScene extends EventEmitter {
             }
 
             this.removeTrees()
-            this.isAnimating = true
+
             let blockObject = intersects[0].object
             this.focusOnBlock(blockObject)
             return
@@ -540,6 +536,8 @@ export default class MainScene extends EventEmitter {
 
   animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
     return new Promise((resolve, reject) => {
+      this.state.isAnimating = true
+
       let moveQuaternion = new THREE.Quaternion()
       blockObject.quaternion.set(moveQuaternion)
 
@@ -550,6 +548,8 @@ export default class MainScene extends EventEmitter {
         blockPosY: fromPos.y,
         time: 0
       }
+
+      let that = this
 
       new TWEEN.Tween(tweenVars)
         .to(
@@ -570,6 +570,7 @@ export default class MainScene extends EventEmitter {
         })
         .easing(this.easing)
         .onComplete(function () {
+          that.state.isAnimating = false
           resolve()
         })
         .start()
@@ -960,7 +961,7 @@ export default class MainScene extends EventEmitter {
 
       this.animateBlockIn(blockObject).then(() => {
         this.buildTree(blockObject)
-        this.isAnimating = false
+        this.state.isAnimating = false
         this.emit('blockSelected', blockObject.blockchainData)
       })
     })
