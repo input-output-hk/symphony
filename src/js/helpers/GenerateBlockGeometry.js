@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 let seedrandom = require('seedrandom')
 
-const merkleDefaults = { hashalgo: 'md5', hashlist: true }
+//const merkleDefaults = { hashalgo: 'md5', hashlist: true }
 
 export default class GenerateBlockGeometry {
   constructor (block, visualise = false) {
@@ -36,7 +36,7 @@ export default class GenerateBlockGeometry {
     // Generate an incremental array of `n_tx` length [0, 1, 2, 3, 4, ...n_tx]
     const array = new Array(n_tx).fill(0).map((v, i) => i.toString())
 
-    let tree = merkle.fromArray({ array, ...merkleDefaults })
+    let tree = merkle.fromArray({ array })
 
     const startingPosition = new THREE.Vector3(0, 0, 0)
     const direction = new THREE.Vector3(0, 1, 0)

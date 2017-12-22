@@ -23,8 +23,11 @@ import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
 const dat = require('dat-gui')
 
-const DayBuilderWorker = require('worker-loader!../workers/dayBuilder.js')
-const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
+const work = require('webworkify')
+
+const DayBuilderWorker = work(require('../workers/dayBuilder.js'))
+const TreeBuilderWorker = work(require('../workers/treeBuilder.js'))
+
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
@@ -57,8 +60,8 @@ export default class MainScene extends EventEmitter {
 
     this.clock = new THREE.Clock()
 
-    this.dayBuilderWorker = new DayBuilderWorker()
-    this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
+    //this.dayBuilderWorker = new DayBuilderWorker()
+    DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
 
   setDate (date, focusOnBlock = false) {
@@ -202,7 +205,7 @@ export default class MainScene extends EventEmitter {
           timeStamp: timeStamp
         }
 
-        this.dayBuilderWorker.postMessage({
+        DayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
           timeStamp: day.timeStamp,
@@ -219,8 +222,6 @@ export default class MainScene extends EventEmitter {
     if (typeof e.data.sizes === 'undefined') {
       return
     }
-
-    document.getElementById('loading').style.display = 'none'
 
     try {
       let workerData = e.data
@@ -369,7 +370,7 @@ export default class MainScene extends EventEmitter {
     document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
-      this.treeBuilderWorker = new TreeBuilderWorker()
+      this.treeBuilderWorker = TreeBuilderWorker
       this.treeBuilderWorker.addEventListener('message', this.addTreeToStage.bind(this), false)
     }
   }
