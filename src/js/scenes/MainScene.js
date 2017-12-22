@@ -60,7 +60,6 @@ export default class MainScene extends EventEmitter {
 
     this.clock = new THREE.Clock()
 
-    // this.dayBuilderWorker = new DayBuilderWorker()
     DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
 
@@ -74,7 +73,7 @@ export default class MainScene extends EventEmitter {
 
     let dayIndex = currentDate.diff(inputDate, 'days')
 
-      // move camera
+    // move camera
     let newOffset = this.dayZOffset * dayIndex
     this.stage.targetCameraLookAt.z = newOffset
     this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
@@ -361,9 +360,6 @@ export default class MainScene extends EventEmitter {
     this.selectBlock = new Event('selectBlock')
 
     this.dayChangedEvent = document.createEvent('CustomEvent')
-
-    // mousewheel controls camera z position
-    document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
 
@@ -816,6 +812,10 @@ export default class MainScene extends EventEmitter {
   }
 
   onCameraMove () {
+    if (typeof this.state.dayData[0] === 'undefined') {
+      return
+    }
+
     // which day are we closest to?
     let closest = Number.MAX_VALUE
     let closestDayIndex = 0
@@ -823,7 +823,7 @@ export default class MainScene extends EventEmitter {
     for (const dayIndex in this.state.dayData) {
       if (this.state.dayData.hasOwnProperty(dayIndex)) {
         const day = this.state.dayData[dayIndex]
-        let dist = Math.abs(day.zPos - this.stage.camera.position.z)
+        let dist = Math.abs(day.zPos - (this.stage.camera.position.z) + 1000.0)
         if (dist < closest) {
           closest = dist
           closestDayIndex = parseInt(dayIndex)
@@ -831,12 +831,17 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    this.state.currentDay = this.state.dayData[closestDayIndex]
-
     // bubble up event
-    if (this.state.closestDayIndex !== closestDayIndex) {
-      this.emit('dayChanged', this.state.currentDay)
+    if (this.state.currentDay === null) {
+      this.emit('firstDayLoaded')
+      this.emit('dayChanged', this.state.dayData[closestDayIndex])
+    } else {
+      if (this.state.closestDayIndex !== closestDayIndex) {
+        this.emit('dayChanged', this.state.dayData[closestDayIndex])
+      }
     }
+
+    this.state.currentDay = this.state.dayData[closestDayIndex]
 
     this.state.closestDayIndex = closestDayIndex
 
@@ -898,44 +903,6 @@ export default class MainScene extends EventEmitter {
     ) {
       this.state.maxCameraZPos = this.state.dayData[latestDayIndex].zPos + this.stage.defaultCameraPos.z
       this.state.minCameraZPos = this.state.dayData[earliestDayIndex].zPos + 1000.0
-    }
-  }
-
-  onDocumentMouseWheel (event) {
-    if (this.scrollBlocked) {
-      return
-    }
-
-    if (this.state.view === 'block') {
-      return
-    }
-
-    event.preventDefault()
-
-    if (Math.abs(event.wheelDeltaY) > 0) {
-      this.scrollBlocked = true
-      setTimeout(() => {
-        this.scrollBlocked = false
-      }, 50)
-    }
-
-    if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {
-      this.stage.targetCameraPos.z = this.state.minCameraZPos
-      return
-    }
-
-    if (this.stage.targetCameraPos.z > this.state.maxCameraZPos) {
-      this.stage.targetCameraPos.z = this.state.maxCameraZPos
-      this.stage.targetCameraLookAt.z = this.state.maxCameraZPos - 1000
-      return
-    }
-
-    if (event.wheelDeltaY > 0) {
-      this.stage.targetCameraPos.z -= this.stage.cameraMoveStep
-      this.stage.targetCameraLookAt.z -= this.stage.cameraMoveStep
-    } else if (event.wheelDeltaY < 0) {
-      this.stage.targetCameraPos.z += this.stage.cameraMoveStep
-      this.stage.targetCameraLookAt.z += this.stage.cameraMoveStep
     }
   }
 

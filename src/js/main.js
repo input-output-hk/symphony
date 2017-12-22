@@ -1,7 +1,3 @@
-;
-'use strict'
-
 import SceneManager from './SceneManager'
 
-window.orpheusAPI = new SceneManager()
-
+window.orpheusApp = new SceneManager()

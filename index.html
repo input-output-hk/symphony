@@ -18,12 +18,29 @@
 	<script src="dist/app.js?v=1.0.1"></script>
 	<script>
 
-		var orpheusAPI = window.orpheusAPI
+		// ref to our API object
+		var orpheusApp = window.orpheusApp
+
 		
-		if (orpheusAPI.checkWebGLSupport()) {
+		// check that browser supports webgl
+		if (orpheusApp.checkWebGLSupport()) {
 			
-			orpheusAPI.init({})
-			orpheusAPI.scene.setDate('2017-12-22') // initial date required
+			orpheusApp.init({})
+			
+			var scene = orpheusApp.scene
+
+			// initial date needs to be set, could be set via current date or url for example
+			scene.setDate('2017-12-22') 
+
+			// wait till first day loaded
+			scene.on('firstDayLoaded', function(data) {
+				console.log('first day of blocks loaded')
+			})
+			
+			// get data about the current day the camera is viewing
+			scene.on('dayChanged', function(data) {
+				console.log(data)
+			})
 
 			// bind esc key to remove currently viewed block
 			document.addEventListener('keydown', event => {
@@ -34,9 +51,50 @@
 					isEscape = (event.keyCode === 27)
 				}
 				if (isEscape) {
-					orpheusAPI.scene.resetDayView()
+					scene.resetDayView()
 				}
 			}, false)
+
+			// move camera on z axis with mouse wheel
+			onDocumentMouseWheel = function (event) {
+				if (scene.scrollBlocked) {
+					return
+				}
+
+				if (scene.state.view === 'block') {
+				return
+				}
+
+				event.preventDefault()
+
+				if (Math.abs(event.wheelDeltaY) > 0) {
+					scene.scrollBlocked = true
+					setTimeout(() => {
+						scene.scrollBlocked = false
+					}, 50)
+				}
+
+				if (scene.stage.targetCameraPos.z < scene.state.minCameraZPos) {
+					scene.stage.targetCameraPos.z = scene.state.minCameraZPos
+					return
+				}
+
+				if (scene.stage.targetCameraPos.z > scene.state.maxCameraZPos) {
+					scene.stage.targetCameraPos.z = scene.state.maxCameraZPos
+					scene.stage.targetCameraLookAt.z = scene.state.maxCameraZPos - 1000
+					return
+				}
+
+				if (event.wheelDeltaY > 0) {
+					scene.stage.targetCameraPos.z -= scene.stage.cameraMoveStep
+					scene.stage.targetCameraLookAt.z -= scene.stage.cameraMoveStep
+				} else if (event.wheelDeltaY < 0) {
+					scene.stage.targetCameraPos.z += scene.stage.cameraMoveStep
+					scene.stage.targetCameraLookAt.z += scene.stage.cameraMoveStep
+				}
+			}
+
+			document.addEventListener('mousewheel', onDocumentMouseWheel, false)
 
 		} else {
 			// WebGL not available
