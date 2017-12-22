@@ -18,101 +18,30 @@
 	<script src="dist/app.js?v=1.0.1"></script>
 	<script>
 
-		/*var time
-		var carouselApi = window.carouselApi
-		var canvas = document.getElementById('carousel-canvas')
-		var tooltip = document.getElementById('carousel-tooltip')
-		var interactionPlaceholder = document.getElementById('interaction-placeholder')
-		var viewAllLink = document.getElementById('view-all-link')
-		var prevButton = document.getElementById('prev-button')
-		var nextButton = document.getElementById('next-button')
-		var tooltipInfo
-		var carousel
+		var orpheusAPI = window.orpheusAPI
+		
+		if (orpheusAPI.checkWebGLSupport()) {
+			
+			orpheusAPI.init({})
+			orpheusAPI.scene.setDate('2017-12-22') // initial date required
 
-		if (carouselApi.detect()) {
-			carousel = new carouselApi.Carousel({
-				canvas: canvas,
-				assetPath: './assets/',
-				itemDataListPath: './assets/list.json'
-			})
-			carousel.preload(function(percent) {
-				// add load progress here
-				if (percent === 1) {
-					// load complete
-					init()
+			// bind esc key to remove currently viewed block
+			document.addEventListener('keydown', event => {
+				var isEscape = false
+				if ('key' in event) {
+					isEscape = (event.key === 'Escape' || event.key === 'Esc')
+				} else {
+					isEscape = (event.keyCode === 27)
 				}
-			})
+				if (isEscape) {
+					orpheusAPI.scene.resetDayView()
+				}
+			}, false)
+
 		} else {
 			// WebGL not available
 		}
 
-		interactionPlaceholder.addEventListener('click', function() {
-			this.classList.toggle('hide')
-			viewAllLink.classList.toggle('hide')
-			prevButton.classList.toggle('hide')
-			nextButton.classList.toggle('hide')
-		});
-
-		function init() {
-
-			document.querySelector('.container').classList.toggle('hide')
-			document.querySelector('.canvas-container').classList.toggle('is-visible')
-
-			carousel.init()
-
-			// interactions
-			let touchEvent = new Hammer(canvas)
-			touchEvent.on('swiperight', function(e) {
-				carousel.navigate(1)
-			})
-			touchEvent.on('swipeleft', function(e) {
-				carousel.navigate(-1)
-			})
-			prevButton.addEventListener('click', function() {
-				carousel.navigate(1)
-			})
-			nextButton.addEventListener('click', function() {
-				carousel.navigate(-1)
-			})
-
-			tooltip.addEventListener('click', function() {
-				alert(tooltipInfo.index) // index including the logo
-			})
-			tooltip.style.display = 'block'
-
-			window.addEventListener('resize', resize)
-			resize()
-
-			animate()
-		}
-
-		function resize() {
-			var width = window.innerWidth
-			var height = window.innerHeight
-			carousel.resize(width, height)
-		}
-
-		function animate() {
-			var lastTime = time || Date.now() / 1000
-			time = Date.now() / 1000
-			render(time - lastTime)
-			window.requestAnimationFrame(animate)
-		}
-
-		function render(dt) {
-			if (carousel.loaded) {
-				carousel.render(dt)
-				// right now the canvas container is using overflow hidden. If it is not the case,
-				// you will need to test the bound box of the canvas and ensure the tooltip wont
-				// go outside the canvas area
-				tooltipInfo = carousel.getTooltipInfo()
-
-				tooltip.style.display = (tooltipInfo.itemData.id == 'logo') ? 'none' : 'block'
-
-				tooltip.style.transform = 'translate3d(' + tooltipInfo.x + 'px,' + tooltipInfo.y + 'px,0)'
-				tooltip.style.opacity = 1 - Math.abs(tooltipInfo.offsetRatio)
-			}
-		}*/
 	</script>
 </body>
 

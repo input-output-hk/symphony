@@ -16,28 +16,13 @@ import MainScene from './scenes/MainScene'
  * Handles building the scene
  */
 export default class SceneManager {
-  constructor ({
-      params = {}
-    } = {}
-  ) {
-    this.init(params)
-  }
+  constructor () { }
 
   checkWebGLSupport () {
-    this.webGLSupport = false
-
-    if (window.WebGLRenderingContext) {
-      this.webGLSupport = true
-    }
+    return window.WebGLRenderingContext
   }
 
-  init (params) {
-    this.checkWebGLSupport()
-
-    if (!this.webGLSupport) {
-      this.webGLNotSupported()
-    }
-
+  init (params = {}) {
     this.stage = new Stage()
     params.stage = this.stage
 

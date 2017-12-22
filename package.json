@@ -41,6 +41,7 @@
     "browserify": "^14.4.0",
     "budo": "^10.0.4",
     "glslify": "^6.1.0",
+    "standard": "^10.0.3",
     "uglify-js": "^3.0.24"
   }
 }
