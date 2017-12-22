@@ -8,7 +8,45 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab|Inconsolata|Copse|Scope+One">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-	<link rel="stylesheet" href="css/main.css">
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+		}
+
+		html {
+			width: 100%;
+			height: 100vh;
+			background: #000000;
+		}
+
+		body {
+			margin: 0;
+			padding: 0;
+			font-size: 14px;
+			font-family: Inconsolata;
+			color: #b6bcbe;
+			line-height: 1.3rem;
+		}
+
+		hr {
+			display: block;
+			height: 1px;
+			border: 0;
+			border-top: 1px solid #b6bcbe;
+			margin: 1em 0;
+			padding: 0;
+		}
+
+		a {
+			color: #cccccc;
+		}
+
+		canvas {
+			width: 100%!important;
+			height: 100%!important;
+		}
+	</style>
 </head>
 
 <body>
@@ -32,7 +70,7 @@
 			// initial date needs to be set, could be set via current date or url for example
 			scene.setDate('2017-12-22') 
 
-			// wait till first day loaded
+			// wait until first day loaded
 			scene.on('firstDayLoaded', function(data) {
 				console.log('first day of blocks loaded')
 			})
@@ -62,7 +100,7 @@
 				}
 
 				if (scene.state.view === 'block') {
-				return
+					return
 				}
 
 				event.preventDefault()
