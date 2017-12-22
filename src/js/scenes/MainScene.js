@@ -60,7 +60,7 @@ export default class MainScene extends EventEmitter {
 
     this.clock = new THREE.Clock()
 
-    //this.dayBuilderWorker = new DayBuilderWorker()
+    // this.dayBuilderWorker = new DayBuilderWorker()
     DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
 
@@ -666,13 +666,13 @@ export default class MainScene extends EventEmitter {
       'nz.png'
     ]
 
-    let map = new THREE.TextureLoader().load('/static/assets/textures/Marble068_COL_1K.jpg')
-    let metalnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_REFL_1K.jpg')
-    let roughnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let glossMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_NRM_1K.jpg')
-    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
-    this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
+    let map = new THREE.TextureLoader().load('static/assets/textures/Marble068_COL_1K.jpg')
+    let metalnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_REFL_1K.jpg')
+    let roughnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let glossMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_NRM_1K.jpg')
+    let bumpMap = new THREE.TextureLoader().load('static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
+    this.bgMap = new THREE.CubeTextureLoader().setPath('static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
@@ -750,7 +750,6 @@ export default class MainScene extends EventEmitter {
       envMap: this.bgMap
     })
 
-    // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
       color: 0xfff900,
       size: 30.0,
