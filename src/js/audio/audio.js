@@ -176,7 +176,7 @@ export default class Audio {
       let loadCount = 0
       let self = this
       resolve()
-      _.forIn(this.notes, (note, key) => {
+      /* _.forIn(this.notes, (note, key) => {
         this.audioLoader.load(
           // resource URL
           Config.assetPath + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3',
@@ -188,12 +188,13 @@ export default class Audio {
             }
           }
         )
-      })
+      }) */
     })
   }
 
   preloadAmbience () {
     return new Promise((resolve, reject) => {
+      resolve()
       this.audioLoader.load(
         this.ambiencePath,
         function (audioBuffer) {
