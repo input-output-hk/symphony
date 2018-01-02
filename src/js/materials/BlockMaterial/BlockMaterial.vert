@@ -64,12 +64,12 @@ void main() {
 	vec3 I = worldPosition.xyz - cameraPosition;
 
 	//vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
-	vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
+	//vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
 
-	vRefract[0] = refract( normalize( I ), worldNormal, uRefractionRatio );
-	vRefract[1] = refract( normalize( I ), worldNormal, uRefractionRatio * 0.99 );
-	vRefract[2] = refract( normalize( I ), worldNormal, uRefractionRatio * 0.98 );
+	//vRefract[0] = refract( normalize( I ), worldNormal, uRefractionRatio );
+	//vRefract[1] = refract( normalize( I ), worldNormal, uRefractionRatio * 0.99 );
+	//vRefract[2] = refract( normalize( I ), worldNormal, uRefractionRatio * 0.98 );
 
-	vReflectionFactor = uFresnelBias + uFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), uFresnelPower );
+	//vReflectionFactor = uFresnelBias + uFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), uFresnelPower );
 
 }

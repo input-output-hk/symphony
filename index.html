@@ -56,19 +56,20 @@
 	<script src="dist/app.js?v=1.0.1"></script>
 	<script>
 
-		// ref to our API object
+		// ref to our application object
 		var orpheusApp = window.orpheusApp
-
 		
 		// check that browser supports webgl
 		if (orpheusApp.checkWebGLSupport()) {
 			
+			// init
 			orpheusApp.init({})
 			
+			// get ref to appliction scene
 			var scene = orpheusApp.scene
 
 			// initial date needs to be set, could be set via current date or url for example
-			scene.setDate('2017-12-22') 
+			scene.setDate('2018-01-01') 
 
 			// wait until first day loaded
 			scene.on('firstDayLoaded', function(data) {
@@ -79,6 +80,8 @@
 			scene.on('dayChanged', function(data) {
 				console.log(data)
 			})
+
+			// data about the scene can be accessed via: scene.state
 
 			// bind esc key to remove currently viewed block
 			document.addEventListener('keydown', event => {

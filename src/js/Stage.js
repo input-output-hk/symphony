@@ -61,7 +61,7 @@ export default class Stage {
     // this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass)
 
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.3, 0.85) // 1.0, 9, 0.5, 512);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.3, 0.9) // 1.0, 9, 0.5, 512);
     this.bloomPass.renderToScreen = true
     this.composer.addPass(this.bloomPass)
 

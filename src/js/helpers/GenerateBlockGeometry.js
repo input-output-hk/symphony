@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 let seedrandom = require('seedrandom')
 
-//const merkleDefaults = { hashalgo: 'md5', hashlist: true }
+// const merkleDefaults = { hashalgo: 'md5', hashlist: true }
 
 export default class GenerateBlockGeometry {
   constructor (block, visualise = false) {
