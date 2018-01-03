@@ -1,17 +1,147 @@
 <!DOCTYPE html>
-<html>
-  <head>
-      <meta charset="utf-8">
-      <title>Orpheus</title>
-      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<html lang="en">
 
-      <link href="//fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+<head>
+	<title>IOHK Implementation Example</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab|Inconsolata|Copse|Scope+One">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+		}
 
-  </head>
-  <body>
-    <div id="app">
-      <router-view></router-view>
-    </div>
-  </body>
+		html {
+			width: 100%;
+			height: 100vh;
+			background: #000000;
+		}
+
+		body {
+			margin: 0;
+			padding: 0;
+			font-size: 14px;
+			font-family: Inconsolata;
+			color: #b6bcbe;
+			line-height: 1.3rem;
+		}
+
+		hr {
+			display: block;
+			height: 1px;
+			border: 0;
+			border-top: 1px solid #b6bcbe;
+			margin: 1em 0;
+			padding: 0;
+		}
+
+		a {
+			color: #cccccc;
+		}
+
+		canvas {
+			width: 100%!important;
+			height: 100%!important;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="canvas-container">
+		<canvas id="stage"></canvas>
+	</div>
+	<script src="dist/app.js?v=1.0.1"></script>
+	<script>
+
+		// ref to our application object
+		var orpheusApp = window.orpheusApp
+		
+		// check that browser supports webgl
+		if (orpheusApp.checkWebGLSupport()) {
+			
+			// init
+			orpheusApp.init({})
+			
+			// get ref to appliction scene
+			var scene = orpheusApp.scene
+
+			// initial date needs to be set, could be set via current date or url for example
+			scene.setDate('2018-01-01') 
+
+			// wait until first day loaded
+			scene.on('firstDayLoaded', function(data) {
+				console.log('first day of blocks loaded')
+			})
+			
+			// get data about the current day the camera is viewing
+			scene.on('dayChanged', function(data) {
+				console.log(data)
+			})
+
+			// data about the scene can be accessed via: scene.state
+
+			// bind esc key to remove currently viewed block
+			document.addEventListener('keydown', event => {
+				var isEscape = false
+				if ('key' in event) {
+					isEscape = (event.key === 'Escape' || event.key === 'Esc')
+				} else {
+					isEscape = (event.keyCode === 27)
+				}
+				if (isEscape) {
+					scene.resetDayView()
+				}
+			}, false)
+
+			// move camera on z axis with mouse wheel
+			onDocumentMouseWheel = function (event) {
+				if (scene.scrollBlocked) {
+					return
+				}
+
+				if (scene.state.view === 'block') {
+					return
+				}
+
+				event.preventDefault()
+
+				if (Math.abs(event.wheelDeltaY) > 0) {
+					scene.scrollBlocked = true
+					setTimeout(() => {
+						scene.scrollBlocked = false
+					}, 50)
+				}
+
+				if (scene.stage.targetCameraPos.z < scene.state.minCameraZPos) {
+					scene.stage.targetCameraPos.z = scene.state.minCameraZPos
+					return
+				}
+
+				if (scene.stage.targetCameraPos.z > scene.state.maxCameraZPos) {
+					scene.stage.targetCameraPos.z = scene.state.maxCameraZPos
+					scene.stage.targetCameraLookAt.z = scene.state.maxCameraZPos - 1000
+					return
+				}
+
+				if (event.wheelDeltaY > 0) {
+					scene.stage.targetCameraPos.z -= scene.stage.cameraMoveStep
+					scene.stage.targetCameraLookAt.z -= scene.stage.cameraMoveStep
+				} else if (event.wheelDeltaY < 0) {
+					scene.stage.targetCameraPos.z += scene.stage.cameraMoveStep
+					scene.stage.targetCameraLookAt.z += scene.stage.cameraMoveStep
+				}
+			}
+
+			document.addEventListener('mousewheel', onDocumentMouseWheel, false)
+
+		} else {
+			// WebGL not available
+		}
+
+	</script>
+</body>
+
 </html>

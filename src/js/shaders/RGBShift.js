@@ -1,7 +1,7 @@
 const RGBShiftShader = {
   uniforms: {
     tDiffuse: { value: null },
-    amount: { value: 0.0005 },
+    amount: { value: 0.00065 },
     angle: { value: 0.1 }
   },
   vertexShader: `

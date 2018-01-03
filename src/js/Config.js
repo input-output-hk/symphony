@@ -2,7 +2,7 @@
 
 const Config = {
   daysEitherSide: 4,
-  assetPath: '/static/assets/',
+  assetPath: 'static/assets/',
   showGUI: true,
   scene: {
     bgColor: 0x26263c,

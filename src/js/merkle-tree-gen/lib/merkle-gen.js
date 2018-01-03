@@ -38,7 +38,7 @@
     for (i = 0; i < nl; i++) {
       nextval = fastMap.get(i)
 
-            // Add the leaves to the 'tree' object
+      // Add the leaves to the 'tree' object
       tree[nextval] = {
         'type': 'leaf',
         'level': currentlevel,

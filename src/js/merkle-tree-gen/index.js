@@ -25,19 +25,11 @@
     } else {
       array = args.array
 
-      if (!args.hashalgo) {
-        hashalgo = 'sha256'    // Set the default hash as SHA-256
-      } else {
-        hashalgo = args.hashalgo
-      }
+      hashalgo = 'md5'
 
-      if (!args.hashlist) {
-        hashlist = false       // Assume the elements aren't hashes
-      } else {
-        hashlist = args.hashlist
-      }
+      hashlist = true
 
-            // Import dependencies
+      // Import dependencies
       var HashArray = require('./lib/hash-array')
       var genMerkle = require('./lib/merkle-gen')
 
@@ -45,9 +37,9 @@
 
       const fastMap = arrayHasher.hashElements(array)//, function (fastMap) {
 
-                // Generate a Merkle Tree from the leaves
+      // Generate a Merkle Tree from the leaves
       const tree = genMerkle(fastMap, hashalgo)//, function (tree) {
-                    // cb(null, tree);
+        
       let sortedTree
       for (var key in tree) {
         if (tree.hasOwnProperty(key)) {

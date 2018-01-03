@@ -23,8 +23,11 @@ import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
 const dat = require('dat-gui')
 
-const DayBuilderWorker = require('worker-loader!../workers/dayBuilder.js')
-const TreeBuilderWorker = require('worker-loader!../workers/treeBuilder.js')
+const work = require('webworkify')
+
+const DayBuilderWorker = work(require('../workers/dayBuilder.js'))
+const TreeBuilderWorker = work(require('../workers/treeBuilder.js'))
+
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
@@ -57,8 +60,7 @@ export default class MainScene extends EventEmitter {
 
     this.clock = new THREE.Clock()
 
-    this.dayBuilderWorker = new DayBuilderWorker()
-    this.dayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
+    DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
 
   setDate (date, focusOnBlock = false) {
@@ -71,7 +73,7 @@ export default class MainScene extends EventEmitter {
 
     let dayIndex = currentDate.diff(inputDate, 'days')
 
-      // move camera
+    // move camera
     let newOffset = this.dayZOffset * dayIndex
     this.stage.targetCameraLookAt.z = newOffset
     this.stage.targetCameraPos.z = newOffset + this.stage.defaultCameraPos.z
@@ -202,7 +204,7 @@ export default class MainScene extends EventEmitter {
           timeStamp: timeStamp
         }
 
-        this.dayBuilderWorker.postMessage({
+        DayBuilderWorker.postMessage({
           cmd: 'build',
           blocks: day.blocks,
           timeStamp: day.timeStamp,
@@ -219,8 +221,6 @@ export default class MainScene extends EventEmitter {
     if (typeof e.data.sizes === 'undefined') {
       return
     }
-
-    document.getElementById('loading').style.display = 'none'
 
     try {
       let workerData = e.data
@@ -361,15 +361,12 @@ export default class MainScene extends EventEmitter {
 
     this.dayChangedEvent = document.createEvent('CustomEvent')
 
-    // mousewheel controls camera z position
-    document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
-
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
 
     document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
-      this.treeBuilderWorker = new TreeBuilderWorker()
+      this.treeBuilderWorker = TreeBuilderWorker
       this.treeBuilderWorker.addEventListener('message', this.addTreeToStage.bind(this), false)
     }
   }
@@ -448,26 +445,22 @@ export default class MainScene extends EventEmitter {
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
 
-  onKeyDown (event) {
-    let isEscape = false
-    if ('key' in event) {
-      isEscape = (event.key === 'Escape' || event.key === 'Esc')
-    } else {
-      isEscape = (event.keyCode === 27)
-    }
-    if (isEscape) {
-      this.resetDayView()
-    }
-  }
-
   resetDayView () {
+    if (this.state.isAnimating) {
+      return
+    }
+
     this.removeTrees()
 
-    this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
-    this.animateBlockOut(this.state.currentBlockObject).then(() => {
+    if (this.state.currentBlockObject) {
+      this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
+      this.animateBlockOut(this.state.currentBlockObject).then(() => {
+        this.state.currentBlockObject = null
+        this.state.view = 'day'
+      })
+    } else {
       this.state.view = 'day'
-      this.isAnimating = false
-    })
+    }
   }
 
   removeTrees () {
@@ -485,7 +478,7 @@ export default class MainScene extends EventEmitter {
       return
     }
 
-    if (this.isAnimating) {
+    if (this.state.isAnimating) {
       return
     }
 
@@ -509,7 +502,7 @@ export default class MainScene extends EventEmitter {
             }
 
             this.removeTrees()
-            this.isAnimating = true
+
             let blockObject = intersects[0].object
             this.focusOnBlock(blockObject)
             return
@@ -540,6 +533,8 @@ export default class MainScene extends EventEmitter {
 
   animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
     return new Promise((resolve, reject) => {
+      this.state.isAnimating = true
+
       let moveQuaternion = new THREE.Quaternion()
       blockObject.quaternion.set(moveQuaternion)
 
@@ -550,6 +545,8 @@ export default class MainScene extends EventEmitter {
         blockPosY: fromPos.y,
         time: 0
       }
+
+      let that = this
 
       new TWEEN.Tween(tweenVars)
         .to(
@@ -570,6 +567,7 @@ export default class MainScene extends EventEmitter {
         })
         .easing(this.easing)
         .onComplete(function () {
+          that.state.isAnimating = false
           resolve()
         })
         .start()
@@ -640,15 +638,18 @@ export default class MainScene extends EventEmitter {
     this.state.currentBlock = block
     this.removeTrees()
 
-    this.api.getTransactionsForBlock(block.hash).then((transactions) => {
-      block.transactions = transactions
-      this.treeBuilderWorker.postMessage(
-        {
-          cmd: 'build',
-          block: block
-        }
-      )
-    })
+    this.api.getTransactionsForBlock(block.hash)
+      .then((transactions) => {
+        block.transactions = transactions
+        this.treeBuilderWorker.postMessage(
+          {
+            cmd: 'build',
+            block: block
+          }
+        )
+      }).catch((error) => {
+        console.log(error)
+      })
   }
 
   setupMaterials () {
@@ -661,13 +662,13 @@ export default class MainScene extends EventEmitter {
       'nz.png'
     ]
 
-    let map = new THREE.TextureLoader().load('/static/assets/textures/Marble068_COL_1K.jpg')
-    let metalnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_REFL_1K.jpg')
-    let roughnessMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let glossMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load('/static/assets/textures/Marble068_NRM_1K.jpg')
-    let bumpMap = new THREE.TextureLoader().load('/static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
-    this.bgMap = new THREE.CubeTextureLoader().setPath('/static/assets/textures/').load(this.cubeMapUrls)
+    let map = new THREE.TextureLoader().load('static/assets/textures/Marble068_COL_1K.jpg')
+    let metalnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_REFL_1K.jpg')
+    let roughnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let glossMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_NRM_1K.jpg')
+    let bumpMap = new THREE.TextureLoader().load('static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
+    this.bgMap = new THREE.CubeTextureLoader().setPath('static/assets/textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
@@ -685,7 +686,7 @@ export default class MainScene extends EventEmitter {
 
     this.blockMaterialFront = new BlockMaterial({
       color: 0xeeeeee,
-      emissive: 0x980000,
+      emissive: 0x330000,
       metalness: 0.9,
       roughness: 0.2,
       opacity: 0.5,
@@ -745,10 +746,8 @@ export default class MainScene extends EventEmitter {
       envMap: this.bgMap
     })
 
-    // this.sprite = new THREE.TextureLoader().load(Config.assetPath + 'textures/concentric2.png')
     this.pointsMaterial = new PointsMaterial({
       color: 0xfff900,
-      emissive: 0xfff900,
       size: 30.0,
       // alphaTest: 0.0001,
       transparent: true,
@@ -813,6 +812,10 @@ export default class MainScene extends EventEmitter {
   }
 
   onCameraMove () {
+    if (typeof this.state.dayData[0] === 'undefined') {
+      return
+    }
+
     // which day are we closest to?
     let closest = Number.MAX_VALUE
     let closestDayIndex = 0
@@ -820,7 +823,7 @@ export default class MainScene extends EventEmitter {
     for (const dayIndex in this.state.dayData) {
       if (this.state.dayData.hasOwnProperty(dayIndex)) {
         const day = this.state.dayData[dayIndex]
-        let dist = Math.abs(day.zPos - this.stage.camera.position.z)
+        let dist = Math.abs(day.zPos - (this.stage.camera.position.z) + 1000.0)
         if (dist < closest) {
           closest = dist
           closestDayIndex = parseInt(dayIndex)
@@ -828,12 +831,17 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    this.state.currentDay = this.state.dayData[closestDayIndex]
-
     // bubble up event
-    if (this.state.closestDayIndex !== closestDayIndex) {
-      this.emit('dayChanged', this.state.currentDay)
+    if (this.state.currentDay === null) {
+      this.emit('firstDayLoaded')
+      this.emit('dayChanged', this.state.dayData[closestDayIndex])
+    } else {
+      if (this.state.closestDayIndex !== closestDayIndex) {
+        this.emit('dayChanged', this.state.dayData[closestDayIndex])
+      }
     }
+
+    this.state.currentDay = this.state.dayData[closestDayIndex]
 
     this.state.closestDayIndex = closestDayIndex
 
@@ -898,43 +906,6 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  onDocumentMouseWheel (event) {
-    if (this.scrollBlocked) {
-      return
-    }
-
-    if (this.state.view === 'block') {
-      return
-    }
-
-    event.preventDefault()
-
-    if (Math.abs(event.wheelDeltaY) > 0) {
-      this.scrollBlocked = true
-      setTimeout(() => {
-        this.scrollBlocked = false
-      }, 50)
-    }
-
-    if (this.stage.targetCameraPos.z < this.state.minCameraZPos) {
-      this.stage.targetCameraPos.z = this.state.minCameraZPos
-      return
-    }
-
-    if (this.stage.targetCameraPos.z > this.state.maxCameraZPos) {
-      this.stage.targetCameraPos.z = this.state.maxCameraZPos
-      return
-    }
-
-    if (event.wheelDeltaY > 0) {
-      this.stage.targetCameraPos.z -= this.stage.cameraMoveStep
-      this.stage.targetCameraLookAt.z -= this.stage.cameraMoveStep
-    } else if (event.wheelDeltaY < 0) {
-      this.stage.targetCameraPos.z += this.stage.cameraMoveStep
-      this.stage.targetCameraLookAt.z += this.stage.cameraMoveStep
-    }
-  }
-
   loadBlock (hash = null) {
     this.api.getBlock(hash).then((block) => {
       let blockDay = moment(block.time * 1000).format('YYYY-MM-DD')
@@ -957,7 +928,7 @@ export default class MainScene extends EventEmitter {
 
       this.animateBlockIn(blockObject).then(() => {
         this.buildTree(blockObject)
-        this.isAnimating = false
+        this.state.isAnimating = false
         this.emit('blockSelected', blockObject.blockchainData)
       })
     })
