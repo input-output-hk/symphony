@@ -31,10 +31,7 @@ const TreeBuilderWorker = work(require('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
-  constructor ({
-      params = {}
-    } = {}
-  ) {
+  constructor (params = {}) {
     super()
     this.params = params
 
@@ -62,6 +59,9 @@ export default class MainScene extends EventEmitter {
 
     DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
+
+  start(){ console.warn("'start' method yet to be implemented") }
+  destroy(){ console.warn("'destroy' method yet to be implemented") }
 
   setDate (date, focusOnBlock = false) {
     if (this.state.currentDate === null) {
