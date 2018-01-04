@@ -5,9 +5,9 @@
 	<title>IOHK Implementation Example</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab|Inconsolata|Copse|Scope+One">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"> -->
 	<style>
 		* {
 			padding: 0;
@@ -42,6 +42,11 @@
 			color: #cccccc;
 		}
 
+		.hud{
+			position: absolute;
+			padding: 20px;	
+		}
+
 		canvas {
 			width: 100%!important;
 			height: 100%!important;
@@ -50,6 +55,18 @@
 </head>
 
 <body>
+	<div class='hud'>
+		<div id='bits'></div>
+		<div id='fee'></div>
+		<div id='feeToInputRatio'></div>
+		<div id='hash'></div>
+		<div id='height'></div>
+		<div id='input'></div>
+		<div id='n_tx'></div>
+		<div id='output'></div>
+		<div id='size'></div>
+		<div id='time'></div>
+	</div>
 	<div class="canvas-container">
 		<canvas id="stage"></canvas>
 	</div>
@@ -78,7 +95,15 @@
 			
 			// get data about the current day the camera is viewing
 			scene.on('dayChanged', function(data) {
-				console.log(data)
+				console.log('DAY CHANGED', data)
+			})
+
+			scene.on('blockSelected', block => {
+				const arr = Object.keys(block)
+				arr.forEach(k => {
+					let node = document.querySelector('#'+k)
+					if( node ) node.innerHTML = `${k} : ${block[k].toLocaleString('USD')}`
+				})
 			})
 
 			// data about the scene can be accessed via: scene.state
