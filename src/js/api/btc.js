@@ -52,20 +52,11 @@ export default class BTC {
    * Get hash rate to nearest day
    */
   getHashRateforDay (startTimestamp) {
-    return new Promise((resolve, reject) => {
-      axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp}&cors=true`)
+    axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp}&cors=true`)
       .then((data) => {
         let hashRates = this.formatTimeSeries(data)
-        if (typeof hashRates.values[0] !== 'undefined') {
-          resolve(hashRates.values[0])
-        } else {
-          resolve(null)
-        }
+        return hashRates && hashRates.values[0] !== undefined && hashRates.values[0]
       })
-      .catch((error) => {
-        reject(error)
-      })
-    })
   }
 
 /**
@@ -102,13 +93,9 @@ export default class BTC {
    * Returns a block from a given hash
    */
   getBlock (hash) {
-    return new Promise((resolve, reject) => {
-      this.blocks.where('hash', '==', hash)
+    return this.blocks.where('hash', '==', hash)
       .get()
-      .then(({docs}) => {
-        resolve(docs[0].data())
-      })
-    })
+      .then(({docs}) => docs[0].data())
   }
 
   /**
@@ -128,36 +115,21 @@ export default class BTC {
   }
 
   getBlocksSince (fromDate, toDate = new Date()) {
-    return new Promise((resolve, reject) => {
-      let blocksArray = []
-      this.blocks
-        .orderBy('time', 'asc')
-        .startAt(fromDate / 1000)
-        .endAt(toDate / 1000)
-        .get()
-        .then(({ docs }) => {
-          for (let index = 0; index < docs.length; index++) {
-            const block = docs[index]
-            blocksArray.push(block.data())
-          }
-          resolve(blocksArray)
-        }).catch((error) => {
-          console.log(error)
-        })
-    })
+    return this.blocks
+      .orderBy('time', 'asc')
+      .startAt(fromDate / 1000)
+      .endAt(toDate / 1000)
+      .get()
+      .then(({ docs }) => docs.map(doc => doc.data()))
   }
 
   getDay (date, toDate = new Date()) {
-    return new Promise((resolve, reject) => {
-      this.getBlocksSince(date, toDate).then((blocks) => {
-        const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
-        const input = blocks.reduce((a, { input }) => a + input, 0) || 0
-        const output = blocks.reduce((a, { output }) => a + output, 0) || 0
+    return this.getBlocksSince(date, toDate).then((blocks) => {
+      const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
+      const input = blocks.reduce((a, { input }) => a + input, 0) || 0
+      const output = blocks.reduce((a, { output }) => a + output, 0) || 0
       // const value = blocks.reduce((a, b => a + b.value, 0))
-        resolve({ date, blocks, fee, input, output })
-      }).catch((error) => {
-        console.log(error)
-      })
+      return { date, blocks, fee, input, output }
     })
   }
 

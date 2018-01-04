@@ -15,5 +15,4 @@ orpheusApp.init = (params = {}) => {
 orpheusApp.preload = _ => orpheusApp.textureLoader = new THREE.TextureLoader() 
 window.orpheusApp = orpheusApp
 
-
  
