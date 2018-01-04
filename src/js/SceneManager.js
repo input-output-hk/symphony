@@ -3,9 +3,6 @@
 // 3rd party libs
 import * as THREE from 'three'
 
-// Global config
-import Config from './Config'
-
 // Stage
 import Stage from './Stage'
 
@@ -16,8 +13,6 @@ import MainScene from './scenes/MainScene'
  * Handles building the scene
  */
 export default class SceneManager {
-  constructor () { }
-
   checkWebGLSupport () {
     return window.WebGLRenderingContext
   }
