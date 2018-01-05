@@ -22,6 +22,7 @@ module.exports = function (self) {
           focusOnBlock: data.focusOnBlock
         }
 
+        console.time('blocks')
         for (let index = 0; index < blocks.length; index++) {
           let block = blocks[index]
 
@@ -36,6 +37,7 @@ module.exports = function (self) {
 
           returnData.blocks[index].feeToInputRatio = feeToInputRatio
         }
+        console.timeEnd('blocks')
 
         self.postMessage(returnData)
         break
