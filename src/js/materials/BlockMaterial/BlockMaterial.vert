@@ -61,7 +61,7 @@ void main() {
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
 
-	vec3 I = worldPosition.xyz - cameraPosition;
+	// vec3 I = worldPosition.xyz - cameraPosition;
 
 	//vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
 	//vec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );

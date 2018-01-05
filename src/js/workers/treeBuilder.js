@@ -19,7 +19,7 @@ module.exports = function (self) {
         }
         block.feeToInputRatio = feeToInputRatio
 
-        let geoData = new GenerateBlockGeometry(block, true)
+        let geoData = GenerateBlockGeometry(block, true)
 
         let returnData = {
           // vertices: geoData.treeVertices,

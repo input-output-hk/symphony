@@ -38,25 +38,35 @@
       const fastMap = arrayHasher.hashElements(array)//, function (fastMap) {
 
       // Generate a Merkle Tree from the leaves
-      const tree = genMerkle(fastMap, hashalgo)//, function (tree) {
+      const treeObj = genMerkle(fastMap, hashalgo)//, function (tree) {
         
       let sortedTree
-      for (var key in tree) {
-        if (tree.hasOwnProperty(key)) {
-          var element = tree[key]
+      for (var key in treeObj) {
+        if (treeObj.hasOwnProperty(key)) {
+          var element = treeObj[key]
+          if( element.type === 'root' ){
+             element.parent = null
+          } else if (element.type === 'node' || element.type === 'leaf' ) {
+            element.parent = treeObj[element.parent]
+          }
           if (element.type === 'root' || element.type === 'node') {
-            tree[key].children = {}
-            tree[key].children[element.left] = tree[element.left]
-            tree[key].children[element.right] = tree[element.right]
+            
+            element.children = {}
+            element.children.left = treeObj[element.left]
+            element.children.right = treeObj[element.right]
             if (element.type === 'root') {
               sortedTree = element
             }
           }
         }
       }
-      return sortedTree
-                // });
-            // });
+
+      // Get a flat heirachy sorted by depth
+      let tree = Object.values(treeObj)
+      tree.sort((a, b) => b.level - a.level)
+
+      return { tree, sortedTree }
+
     }
   }
 

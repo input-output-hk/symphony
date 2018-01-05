@@ -22,8 +22,11 @@ module.exports = function (self) {
           focusOnBlock: data.focusOnBlock
         }
 
-        for (let index = 0; index < blocks.length; index++) {
-          let block = blocks[index]
+        let n = blocks.length
+        console.time('blocks')
+        while( n-- > 0 ){
+        // for (let index = 0; index < blocks.length; index++) {
+          let block = blocks[n]
 
           let feeToInputRatio = 0
           if (block.fee && block.input) {
@@ -31,12 +34,12 @@ module.exports = function (self) {
           }
           block.feeToInputRatio = feeToInputRatio
 
-          let blockGeoData = new GenerateBlockGeometry(block)
+          let blockGeoData = GenerateBlockGeometry(block)
           returnData.sizes.push(blockGeoData.boxDimensions)
 
-          returnData.blocks[index].feeToInputRatio = feeToInputRatio
+          returnData.blocks[n].feeToInputRatio = feeToInputRatio
         }
-
+        console.timeEnd('blocks')
         self.postMessage(returnData)
         break
       case 'stop':

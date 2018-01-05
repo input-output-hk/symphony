@@ -121,6 +121,7 @@ export default class MainScene extends EventEmitter {
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
       f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
       f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
+      f.add(mat, 'envMapIntensity', 0.0, 1.0).step(0.01)
       if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
       f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
@@ -130,7 +131,8 @@ export default class MainScene extends EventEmitter {
      * Gui for Material
      */
     // createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
-    // createGuiForMaterial(this.blockMaterialFront, 'Block Material')
+    createGuiForMaterial(this.blockMaterialFront, 'Block Material Front')
+    createGuiForMaterial(this.blockMaterialBack, 'Block Material Back')
     // createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
     /*
@@ -193,31 +195,30 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    if (window.Worker) {
+    // if (window.Worker) {
       const fromDate = moment(date).startOf('day').toDate()
       const toDate = moment(date).endOf('day').toDate()
       const timeStamp = fromDate.valueOf()
 
-      this.api.getBlocksSince(fromDate, toDate).then((blocks) => {
-        const day = {
-          blocks: blocks,
-          timeStamp: timeStamp
-        }
 
+      this.api.getBlocksSince(fromDate, toDate).then((blocks) => {
+        // const day = {
+        //   blocks: blocks,
+        //   timeStamp: timeStamp
+        // }
+        
         DayBuilderWorker.postMessage({
           cmd: 'build',
-          blocks: day.blocks,
-          timeStamp: day.timeStamp,
+          blocks: blocks,
+          timeStamp: timeStamp,
           dayIndex: dayIndex,
           focusOnBlock: focusOnBlock
         })
       })
-    } else {
-      console.log('Webworkers not supported. Sad')
-    }
   }
 
   addBlocksToStage (e) {
+    
     if (typeof e.data.sizes === 'undefined') {
       return
     }
@@ -666,10 +667,10 @@ export default class MainScene extends EventEmitter {
     let metalnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_REFL_1K.jpg')
     let roughnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
     let glossMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_NRM_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load('static/assets/textures/stone-normal.jpg')
     let bumpMap = new THREE.TextureLoader().load('static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('static/assets/textures/').load(this.cubeMapUrls)
-    // this.stage.scene.background = this.bgMap
+    this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
       color: 0xeeeeee,
@@ -680,8 +681,14 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.BackSide,
       envMap: this.bgMap,
+      envMapIntensity: 2.3,
       bumpMap,
+      // map,
       bumpScale: 0.03
+      // roughnessMap,
+      // metalnessMap,
+      // normalMap,
+      // premultipliedAlpha: true
     })
 
     this.blockMaterialFront = new BlockMaterial({
@@ -693,28 +700,35 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.FrontSide,
       envMap: this.bgMap,
+      envMapIntensity: 2.3,
       bumpMap,
+      // map,
       bumpScale: 0.03
+      // roughnessMap,
+      // metalnessMap,
+      // normalMap,
+      // premultipliedAlpha: true
     })
 
-    this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: 0x333333,
-      metalness: 0.8,
-      roughness: 0.2,
-      opacity: 0.5,
-      transparent: true,
-      side: THREE.DoubleSide,
-      envMap: this.bgMap,
-      envMapIntensity: 2.3,
-      // bumpMap,
-      // bumpScale: 0.03,
-      roughnessMap,
-      metalnessMap,
-      normalMap,
-      premultipliedAlpha: true
-      // map
-    })
+    // this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
+    // this.centralBlockMaterial = new THREE.MeshNormalMaterial({
+    //   color: 0xffffff,
+    //   emissive: 0x333333,
+    //   metalness: 0.8,
+    //   roughness: 0.2,
+    //   opacity: 0.5,
+    //   transparent: true,
+    //   side: THREE.DoubleSide,
+    //   envMap: this.bgMap,
+    //   envMapIntensity: 2.3,
+    //   // bumpMap,
+    //   // bumpScale: 0.03,
+    //   roughnessMap,
+    //   metalnessMap,
+    //   normalMap,
+    //   premultipliedAlpha: true
+    //   // map
+    // })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
       color: 0xaaaaaa,
@@ -779,7 +793,7 @@ export default class MainScene extends EventEmitter {
             ) {
               if (
               this.intersected &&
-              this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
+              // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
               typeof this.state.dayData[dayIndex] !== 'undefined'
             ) {
                 this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
@@ -787,9 +801,9 @@ export default class MainScene extends EventEmitter {
 
               this.intersected = intersects[0].object
 
-              if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
-                this.intersected.material = this.blockMaterialHighlight
-              }
+              // if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
+              //   this.intersected.material = this.blockMaterialHighlight
+              // }
 
               const blockWorldPos = this.intersected.getWorldPosition()
 
@@ -799,7 +813,7 @@ export default class MainScene extends EventEmitter {
           } else {
             if (
             this.intersected &&
-            this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
+            // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
             typeof this.state.dayData[dayIndex] !== 'undefined'
           ) {
               this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
