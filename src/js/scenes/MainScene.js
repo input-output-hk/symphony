@@ -857,7 +857,7 @@ export default class MainScene extends EventEmitter {
           if (innerIndex === 1 && index !== 0) {
             signedIndex = index * -1
           }
-
+          console.log(signedIndex)
           if (typeof this.state.dayData[closestDayIndex + signedIndex] === 'undefined') {
             let day = moment(this.state.currentDay.timeStamp).subtract(signedIndex, 'day').format('YYYY-MM-DD')
             this.loadDay(day, closestDayIndex, signedIndex)
