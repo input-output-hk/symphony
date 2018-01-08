@@ -145,7 +145,7 @@
 
 			event.preventDefault()
 
-			if (Math.abs(event.wheelDeltaY) > 0) {
+			if (Math.abs(event.deltaY) > 0) {
 				app.scrollBlocked = true
 				setTimeout(() => {
 					app.scrollBlocked = false
@@ -163,16 +163,16 @@
 				return
 			}
 
-			if (event.wheelDeltaY > 0) {
+			if (event.deltaY > 0) {
 				app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
 				app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
-			} else if (event.wheelDeltaY < 0) {
+			} else if (event.deltaY < 0) {
 				app.stage.targetCameraPos.z += app.stage.cameraMoveStep
 				app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
 			}
 		}
 
-		document.addEventListener('mousewheel', onDocumentMouseWheel, false)
+		document.addEventListener("wheel", onDocumentMouseWheel, false);
 
 	</script>
 
