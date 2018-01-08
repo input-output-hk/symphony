@@ -549,7 +549,7 @@ export default class MainScene extends EventEmitter {
     if (typeof this.state.dayData[dayIndex] !== 'undefined') {
       this.stage.scene.background = this.bgMap
       this.state.dayData[dayIndex].blockMaterialFront.color.setHex(0xffffff)
-      let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
+      let cubeCamera = new THREE.CubeCamera(100.0, 5000, 1024)
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
