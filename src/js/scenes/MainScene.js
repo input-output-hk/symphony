@@ -63,8 +63,18 @@ export default class MainScene extends EventEmitter {
     DayBuilderWorker.addEventListener('message', this.addBlocksToStage.bind(this), false)
   }
 
-  start(){ console.warn("'start' method yet to be implemented") }
-  destroy(){ console.warn("'destroy' method yet to be implemented") }
+  // start(){ console.warn("'start' method yet to be implemented") }
+  destroy(){
+
+    this.stage.scene.traverse(object => {
+      if ( object.geometry ) object.geometry.dispose()
+      if ( object.material ) {
+        if (object.material.map) object.material.map.dispose()
+        object.material.dispose()
+      }
+      scene.remove(object)
+    })
+  }
 
   setDate (date, focusOnBlock = false) {
     if (this.state.currentDate === null) {
