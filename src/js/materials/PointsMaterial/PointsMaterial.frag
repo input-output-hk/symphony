@@ -42,15 +42,10 @@ void main() {
 	float dist = length(pos);
 
 	outgoingLight = diffuseColor.rgb;
-
 	vec3 color = vec3(circle(dist, 0.9));
-
 	color *= sin((dist * 100.0) - (uTime * 30.0));
-
 	color *= diffuseColor.rgb;
-
 	color *= display;
-
 
 	gl_FragColor = vec4( color, 1.0 );
 

@@ -14,7 +14,7 @@ module.exports = function (self) {
         let blocks = data.blocks
 
         let returnData = {
-          sizes: [],
+          // sizes: [],
           blockCount: blocks.length,
           dayIndex: data.dayIndex,
           blocks: data.blocks,
@@ -22,11 +22,12 @@ module.exports = function (self) {
           focusOnBlock: data.focusOnBlock
         }
 
-        let n = blocks.length
+        // let n = blocks.length
+        // let i = 0
         console.time('blocks')
-        while( n-- > 0 ){
-        // for (let index = 0; index < blocks.length; index++) {
-          let block = blocks[n]
+        // while( i < blocks.length ){
+        for (let index = 0; index < blocks.length; index++) {
+          let block = blocks[index]
 
           let feeToInputRatio = 0
           if (block.fee && block.input) {
@@ -34,10 +35,11 @@ module.exports = function (self) {
           }
           block.feeToInputRatio = feeToInputRatio
 
-          let blockGeoData = GenerateBlockGeometry(block)
-          returnData.sizes.push(blockGeoData.boxDimensions)
+          let { size } = GenerateBlockGeometry(block)
+          // returnData.sizes.push(blockGeoData.boxDimensions)
 
-          returnData.blocks[n].feeToInputRatio = feeToInputRatio
+          returnData.blocks[index].feeToInputRatio = feeToInputRatio
+          returnData.blocks[index].size = size
         }
         console.timeEnd('blocks')
         self.postMessage(returnData)
@@ -50,7 +52,7 @@ module.exports = function (self) {
         self.postMessage('Unknown command')
     }
 
-    self.postMessage(e.data)
+    // self.postMessage(e.data)
   }, false)
 
 }

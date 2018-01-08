@@ -20,14 +20,15 @@ module.exports = function (self) {
         block.feeToInputRatio = feeToInputRatio
 
         let geoData = GenerateBlockGeometry(block, true)
-
+        console.log( 'Result IS:', geoData.size )
         let returnData = {
           // vertices: geoData.treeVertices,
           vertices: geoData.treeGeo.attributes.position.array,
-          boxDimensions: geoData.boxDimensions,
+          size: geoData.size,
           boxCenter: geoData.boxCenter,
-          block: block,
-          endPoints: geoData.endPoints
+          offset: geoData.offset,
+          block,
+          endPoints: new Float32Array(geoData.endPoints)
         }
 
         self.postMessage(returnData)

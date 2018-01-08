@@ -39,6 +39,9 @@ export default class MainScene extends EventEmitter {
 
     this.api = new API()
 
+
+    this.allBlocksObj3d = new Map()
+
     this.stage = params.stage // reference to the stage
 
     this.initProperties() // class properties
@@ -121,7 +124,6 @@ export default class MainScene extends EventEmitter {
       f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
       f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
       f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
-      f.add(mat, 'envMapIntensity', 0.0, 1.0).step(0.01)
       if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
       f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
       f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
@@ -131,8 +133,7 @@ export default class MainScene extends EventEmitter {
      * Gui for Material
      */
     // createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
-    createGuiForMaterial(this.blockMaterialFront, 'Block Material Front')
-    createGuiForMaterial(this.blockMaterialBack, 'Block Material Back')
+    // createGuiForMaterial(this.blockMaterialFront, 'Block Material')
     // createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
 
     /*
@@ -195,46 +196,49 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    // if (window.Worker) {
+    if (window.Worker) {
       const fromDate = moment(date).startOf('day').toDate()
       const toDate = moment(date).endOf('day').toDate()
       const timeStamp = fromDate.valueOf()
 
-
       this.api.getBlocksSince(fromDate, toDate).then((blocks) => {
-        // const day = {
-        //   blocks: blocks,
-        //   timeStamp: timeStamp
-        // }
-        
+        const day = {
+          blocks: blocks,
+          timeStamp: timeStamp
+        }
+
         DayBuilderWorker.postMessage({
           cmd: 'build',
-          blocks: blocks,
-          timeStamp: timeStamp,
+          blocks: day.blocks,
+          timeStamp: day.timeStamp,
           dayIndex: dayIndex,
           focusOnBlock: focusOnBlock
         })
       })
+    } else {
+      console.log('Webworkers not supported. Sad')
+    }
   }
 
-  addBlocksToStage (e) {
-    
-    if (typeof e.data.sizes === 'undefined') {
-      return
-    }
+  addBlocksToStage ({ data }) {
+    // if (typeof e.data.sizes === 'undefined') {
+    //   return
+    // }
+
+    const that = this
 
     try {
-      let workerData = e.data
-      let sizes = workerData.sizes
-      let blockCount = workerData.blockCount
-      let timeStamp = workerData.timeStamp
-      let dayIndex = workerData.dayIndex
-      let blocks = workerData.blocks
-      let focusOnBlock = workerData.focusOnBlock
+      // let workerData = e.data
+      const { sizes, blockCount, timeStamp, dayIndex, blocks, focusOnBlock } = data
+      // let sizes = workerData.sizes
+      // let blockCount = workerData.blockCount
+      // let timeStamp = workerData.timeStamp
+      // let dayIndex = workerData.dayIndex
+      // let blocks = workerData.blocks
+      // let focusOnBlock = workerData.focusOnBlock
 
       this.state.dayData[dayIndex] = {
-        blocks: blocks,
-        timeStamp: timeStamp,
+        blocks, timeStamp,
         blockMaterialFront: this.blockMaterialFront.clone(), // each day has it's own material
         blockMaterialBack: this.blockMaterialBack.clone(),
         merkleMaterial: this.merkleMaterial.clone(),
@@ -246,9 +250,10 @@ export default class MainScene extends EventEmitter {
       this.stage.scene.add(group)
       this.blocksToAnimate = []
 
-      for (let index = 0; index < sizes.length; index++) {
-        const size = sizes[index]
+      for (let index = 0; index < blocks.length; index++) {
+        // const size = sizes[index]
         const block = blocks[index]
+        const size = block.size
 
         if (
           size.x === 0 ||
@@ -263,32 +268,34 @@ export default class MainScene extends EventEmitter {
         size.y += 20.0
         size.z += 20.0 */
 
-        let blockMeshFront = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialFront)
-        let blockMeshBack = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialBack)
+        let front = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialFront)
+        let back = new THREE.Mesh(this.boxGeometry, this.state.dayData[dayIndex].blockMaterialBack)
+        front.name = 'front'
+        back.name = 'back'
 
-        blockMeshBack.renderOrder = ((index - 1 * -dayIndex) + 1000000)
-        blockMeshFront.renderOrder = ((index * -dayIndex) + 1000000)
+        back.renderOrder = ((index - 1 * -dayIndex) + 1000000)
+        front.renderOrder = ((index * -dayIndex) + 1000000)
 
-        blockMeshFront.scale.set(size.x, size.y, size.z)
-        blockMeshBack.scale.set(size.x, size.y, size.z)
+        front.scale.set(size.x, size.y, size.z)
+        back.scale.set(size.x, size.y, size.z)
 
         // align all front faces
-        blockMeshFront.translateZ(-(size.z / 2))
-        blockMeshBack.translateZ(-(size.z / 2))
+        // blockMeshFront.translateZ(-(size.z / 2))
+        // blockMeshBack.translateZ(-(size.z / 2))
 
         let rotation = -(((25 * Math.PI) / 200) * index)
 
         block.dayIndex = dayIndex
 
-        blockMeshFront.rotation.z = rotation
-        blockMeshFront.translateY(800 + (index))
-        blockMeshFront.rotation.z += Math.PI / 2
-        blockMeshFront.translateZ((index * 30))
-        blockMeshFront.blockchainData = block
-        blockMeshBack.rotation.z = rotation
-        blockMeshBack.translateY(800 + (index))
-        blockMeshBack.rotation.z += Math.PI / 2
-        blockMeshBack.translateZ((index * 30))
+        // blockMeshFront.rotation.z = rotation
+        // blockMeshFront.translateY(800 + (index))
+        // blockMeshFront.rotation.z += Math.PI / 2
+        // blockMeshFront.translateZ((index * 30))
+        
+        // blockMeshBack.rotation.z = rotation
+        // blockMeshBack.translateY(800 + (index))
+        // blockMeshBack.rotation.z += Math.PI / 2
+        // blockMeshBack.translateZ((index * 30))
         // lockMeshBack.blockchainData = block
 
         /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
@@ -296,11 +303,26 @@ export default class MainScene extends EventEmitter {
         blockMesh.add(wireframe) */
 
         let blockGroup = new THREE.Group()
+        blockGroup.materials = {
+          front: this.state.dayData[dayIndex].blockMaterialFront,
+          back: this.state.dayData[dayIndex].blockMaterialBack
+        }
+        blockGroup.front = front
+        blockGroup.back = back
+
+        blockGroup.blockchainData = block
+        blockGroup.rotation.z = rotation
+        blockGroup.translateY(800 + (index))
+        blockGroup.rotation.z += Math.PI / 2
+        blockGroup.translateZ((index * 30))
+        // blockGroup.name = block.hash
+        this.allBlocksObj3d.set(block.hash, blockGroup)
         blockGroup.visible = false
 
-        blockGroup.add(blockMeshBack)
-        blockGroup.add(blockMeshFront)
-
+        
+        blockGroup.add(back)
+        blockGroup.add(front)
+        
         group.add(blockGroup)
       }
 
@@ -320,10 +342,10 @@ export default class MainScene extends EventEmitter {
         that.stage.scene.add(group)
       })
 
-      if (this.treeGroup) {
-        that.stage.scene.remove(this.treeGroup)
-        that.stage.scene.add(this.treeGroup)
-      }
+      // if (this.treeGroup) {
+      //   that.stage.scene.remove(this.treeGroup)
+      //   that.stage.scene.add(this.treeGroup)
+      // }
 
       if (focusOnBlock) {
         for (let index = 0; index < this.state.dayGroups[dayIndex].children.length; index++) {
@@ -372,76 +394,63 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  addTreeToStage (e) {
-    if (typeof e.data.vertices === 'undefined') {
-      return
+  addTreeToStage ({ data }) {
+    
+    const { boxCenter, offset, sie, vertices, endPoints, block } = data
+    if (!vertices) return
+
+    /*
+      Remove existing Trees
+    */
+    if( this.state.currentBlockObject ){
+      this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
+      this.audio.unloadSound()
     }
 
-    let boxCenter = e.data.boxCenter
-    let vertices = e.data.vertices
-    let endPoints = e.data.endPoints
-
-    let block = e.data.block
-
-    this.removeTrees()
-
-    this.treeGroup = new THREE.Group()
-    this.stage.scene.add(this.treeGroup)
+    // this.treeGroup = new THREE.Group()
+    // this.stage.scene.add(this.treeGroup)
 
     let blockObjectPosition = this.state.currentBlockObject.getWorldPosition().clone()
-    let rotation = this.state.currentBlockObject.getWorldRotation().clone()
+    // let rotation = this.state.currentBlockObject.getWorldRotation().clone()
 
     let treeGeo = new THREE.BufferGeometry()
     treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
-
     treeGeo.computeVertexNormals()
     treeGeo.computeFaceNormals()
 
+    /*
+      Tree Mesh
+    */
     let mesh = new THREE.Mesh(treeGeo, this.state.dayData[block.dayIndex].merkleMaterial)
-
-    mesh.translateX(-boxCenter.x)
-    mesh.translateY(-boxCenter.y)
-    mesh.translateZ(-boxCenter.z)
-
+    mesh.position.add(offset)
     mesh.renderOrder = 10000000
-    mesh.onBeforeRender = (renderer) => {
-      renderer.clearDepth()
-    }
+    mesh.onBeforeRender = renderer => renderer.clearDepth()
+
+    /*
+      Sound Wave Geometry
+    */
+    let positions = new THREE.BufferAttribute(endPoints, 3, 1)
+    const indices = new Array(endPoints.length / 3).fill(0).map((a, i ) => i)
 
     let geometry = new THREE.BufferGeometry()
-
-    let positions = new THREE.BufferAttribute(new Float32Array(endPoints.length * 3), 3, 1)
-    for (let index = 0; index < endPoints.length; index++) {
-      const pos = endPoints[index]
-      positions.setXYZ(
-        index,
-        pos.x,
-        pos.y,
-        pos.z
-      )
-    }
     geometry.addAttribute('position', positions)
-
+    geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
     // per instance data
-    let indexes = new THREE.BufferAttribute(new Float32Array(endPoints.length), 1, 1)
-    for (let i = 0, l = indexes.count; i < l; i++) {
-      indexes.setXYZ(i, i)
-    }
-    geometry.addAttribute('id', indexes)
+    
 
     let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
-    pointsMesh.translateX(-boxCenter.x)
-    pointsMesh.translateY(-boxCenter.y)
-    pointsMesh.translateZ(-boxCenter.z)
+    pointsMesh.position.add(offset)
 
-    this.treeGroup.add(pointsMesh)
-    this.treeGroup.add(mesh)
+    const blockObj3D = this.allBlocksObj3d.get(block.hash)
+    blockObj3D.add(pointsMesh)
+    blockObj3D.add(mesh)
+    blockObj3D.tree = mesh
 
     // start animation
     this.merkleMaterial.uniforms.uAnimTime.value = 0.0
 
-    this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
-    this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
+    // this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
+    // this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
 
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
@@ -451,10 +460,12 @@ export default class MainScene extends EventEmitter {
       return
     }
 
-    this.removeTrees()
+    // this.removeTrees()
+    this.audio.unloadSound()
 
     if (this.state.currentBlockObject) {
-      this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
+      this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
+      // this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
       this.animateBlockOut(this.state.currentBlockObject).then(() => {
         this.state.currentBlockObject = null
         this.state.view = 'day'
@@ -464,59 +475,58 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  removeTrees () {
-    if (typeof this.treeGroup !== 'undefined') {
-      this.stage.scene.remove(this.treeGroup)
-      this.treeGroup = null
-    }
-    this.audio.unloadSound()
-  }
+  // removeTrees () {
+  //   debugger;
+  //   if (typeof this.treeGroup !== 'undefined') {
+  //     this.stage.scene.remove(this.treeGroup)
+  //     this.treeGroup = null
+  //   }
+  //   this.audio.unloadSound()
+  // }
 
   onDocumentMouseDown (event) {
     event.preventDefault()
+    if (document.querySelector('.dg.ac').contains(event.target)) return
+    if (this.state.isAnimating) return
 
-    if (document.querySelector('.dg.ac').contains(event.target)) {
-      return
-    }
+    const { intersected } = this.getIntersections()
 
-    if (this.state.isAnimating) {
-      return
-    }
+    // if( intersected ){
+    if(!intersected || intersected === this.state.currentBlockObject ) this.resetDayView()
+    else this.focusOnBlock(intersected)
 
-    this.raycaster.setFromCamera({x: this.stage.targetMousePos.x, y: this.stage.targetMousePos.y}, this.stage.camera)
+    // for (const key in this.state.dayGroups) {
+    //   if (this.state.dayGroups.hasOwnProperty(key)) {
+    //     const group = this.state.dayGroups[key]
 
-    for (const key in this.state.dayGroups) {
-      if (this.state.dayGroups.hasOwnProperty(key)) {
-        const group = this.state.dayGroups[key]
+    //     for (let index = 0; index < group.children.length; index++) {
+    //       const blockGroup = group.children[index]
 
-        for (let index = 0; index < group.children.length; index++) {
-          const blockGroup = group.children[index]
+    //       let intersects = this.raycaster.intersectObjects(blockGroup.children)
+    //       if (intersects.length > 0) {
+    //         if (
+    //           intersects[0].object === this.state.currentBlockObject ||
+    //           intersects[1].object === this.state.currentBlockObject
+    //         ) {
+    //           this.resetDayView()
+    //           return
+    //         }
 
-          let intersects = this.raycaster.intersectObjects(blockGroup.children)
-          if (intersects.length > 0) {
-            if (
-              intersects[0].object === this.state.currentBlockObject ||
-              intersects[1].object === this.state.currentBlockObject
-            ) {
-              this.resetDayView()
-              return
-            }
+    //         // this.removeTrees()
+            
+            
 
-            this.removeTrees()
-
-            let blockObject = intersects[0].object
-            this.focusOnBlock(blockObject)
-            return
-          }
-        }
-      }
-    }
+    //         let blockObject = intersects[0].object
+    //         this.focusOnBlock(blockObject)
+    //         return
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   createCubeMap (position, dayIndex) {
-    if (
-      typeof this.state.dayData[dayIndex] !== 'undefined'
-    ) {
+    if (typeof this.state.dayData[dayIndex] !== 'undefined') {
       this.stage.scene.background = this.bgMap
       this.state.dayData[dayIndex].blockMaterialFront.color.setHex(0xffffff)
       let cubeCamera = new THREE.CubeCamera(100.0, 5000, 2048)
@@ -535,42 +545,36 @@ export default class MainScene extends EventEmitter {
   animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
     return new Promise((resolve, reject) => {
       this.state.isAnimating = true
-
       let moveQuaternion = new THREE.Quaternion()
       blockObject.quaternion.set(moveQuaternion)
 
       this.easing = TWEEN.Easing.Quartic.InOut
 
-      let tweenVars = {
-        blockPosX: fromPos.x,
-        blockPosY: fromPos.y,
-        time: 0
-      }
+      // let tweenVars = {
+      //   blockPosX: fromPos.x,
+      //   blockPosY: fromPos.y,
+      //   time: 0
+      // }
 
-      let that = this
+      // let that = this
 
-      new TWEEN.Tween(tweenVars)
-        .to(
-        {
-          blockPosX: toPos.x,
-          blockPosY: toPos.y,
-          time: 1
-        },
-          duration
-        )
-        .onUpdate(function () {
-          blockObject.position.x = tweenVars.blockPosX
-          blockObject.position.y = tweenVars.blockPosY
+      new TWEEN.Tween(blockObject.position)
+        .to(toPos, duration )
+        .easing(this.easing)
+        .onComplete(() => {
+          this.state.isAnimating = false
+          resolve()
+        })
+        .start()
 
+      new TWEEN.Tween({time:0})
+        .to({time: 1}, duration )
+        .onUpdate(function ({ time }) {
           // slerp to target rotation
-          THREE.Quaternion.slerp(fromQuaternion, toQuaternion, moveQuaternion, tweenVars.time)
+          THREE.Quaternion.slerp(fromQuaternion, toQuaternion, moveQuaternion, time)
           blockObject.quaternion.set(moveQuaternion.x, moveQuaternion.y, moveQuaternion.z, moveQuaternion.w)
         })
         .easing(this.easing)
-        .onComplete(function () {
-          that.state.isAnimating = false
-          resolve()
-        })
         .start()
     })
   }
@@ -603,8 +607,7 @@ export default class MainScene extends EventEmitter {
 
   animateBlockIn (blockObject) {
     return new Promise((resolve, reject) => {
-      this.state.currentBlockObject = blockObject
-
+      
       let blockPos = blockObject.position.clone()
 
       let targetRotation = new THREE.Euler(0.0, 0.0, 0.0)
@@ -616,15 +619,18 @@ export default class MainScene extends EventEmitter {
 
       // focus camera on block
       let blockWorldPos = blockObject.getWorldPosition()
-
+      
       this.stage.targetCameraLookAt.z = blockWorldPos.z
       this.stage.targetCameraPos.z = blockWorldPos.z + this.cameraBlockFocusDistance
+      const toPos = new THREE.Vector3()
+      toPos.z = blockObject.position.z
 
       this.animateBlock(
         blockObject,
         blockPos,
         fromQuaternion,
-        this.stage.targetCameraLookAt,
+        // this.stage.targetCameraLookAt,
+        toPos,
         toQuaternion,
         2000,
         true
@@ -636,12 +642,17 @@ export default class MainScene extends EventEmitter {
 
   buildTree (blockObject) {
     let block = blockObject.blockchainData
+    if( this.state.currentBlockObject ){
+      this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
+      this.audio.unloadSound()
+    }
     this.state.currentBlock = block
-    this.removeTrees()
-
+    // this.removeTrees()
+    
     this.api.getTransactionsForBlock(block.hash)
       .then((transactions) => {
         block.transactions = transactions
+        console.log( 'Building Tree for', block.hash )
         this.treeBuilderWorker.postMessage(
           {
             cmd: 'build',
@@ -667,10 +678,10 @@ export default class MainScene extends EventEmitter {
     let metalnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_REFL_1K.jpg')
     let roughnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
     let glossMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load('static/assets/textures/stone-normal.jpg')
+    let normalMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_NRM_1K.jpg')
     let bumpMap = new THREE.TextureLoader().load('static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
     this.bgMap = new THREE.CubeTextureLoader().setPath('static/assets/textures/').load(this.cubeMapUrls)
-    this.stage.scene.background = this.bgMap
+    // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
       color: 0xeeeeee,
@@ -681,14 +692,8 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.BackSide,
       envMap: this.bgMap,
-      envMapIntensity: 2.3,
       bumpMap,
-      // map,
       bumpScale: 0.03
-      // roughnessMap,
-      // metalnessMap,
-      // normalMap,
-      // premultipliedAlpha: true
     })
 
     this.blockMaterialFront = new BlockMaterial({
@@ -700,35 +705,28 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.FrontSide,
       envMap: this.bgMap,
-      envMapIntensity: 2.3,
       bumpMap,
-      // map,
       bumpScale: 0.03
-      // roughnessMap,
-      // metalnessMap,
-      // normalMap,
-      // premultipliedAlpha: true
     })
 
-    // this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
-    // this.centralBlockMaterial = new THREE.MeshNormalMaterial({
-    //   color: 0xffffff,
-    //   emissive: 0x333333,
-    //   metalness: 0.8,
-    //   roughness: 0.2,
-    //   opacity: 0.5,
-    //   transparent: true,
-    //   side: THREE.DoubleSide,
-    //   envMap: this.bgMap,
-    //   envMapIntensity: 2.3,
-    //   // bumpMap,
-    //   // bumpScale: 0.03,
-    //   roughnessMap,
-    //   metalnessMap,
-    //   normalMap,
-    //   premultipliedAlpha: true
-    //   // map
-    // })
+    this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      emissive: 0x333333,
+      metalness: 0.8,
+      roughness: 0.2,
+      opacity: 0.5,
+      transparent: true,
+      side: THREE.DoubleSide,
+      envMap: this.bgMap,
+      envMapIntensity: 2.3,
+      // bumpMap,
+      // bumpScale: 0.03,
+      roughnessMap,
+      metalnessMap,
+      normalMap,
+      premultipliedAlpha: true
+      // map
+    })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
       color: 0xaaaaaa,
@@ -773,56 +771,93 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  checkMouseIntersection () {
+  getIntersections(){
     var vector = new THREE.Vector3(this.stage.targetMousePos.x, this.stage.targetMousePos.y, 0.5)
     vector.unproject(this.stage.camera)
-    var ray = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
+    var raycaster = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
 
-    for (const dayIndex in this.state.dayGroups) {
-      if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
-        const group = this.state.dayGroups[dayIndex]
+    const allBlocks = Array.from(this.allBlocksObj3d.values())
+      
+    const boxes = allBlocks
+      // .filter(box => box !== this.state.currentBlockObject)
+      .map(group => group.children[0])
+      .filter(box => box) // Filter to only those with non null refs
+    
+    const intersections = raycaster.intersectObjects(boxes, false)
+    const intersected = intersections[0] && intersections[0].object.parent
+    
+    return { intersections, allBlocks, intersected }
+  }
 
-        for (let index = 0; index < group.children.length; index++) {
-          const blockGroup = group.children[index]
+  checkMouseIntersection () {
+    
+    const { intersected, allBlocks } = this.getIntersections()
+    /*
+      Doing own intersection test as we don't need it recursive or to check front/back objects
+    */
+    // const intersections = Array.from(this.state.dayGroups)
+      // .map(group => raycase.intersectObject(group.children[0], false ))
+      // .sort(( a, b ) => a.distance - b.distance)
 
-          let intersects = ray.intersectObjects(blockGroup.children)
-          if (intersects.length > 0) {
-            if (
-              intersects[0].object !== this.intersected &&
-              intersects[0].object !== this.state.currentBlockObject
-            ) {
-              if (
-              this.intersected &&
-              // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
-              typeof this.state.dayData[dayIndex] !== 'undefined'
-            ) {
-                this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
-              }
+    // // const nearestIntersectedBlock = intersections[0]
 
-              this.intersected = intersects[0].object
+    // For Each block
+    allBlocks.forEach(block => {
+      // Set the front/back materials to their default
+      // block.children.forEach((child, i) => child.material = block.materials[i])
+      block.front.material = block.materials.front
+      block.back.material = block.materials.back
+    })
 
-              // if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
-              //   this.intersected.material = this.blockMaterialHighlight
-              // }
 
-              const blockWorldPos = this.intersected.getWorldPosition()
-
-              this.pointLightTarget = blockWorldPos
-            }
-            return
-          } else {
-            if (
-            this.intersected &&
-            // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
-            typeof this.state.dayData[dayIndex] !== 'undefined'
-          ) {
-              this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
-            }
-            this.intersected = null
-          }
-        }
-      }
+    /*
+      If an intersection occured but not on the selected block, set a highlight
+    */
+    if (intersected && intersected !== this.state.currentBlockObject) {
+      intersected.children.forEach(child => child.material = this.blockMaterialHighlight)
+      this.pointLightTarget = intersected.position
     }
+    
+
+
+    // for (const dayIndex in this.state.dayGroups) {
+    //   if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
+    //     const group = this.state.dayGroups[dayIndex]
+
+    //     for (let index = 0; index < group.children.length; index++) {
+    //       const blockGroup = group.children[index]
+
+    //       let intersects = ray.intersectObjects(blockGroup.children)
+    //       if (intersects.length > 0) {
+    //         if ( intersects[0].object !== this.intersected && intersects[0].object !== this.state.currentBlockObject ) {
+    //           if ( this.intersected && typeof this.state.dayData[dayIndex] !== 'undefined' // this.intersected.material.uuid !== this.centralBlockMaterial.uuid && ) {
+    //             this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
+    //           }
+
+    //           this.intersected = intersects[0].object
+
+    //           if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
+    //             this.intersected.material = this.blockMaterialHighlight
+    //           }
+
+    //           const blockWorldPos = this.intersected.getWorldPosition()
+
+    //           this.pointLightTarget = blockWorldPos
+    //         }
+    //         return
+    //       } else {
+    //         if (
+    //         this.intersected &&
+    //         // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
+    //         typeof this.state.dayData[dayIndex] !== 'undefined'
+    //       ) {
+    //           this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
+    //         }
+    //         this.intersected = null
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   onCameraMove () {
@@ -929,33 +964,40 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  focusOnBlock (blockObject) {
-    let blockGroup = blockObject.parent
+  focusOnBlock (blockGroup) {
+    // let blockGroup = blockObject//.parent
     blockGroup.visible = true
     this.state.view = 'block'
 
-    if (this.state.currentBlockObject) {
-      this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
-    }
+    // if (this.state.currentBlockObject) {
+    //   this.animateBlockOut(this.state.currentBlockObject/*.parent.children[0]*/)
+    // }
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
-      this.animateBlockIn(blockGroup.children[0])
+      // this.animateBlockIn(blockGroup.children[0])
+      if(this.state.currentBlockObject){
+        this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
+        this.audio.unloadSound()
+      }
 
-      this.animateBlockIn(blockObject).then(() => {
-        this.buildTree(blockObject)
+      this.state.currentBlockObject = blockGroup
+
+      this.animateBlockIn(this.state.currentBlockObject).then(() => {
+        this.buildTree(this.state.currentBlockObject)
         this.state.isAnimating = false
-        this.emit('blockSelected', blockObject.blockchainData)
+        // console.log('BLOCK SELECTED')
+        this.emit('blockSelected', this.state.currentBlockObject.blockchainData)
       })
     })
   }
 
   animateTree () {
-    if (this.state.view === 'block') {
-      if (this.treeGroup) {
-        this.state.currentBlockObject.rotation.y += 0.001
-        this.state.currentBlockObject.parent.children[0].rotation.y += 0.001
-        this.treeGroup.rotation.y += 0.001
-      }
-    }
+    // if (this.state.view === 'block') {
+    //   if (this.treeGroup) {
+    //     this.state.currentBlockObject.rotation.y += 0.001
+    //     this.state.currentBlockObject.parent.children[0].rotation.y += 0.001
+    //     this.treeGroup.rotation.y += 0.001
+    //   }
+    // }
   }
 
   animateBlockVisibility () {
@@ -1011,7 +1053,6 @@ export default class MainScene extends EventEmitter {
       this.audio.pointColors.length > 0
     ) {
       let pointColors = Uint8Array.from(this.audio.pointColors)
-
       let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
 
       pointColorsTexture.minFilter = THREE.NearestFilter
