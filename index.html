@@ -94,7 +94,18 @@
 		/*
 			Event called as a user scrolls through time and the current day changes
 		*/
-		app.on('dayChanged', data => console.log('DAY CHANGED', data))
+		app.on('dayChanged', ({ date, input, output, fee }) => {
+			ReactDOM.render(		
+				<div>	
+					<h1>Day View</h1>
+					<br/>
+					<div>Date: { date.toString() }</div>
+					<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
+					<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
+					<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
+				</div>
+			,document.querySelector('#hud'))
+		})
 
 
 		/*
@@ -102,15 +113,17 @@
 		*/
 		app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
 			ReactDOM.render(		
-				<div>		
+				<div>	
+					<h1>Block View</h1>
+					<br/>
+					<div>Date: { time.toString() }</div>
 					<div>Bits: { bits.toLocaleString('USD') }</div>
 					<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
 					<div>Fee Level: { feeToInputRatio }</div>
 					<div>Block Hash: { hash.substr(-16) }</div>
 					<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
 					<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
-					<div >Number of Transactions: { n_tx }</div>
-					<div>Date: { new Date(time * 1000).toString() }</div>
+					<div >Number of Transactions: { n_tx }</div>				
 				</div>
 			,document.querySelector('#hud'))
 		})

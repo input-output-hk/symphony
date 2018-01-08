@@ -902,11 +902,21 @@ export default class MainScene extends EventEmitter {
 
     // bubble up event
     if (this.state.currentDay === null) {
+      const blocks = this.state.dayData[closestDayIndex].blocks
+      const time = blocks[0].time * 1000
+      const date = moment(time).startOf('day').toDate()
+      const day = {
+        date,
+        input: blocks.reduce((a, b) => a + b.input, 0),
+        output: blocks.reduce((a, b) => a + b.output, 0),
+        fee: blocks.reduce((a, b) => a + b.fee, 0)
+      }
+
       this.emit('firstDayLoaded')
-      this.emit('dayChanged', this.state.dayData[closestDayIndex])
+      this.emit('dayChanged', day)
     } else {
       if (this.state.closestDayIndex !== closestDayIndex) {
-        this.emit('dayChanged', this.state.dayData[closestDayIndex])
+        this.emit('dayChanged', day)
       }
     }
 
@@ -1005,7 +1015,8 @@ export default class MainScene extends EventEmitter {
         this.buildTree(this.state.currentBlockObject)
         this.state.isAnimating = false
         // console.log('BLOCK SELECTED')
-        this.emit('blockSelected', this.state.currentBlockObject.blockchainData)
+        const block = this.state.currentBlockObject.blockchainData
+        this.emit('blockSelected', { ...block, time: new Date(block.time * 1000 )})
       })
     })
   }
