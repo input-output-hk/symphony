@@ -29,10 +29,10 @@
     var currentlevel = 0
     var nl = fastMap.length
 
-    tree.root = ''
-    tree.hashalgo = hashalgo
-    tree.leaves = nl
-    tree.levels = ''
+    // tree.root = ''
+    // tree.hashalgo = hashalgo
+    // tree.leaves = nl
+    // tree.levels = ''
 
         // Push all of the leaves onto the main queue
     for (i = 0; i < nl; i++) {
@@ -110,10 +110,10 @@
     }
 
     // Set the number of levels, the root node value, and the root node type & parent
-    tree.levels = currentlevel
-    tree.root = deque1.pop()
-    tree[tree.root].type = 'root'
-    tree[tree.root].parent = 'root'
+    // tree.levels = currentlevel
+    const root = deque1.pop()
+    tree[root].type = 'root'
+    // tree[tree.root].parent = 'root'
 
     // return tree
     // cb(tree);

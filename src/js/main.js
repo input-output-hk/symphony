@@ -8,7 +8,7 @@ const orpheusApp = function(params = {}) {
   return new MainScene({...params, stage})
 }
 
-orpheusApp.checkWebGLSupport = _ => window.WebGLRenderingContext 
+orpheusApp.canRun = window.WebGLRenderingContext !== null && window.Worker !== null
 orpheusApp.preload = _ => orpheusApp.textureLoader = new THREE.TextureLoader() 
 
 window.orpheusApp = orpheusApp

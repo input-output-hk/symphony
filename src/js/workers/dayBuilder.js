@@ -14,7 +14,7 @@ module.exports = function (self) {
         let blocks = data.blocks
 
         let returnData = {
-          sizes: [],
+          // sizes: [],
           blockCount: blocks.length,
           dayIndex: data.dayIndex,
           blocks: data.blocks,
@@ -32,13 +32,13 @@ module.exports = function (self) {
           }
           block.feeToInputRatio = feeToInputRatio
 
-          let blockGeoData = new GenerateBlockGeometry(block)
-          returnData.sizes.push(blockGeoData.boxDimensions)
+          let { size } = GenerateBlockGeometry(block)
+          // returnData.sizes.push(blockGeoData.boxDimensions)
 
           returnData.blocks[index].feeToInputRatio = feeToInputRatio
+          returnData.blocks[index].size = size
         }
         console.timeEnd('blocks')
-
         self.postMessage(returnData)
         break
       case 'stop':
@@ -49,7 +49,7 @@ module.exports = function (self) {
         self.postMessage('Unknown command')
     }
 
-    self.postMessage(e.data)
+    // self.postMessage(e.data)
   }, false)
 
 }

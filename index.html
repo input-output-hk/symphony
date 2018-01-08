@@ -68,13 +68,15 @@
 	<script type="text/babel">
 
 		// check that browser supports webgl
-		if (!orpheusApp.checkWebGLSupport()) console.error('no WebGL :(')
+		if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
 			
-		// Create App
+		// Create the Orpeus App
 		const app = orpheusApp()
+
 
 		// initial date needs to be set, could be set via current date or url for example
 		app.setDate('2018-01-01') 
+
 
 		/*
 			Destroys the Orpheus instance and unloads all data.
@@ -83,25 +85,23 @@
 		app.destroy()
 		app.start()
 
+
 		/*
 			Event called when the first day loads
 		*/
 		app.on('firstDayLoaded', data => console.log('first day of blocks loaded'))
 		
+
 		/*
 			Event called as a user scrolls through time and the current day changes
 		*/
 		app.on('dayChanged', data => console.log('DAY CHANGED', data))
 
+
 		/*
 			Event called when a block is selected
 		*/
 		app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
-			// const arr = Object.keys(block)
-			// arr.forEach(k => {
-			// 	let node = document.querySelector('#'+k)
-			// 	if( node ) node.innerHTML = `${k} : ${block[k].toLocaleString('USD')}`
-			// })
 			ReactDOM.render(		
 				<div>		
 					<div>Bits: { bits.toLocaleString('USD') }</div>
@@ -111,10 +111,9 @@
 					<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
 					<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
 					<div >Number of Transactions: { n_tx }</div>
-					<div>Size { size }</div>
 					<div>Date: { new Date(time * 1000).toString() }</div>
 				</div>
-			, document.querySelector('#hud'))
+			,document.querySelector('#hud'))
 		})
 
 		
