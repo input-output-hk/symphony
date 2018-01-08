@@ -386,7 +386,7 @@ export default class MainScene extends EventEmitter {
 
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
 
-    document.addEventListener('touchstart', this.onDocumentMouseDown.bind(this), false)
+    document.addEventListener('touchend', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
       this.treeBuilderWorker = TreeBuilderWorker

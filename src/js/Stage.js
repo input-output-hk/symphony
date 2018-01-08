@@ -123,11 +123,16 @@ export default class Stage {
    */
   initRenderer () {
     this.canvas = document.getElementById('stage')
+
+    this.canvas.style.touchAction = 'none';
+
     this.renderer = new THREE.WebGLRenderer({
       antialias: Config.scene.antialias,
       canvas: this.canvas
       // alpha: true
     })
+
+
 
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
     this.renderer.setPixelRatio(window.devicePixelRatio)
@@ -159,12 +164,16 @@ export default class Stage {
     // event fired when mouse is moved
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
 
-    function _getTouchBound (fn) {
-      return function (evt) {
-        fn.call(this, evt.changedTouches[0] || evt.touches[0])
-      }
-    }
-    document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
+    // function _getTouchBound (fn) {
+    //   return function (evt) {
+    //     fn.call(this, evt.changedTouches[0] || evt.touches[0])
+    //   }
+    // }
+    // document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
+    this.canvas.addEventListener('touchmove', evt => {
+      evt.preventDefault()
+      this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
+    })
 
     // window resize event
     window.addEventListener('resize', this.resize.bind(this), false)
