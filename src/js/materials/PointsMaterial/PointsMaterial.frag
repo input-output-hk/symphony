@@ -16,7 +16,7 @@ varying float display;
 
 float circle(in float dist, in float radius) {
 	return 1.0 - smoothstep(
-		radius - (radius * 5.0),
+		radius - (radius * 10.0),
 		radius + (radius * 0.01),
         dot(dist, dist) * 3.0
 	);

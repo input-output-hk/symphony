@@ -58,12 +58,12 @@ export default class Stage {
     this.composer.addPass(this.FXAAPass)
 
     this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    // this.RGBShiftPass.renderToScreen = true
+    this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass)
 
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
+    /*this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
     this.bloomPass.renderToScreen = true
-    this.composer.addPass(this.bloomPass)
+    this.composer.addPass(this.bloomPass) */
 
     /* this.FilmShaderPass = new ShaderPass(FilmShader)
     this.FilmShaderPass.renderToScreen = true
@@ -124,15 +124,13 @@ export default class Stage {
   initRenderer () {
     this.canvas = document.getElementById('stage')
 
-    this.canvas.style.touchAction = 'none';
+    this.canvas.style.touchAction = 'none'
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: Config.scene.antialias,
       canvas: this.canvas
       // alpha: true
     })
-
-
 
     this.renderer.setClearColor(Config.scene.bgColor, 0.0)
     this.renderer.setPixelRatio(window.devicePixelRatio)

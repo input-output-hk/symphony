@@ -38,7 +38,6 @@ export default class MainScene extends EventEmitter {
 
     this.api = new API()
 
-
     this.allBlocksObj3d = new Map()
 
     this.stage = stage // reference to the stage
@@ -63,7 +62,7 @@ export default class MainScene extends EventEmitter {
   }
 
   // start(){ console.warn("'start' method yet to be implemented") }
-  destroy(){
+  destroy () {
     document.removeEventListener('preUpdate', this.onUpdateBound, false)
     cancelAnimationFrame(this.stage.reqID)
     const scene = this.stage.scene
@@ -72,10 +71,10 @@ export default class MainScene extends EventEmitter {
     //   obj.children.forEach(child => traverse(child, callback))
     //   callback(obj)
     // }
-    
-    const dispose = function(object) {
-      if ( object.geometry ) object.geometry.dispose()
-      if ( object.material ) {
+
+    const dispose = function (object) {
+      if (object.geometry) object.geometry.dispose()
+      if (object.material) {
         if (object.material.map) object.material.map.dispose()
         object.material.dispose()
       }
@@ -257,7 +256,8 @@ export default class MainScene extends EventEmitter {
       // let focusOnBlock = workerData.focusOnBlock
 
       this.state.dayData[dayIndex] = {
-        blocks, timeStamp,
+        blocks,
+        timeStamp,
         blockMaterialFront: this.blockMaterialFront.clone(), // each day has it's own material
         blockMaterialBack: this.blockMaterialBack.clone(),
         merkleMaterial: this.merkleMaterial.clone(),
@@ -310,7 +310,7 @@ export default class MainScene extends EventEmitter {
         // blockMeshFront.translateY(800 + (index))
         // blockMeshFront.rotation.z += Math.PI / 2
         // blockMeshFront.translateZ((index * 30))
-        
+
         // blockMeshBack.rotation.z = rotation
         // blockMeshBack.translateY(800 + (index))
         // blockMeshBack.rotation.z += Math.PI / 2
@@ -338,10 +338,9 @@ export default class MainScene extends EventEmitter {
         this.allBlocksObj3d.set(block.hash, blockGroup)
         blockGroup.visible = false
 
-        
         blockGroup.add(back)
         blockGroup.add(front)
-        
+
         group.add(blockGroup)
       }
 
@@ -415,14 +414,13 @@ export default class MainScene extends EventEmitter {
   }
 
   addTreeToStage ({ data }) {
-    
     const { boxCenter, offset, sie, vertices, endPoints, block } = data
     if (!vertices) return
 
     /*
       Remove existing Trees
     */
-    if( this.state.currentBlockObject ){
+    if (this.state.currentBlockObject) {
       this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
       this.audio.unloadSound()
     }
@@ -450,13 +448,12 @@ export default class MainScene extends EventEmitter {
       Sound Wave Geometry
     */
     let positions = new THREE.BufferAttribute(endPoints, 3, 1)
-    const indices = new Array(endPoints.length / 3).fill(0).map((a, i ) => i)
+    const indices = new Array(endPoints.length / 3).fill(0).map((a, i) => i)
 
     let geometry = new THREE.BufferGeometry()
     geometry.addAttribute('position', positions)
     geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
     // per instance data
-    
 
     let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
     pointsMesh.position.add(offset)
@@ -512,7 +509,7 @@ export default class MainScene extends EventEmitter {
     const { intersected } = this.getIntersections()
 
     // if( intersected ){
-    if(!intersected || intersected === this.state.currentBlockObject ) this.resetDayView()
+    if (!intersected || intersected === this.state.currentBlockObject) this.resetDayView()
     else this.focusOnBlock(intersected)
 
     // for (const key in this.state.dayGroups) {
@@ -533,8 +530,6 @@ export default class MainScene extends EventEmitter {
     //         }
 
     //         // this.removeTrees()
-            
-            
 
     //         let blockObject = intersects[0].object
     //         this.focusOnBlock(blockObject)
@@ -579,7 +574,7 @@ export default class MainScene extends EventEmitter {
       // let that = this
 
       new TWEEN.Tween(blockObject.position)
-        .to(toPos, duration )
+        .to(toPos, duration)
         .easing(this.easing)
         .onComplete(() => {
           this.state.isAnimating = false
@@ -587,8 +582,8 @@ export default class MainScene extends EventEmitter {
         })
         .start()
 
-      new TWEEN.Tween({time:0})
-        .to({time: 1}, duration )
+      new TWEEN.Tween({time: 0})
+        .to({time: 1}, duration)
         .onUpdate(function ({ time }) {
           // slerp to target rotation
           THREE.Quaternion.slerp(fromQuaternion, toQuaternion, moveQuaternion, time)
@@ -627,7 +622,6 @@ export default class MainScene extends EventEmitter {
 
   animateBlockIn (blockObject) {
     return new Promise((resolve, reject) => {
-      
       let blockPos = blockObject.position.clone()
 
       let targetRotation = new THREE.Euler(0.0, 0.0, 0.0)
@@ -639,7 +633,7 @@ export default class MainScene extends EventEmitter {
 
       // focus camera on block
       let blockWorldPos = blockObject.getWorldPosition()
-      
+
       this.stage.targetCameraLookAt.z = blockWorldPos.z
       this.stage.targetCameraPos.z = blockWorldPos.z + this.cameraBlockFocusDistance
       const toPos = new THREE.Vector3()
@@ -662,17 +656,17 @@ export default class MainScene extends EventEmitter {
 
   buildTree (blockObject) {
     let block = blockObject.blockchainData
-    if( this.state.currentBlockObject ){
+    if (this.state.currentBlockObject) {
       this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
       this.audio.unloadSound()
     }
     this.state.currentBlock = block
     // this.removeTrees()
-    
+
     this.api.getTransactionsForBlock(block.hash)
       .then((transactions) => {
         block.transactions = transactions
-        console.log( 'Building Tree for', block.hash )
+        console.log('Building Tree for', block.hash)
         this.treeBuilderWorker.postMessage(
           {
             cmd: 'build',
@@ -791,26 +785,25 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  getIntersections(){
+  getIntersections () {
     var vector = new THREE.Vector3(this.stage.targetMousePos.x, this.stage.targetMousePos.y, 0.5)
     vector.unproject(this.stage.camera)
     var raycaster = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
 
     const allBlocks = Array.from(this.allBlocksObj3d.values())
-      
+
     const boxes = allBlocks
       // .filter(box => box !== this.state.currentBlockObject)
       .map(group => group.children[0])
       .filter(box => box) // Filter to only those with non null refs
-    
+
     const intersections = raycaster.intersectObjects(boxes, false)
     const intersected = intersections[0] && intersections[0].object.parent
-    
+
     return { intersections, allBlocks, intersected }
   }
 
   checkMouseIntersection () {
-    
     const { intersected, allBlocks } = this.getIntersections()
     /*
       Doing own intersection test as we don't need it recursive or to check front/back objects
@@ -829,7 +822,6 @@ export default class MainScene extends EventEmitter {
       block.back.material = block.materials.back
     })
 
-
     /*
       If an intersection occured but not on the selected block, set a highlight
     */
@@ -837,8 +829,6 @@ export default class MainScene extends EventEmitter {
       intersected.children.forEach(child => child.material = this.blockMaterialHighlight)
       this.pointLightTarget = intersected.position
     }
-    
-
 
     // for (const dayIndex in this.state.dayGroups) {
     //   if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
@@ -936,7 +926,7 @@ export default class MainScene extends EventEmitter {
           if (innerIndex === 1 && index !== 0) {
             signedIndex = index * -1
           }
-          
+
           if (typeof this.state.dayData[closestDayIndex + signedIndex] === 'undefined') {
             let day = moment(this.state.currentDay.timeStamp).subtract(signedIndex, 'day').format('YYYY-MM-DD')
             this.loadDay(day, closestDayIndex, signedIndex)
@@ -1004,7 +994,7 @@ export default class MainScene extends EventEmitter {
     // }
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       // this.animateBlockIn(blockGroup.children[0])
-      if(this.state.currentBlockObject){
+      if (this.state.currentBlockObject) {
         this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
         this.audio.unloadSound()
       }
@@ -1016,7 +1006,7 @@ export default class MainScene extends EventEmitter {
         this.state.isAnimating = false
         // console.log('BLOCK SELECTED')
         const block = this.state.currentBlockObject.blockchainData
-        this.emit('blockSelected', { ...block, time: new Date(block.time * 1000 )})
+        this.emit('blockSelected', { ...block, time: new Date(block.time * 1000)})
       })
     })
   }
