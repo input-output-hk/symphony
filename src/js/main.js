@@ -5,7 +5,7 @@ import MainScene from './scenes/MainScene'
 
 const orpheusApp = function(params = {}) {
   const stage = new Stage()
-  return new MainScene({...params, stage})
+  return new MainScene({ ...params, stage})
 }
 
 orpheusApp.canRun = window.WebGLRenderingContext !== null && window.Worker !== null

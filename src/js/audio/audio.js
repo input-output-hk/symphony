@@ -7,14 +7,14 @@ import _ from 'lodash'
 import { map } from '../../utils/math'
 
 export default class Audio {
-  constructor (camera) {
+  constructor (camera, path) {
     this.samplerLoaded = false
     this.camera = camera
     this.loops = []
     this.quantize = 32
     this.masterVol = -18 // db
     this.ambienceVol = -15 // db
-    this.ambiencePath = Config.assetPath + 'sounds/ambience/mining.ogg'
+    this.ambiencePath = path + 'sounds/ambience/mining.ogg'
     this.bpm = 60
     this.notes = {
       55.000: 'A1',
@@ -180,7 +180,7 @@ export default class Audio {
       /* _.forIn(this.notes, (note, key) => {
         this.audioLoader.load(
           // resource URL
-          Config.assetPath + 'sounds/kalimba/' + note.replace('#', 'S') + '.ogg',
+          path + 'sounds/kalimba/' + note.replace('#', 'S') + '.ogg',
           // Function when resource is loaded
           function (audioBuffer) {
             loadCount++
@@ -221,7 +221,7 @@ export default class Audio {
       this.masterBus = new Tone.Volume(this.masterVol).toMaster()
       this.ambienceBus = new Tone.Volume(-96).toMaster()
 
-      /* this.convolver = new Tone.Convolver(Config.assetPath + 'sounds/IR/r1_ortf.wav')
+      /* this.convolver = new Tone.Convolver(path + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0) */
 
       // this.pingPong = new Tone.PingPongDelay('16n', 0.85)
@@ -252,46 +252,46 @@ export default class Audio {
 
   loadSampler () {
     this.sampler = new Tone.Sampler({
-      'A1': Config.assetPath + 'sounds/kalimba/A1.ogg',
-      'A#1': Config.assetPath + 'sounds/kalimba/AS1.ogg',
-      'B1': Config.assetPath + 'sounds/kalimba/B1.ogg',
-      'C1': Config.assetPath + 'sounds/kalimba/C1.ogg',
-      'C#1': Config.assetPath + 'sounds/kalimba/CS1.ogg',
-      'D1': Config.assetPath + 'sounds/kalimba/D1.ogg',
-      'D#1': Config.assetPath + 'sounds/kalimba/DS1.ogg',
-      'E1': Config.assetPath + 'sounds/kalimba/E1.ogg',
-      'F1': Config.assetPath + 'sounds/kalimba/F1.ogg',
-      'F#1': Config.assetPath + 'sounds/kalimba/FS1.ogg',
-      'G1': Config.assetPath + 'sounds/kalimba/G1.ogg',
-      'G#1': Config.assetPath + 'sounds/kalimba/GS1.ogg',
-      'A2': Config.assetPath + 'sounds/kalimba/A2.ogg',
-      'A#2': Config.assetPath + 'sounds/kalimba/AS2.ogg',
-      'B2': Config.assetPath + 'sounds/kalimba/B2.ogg',
-      'C2': Config.assetPath + 'sounds/kalimba/C2.ogg',
-      'C#2': Config.assetPath + 'sounds/kalimba/CS2.ogg',
-      'D2': Config.assetPath + 'sounds/kalimba/D2.ogg',
-      'D#2': Config.assetPath + 'sounds/kalimba/DS2.ogg',
-      'E2': Config.assetPath + 'sounds/kalimba/E2.ogg',
-      'F2': Config.assetPath + 'sounds/kalimba/F2.ogg',
-      'F#2': Config.assetPath + 'sounds/kalimba/FS2.ogg',
-      'G2': Config.assetPath + 'sounds/kalimba/G2.ogg',
-      'G#2': Config.assetPath + 'sounds/kalimba/GS2.ogg',
-      'A3': Config.assetPath + 'sounds/kalimba/A3.ogg',
-      'A#3': Config.assetPath + 'sounds/kalimba/AS3.ogg',
-      'B3': Config.assetPath + 'sounds/kalimba/B3.ogg',
-      'C3': Config.assetPath + 'sounds/kalimba/C3.ogg',
-      'C#3': Config.assetPath + 'sounds/kalimba/CS3.ogg',
-      'D3': Config.assetPath + 'sounds/kalimba/D3.ogg',
-      'D#3': Config.assetPath + 'sounds/kalimba/DS3.ogg',
-      'E3': Config.assetPath + 'sounds/kalimba/E3.ogg',
-      'F3': Config.assetPath + 'sounds/kalimba/F3.ogg',
-      'F#3': Config.assetPath + 'sounds/kalimba/FS3.ogg',
-      'G3': Config.assetPath + 'sounds/kalimba/G3.ogg',
-      'G#3': Config.assetPath + 'sounds/kalimba/GS3.ogg'
-  /*    'A4': Config.assetPath + 'sounds/kalimba/A4.ogg',
-      'A#4': Config.assetPath + 'sounds/kalimba/AS4.ogg',
-      'B4': Config.assetPath + 'sounds/kalimba/B4.ogg',
-      'C4': Config.assetPath + 'sounds/kalimba/C4.ogg' */
+      'A1': path + 'sounds/kalimba/A1.ogg',
+      'A#1': path + 'sounds/kalimba/AS1.ogg',
+      'B1': path + 'sounds/kalimba/B1.ogg',
+      'C1': path + 'sounds/kalimba/C1.ogg',
+      'C#1': path + 'sounds/kalimba/CS1.ogg',
+      'D1': path + 'sounds/kalimba/D1.ogg',
+      'D#1': path + 'sounds/kalimba/DS1.ogg',
+      'E1': path + 'sounds/kalimba/E1.ogg',
+      'F1': path + 'sounds/kalimba/F1.ogg',
+      'F#1': path + 'sounds/kalimba/FS1.ogg',
+      'G1': path + 'sounds/kalimba/G1.ogg',
+      'G#1': path + 'sounds/kalimba/GS1.ogg',
+      'A2': path + 'sounds/kalimba/A2.ogg',
+      'A#2': path + 'sounds/kalimba/AS2.ogg',
+      'B2': path + 'sounds/kalimba/B2.ogg',
+      'C2': path + 'sounds/kalimba/C2.ogg',
+      'C#2': path + 'sounds/kalimba/CS2.ogg',
+      'D2': path + 'sounds/kalimba/D2.ogg',
+      'D#2': path + 'sounds/kalimba/DS2.ogg',
+      'E2': path + 'sounds/kalimba/E2.ogg',
+      'F2': path + 'sounds/kalimba/F2.ogg',
+      'F#2': path + 'sounds/kalimba/FS2.ogg',
+      'G2': path + 'sounds/kalimba/G2.ogg',
+      'G#2': path + 'sounds/kalimba/GS2.ogg',
+      'A3': path + 'sounds/kalimba/A3.ogg',
+      'A#3': path + 'sounds/kalimba/AS3.ogg',
+      'B3': path + 'sounds/kalimba/B3.ogg',
+      'C3': path + 'sounds/kalimba/C3.ogg',
+      'C#3': path + 'sounds/kalimba/CS3.ogg',
+      'D3': path + 'sounds/kalimba/D3.ogg',
+      'D#3': path + 'sounds/kalimba/DS3.ogg',
+      'E3': path + 'sounds/kalimba/E3.ogg',
+      'F3': path + 'sounds/kalimba/F3.ogg',
+      'F#3': path + 'sounds/kalimba/FS3.ogg',
+      'G3': path + 'sounds/kalimba/G3.ogg',
+      'G#3': path + 'sounds/kalimba/GS3.ogg'
+  /*    'A4': path + 'sounds/kalimba/A4.ogg',
+      'A#4': path + 'sounds/kalimba/AS4.ogg',
+      'B4': path + 'sounds/kalimba/B4.ogg',
+      'C4': path + 'sounds/kalimba/C4.ogg' */
     }).chain(this.masterBus)
   }
 

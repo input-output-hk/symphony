@@ -27,13 +27,12 @@ const work = require('webworkify')
 
 const DayBuilderWorker = work(require('../workers/dayBuilder.js'))
 const TreeBuilderWorker = work(require('../workers/treeBuilder.js'))
-
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
-  constructor (params = {}) {
+  constructor ({ stage, path = './static/assets/' }) {
     super()
-    this.params = params
+    // this.params = params
 
     this.cubeCamera = null
 
@@ -42,18 +41,18 @@ export default class MainScene extends EventEmitter {
 
     this.allBlocksObj3d = new Map()
 
-    this.stage = params.stage // reference to the stage
+    this.stage = stage // reference to the stage
 
     this.initProperties() // class properties
     this.initState()
     this.addInteraction()
 
-    this.audio = new Audio(this.stage.camera)
+    this.audio = new Audio(this.stage.camera, path)
 
     this.audio.init()
 
     this.addEvents()
-    this.setupMaterials()
+    this.setupMaterials(path)
     this.initGui()
 
     this.initReflection()
@@ -685,7 +684,7 @@ export default class MainScene extends EventEmitter {
       })
   }
 
-  setupMaterials () {
+  setupMaterials (path) {
     this.cubeMapUrls = [
       'px.png',
       'nx.png',
@@ -695,13 +694,13 @@ export default class MainScene extends EventEmitter {
       'nz.png'
     ]
 
-    let map = new THREE.TextureLoader().load('static/assets/textures/Marble068_COL_1K.jpg')
-    let metalnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_REFL_1K.jpg')
-    let roughnessMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let glossMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load('static/assets/textures/Marble068_NRM_1K.jpg')
-    let bumpMap = new THREE.TextureLoader().load('static/assets/textures/IceBlock008_OVERLAY_1K.jpg')
-    this.bgMap = new THREE.CubeTextureLoader().setPath('static/assets/textures/').load(this.cubeMapUrls)
+    let map = new THREE.TextureLoader().load(path + 'textures/Marble068_COL_1K.jpg')
+    let metalnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_REFL_1K.jpg')
+    let roughnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
+    let glossMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
+    let normalMap = new THREE.TextureLoader().load(path + 'textures/Marble068_NRM_1K.jpg')
+    let bumpMap = new THREE.TextureLoader().load(path + 'textures/IceBlock008_OVERLAY_1K.jpg')
+    this.bgMap = new THREE.CubeTextureLoader().setPath(path + 'textures/').load(this.cubeMapUrls)
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
