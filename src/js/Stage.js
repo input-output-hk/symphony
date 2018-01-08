@@ -274,7 +274,7 @@ export default class Stage {
    * Animation loop
    */
   animate () {
-    requestAnimationFrame(this.animate.bind(this))
+    this.reqID = requestAnimationFrame(this.animate.bind(this))
     this.update()
   }
 }

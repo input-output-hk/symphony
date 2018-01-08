@@ -65,15 +65,25 @@ export default class MainScene extends EventEmitter {
 
   // start(){ console.warn("'start' method yet to be implemented") }
   destroy(){
+    document.removeEventListener('preUpdate', this.onUpdateBound, false)
+    cancelAnimationFrame(this.stage.reqID)
+    const scene = this.stage.scene
 
-    this.stage.scene.traverse(object => {
+    // const traverse = (obj, callback) => {
+    //   obj.children.forEach(child => traverse(child, callback))
+    //   callback(obj)
+    // }
+    
+    const dispose = function(object) {
       if ( object.geometry ) object.geometry.dispose()
       if ( object.material ) {
         if (object.material.map) object.material.map.dispose()
         object.material.dispose()
       }
-      scene.remove(object)
-    })
+      // if( object.parent ) object.parent.remove(object)
+    }
+
+    this.stage.scene.traverse(dispose)
   }
 
   setDate (date, focusOnBlock = false) {
@@ -387,7 +397,8 @@ export default class MainScene extends EventEmitter {
   }
 
   addEvents () {
-    document.addEventListener('preUpdate', this.onUpdate.bind(this), false)
+    this.onUpdateBound = this.onUpdate.bind(this)
+    document.addEventListener('preUpdate', this.onUpdateBound, false)
     document.addEventListener('cameraMove', this.onCameraMove.bind(this), false)
 
     this.selectBlock = new Event('selectBlock')
@@ -916,7 +927,7 @@ export default class MainScene extends EventEmitter {
           if (innerIndex === 1 && index !== 0) {
             signedIndex = index * -1
           }
-          console.log(signedIndex)
+          
           if (typeof this.state.dayData[closestDayIndex + signedIndex] === 'undefined') {
             let day = moment(this.state.currentDay.timeStamp).subtract(signedIndex, 'day').format('YYYY-MM-DD')
             this.loadDay(day, closestDayIndex, signedIndex)
