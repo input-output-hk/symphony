@@ -7,7 +7,7 @@
   "scripts": {
     "start": "budo src/js/main.js:dist/app.js --live --open",
     "test": "budo src/js/main.js:dist/app.js --live --open -- -t babelify",
-    "build": "browserify src/js/main.js | uglifyjs -cm > dist/app.js"
+    "build": "browserify src/js/main.js > dist/app.js"
   },
   "browserify": {
     "transform": [
