@@ -5,7 +5,7 @@ uniform float uFresnelPower;
 
 varying vec3 vReflect;
 varying vec3 vRefract[3];
-varying float vReflectionFactor;
+//varying float vReflectionFactor;
 
 #define PHYSICAL
 

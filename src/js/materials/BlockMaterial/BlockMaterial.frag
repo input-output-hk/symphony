@@ -1,6 +1,6 @@
 varying vec3 vReflect;
 varying vec3 vRefract[3];
-varying float vReflectionFactor;
+//varying float vReflectionFactor;
 varying vec3 worldNormal;
 
 #define PHYSICAL
