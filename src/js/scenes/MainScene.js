@@ -897,18 +897,19 @@ export default class MainScene extends EventEmitter {
       }
     }
 
+    const blocks = this.state.dayData[closestDayIndex].blocks
+    const time = blocks[0].time * 1000
+    const date = moment(time).startOf('day').toDate()
+    const day = {
+      date,
+      input: blocks.reduce((a, b) => a + b.input, 0),
+      output: blocks.reduce((a, b) => a + b.output, 0),
+      fee: blocks.reduce((a, b) => a + b.fee, 0)
+    }
+
     // bubble up event
     if (this.state.currentDay === null) {
-      const blocks = this.state.dayData[closestDayIndex].blocks
-      const time = blocks[0].time * 1000
-      const date = moment(time).startOf('day').toDate()
-      const day = {
-        date,
-        input: blocks.reduce((a, b) => a + b.input, 0),
-        output: blocks.reduce((a, b) => a + b.output, 0),
-        fee: blocks.reduce((a, b) => a + b.fee, 0)
-      }
-
+      
       this.emit('firstDayLoaded')
       this.emit('dayChanged', day)
     } else {
@@ -982,13 +983,15 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  loadBlock (hash = null) {
-    this.api.getBlock(hash).then((block) => {
-      let blockDay = moment(block.time * 1000).format('YYYY-MM-DD')
-      this.state.currentHash = block.hash
-
-      this.setDate(blockDay, true)
-    })
+  async goToBlock (blockhash) {
+    if(!blockhash) return
+    const existingBlock = Array.from(this.allBlocks.values()).find(({ hash }) => hash === blockhash)
+    // console.log( existingBlock )
+    let block = existingBlock
+    if(!existingBlock) block = await this.api.getBlock(hash)
+    let day = moment(block.time * 1000).format('YYYY-MM-DD')
+    this.state.currentHash = block.hash
+    this.setDate(day, true)
   }
 
   focusOnBlock (blockGroup) {
