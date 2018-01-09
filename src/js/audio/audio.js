@@ -13,9 +13,9 @@ export default class Audio {
     this.loops = []
     this.quantize = 32
     this.masterVol = -18 // db
-    this.ambienceVol = -30 // db
+    this.ambienceVol = -10 // db
     this.path = path
-    this.ambiencePath = path + 'sounds/ambience/mining.ogg'
+    this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
     this.notes = {
       55.000: 'A1',
@@ -242,11 +242,11 @@ export default class Audio {
       Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z) */
 
       // this.preload().then(() => {
-      // this.loadAmbience().then(() => {
-        // this.ambiencePlayer.start()
-      Tone.Transport.start()
-      resolve()
-     // })
+      this.loadAmbience().then(() => {
+        this.ambiencePlayer.start()
+        Tone.Transport.start()
+        resolve()
+      })
       // })
     })
   }
