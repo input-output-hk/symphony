@@ -39,6 +39,8 @@ export default class MainScene extends EventEmitter {
     this.api = new API()
 
     this.allBlocksObj3d = new Map()
+    this.allBlocks = new Map()
+    this.lastHoveredBlock = null
 
     this.stage = stage // reference to the stage
 
@@ -336,6 +338,7 @@ export default class MainScene extends EventEmitter {
         blockGroup.translateZ((index * 30))
         // blockGroup.name = block.hash
         this.allBlocksObj3d.set(block.hash, blockGroup)
+        this.allBlocks.set(blockGroup, block)
         blockGroup.visible = false
 
         blockGroup.add(back)
@@ -795,7 +798,7 @@ export default class MainScene extends EventEmitter {
     const boxes = allBlocks
       // .filter(box => box !== this.state.currentBlockObject)
       .map(group => group.children[0])
-      .filter(box => box) // Filter to only those with non null refs
+      .filter(box => box && box.visible) // Filter to only those with non null refs
 
     const intersections = raycaster.intersectObjects(boxes, false)
     const intersected = intersections[0] && intersections[0].object.parent
@@ -827,6 +830,10 @@ export default class MainScene extends EventEmitter {
     */
     if (intersected && intersected !== this.state.currentBlockObject) {
       intersected.children.forEach(child => child.material = this.blockMaterialHighlight)
+      if( intersected !== this.lastHoveredBlock ){
+        this.lastHoveredBlock = intersected
+        this.emit('blockHovered', this.allBlocks.get(intersected))
+      }
       this.pointLightTarget = intersected.position
     }
 
