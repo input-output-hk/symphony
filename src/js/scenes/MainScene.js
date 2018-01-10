@@ -480,6 +480,8 @@ export default class MainScene extends EventEmitter {
       return
     }
 
+    this.emit('blockUnselected')
+
     // this.removeTrees()
     this.audio.unloadSound()
 
