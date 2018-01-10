@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-const glslify = require('glslify')
+import vertexShader from './BlockMaterial.vert'
+import fragmentShader from './BlockMaterial.frag'
 
 export default class BlockMaterial extends THREE.MeshStandardMaterial {
   constructor (cfg) {
@@ -28,7 +29,7 @@ export default class BlockMaterial extends THREE.MeshStandardMaterial {
       value: 20.0
     }
 
-    this.vertexShader = glslify('./BlockMaterial.vert')
-    this.fragmentShader = glslify('./BlockMaterial.frag')
+    this.vertexShader = vertexShader
+    this.fragmentShader = fragmentShader
   }
 }

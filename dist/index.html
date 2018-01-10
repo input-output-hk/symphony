@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>IOHK Implementation Example</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"> -->
-	<style>
-		* {
+<!DOCTYPE html><html lang=en><head><title>IOHK Implementation Example</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no"><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Inconsolata"><style>* {
 			padding: 0;
 			margin: 0;
 		}
@@ -51,148 +41,130 @@
 		canvas {
 			width: 100%!important;
 			height: 100%!important;
-		}
-	</style>
-</head>
+		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=https://unpkg.com/react@16/umd/react.development.js></script><script src=https://unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=https://unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script type=text/babel>window.onload = function(){
 
-<body>
-	<div id='hud'></div>
-	<div class="canvas-container">
-		<canvas id="stage"></canvas>
-	</div>
-	<script src="dist/app.js?v=1.0.1"></script>
-	<script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-	<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-	<script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-	<script type="text/babel">
+			// check that browser supports webgl
+			if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
+				
+			// Create the Orpeus App
+			const app = orpheusApp({ path: './static/assets/' })
+			window.app
 
-		// check that browser supports webgl
-		if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
+
+			// initial date needs to be set, could be set via current date or url for example
+			app.setDate('2018-01-01') 
+
+
+			/*
+				Destroys the Orpheus instance and unloads all data.
+				The application instance cannot be used after this is called
+			*/
+			// app.destroy()
+
+
+			/*
+				Event called when the first day loads
+			*/
+			app.on('firstDayLoaded', data => console.log('first day of blocks loaded'))
 			
-		// Create the Orpeus App
-		const app = orpheusApp({ path: './static/assets/' })
-		window.app
+
+			/*
+				Event called as a user scrolls through time and the current day changes
+			*/
+			app.on('dayChanged', ({ date, input, output, fee }) => {
+				ReactDOM.render(		
+					<div>	
+						<h1>Day View</h1>
+						<br/>
+						<div>Date: { date.toString() }</div>
+						<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
+						<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
+						<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
+					</div>
+				,document.querySelector('#hud'))
+			})
+
+			/*
+				Event called when a block is hovered over
+			*/
+			//app.on('blockHovered', console.log )
 
 
-		// initial date needs to be set, could be set via current date or url for example
-		app.setDate('2018-01-01') 
+			/*
+				Event called when a block is selected
+			*/
+			app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
+				ReactDOM.render(		
+					<div>	
+						<h1>Block View</h1>
+						<br/>
+						<div>Date: { time.toString() }</div>
+						<div>Bits: { bits.toLocaleString('USD') }</div>
+						<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
+						<div>Fee Level: { feeToInputRatio }</div>
+						<div>Block Hash: { hash.substr(-16) }</div>
+						<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
+						<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
+						<div >Number of Transactions: { n_tx }</div>				
+					</div>
+				,document.querySelector('#hud'))
+			})
 
+			
 
-		/*
-			Destroys the Orpheus instance and unloads all data.
-			The application instance cannot be used after this is called
-		*/
-		// app.destroy()
+			// data about the app can be accessed via: app.state
 
+			// bind esc key to remove currently viewed block
+			document.addEventListener('keydown', event => {
+				var isEscape = false
+				if ('key' in event) {
+					isEscape = (event.key === 'Escape' || event.key === 'Esc')
+				} else {
+					isEscape = (event.keyCode === 27)
+				}
+				if (isEscape) {
+					app.resetDayView()
+				}
+			}, false)
 
-		/*
-			Event called when the first day loads
-		*/
-		app.on('firstDayLoaded', data => console.log('first day of blocks loaded'))
-		
+			// move camera on z axis with mouse wheel
+			const onDocumentMouseWheel = function (event) {
+				if (app.scrollBlocked) {
+					return
+				}
 
-		/*
-			Event called as a user scrolls through time and the current day changes
-		*/
-		app.on('dayChanged', ({ date, input, output, fee }) => {
-			ReactDOM.render(		
-				<div>	
-					<h1>Day View</h1>
-					<br/>
-					<div>Date: { date.toString() }</div>
-					<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
-					<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
-					<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
-				</div>
-			,document.querySelector('#hud'))
-		})
+				if (app.state.view === 'block') {
+					return
+				}
 
-		/*
-			Event called when a block is hovered over
-		*/
-		//app.on('blockHovered', console.log )
+				event.preventDefault()
 
+				if (Math.abs(event.deltaY) > 0) {
+					app.scrollBlocked = true
+					setTimeout(() => {
+						app.scrollBlocked = false
+					}, 50)
+				}
 
-		/*
-			Event called when a block is selected
-		*/
-		app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
-			ReactDOM.render(		
-				<div>	
-					<h1>Block View</h1>
-					<br/>
-					<div>Date: { time.toString() }</div>
-					<div>Bits: { bits.toLocaleString('USD') }</div>
-					<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
-					<div>Fee Level: { feeToInputRatio }</div>
-					<div>Block Hash: { hash.substr(-16) }</div>
-					<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
-					<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
-					<div >Number of Transactions: { n_tx }</div>				
-				</div>
-			,document.querySelector('#hud'))
-		})
+				if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
+					app.stage.targetCameraPos.z = app.state.minCameraZPos
+					return
+				}
 
-		
+				if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
+					app.stage.targetCameraPos.z = app.state.maxCameraZPos
+					app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
+					return
+				}
 
-		// data about the app can be accessed via: app.state
-
-		// bind esc key to remove currently viewed block
-		document.addEventListener('keydown', event => {
-			var isEscape = false
-			if ('key' in event) {
-				isEscape = (event.key === 'Escape' || event.key === 'Esc')
-			} else {
-				isEscape = (event.keyCode === 27)
-			}
-			if (isEscape) {
-				app.resetDayView()
-			}
-		}, false)
-
-		// move camera on z axis with mouse wheel
-		const onDocumentMouseWheel = function (event) {
-			if (app.scrollBlocked) {
-				return
-			}
-
-			if (app.state.view === 'block') {
-				return
-			}
-
-			event.preventDefault()
-
-			if (Math.abs(event.deltaY) > 0) {
-				app.scrollBlocked = true
-				setTimeout(() => {
-					app.scrollBlocked = false
-				}, 50)
-			}
-
-			if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
-				app.stage.targetCameraPos.z = app.state.minCameraZPos
-				return
+				if (event.deltaY > 0) {
+					app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
+					app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
+				} else if (event.deltaY < 0) {
+					app.stage.targetCameraPos.z += app.stage.cameraMoveStep
+					app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
+				}
 			}
 
-			if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
-				app.stage.targetCameraPos.z = app.state.maxCameraZPos
-				app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
-				return
-			}
-
-			if (event.deltaY > 0) {
-				app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
-				app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
-			} else if (event.deltaY < 0) {
-				app.stage.targetCameraPos.z += app.stage.cameraMoveStep
-				app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
-			}
-		}
-
-		document.addEventListener("wheel", onDocumentMouseWheel, false);
-
-	</script>
-
-</body>
-
-</html>
+			document.addEventListener("wheel", onDocumentMouseWheel, false);
+		}</script><script type=text/javascript src=/static/js/manifest.c865ded87987e0a51682.js></script><script type=text/javascript src=/static/js/vendor.a07de40efd87a36ed2b9.js></script><script type=text/javascript src=/static/js/app.4d5e6e6584f8fd78fc43.js></script></body></html>

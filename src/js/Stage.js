@@ -12,7 +12,7 @@ import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
 import HorizontalTiltShiftShader from './shaders/HorizontalTiltShiftShader'
-import * as fboHelper from './helpers/fboHelper'
+// import * as fboHelper from './helpers/fboHelper'
 // import EffectComposer2 from './EffectComposer'
 
 // Global config
@@ -138,7 +138,7 @@ export default class Stage {
     this.renderer.autoClear = true
     this.renderer.sortObjects = false
 
-    fboHelper.init(this.renderer)
+    // fboHelper.init(this.renderer)
     this.composer = new EffectComposer(this.renderer)
   }
 

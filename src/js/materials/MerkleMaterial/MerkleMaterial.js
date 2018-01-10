@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import BlockMaterial from '../BlockMaterial/BlockMaterial'
-const glslify = require('glslify')
+import vertexShader from './MerkleMaterial.vert'
+import fragmentShader from './MerkleMaterial.frag'
 
 export default class MerkleMaterial extends BlockMaterial {
   constructor (cfg) {
@@ -19,7 +20,7 @@ export default class MerkleMaterial extends BlockMaterial {
    //   value: 0.0
     }
 
-    this.vertexShader = glslify('./MerkleMaterial.vert')
-    this.fragmentShader = glslify('./MerkleMaterial.frag')
+    this.vertexShader = vertexShader
+    this.fragmentShader = vertexShader
   }
 }

@@ -23,10 +23,10 @@ import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
 const dat = require('dat-gui')
 
-const work = require('webworkify')
+const work = require('webworkify-webpack')
 
-const DayBuilderWorker = work(require('../workers/dayBuilder.js'))
-const TreeBuilderWorker = work(require('../workers/treeBuilder.js'))
+const DayBuilderWorker = work(require.resolve('../workers/dayBuilder.js'))
+const TreeBuilderWorker = work(require.resolve('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {

@@ -3,7 +3,7 @@
 
     // This module hashes the elements in an array and returns a FastMap of the hashes
 
-  var hasha = require('hasha')
+  // var hasha = require('hasha')
   var FastMap = require('collections/fast-map')
 
   var hashAlgorithm
@@ -41,10 +41,10 @@
         fastMap.add(value, index)
       }
     } else {
-      for (let index = 0; index < array.length; index++) {
-        const value = array[index]
-        fastMap.add(hasha(value, {algorithm: hashAlgorithm}), index)
-      }
+      // for (let index = 0; index < array.length; index++) {
+      //   const value = array[index]
+      //   fastMap.add(hasha(value, {algorithm: hashAlgorithm}), index)
+      // }
     }
 
     return fastMap

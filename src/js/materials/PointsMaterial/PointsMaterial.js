@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-const glslify = require('glslify')
+import vertexShader from './PointsMaterial.vert'
+import fragmentShader from './PointsMaterial.frag'
 
 export default class PointsMaterial extends THREE.PointsMaterial {
   constructor (cfg) {
@@ -21,7 +22,7 @@ export default class PointsMaterial extends THREE.PointsMaterial {
       type: 'f'
     }
 
-    this.vertexShader = glslify('./PointsMaterial.vert')
-    this.fragmentShader = glslify('./PointsMaterial.frag')
+    this.vertexShader = vertexShader
+    this.fragmentShader = fragmentShader
   }
 }
