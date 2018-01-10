@@ -36,7 +36,7 @@ export default class Stage {
     this.initPost()
     this.addLights()
     this.addEvents()
-    this.resize()
+    this.resize( 300, 150 )
     this.animate()
   }
 
@@ -173,8 +173,6 @@ export default class Stage {
       this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
     })
 
-    // window resize event
-    window.addEventListener('resize', this.resize.bind(this), false)
   }
 
   /**
@@ -191,14 +189,14 @@ export default class Stage {
   /**
    * Window resize
    */
-  resize () {
-    this.camera.aspect = window.innerWidth / window.innerHeight
+  resize (w, h) {
+    this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
 
-    this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight)
+    this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / w, 1 / h)
 
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
-    this.composer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setSize(w, h)
+    this.composer.setSize(w, h)
   }
 
   /**

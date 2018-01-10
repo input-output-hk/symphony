@@ -416,6 +416,10 @@ export default class MainScene extends EventEmitter {
     }
   }
 
+  setSize(w, h){
+    this.stage.resize(w, h)
+  }
+
   addTreeToStage ({ data }) {
     const { boxCenter, offset, sie, vertices, endPoints, block } = data
     if (!vertices) return

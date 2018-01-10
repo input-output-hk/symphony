@@ -73,6 +73,7 @@
 				
 			// Create the Orpeus App
 			const app = orpheusApp({ path: './static/assets/' })
+			app.setSize(window.innerWidth, window.innerHeight)
 			window.app
 
 
@@ -139,6 +140,11 @@
 				Event for whenever a block is unselected
 			*/
 			app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
+
+
+			// window resize event
+			window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+			app.setSize(window.innerWidth, window.innerHeight)
 
 			// data about the app can be accessed via: app.state
 
