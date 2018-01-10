@@ -501,10 +501,7 @@ export default class MainScene extends EventEmitter {
       // this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
       this.animateBlockOut(this.state.currentBlockObject).then(() => {
         this.state.currentBlockObject = null
-        this.state.view = 'day'
       })
-    } else {
-      this.state.view = 'day'
     }
   }
 
@@ -995,10 +992,8 @@ export default class MainScene extends EventEmitter {
   }
 
   async goToBlock (blockhash) {
-    console.log(blockhash)
     if (!blockhash) return
     const existingBlock = Array.from(this.allBlocks.values()).find(({ hash }) => hash === blockhash)
-    // console.log( existingBlock )
     let block = existingBlock
     if (!existingBlock) block = await this.api.getBlock(blockhash)
     let day = moment(block.time * 1000).toDate()//.format('YYYY-MM-DD')
@@ -1009,7 +1004,6 @@ export default class MainScene extends EventEmitter {
   focusOnBlock (blockGroup) {
     // let blockGroup = blockObject//.parent
     blockGroup.visible = true
-    this.state.view = 'block'
 
     // if (this.state.currentBlockObject) {
     //   this.animateBlockOut(this.state.currentBlockObject/*.parent.children[0]*/)
@@ -1031,16 +1025,6 @@ export default class MainScene extends EventEmitter {
         this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
       })
     })
-  }
-
-  animateTree () {
-    if (this.state.view === 'block') {
-      if (this.treeGroup) {
-        this.state.currentBlockObject.rotation.y += 0.001
-        this.state.currentBlockObject.parent.children[0].rotation.y += 0.001
-        this.treeGroup.rotation.y += 0.001
-      }
-    }
   }
 
   animateBlockVisibility () {
@@ -1079,7 +1063,6 @@ export default class MainScene extends EventEmitter {
     TWEEN.update()
     this.updateLights()
     this.checkMouseIntersection()
-    // this.animateTree()
     this.animateBlockVisibility()
 
     this.uTime = this.clock.getElapsedTime()
