@@ -553,8 +553,6 @@ export default class MainScene extends EventEmitter {
       cubeCamera.position.set(position.x, position.y, position.z)
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
-
-      console.log(this.state.dayData[dayIndex].blockMaterialFront, cubeCamera.renderTarget.texture )
       this.state.dayData[dayIndex].blockMaterialFront.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].blockMaterialBack.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
