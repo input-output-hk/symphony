@@ -995,12 +995,13 @@ export default class MainScene extends EventEmitter {
   }
 
   async goToBlock (blockhash) {
+    console.log(blockhash)
     if (!blockhash) return
     const existingBlock = Array.from(this.allBlocks.values()).find(({ hash }) => hash === blockhash)
     // console.log( existingBlock )
     let block = existingBlock
     if (!existingBlock) block = await this.api.getBlock(blockhash)
-    let day = moment(block.time * 1000).format('YYYY-MM-DD')
+    let day = moment(block.time * 1000).toDate()//.format('YYYY-MM-DD')
     this.state.currentHash = block.hash
     this.setDate(day, true)
   }
