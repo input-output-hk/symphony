@@ -471,7 +471,6 @@ export default class MainScene extends EventEmitter {
 
     // this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
     // this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
-
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
 
