@@ -709,7 +709,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.BackSide,
-      // envMap: this.bgMap,
+      envMap: this.bgMap,
       bumpMap,
       bumpScale: 0.03
     })
@@ -722,7 +722,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.FrontSide,
-      // envMap: this.bgMap,
+      envMap: this.bgMap,
       bumpMap,
       bumpScale: 0.03
     })
@@ -735,7 +735,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      // envMap: this.bgMap,
+      envMap: this.bgMap,
       envMapIntensity: 2.3,
       // bumpMap,
       // bumpScale: 0.03,
@@ -773,7 +773,7 @@ export default class MainScene extends EventEmitter {
       depthWrite: false, */
       transparent: true,
       side: THREE.DoubleSide,
-      // envMap: this.bgMap
+      envMap: this.bgMap
     })
 
     this.pointsMaterial = new PointsMaterial({
