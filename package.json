@@ -5,9 +5,10 @@
   "author": "Kuva <hello@kuva.io>",
   "private": true,
   "scripts": {
-    "start": "budo src/js/main.js:dist/app.js --live --open",
-    "test": "budo src/js/main.js:dist/app.js --live --open -- -t babelify",
-    "build": "browserify src/js/main.js | uglifyjs -cm > dist/app.js"
+    "dev": "node build/dev-server.js",
+    "start": "node build/dev-server.js",
+    "build": "node build/build.js",
+    "test": "standard 'src/**/*.js'"
   },
   "browserify": {
     "transform": [
