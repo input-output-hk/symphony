@@ -139,23 +139,23 @@ export default class Audio {
   }
 
   loadAmbience () {
-    return new Promise((resolve, reject) => {
-      this.ambienceFilter = new Tone.Filter({
-        type: 'lowpass',
-        Q: 5
-      }).chain(this.ambienceBus)
+    // return new Promise((resolve, reject) => {
+    //   this.ambienceFilter = new Tone.Filter({
+    //     type: 'lowpass',
+    //     Q: 5
+    //   }).chain(this.ambienceBus)
 
-      this.ambiencePlayer = new Tone.Player({
-        'url': this.ambiencePath,
-        'loop': true,
-        onload: () => {
-          resolve()
-        }
-      // }).chain(this.ambienceFilter)
-      }).chain(this.ambienceBus)
+    //   this.ambiencePlayer = new Tone.Player({
+    //     'url': this.ambiencePath,
+    //     'loop': true,
+    //     onload: () => {
+    //       resolve()
+    //     }
+    //   // }).chain(this.ambienceFilter)
+    //   }).chain(this.ambienceBus)
 
-      this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
-    })
+    //   this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
+    // })
   }
 
   setAmbienceFilterCutoff (value) {
@@ -174,6 +174,7 @@ export default class Audio {
   }
 
   preloadNotes () {
+    debugger
     return new Promise((resolve, reject) => {
       let loadCount = 0
       let self = this
@@ -195,6 +196,7 @@ export default class Audio {
   }
 
   preloadAmbience () {
+    debugger
     return new Promise((resolve, reject) => {
       resolve()
      /* this.audioLoader.load(
@@ -207,6 +209,7 @@ export default class Audio {
   }
 
   preload () {
+    debugger
     return new Promise((resolve, reject) => {
       this.preloadNotes().then(() => {
         this.preloadAmbience().then(() => {
@@ -219,15 +222,15 @@ export default class Audio {
 
   init () {
     return new Promise((resolve, reject) => {
-      this.masterBus = new Tone.Volume(this.masterVol).toMaster()
-      this.ambienceBus = new Tone.Volume(-96).toMaster()
+      // this.masterBus = new Tone.Volume(this.masterVol).toMaster()
+      // this.ambienceBus = new Tone.Volume(-96).toMaster()
 
       /* this.convolver = new Tone.Convolver(path + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0) */
 
       // this.pingPong = new Tone.PingPongDelay('16n', 0.85)
 
-      Tone.Transport.bpm.value = this.bpm
+      // Tone.Transport.bpm.value = this.bpm
 
       /* Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
 
@@ -243,8 +246,8 @@ export default class Audio {
 
       // this.preload().then(() => {
       this.loadAmbience().then(() => {
-        this.ambiencePlayer.start()
-        Tone.Transport.start()
+        // this.ambiencePlayer.start()
+        // Tone.Transport.start()
         resolve()
       })
       // })
@@ -252,143 +255,143 @@ export default class Audio {
   }
 
   loadSampler () {
-    this.sampler = new Tone.Sampler({
-      'A1': this.path + 'sounds/kalimba/A1.mp3',
-      'A#1': this.path + 'sounds/kalimba/AS1.mp3',
-      'B1': this.path + 'sounds/kalimba/B1.mp3',
-      'C1': this.path + 'sounds/kalimba/C1.mp3',
-      'C#1': this.path + 'sounds/kalimba/CS1.mp3',
-      'D1': this.path + 'sounds/kalimba/D1.mp3',
-      'D#1': this.path + 'sounds/kalimba/DS1.mp3',
-      'E1': this.path + 'sounds/kalimba/E1.mp3',
-      'F1': this.path + 'sounds/kalimba/F1.mp3',
-      'F#1': this.path + 'sounds/kalimba/FS1.mp3',
-      'G1': this.path + 'sounds/kalimba/G1.mp3',
-      'G#1': this.path + 'sounds/kalimba/GS1.mp3',
-      'A2': this.path + 'sounds/kalimba/A2.mp3',
-      'A#2': this.path + 'sounds/kalimba/AS2.mp3',
-      'B2': this.path + 'sounds/kalimba/B2.mp3',
-      'C2': this.path + 'sounds/kalimba/C2.mp3',
-      'C#2': this.path + 'sounds/kalimba/CS2.mp3',
-      'D2': this.path + 'sounds/kalimba/D2.mp3',
-      'D#2': this.path + 'sounds/kalimba/DS2.mp3',
-      'E2': this.path + 'sounds/kalimba/E2.mp3',
-      'F2': this.path + 'sounds/kalimba/F2.mp3',
-      'F#2': this.path + 'sounds/kalimba/FS2.mp3',
-      'G2': this.path + 'sounds/kalimba/G2.mp3',
-      'G#2': this.path + 'sounds/kalimba/GS2.mp3',
-      'A3': this.path + 'sounds/kalimba/A3.mp3',
-      'A#3': this.path + 'sounds/kalimba/AS3.mp3',
-      'B3': this.path + 'sounds/kalimba/B3.mp3',
-      'C3': this.path + 'sounds/kalimba/C3.mp3',
-      'C#3': this.path + 'sounds/kalimba/CS3.mp3',
-      'D3': this.path + 'sounds/kalimba/D3.mp3',
-      'D#3': this.path + 'sounds/kalimba/DS3.mp3',
-      'E3': this.path + 'sounds/kalimba/E3.mp3',
-      'F3': this.path + 'sounds/kalimba/F3.mp3',
-      'F#3': this.path + 'sounds/kalimba/FS3.mp3',
-      'G3': this.path + 'sounds/kalimba/G3.mp3',
-      'G#3': this.path + 'sounds/kalimba/GS3.mp3'
-  /*    'A4': this.path + 'sounds/kalimba/A4.mp3',
-      'A#4': this.path + 'sounds/kalimba/AS4.mp3',
-      'B4': this.path + 'sounds/kalimba/B4.mp3',
-      'C4': this.path + 'sounds/kalimba/C4.mp3' */
-    }).chain(this.masterBus)
+  //   this.sampler = new Tone.Sampler({
+  //     'A1': this.path + 'sounds/kalimba/A1.mp3',
+  //     'A#1': this.path + 'sounds/kalimba/AS1.mp3',
+  //     'B1': this.path + 'sounds/kalimba/B1.mp3',
+  //     'C1': this.path + 'sounds/kalimba/C1.mp3',
+  //     'C#1': this.path + 'sounds/kalimba/CS1.mp3',
+  //     'D1': this.path + 'sounds/kalimba/D1.mp3',
+  //     'D#1': this.path + 'sounds/kalimba/DS1.mp3',
+  //     'E1': this.path + 'sounds/kalimba/E1.mp3',
+  //     'F1': this.path + 'sounds/kalimba/F1.mp3',
+  //     'F#1': this.path + 'sounds/kalimba/FS1.mp3',
+  //     'G1': this.path + 'sounds/kalimba/G1.mp3',
+  //     'G#1': this.path + 'sounds/kalimba/GS1.mp3',
+  //     'A2': this.path + 'sounds/kalimba/A2.mp3',
+  //     'A#2': this.path + 'sounds/kalimba/AS2.mp3',
+  //     'B2': this.path + 'sounds/kalimba/B2.mp3',
+  //     'C2': this.path + 'sounds/kalimba/C2.mp3',
+  //     'C#2': this.path + 'sounds/kalimba/CS2.mp3',
+  //     'D2': this.path + 'sounds/kalimba/D2.mp3',
+  //     'D#2': this.path + 'sounds/kalimba/DS2.mp3',
+  //     'E2': this.path + 'sounds/kalimba/E2.mp3',
+  //     'F2': this.path + 'sounds/kalimba/F2.mp3',
+  //     'F#2': this.path + 'sounds/kalimba/FS2.mp3',
+  //     'G2': this.path + 'sounds/kalimba/G2.mp3',
+  //     'G#2': this.path + 'sounds/kalimba/GS2.mp3',
+  //     'A3': this.path + 'sounds/kalimba/A3.mp3',
+  //     'A#3': this.path + 'sounds/kalimba/AS3.mp3',
+  //     'B3': this.path + 'sounds/kalimba/B3.mp3',
+  //     'C3': this.path + 'sounds/kalimba/C3.mp3',
+  //     'C#3': this.path + 'sounds/kalimba/CS3.mp3',
+  //     'D3': this.path + 'sounds/kalimba/D3.mp3',
+  //     'D#3': this.path + 'sounds/kalimba/DS3.mp3',
+  //     'E3': this.path + 'sounds/kalimba/E3.mp3',
+  //     'F3': this.path + 'sounds/kalimba/F3.mp3',
+  //     'F#3': this.path + 'sounds/kalimba/FS3.mp3',
+  //     'G3': this.path + 'sounds/kalimba/G3.mp3',
+  //     'G#3': this.path + 'sounds/kalimba/GS3.mp3'
+  // /*    'A4': this.path + 'sounds/kalimba/A4.mp3',
+  //     'A#4': this.path + 'sounds/kalimba/AS4.mp3',
+  //     'B4': this.path + 'sounds/kalimba/B4.mp3',
+  //     'C4': this.path + 'sounds/kalimba/C4.mp3' */
+  //   }).chain(this.masterBus)
   }
 
   generateMerkleSound (positionsArray, blockObjectPosition, block, pointsMaterial, pointsMesh) {
-    if (!this.samplerLoaded) {
-      this.loadSampler()
-    }
+    // if (!this.samplerLoaded) {
+    //   this.loadSampler()
+    // }
 
-    this.samplerLoaded = true
+    // this.samplerLoaded = true
 
-    this.loopMap = []
+    // this.loopMap = []
 
-    this.black = new THREE.Color(0x000000)
-    this.white = new THREE.Color(0xffffff)
+    // this.black = new THREE.Color(0x000000)
+    // this.white = new THREE.Color(0xffffff)
 
-    this.pointsMaterial = pointsMaterial
+    // this.pointsMaterial = pointsMaterial
 
-    let minTime = Number.MAX_SAFE_INTEGER
-    let maxTime = 0
+    // let minTime = Number.MAX_SAFE_INTEGER
+    // let maxTime = 0
 
-    for (let index = 0; index < block.transactions.length; index++) {
-      const transaction = block.transactions[index]
-      minTime = Math.min(transaction.time, minTime)
-      maxTime = Math.max(transaction.time, maxTime)
-    }
+    // for (let index = 0; index < block.transactions.length; index++) {
+    //   const transaction = block.transactions[index]
+    //   minTime = Math.min(transaction.time, minTime)
+    //   maxTime = Math.max(transaction.time, maxTime)
+    // }
 
-    block.transactions.sort((a, b) => {
-      return a.time > b.time
-    })
+    // block.transactions.sort((a, b) => {
+    //   return a.time > b.time
+    // })
 
-    this.pointColors = []
-    for (let index = 0; index < positionsArray.length * 3; index++) {
-      this.pointColors.push(0)
-    }
+    // this.pointColors = []
+    // for (let index = 0; index < positionsArray.length * 3; index++) {
+    //   this.pointColors.push(0)
+    // }
 
-    for (let index = 0; index < positionsArray.length; index++) {
-      const point = positionsArray[index]
+    // for (let index = 0; index < positionsArray.length; index++) {
+    //   const point = positionsArray[index]
 
-      /**
-       * Map transaction time to new range
-       */
-      if (typeof block.transactions[index] !== 'undefined') {
-        const transaction = block.transactions[index]
-        let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
+    //   /**
+    //    * Map transaction time to new range
+    //    */
+    //   if (typeof block.transactions[index] !== 'undefined') {
+    //     const transaction = block.transactions[index]
+    //     let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
 
-        // noteCount++
+    //     // noteCount++
 
-        // get closest note
-        let minDiff = Number.MAX_SAFE_INTEGER
-        let note = 'C1'
+    //     // get closest note
+    //     let minDiff = Number.MAX_SAFE_INTEGER
+    //     let note = 'C1'
 
-        let mode = this.modes.aeolian
-        for (var frequency in this.notes) {
-          if (this.notes.hasOwnProperty(frequency)) {
-            let noteName = this.notes[frequency].replace(/[0-9]/g, '')
-            if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((point * 2.0) - frequency)
-              if (diff < minDiff) {
-                minDiff = diff
-                note = this.notes[frequency]
-              }
-            }
-          }
-        }
+    //     let mode = this.modes.aeolian
+    //     for (var frequency in this.notes) {
+    //       if (this.notes.hasOwnProperty(frequency)) {
+    //         let noteName = this.notes[frequency].replace(/[0-9]/g, '')
+    //         if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
+    //           let diff = Math.abs((point * 2.0) - frequency)
+    //           if (diff < minDiff) {
+    //             minDiff = diff
+    //             note = this.notes[frequency]
+    //           }
+    //         }
+    //       }
+    //     }
 
-        let that = this
-        let loop
+    //     let that = this
+    //     let loop
 
-        let timeLowRes = time.toFixed(1)
+    //     let timeLowRes = time.toFixed(1)
 
-        if (typeof this.loopMap[timeLowRes] === 'undefined') {
-          loop = new Tone.Loop(
-            () => {
-              this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
-              this.pointColors[index * 3] = 255
-              setTimeout(() => {
-                this.pointColors[index * 3] = 0
-              }, 500)
-            },
-            '1m'
-          ).start(Tone.Transport.seconds + time)
-        } else {
-          loop = new Tone.Loop(
-            () => {
-              this.pointColors[index * 3] = 255
-              setTimeout(() => {
-                this.pointColors[index * 3] = 0
-              }, 500)
-            },
-              '1m'
-          ).start(Tone.Transport.seconds + time)
-        }
-        loop.humanize = '64n'
-        this.loops.push(loop)
-        this.loopMap[timeLowRes] = true
-      }
-    }
+    //     if (typeof this.loopMap[timeLowRes] === 'undefined') {
+    //       loop = new Tone.Loop(
+    //         () => {
+    //           this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+    //           this.pointColors[index * 3] = 255
+    //           setTimeout(() => {
+    //             this.pointColors[index * 3] = 0
+    //           }, 500)
+    //         },
+    //         '1m'
+    //       ).start(Tone.Transport.seconds + time)
+    //     } else {
+    //       loop = new Tone.Loop(
+    //         () => {
+    //           this.pointColors[index * 3] = 255
+    //           setTimeout(() => {
+    //             this.pointColors[index * 3] = 0
+    //           }, 500)
+    //         },
+    //           '1m'
+    //       ).start(Tone.Transport.seconds + time)
+    //     }
+    //     loop.humanize = '64n'
+    //     this.loops.push(loop)
+    //     this.loopMap[timeLowRes] = true
+    //   }
+    // }
   }
 }

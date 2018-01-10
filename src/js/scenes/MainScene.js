@@ -406,9 +406,9 @@ export default class MainScene extends EventEmitter {
 
     this.dayChangedEvent = document.createEvent('CustomEvent')
 
-    document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
+    document.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
 
-    document.addEventListener('touchend', this.onDocumentMouseDown.bind(this), false)
+    // document.addEventListener('touchend', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
       this.treeBuilderWorker = TreeBuilderWorker
@@ -517,8 +517,8 @@ export default class MainScene extends EventEmitter {
     const { intersected } = this.getIntersections()
 
     // if( intersected ){
-    if (!intersected || intersected === this.state.currentBlockObject) this.resetDayView()
-    else this.focusOnBlock(intersected)
+    if (intersected && intersected !== this.state.currentBlockObject) this.focusOnBlock(intersected)
+    else if (this.state.currentBlockObject) this.resetDayView()
 
     // for (const key in this.state.dayGroups) {
     //   if (this.state.dayGroups.hasOwnProperty(key)) {
@@ -1083,20 +1083,20 @@ export default class MainScene extends EventEmitter {
       this.merkleMaterial.uniforms.uTime.value = this.uTime
     }
 
-    if (
-      typeof this.audio.pointColors !== 'undefined' &&
-      this.audio.pointColors.length > 0
-    ) {
-      let pointColors = Uint8Array.from(this.audio.pointColors)
-      let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
+    // if (
+    //   typeof this.audio.pointColors !== 'undefined' &&
+    //   this.audio.pointColors.length > 0
+    // ) {
+    //   let pointColors = Uint8Array.from(this.audio.pointColors)
+    //   let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
 
-      pointColorsTexture.minFilter = THREE.NearestFilter
-      pointColorsTexture.magFilter = THREE.NearestFilter
+    //   pointColorsTexture.minFilter = THREE.NearestFilter
+    //   pointColorsTexture.magFilter = THREE.NearestFilter
 
-      pointColorsTexture.needsUpdate = true
+    //   pointColorsTexture.needsUpdate = true
 
-      this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
-      this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
-    }
+    //   this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
+    //   this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
+    // }
   }
 }
