@@ -552,6 +552,7 @@ export default class MainScene extends EventEmitter {
       cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
       cubeCamera.update(this.stage.renderer, this.stage.scene)
 
+      console.log(this.state.dayData[dayIndex].blockMaterialFront, cubeCamera.renderTarget.texture )
       this.state.dayData[dayIndex].blockMaterialFront.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].blockMaterialBack.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
@@ -708,7 +709,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.BackSide,
-      envMap: this.bgMap,
+      // envMap: this.bgMap,
       bumpMap,
       bumpScale: 0.03
     })
@@ -721,7 +722,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.FrontSide,
-      envMap: this.bgMap,
+      // envMap: this.bgMap,
       bumpMap,
       bumpScale: 0.03
     })
@@ -734,7 +735,7 @@ export default class MainScene extends EventEmitter {
       opacity: 0.5,
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap,
+      // envMap: this.bgMap,
       envMapIntensity: 2.3,
       // bumpMap,
       // bumpScale: 0.03,
@@ -772,7 +773,7 @@ export default class MainScene extends EventEmitter {
       depthWrite: false, */
       transparent: true,
       side: THREE.DoubleSide,
-      envMap: this.bgMap
+      // envMap: this.bgMap
     })
 
     this.pointsMaterial = new PointsMaterial({
