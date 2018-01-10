@@ -135,7 +135,10 @@
 				,document.querySelector('#hud'))
 			})
 
-			
+			/*
+				Event for whenever a block is unselected
+			*/
+			app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
 			// data about the app can be accessed via: app.state
 
