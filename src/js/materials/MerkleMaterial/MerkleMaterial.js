@@ -1,9 +1,9 @@
 import * as THREE from 'three'
-import BlockMaterial from '../BlockMaterial/BlockMaterial'
+// import BlockMaterial from '../BlockMaterial/BlockMaterial'
 import vertexShader from './MerkleMaterial.vert'
 import fragmentShader from './MerkleMaterial.frag'
 
-export default class MerkleMaterial extends BlockMaterial {
+export default class MerkleMaterial extends THREE.MeshStandardMaterial {
   constructor (cfg) {
     super(cfg)
     this.type = 'ShaderMaterial'
@@ -21,6 +21,6 @@ export default class MerkleMaterial extends BlockMaterial {
     }
 
     this.vertexShader = vertexShader
-    this.fragmentShader = vertexShader
+    this.fragmentShader = fragmentShader
   }
 }

@@ -5,7 +5,7 @@ import { merge as mergeBufferGeometry } from './BufferGeometryUtils'
 
 let seedrandom = require('seedrandom')
 
-const path = new THREE.LineCurve3()
+// const path = new THREE.LineCurve3()
 const tmpVec3 = new THREE.Vector3()
 const tmpVec3_2 = new THREE.Vector3()
 const tmpQuat = new THREE.Quaternion()
@@ -114,8 +114,8 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
       if (node.level === 0) {
         endPoints.push(node.endPosition.x, node.endPosition.y, node.endPosition.z)
       }
-      path.v1.copy(node.startPosition)
-      path.v2.copy(node.endPosition)
+      path.v1 = node.startPosition.clone()
+      path.v2 = node.endPosition.clone()
       // debugger
       // geos.push( new THREE.TubeBufferGeometry(path, 1, magnitude / 20, 6, false))
       const tubeGeo = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
@@ -123,7 +123,7 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
       treeGeo.merge(tubeGeo)
       // debugger;
     }
-
+    
     if (node.level === 1) {
       endPoints.push(node.endPosition.x, node.endPosition.y, node.endPosition.z)
     }
