@@ -41,13 +41,14 @@
 		canvas {
 			width: 100%!important;
 			height: 100%!important;
-		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=https://unpkg.com/react@16/umd/react.development.js></script><script src=https://unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=https://unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script type=text/babel>window.onload = function(){
+		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script type=text/babel>window.onload = function(){
 
 			// check that browser supports webgl
 			if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
 				
 			// Create the Orpeus App
 			const app = orpheusApp({ path: './static/assets/' })
+			app.setSize(window.innerWidth, window.innerHeight)
 			window.app
 
 
@@ -115,6 +116,11 @@
 			*/
 			app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
+
+			// window resize event
+			window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+			app.setSize(window.innerWidth, window.innerHeight)
+
 			// data about the app can be accessed via: app.state
 
 			// bind esc key to remove currently viewed block
@@ -170,4 +176,4 @@
 			}
 
 			document.addEventListener("wheel", onDocumentMouseWheel, false);
-		}</script><script type=text/javascript src=/static/js/manifest.4dbb2834ae20259d83ad.js></script><script type=text/javascript src=/static/js/vendor.a07de40efd87a36ed2b9.js></script><script type=text/javascript src=/static/js/app.c8dc37ccfcb5286a66f2.js></script></body></html>
+		}</script><script type=text/javascript src=/static/js/manifest.d0d4ad8b7010b45b5b98.js></script><script type=text/javascript src=/static/js/vendor.a07de40efd87a36ed2b9.js></script><script type=text/javascript src=/static/js/app.e10e5009c51f852870e2.js></script></body></html>
