@@ -289,10 +289,6 @@ export default class Audio {
       'F#3': this.path + 'sounds/kalimba/FS3.mp3',
       'G3': this.path + 'sounds/kalimba/G3.mp3',
       'G#3': this.path + 'sounds/kalimba/GS3.mp3'
-  /*    'A4': this.path + 'sounds/kalimba/A4.mp3',
-      'A#4': this.path + 'sounds/kalimba/AS4.mp3',
-      'B4': this.path + 'sounds/kalimba/B4.mp3',
-      'C4': this.path + 'sounds/kalimba/C4.mp3' */
     }).chain(this.masterBus)
   }
 
@@ -300,6 +296,8 @@ export default class Audio {
     if (!this.samplerLoaded) {
       this.loadSampler()
     }
+
+    Tone.Transport.start()
 
     this.samplerLoaded = true
 
@@ -338,8 +336,6 @@ export default class Audio {
         const transaction = block.transactions[index]
         let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
 
-        // noteCount++
-
         // get closest note
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
@@ -366,7 +362,11 @@ export default class Audio {
         if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(
             () => {
-              this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+              try {
+                this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+              } catch (error) {
+                console.log(error)
+              }
               this.pointColors[index * 3] = 255
               setTimeout(() => {
                 this.pointColors[index * 3] = 0
@@ -390,5 +390,10 @@ export default class Audio {
         this.loopMap[timeLowRes] = true
       }
     }
+
+    setTimeout(function () {
+      console.log('#stop')
+      Tone.Transport.stop()
+    }, 30 * 1000)
   }
 }
