@@ -29,7 +29,7 @@ const TreeBuilderWorker = work(require.resolve('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
-  constructor ({ stage, cubeMap, path = './static/assets/' }) {
+  constructor ({ stage, cubeMap, textures, path = './static/assets/' }) {
     super()
     // this.params = params
 
@@ -54,7 +54,7 @@ export default class MainScene extends EventEmitter {
 
     this.addEvents()
 
-    this.setupMaterials(path, cubeMap)
+    this.setupMaterials(textures, cubeMap)
 
     if (process.env.NODE_ENV !== 'production') {
       /*
@@ -646,15 +646,8 @@ export default class MainScene extends EventEmitter {
       })
   }
 
-  setupMaterials (path, cubeTextures) {
+  setupMaterials (textures, cubeTextures) {
   
-    let map = new THREE.TextureLoader().load(path + 'textures/Marble068_COL_1K.jpg')
-    let metalnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_REFL_1K.jpg')
-    let roughnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
-    let glossMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load(path + 'textures/Marble068_NRM_1K.jpg')
-    let bumpMap = new THREE.TextureLoader().load(path + 'textures/IceBlock008_OVERLAY_1K.jpg')
-    // this.bgMap = new THREE.CubeTextureLoader().setPath(path + 'textures/').load(this.cubeMapUrls)
     this.bgMap = new THREE.CubeTexture(cubeTextures)
     this.bgMap.needsUpdate = true
     // this.stage.scene.background = this.bgMap
@@ -668,7 +661,7 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.BackSide,
       envMap: this.bgMap,
-      bumpMap,
+      ...textures,
       bumpScale: 0.03
     })
 
@@ -681,27 +674,8 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.FrontSide,
       envMap: this.bgMap,
-      bumpMap,
+      ...textures,
       bumpScale: 0.03
-    })
-
-    this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: 0x333333,
-      metalness: 0.8,
-      roughness: 0.2,
-      opacity: 0.5,
-      transparent: true,
-      side: THREE.DoubleSide,
-      envMap: this.bgMap,
-      envMapIntensity: 2.3,
-      // bumpMap,
-      // bumpScale: 0.03,
-      roughnessMap,
-      metalnessMap,
-      normalMap,
-      premultipliedAlpha: true
-      // map
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
