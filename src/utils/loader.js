@@ -1,9 +1,12 @@
 import axios from 'axios'
 
-export default axios.create({
-  baseURL: 'https://us-central1-iohk-orpheus.cloudfunctions.net/',
-  timeout: 1000,
-  headers: {
-    'Access-Control-Allow-Origin': '*'
+export const imageLoader = baseURL => axios.create({
+  baseURL,
+  responseType: 'blob',
+  transformResponse: blob => {
+    const image = new Image()
+    image.crossOrigin = 'Anonymous'
+    image.src = URL.createObjectURL( blob )
+    return image
   }
 })

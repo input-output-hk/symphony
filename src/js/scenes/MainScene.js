@@ -709,10 +709,8 @@ export default class MainScene extends EventEmitter {
     let normalMap = new THREE.TextureLoader().load(path + 'textures/Marble068_NRM_1K.jpg')
     let bumpMap = new THREE.TextureLoader().load(path + 'textures/IceBlock008_OVERLAY_1K.jpg')
     // this.bgMap = new THREE.CubeTextureLoader().setPath(path + 'textures/').load(this.cubeMapUrls)
-    console.log( cubeTextures )
     this.bgMap = new THREE.CubeTexture(cubeTextures)
     this.bgMap.needsUpdate = true
-    console.log( this.bgMap)
     // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
