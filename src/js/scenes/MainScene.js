@@ -504,6 +504,7 @@ export default class MainScene extends EventEmitter {
       this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
       // this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
       this.animateBlockOut(this.state.currentBlockObject).then(() => {
+        this.state.currentBlock = null
         this.state.currentBlockObject = null
       })
     }

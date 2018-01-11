@@ -164,9 +164,7 @@
 						return
 					}
 
-					if (app.state.view === 'block') {
-						return
-					}
+					if (app.state.currentBlock) return
 
 					event.preventDefault()
 
