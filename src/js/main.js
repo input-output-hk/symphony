@@ -17,14 +17,24 @@ const orpheusApp = async function (params) {
     'textures/nz.png'
   ]
 
+  const assets = {
+    // map:'textures/Marble068_COL_1K.jpg',
+    // metalnessMap:'textures/Marble068_REFL_1K.jpg',
+    // roughnessMap:'textures/Marble068_GLOSS_1K.jpg',
+    // glossMap:'textures/Marble068_GLOSS_1K.jpg',
+    // normalMap:'textures/Marble068_NRM_1K.jpg',
+    bumpMap:'textures/IceBlock008_OVERLAY_1K.jpg'
+  }
+    
+
   const loader = imageLoader(params.path)
   const loadImage = image => loader.get(image).then(({data}) => data)
   const cubeMap = await Promise.all(bgMap.map(loadImage))
+  const textures = await Promise.all(Object.values(assets).map(loadImage))
   const stage = new Stage()
-  return new MainScene({...params, stage, cubeMap})
+  return new MainScene({...params, stage, cubeMap, textures})
 }
 
 orpheusApp.canRun = window.WebGLRenderingContext !== null && window.Worker !== null
-// orpheusApp.preload = _ => orpheusApp.textureLoader = new THREE.TextureLoader()
 
 window.orpheusApp = orpheusApp

@@ -5,7 +5,6 @@ import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
-import _ from 'lodash'
 
 // Global config
 import Config from '../Config'
@@ -30,7 +29,7 @@ const TreeBuilderWorker = work(require.resolve('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
-  constructor ({ stage, cubeMap, path = './static/assets/' }) {
+  constructor ({ stage, cubeMap, textures, path = './static/assets/' }) {
     super()
     // this.params = params
 
@@ -55,7 +54,7 @@ export default class MainScene extends EventEmitter {
 
     this.addEvents()
 
-    this.setupMaterials(path, cubeMap)
+    this.setupMaterials(textures, cubeMap)
 
     if (process.env.NODE_ENV !== 'production') {
       /*
@@ -201,7 +200,6 @@ export default class MainScene extends EventEmitter {
       view: 'day', // can be 'day' or 'block'
       dayData: [], // all blocks grouped by day
       currentDay: null, // which day is the camera closest to
-      blocksToAnimate: [],
       closestDayIndex: 0,
       minCameraZPos: 0,
       maxCameraZPos: 0
@@ -259,12 +257,7 @@ export default class MainScene extends EventEmitter {
     try {
       // let workerData = e.data
       const { sizes, blockCount, timeStamp, dayIndex, blocks, focusOnBlock } = data
-      // let sizes = workerData.sizes
-      // let blockCount = workerData.blockCount
-      // let timeStamp = workerData.timeStamp
-      // let dayIndex = workerData.dayIndex
-      // let blocks = workerData.blocks
-      // let focusOnBlock = workerData.focusOnBlock
+
 
       this.state.dayData[dayIndex] = {
         blocks,
@@ -278,7 +271,6 @@ export default class MainScene extends EventEmitter {
       let group = new THREE.Group()
       this.state.dayGroups[dayIndex] = group
       this.stage.scene.add(group)
-      this.blocksToAnimate = []
 
       for (let index = 0; index < blocks.length; index++) {
         // const size = sizes[index]
@@ -376,6 +368,7 @@ export default class MainScene extends EventEmitter {
       //   that.stage.scene.remove(this.treeGroup)
       //   that.stage.scene.add(this.treeGroup)
       // }
+      
 
       if (focusOnBlock) {
         for (let index = 0; index < this.state.dayGroups[dayIndex].children.length; index++) {
@@ -395,8 +388,6 @@ export default class MainScene extends EventEmitter {
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
     this.dayZOffset = -5500 // offset for each day on z-axis
     this.treeGroup = null
-    this.blockLoadZThreshold = 10000 // how far away from the last block until we load in another?
-    this.crystalOpacity = 0.5
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
     this.cameraBlockFocusDistance = 300
   }
@@ -471,7 +462,6 @@ export default class MainScene extends EventEmitter {
 
     let geometry = new THREE.BufferGeometry()
     geometry.addAttribute('position', positions)
-    // geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
     geometry.addAttribute('soundData', new THREE.BufferAttribute(new Float32Array(endPoints.length), 3))
 
     // per instance data
@@ -502,7 +492,6 @@ export default class MainScene extends EventEmitter {
 
     if (this.state.currentBlockObject) {
       this.state.currentBlockObject.remove(this.state.currentBlockObject.tree)
-      // this.animateBlockOut(this.state.currentBlockObject.parent.children[0])
       this.animateBlockOut(this.state.currentBlockObject).then(() => {
         this.state.currentBlock = null
         this.state.currentBlockObject = null
@@ -521,41 +510,12 @@ export default class MainScene extends EventEmitter {
 
   onDocumentMouseDown (event) {
     event.preventDefault()
-    // if (document.querySelector('.dg.ac').contains(event.target)) return
     if (this.state.isAnimating) return
 
     const { intersected } = this.getIntersections()
 
-    // if( intersected ){
     if (intersected && intersected !== this.state.currentBlockObject) this.focusOnBlock(intersected)
     else if (this.state.currentBlockObject) this.resetDayView()
-
-    // for (const key in this.state.dayGroups) {
-    //   if (this.state.dayGroups.hasOwnProperty(key)) {
-    //     const group = this.state.dayGroups[key]
-
-    //     for (let index = 0; index < group.children.length; index++) {
-    //       const blockGroup = group.children[index]
-
-    //       let intersects = this.raycaster.intersectObjects(blockGroup.children)
-    //       if (intersects.length > 0) {
-    //         if (
-    //           intersects[0].object === this.state.currentBlockObject ||
-    //           intersects[1].object === this.state.currentBlockObject
-    //         ) {
-    //           this.resetDayView()
-    //           return
-    //         }
-
-    //         // this.removeTrees()
-
-    //         let blockObject = intersects[0].object
-    //         this.focusOnBlock(blockObject)
-    //         return
-    //       }
-    //     }
-    //   }
-    // }
   }
 
   createCubeMap (position, dayIndex) {
@@ -581,14 +541,6 @@ export default class MainScene extends EventEmitter {
       blockObject.quaternion.set(moveQuaternion)
 
       this.easing = TWEEN.Easing.Quartic.InOut
-
-      // let tweenVars = {
-      //   blockPosX: fromPos.x,
-      //   blockPosY: fromPos.y,
-      //   time: 0
-      // }
-
-      // let that = this
 
       new TWEEN.Tween(blockObject.position)
         .to(toPos, duration)
@@ -683,7 +635,6 @@ export default class MainScene extends EventEmitter {
     this.api.getTransactionsForBlock(block.hash)
       .then((transactions) => {
         block.transactions = transactions
-        console.log('Building Tree for', block.hash)
         this.treeBuilderWorker.postMessage(
           {
             cmd: 'build',
@@ -695,23 +646,8 @@ export default class MainScene extends EventEmitter {
       })
   }
 
-  setupMaterials (path, cubeTextures) {
-    this.cubeMapUrls = [
-      'px.png',
-      'nx.png',
-      'py.png',
-      'ny.png',
-      'pz.png',
-      'nz.png'
-    ]
-
-    let map = new THREE.TextureLoader().load(path + 'textures/Marble068_COL_1K.jpg')
-    let metalnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_REFL_1K.jpg')
-    let roughnessMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
-    let glossMap = new THREE.TextureLoader().load(path + 'textures/Marble068_GLOSS_1K.jpg')
-    let normalMap = new THREE.TextureLoader().load(path + 'textures/Marble068_NRM_1K.jpg')
-    let bumpMap = new THREE.TextureLoader().load(path + 'textures/IceBlock008_OVERLAY_1K.jpg')
-    // this.bgMap = new THREE.CubeTextureLoader().setPath(path + 'textures/').load(this.cubeMapUrls)
+  setupMaterials (textures, cubeTextures) {
+  
     this.bgMap = new THREE.CubeTexture(cubeTextures)
     this.bgMap.needsUpdate = true
     // this.stage.scene.background = this.bgMap
@@ -725,7 +661,7 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.BackSide,
       envMap: this.bgMap,
-      bumpMap,
+      ...textures,
       bumpScale: 0.03
     })
 
@@ -738,27 +674,8 @@ export default class MainScene extends EventEmitter {
       transparent: true,
       side: THREE.FrontSide,
       envMap: this.bgMap,
-      bumpMap,
+      ...textures,
       bumpScale: 0.03
-    })
-
-    this.centralBlockMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: 0x333333,
-      metalness: 0.8,
-      roughness: 0.2,
-      opacity: 0.5,
-      transparent: true,
-      side: THREE.DoubleSide,
-      envMap: this.bgMap,
-      envMapIntensity: 2.3,
-      // bumpMap,
-      // bumpScale: 0.03,
-      roughnessMap,
-      metalnessMap,
-      normalMap,
-      premultipliedAlpha: true
-      // map
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
@@ -807,7 +724,7 @@ export default class MainScene extends EventEmitter {
   getIntersections () {
     var vector = new THREE.Vector3(this.stage.targetMousePos.x, this.stage.targetMousePos.y, 0.5)
     vector.unproject(this.stage.camera)
-    var raycaster = new THREE.Raycaster(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
+    this.raycaster.set(this.stage.camera.position, vector.sub(this.stage.camera.position).normalize())
 
     const allBlocks = Array.from(this.allBlocksObj3d.values())
 
@@ -816,7 +733,7 @@ export default class MainScene extends EventEmitter {
       .map(group => group.children[0])
       .filter(box => box && box.visible) // Filter to only those with non null refs
 
-    const intersections = raycaster.intersectObjects(boxes, false)
+    const intersections = this.raycaster.intersectObjects(boxes, false)
     const intersected = intersections[0] && intersections[0].object.parent
 
     return { intersections, allBlocks, intersected }
@@ -824,19 +741,9 @@ export default class MainScene extends EventEmitter {
 
   checkMouseIntersection () {
     const { intersected, allBlocks } = this.getIntersections()
-    /*
-      Doing own intersection test as we don't need it recursive or to check front/back objects
-    */
-    // const intersections = Array.from(this.state.dayGroups)
-      // .map(group => raycase.intersectObject(group.children[0], false ))
-      // .sort(( a, b ) => a.distance - b.distance)
-
-    // // const nearestIntersectedBlock = intersections[0]
 
     // For Each block
     allBlocks.forEach(block => {
-      // Set the front/back materials to their default
-      // block.children.forEach((child, i) => child.material = block.materials[i])
       block.front.material = block.materials.front
       block.back.material = block.materials.back
     })
@@ -852,45 +759,6 @@ export default class MainScene extends EventEmitter {
       }
       this.pointLightTarget = intersected.position
     }
-
-    // for (const dayIndex in this.state.dayGroups) {
-    //   if (this.state.dayGroups.hasOwnProperty(dayIndex)) {
-    //     const group = this.state.dayGroups[dayIndex]
-
-    //     for (let index = 0; index < group.children.length; index++) {
-    //       const blockGroup = group.children[index]
-
-    //       let intersects = ray.intersectObjects(blockGroup.children)
-    //       if (intersects.length > 0) {
-    //         if ( intersects[0].object !== this.intersected && intersects[0].object !== this.state.currentBlockObject ) {
-    //           if ( this.intersected && typeof this.state.dayData[dayIndex] !== 'undefined' // this.intersected.material.uuid !== this.centralBlockMaterial.uuid && ) {
-    //             this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
-    //           }
-
-    //           this.intersected = intersects[0].object
-
-    //           if (this.intersected.material.uuid !== this.centralBlockMaterial.uuid) {
-    //             this.intersected.material = this.blockMaterialHighlight
-    //           }
-
-    //           const blockWorldPos = this.intersected.getWorldPosition()
-
-    //           this.pointLightTarget = blockWorldPos
-    //         }
-    //         return
-    //       } else {
-    //         if (
-    //         this.intersected &&
-    //         // this.intersected.material.uuid !== this.centralBlockMaterial.uuid &&
-    //         typeof this.state.dayData[dayIndex] !== 'undefined'
-    //       ) {
-    //           this.intersected.material = this.state.dayData[dayIndex].blockMaterialFront
-    //         }
-    //         this.intersected = null
-    //       }
-    //     }
-    //   }
-    // }
   }
 
   onCameraMove () {
@@ -1012,9 +880,6 @@ export default class MainScene extends EventEmitter {
     // let blockGroup = blockObject//.parent
     blockGroup.visible = true
 
-    // if (this.state.currentBlockObject) {
-    //   this.animateBlockOut(this.state.currentBlockObject/*.parent.children[0]*/)
-    // }
     this.animateBlockOut(this.state.currentBlockObject).then(() => {
       // this.animateBlockIn(blockGroup.children[0])
       if (this.state.currentBlockObject) {
@@ -1024,8 +889,8 @@ export default class MainScene extends EventEmitter {
 
       this.state.currentBlockObject = blockGroup
 
+      this.buildTree(this.state.currentBlockObject)
       this.animateBlockIn(this.state.currentBlockObject).then(() => {
-        this.buildTree(this.state.currentBlockObject)
         this.state.isAnimating = false
         // console.log('BLOCK SELECTED')
         const block = this.state.currentBlockObject.blockchainData
@@ -1050,10 +915,10 @@ export default class MainScene extends EventEmitter {
             }
             if (this.state.dayData[dayIndex].visibleCount === dayGroup.children.length) {
               // take a cube map of blocks once all are visible
-              // this.createCubeMap(
-              //   dayGroup.getWorldPosition(),
-              //   dayIndex
-              // )
+              this.createCubeMap(
+                dayGroup.getWorldPosition(),
+                dayIndex
+              )
             }
           }
         }
