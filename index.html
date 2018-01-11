@@ -57,6 +57,8 @@
 
 <body>
 	<div id='hud'></div>
+	<!--<button id="mute">Mute</button>
+	<button id="unmute">Un-mute</button>-->
 	<div class="canvas-container">
 		<canvas id="stage"></canvas>
 	</div>
@@ -111,6 +113,21 @@
 				 */
 				app.audio.on('bgAudioLoaded', function () {
 					StartAudioContext(app.audio.context, '#stage')
+
+					var muteButton = document.querySelector('#mute')
+					if (muteButton) {
+						muteButton.addEventListener('click', function () {
+							app.audio.muteAudio()
+						})
+					}
+
+					var unMuteButton = document.querySelector('#unmute')
+					if (unMuteButton) {
+						unMuteButton.addEventListener('click', function () {
+							app.audio.unMuteAudio()
+						})
+					}
+
 				})
 
 				/*

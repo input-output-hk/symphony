@@ -19,6 +19,7 @@ export default class Audio extends EventEmitter {
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
+    this.isMuted = false
     this.context = null
     this.notes = {
       55.000: 'A1',
@@ -220,6 +221,18 @@ export default class Audio extends EventEmitter {
         })
       })
     })
+  }
+
+  muteAudio () {
+    this.isMuted = true
+    this.masterBus.set('mute', true)
+    this.ambienceBus.set('mute', true)
+  }
+
+  unMuteAudio () {
+    this.isMuted = false
+    this.masterBus.set('mute', false)
+    this.ambienceBus.set('mute', false)
   }
 
   init () {
