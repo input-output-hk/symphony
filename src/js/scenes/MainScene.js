@@ -13,7 +13,7 @@ import Config from '../Config'
 import Audio from '../audio/audio'
 
 // API
-import API from '../api/btc'
+import {getBlocksSince, getTransactionsForBlock, getBlock} from '../api/btc'
 
 // Custom Materials
 import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
@@ -29,18 +29,18 @@ const TreeBuilderWorker = work(require.resolve('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
 
 export default class MainScene extends EventEmitter {
-  constructor ({ stage, cubeMap, textures, path = './static/assets/' }) {
+  constructor ({ stage, cubeMap, textures, earliestDate, latestDate, path = './static/assets/' }) {
     super()
     // this.params = params
 
     this.cubeCamera = null
     this.cubeMap = cubeMap
 
-    this.api = new API()
-
     this.allBlocksObj3d = new Map()
     this.allBlocks = new Map()
     this.lastHoveredBlock = null
+    this.earliestDate = earliestDate
+    this.latestDate = latestDate
 
     this.stage = stage // reference to the stage
 
@@ -95,6 +95,10 @@ export default class MainScene extends EventEmitter {
   }
 
   setDate (date, focusOnBlock = false) {
+
+    if( date < this.earliestDate ) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format("MMM Do YYYY"))
+    if( date > this.latestDate ) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format("MMM Do YYYY"))
+
     if (this.state.currentDate === null) {
       this.state.currentDate = date
     }
@@ -111,7 +115,7 @@ export default class MainScene extends EventEmitter {
 
     this.state.closestDayIndex = dayIndex
 
-    this.loadBlocks(inputDate.valueOf(), dayIndex, focusOnBlock, dayIndex)
+    return this.loadBlocks(inputDate.valueOf(), dayIndex, focusOnBlock, dayIndex)
   }
 
   initReflection () {
@@ -228,7 +232,7 @@ export default class MainScene extends EventEmitter {
       const toDate = moment(date).endOf('day').toDate()
       const timeStamp = fromDate.valueOf()
 
-      this.api.getBlocksSince(fromDate, toDate).then((blocks) => {
+      getBlocksSince(fromDate, toDate).then((blocks) => {
         const day = {
           blocks: blocks,
           timeStamp: timeStamp
@@ -631,8 +635,8 @@ export default class MainScene extends EventEmitter {
     }
     this.state.currentBlock = block
     // this.removeTrees()
-
-    this.api.getTransactionsForBlock(block.hash)
+    
+    getTransactionsForBlock(block.hash)
       .then((transactions) => {
         block.transactions = transactions
         this.treeBuilderWorker.postMessage(
@@ -870,7 +874,7 @@ export default class MainScene extends EventEmitter {
     if (!blockhash) return
     const existingBlock = Array.from(this.allBlocks.values()).find(({ hash }) => hash === blockhash)
     let block = existingBlock
-    if (!existingBlock) block = await this.api.getBlock(blockhash)
+    if (!existingBlock) block = await getBlock(blockhash)
     let day = moment(block.time * 1000).toDate()// .format('YYYY-MM-DD')
     this.state.currentHash = block.hash
     this.setDate(day, true)

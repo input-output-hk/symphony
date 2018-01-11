@@ -3,8 +3,7 @@ import * as THREE from 'three'
 import Stage from './Stage'
 import MainScene from './scenes/MainScene'
 import { imageLoader } from '../utils/loader'
-
-
+import { getEarliestBlock, getLatestBlock } from './api/btc'
 
 const orpheusApp = async function (params) {
 
@@ -26,13 +25,17 @@ const orpheusApp = async function (params) {
     bumpMap:'textures/IceBlock008_OVERLAY_1K.jpg'
   }
     
+  const earliestBlock = await getEarliestBlock()
+  const latestBlock = await getLatestBlock()
+  const earliestDate = new Date(latestBlock.time * 1000 )
+  const latestDate = new Date(earliestBlock.time * 1000)
 
   const loader = imageLoader(params.path)
   const loadImage = image => loader.get(image).then(({data}) => data)
   const cubeMap = await Promise.all(bgMap.map(loadImage))
   const textures = await Promise.all(Object.values(assets).map(loadImage))
   const stage = new Stage()
-  return new MainScene({...params, stage, cubeMap, textures})
+  return new MainScene({...params, stage, cubeMap, textures, earliestDate, latestDate})
 }
 
 orpheusApp.canRun = window.WebGLRenderingContext !== null && window.Worker !== null
