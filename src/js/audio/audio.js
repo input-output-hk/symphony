@@ -342,7 +342,7 @@ export default class Audio {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((point * 2.0) - frequency)
+              let diff = Math.abs((point * 4.0) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -390,6 +390,6 @@ export default class Audio {
 
     setTimeout(function () {
       Tone.Transport.stop()
-    }, 30 * 1000)
+    }, 31 * 1000)
   }
 }
