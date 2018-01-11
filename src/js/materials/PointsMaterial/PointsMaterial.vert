@@ -1,10 +1,11 @@
 uniform float size;
 uniform float scale;
 uniform float uTime;
-uniform sampler2D uColor;
+// uniform sampler2D uColor;
 uniform float pointCount;
 
-attribute float id;
+attribute float soundData;
+// attribute float id;
 varying float display;
 
 #include <common>
@@ -27,19 +28,19 @@ void main() {
 	#endif
 
 	// get color from texture
-	vec4 sampleColor = texture2D(uColor, vec2((id / 3.0) / pointCount, 0.0));
+	display = soundData;//texture2D(uColor, vec2((id / 3.0) / pointCount, 0.0));
 
-	float mod3 = mod(id, 3.0);
+	// float mod3 = mod(id, 3.0);
 
-	if (mod3 == 0.0) {
-		display = float(sampleColor.r);
-	}
-	if (mod3 == 1.0) {
-		display = float(sampleColor.g);
-	}
-	if (mod3 == 2.0) {
-		display = float(sampleColor.b);
-	}
+	// if (mod3 == 0.0) {
+	// 	display = float(sampleColor.r);
+	// }
+	// if (mod3 == 1.0) {
+	// 	display = float(sampleColor.g);
+	// }
+	// if (mod3 == 2.0) {
+	// 	display = float(sampleColor.b);
+	// }
 
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

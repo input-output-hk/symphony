@@ -321,10 +321,7 @@ export default class Audio {
       return a.time > b.time
     })
 
-    this.pointColors = []
-    for (let index = 0; index < positionsArray.length * 3; index++) {
-      this.pointColors.push(0)
-    }
+    this.pointColors = positionsArray.map(_ => 0)
 
     for (let index = 0; index < positionsArray.length; index++) {
       const point = positionsArray[index]
@@ -367,9 +364,9 @@ export default class Audio {
               } catch (error) {
                 console.log(error)
               }
-              this.pointColors[index * 3] = 255
+              this.pointColors[index] = 1
               setTimeout(() => {
-                this.pointColors[index * 3] = 0
+                this.pointColors[index] = 0
               }, 500)
             },
             '1m'
@@ -377,9 +374,9 @@ export default class Audio {
         } else {
           loop = new Tone.Loop(
             () => {
-              this.pointColors[index * 3] = 255
+              this.pointColors[index] = 1
               setTimeout(() => {
-                this.pointColors[index * 3] = 0
+                this.pointColors[index] = 0
               }, 500)
             },
               '1m'

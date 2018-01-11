@@ -471,21 +471,23 @@ export default class MainScene extends EventEmitter {
 
     let geometry = new THREE.BufferGeometry()
     geometry.addAttribute('position', positions)
-    geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
+    // geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
+    geometry.addAttribute('soundData', new THREE.BufferAttribute(new Float32Array(endPoints.length), 3))
 
     // per instance data
-    let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
-    pointsMesh.position.add(offset)
+    this.pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
+    this.pointsMesh.position.add(offset)
+    this.pointsMesh.translateZ(-(size.z / 2))
 
     const blockObj3D = this.allBlocksObj3d.get(block.hash)
-    blockObj3D.add(pointsMesh)
+    blockObj3D.add(this.pointsMesh)
     blockObj3D.add(mesh)
     blockObj3D.tree = mesh
 
     // start animation
     this.merkleMaterial.uniforms.uAnimTime.value = 0.0
 
-    this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
+    this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, this.pointsMesh)
   }
 
   resetDayView () {
@@ -1082,15 +1084,17 @@ export default class MainScene extends EventEmitter {
        typeof this.audio.pointColors !== 'undefined' &&
        this.audio.pointColors.length > 0
      ) {
-      let pointColors = Uint8Array.from(this.audio.pointColors)
-      let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
+      let pointColors = Float32Array.from(this.audio.pointColors)
+      this.pointsMesh.geometry.attributes.soundData.array.set(pointColors)
+      this.pointsMesh.geometry.attributes.soundData.needsUpdate = true
+      // let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
 
-      pointColorsTexture.minFilter = THREE.NearestFilter
-      pointColorsTexture.magFilter = THREE.NearestFilter
-      pointColorsTexture.needsUpdate = true
+      // pointColorsTexture.minFilter = THREE.NearestFilter
+      // pointColorsTexture.magFilter = THREE.NearestFilter
+      // pointColorsTexture.needsUpdate = true
 
-      this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
-      this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
+      // this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
+      // this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
     }
   }
 }
