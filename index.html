@@ -64,6 +64,7 @@
 	<script src="//unpkg.com/react@16/umd/react.development.js"></script>
 	<script src="//unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
 	<script src="//unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+	<script src="//unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js"></script>
 	<script type="text/babel">
 
 		window.onload = function(){
@@ -104,7 +105,13 @@
 					Event called when the first day loads
 				*/
 				app.on('firstDayLoaded', data => console.log('first day of blocks loaded'))
-				
+
+				/**
+				 * on iOS devices, the user must first interact with the page before any sound will play
+				 */
+				app.audio.on('bgAudioLoaded', function () {
+					StartAudioContext(app.audio.context, '#stage')
+				})
 
 				/*
 					Event called as a user scrolls through time and the current day changes

@@ -5,9 +5,11 @@ import Config from '../Config'
 import Tone from 'tone'
 import _ from 'lodash'
 import { map } from '../../utils/math'
+import EventEmitter from 'eventemitter3'
 
-export default class Audio {
+export default class Audio extends EventEmitter {
   constructor (camera, path) {
+    super()
     this.samplerLoaded = false
     this.camera = camera
     this.loops = []
@@ -17,6 +19,7 @@ export default class Audio {
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
+    this.context = null
     this.notes = {
       55.000: 'A1',
       58.270: 'A#1',
@@ -148,7 +151,9 @@ export default class Audio {
       this.ambiencePlayer = new Tone.Player({
         'url': this.ambiencePath,
         'loop': true,
-        onload: () => {
+        onload: (player) => {
+          this.context = player.context
+          this.emit('bgAudioLoaded')
           resolve()
         }
       // }).chain(this.ambienceFilter)
