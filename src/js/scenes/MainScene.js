@@ -915,8 +915,8 @@ export default class MainScene extends EventEmitter {
 
       this.state.currentBlockObject = blockGroup
 
+      this.buildTree(this.state.currentBlockObject)
       this.animateBlockIn(this.state.currentBlockObject).then(() => {
-        this.buildTree(this.state.currentBlockObject)
         this.state.isAnimating = false
         // console.log('BLOCK SELECTED')
         const block = this.state.currentBlockObject.blockchainData
