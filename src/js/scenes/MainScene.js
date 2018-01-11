@@ -55,14 +55,13 @@ export default class MainScene extends EventEmitter {
     this.addEvents()
     this.setupMaterials(path)
 
-    if(process.env.NODE_ENV !== 'production'){
-
+    if (process.env.NODE_ENV !== 'production') {
       /*
         Dead code elimination. Only create the GUI if in dev mode
         See: https://webpack.js.org/guides/tree-shaking/
       */
       this.initGui()
-    } 
+    }
 
     this.initReflection()
 
@@ -253,7 +252,7 @@ export default class MainScene extends EventEmitter {
     //   return
     // }
 
-    const that = this
+    // const that = this
 
     try {
       // let workerData = e.data
@@ -309,8 +308,8 @@ export default class MainScene extends EventEmitter {
         back.scale.set(size.x, size.y, size.z)
 
         // align all front faces
-        // blockMeshFront.translateZ(-(size.z / 2))
-        // blockMeshBack.translateZ(-(size.z / 2))
+        front.translateZ(-(size.z / 2))
+        back.translateZ(-(size.z / 2))
 
         let rotation = -(((25 * Math.PI) / 200) * index)
 
@@ -429,7 +428,7 @@ export default class MainScene extends EventEmitter {
   }
 
   addTreeToStage ({ data }) {
-    const { boxCenter, offset, sie, vertices, endPoints, block } = data
+    const { boxCenter, offset, size, vertices, endPoints, block } = data
     if (!vertices) return
 
     /*
@@ -459,6 +458,9 @@ export default class MainScene extends EventEmitter {
     mesh.renderOrder = 10000000
     mesh.onBeforeRender = renderer => renderer.clearDepth()
 
+    // align with box
+    mesh.translateZ(-(size.z / 2))
+
     /*
       Sound Wave Geometry
     */
@@ -468,8 +470,8 @@ export default class MainScene extends EventEmitter {
     let geometry = new THREE.BufferGeometry()
     geometry.addAttribute('position', positions)
     geometry.addAttribute('id', new THREE.BufferAttribute(new Float32Array(indices), 1, 1))
-    // per instance data
 
+    // per instance data
     let pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
     pointsMesh.position.add(offset)
 
@@ -481,8 +483,6 @@ export default class MainScene extends EventEmitter {
     // start animation
     this.merkleMaterial.uniforms.uAnimTime.value = 0.0
 
-    // this.treeGroup.rotation.set(rotation.x, rotation.y, rotation.z)
-    // this.treeGroup.position.set(blockObjectPosition.x, blockObjectPosition.y, blockObjectPosition.z)
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, pointsMesh)
   }
 
@@ -996,7 +996,7 @@ export default class MainScene extends EventEmitter {
     const existingBlock = Array.from(this.allBlocks.values()).find(({ hash }) => hash === blockhash)
     let block = existingBlock
     if (!existingBlock) block = await this.api.getBlock(blockhash)
-    let day = moment(block.time * 1000).toDate()//.format('YYYY-MM-DD')
+    let day = moment(block.time * 1000).toDate()// .format('YYYY-MM-DD')
     this.state.currentHash = block.hash
     this.setDate(day, true)
   }
@@ -1074,20 +1074,19 @@ export default class MainScene extends EventEmitter {
       this.merkleMaterial.uniforms.uTime.value = this.uTime
     }
 
-    // if (
-    //   typeof this.audio.pointColors !== 'undefined' &&
-    //   this.audio.pointColors.length > 0
-    // ) {
-    //   let pointColors = Uint8Array.from(this.audio.pointColors)
-    //   let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
+    if (
+       typeof this.audio.pointColors !== 'undefined' &&
+       this.audio.pointColors.length > 0
+     ) {
+      let pointColors = Uint8Array.from(this.audio.pointColors)
+      let pointColorsTexture = new THREE.DataTexture(pointColors, pointColors.length / 3, 1, THREE.RGBFormat)
 
-    //   pointColorsTexture.minFilter = THREE.NearestFilter
-    //   pointColorsTexture.magFilter = THREE.NearestFilter
+      pointColorsTexture.minFilter = THREE.NearestFilter
+      pointColorsTexture.magFilter = THREE.NearestFilter
+      pointColorsTexture.needsUpdate = true
 
-    //   pointColorsTexture.needsUpdate = true
-
-    //   this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
-    //   this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
-    // }
+      this.pointsMaterial.uniforms.uColor.value = pointColorsTexture
+      this.pointsMaterial.uniforms.pointCount.value = pointColors.length / 3
+    }
   }
 }

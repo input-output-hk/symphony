@@ -392,7 +392,6 @@ export default class Audio {
     }
 
     setTimeout(function () {
-      console.log('#stop')
       Tone.Transport.stop()
     }, 30 * 1000)
   }

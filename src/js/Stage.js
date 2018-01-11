@@ -36,7 +36,7 @@ export default class Stage {
     this.initPost()
     this.addLights()
     this.addEvents()
-    this.resize( 300, 150 )
+    this.resize(300, 150)
     this.animate()
   }
 
@@ -61,7 +61,7 @@ export default class Stage {
     this.RGBShiftPass.renderToScreen = true
     this.composer.addPass(this.RGBShiftPass)
 
-    /*this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
+    /* this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
     this.bloomPass.renderToScreen = true
     this.composer.addPass(this.bloomPass) */
 
@@ -172,7 +172,6 @@ export default class Stage {
       evt.preventDefault()
       this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
     })
-
   }
 
   /**
