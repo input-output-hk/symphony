@@ -48,12 +48,23 @@
 				
 			// Create the Orpeus App
 			const app = orpheusApp({ path: './static/assets/' })
+			window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
 			app.setSize(window.innerWidth, window.innerHeight)
-			window.app
+			window.app = app
+
+
+			/*
+				Utility methods for navigating along the block chain
+			*/
+			const goToNextBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.next_block)
+			const goToPrevBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.prev_block)
+			window.goToNextBlock = goToNextBlock
+			window.goToPrevBlock = goToPrevBlock
 
 
 			// initial date needs to be set, could be set via current date or url for example
-			app.setDate('2018-01-01') 
+			const Jan1st_2018 = new Date(2018, 0, 1)
+			app.setDate(Jan1st_2018) 
 
 
 			/*
@@ -94,7 +105,10 @@
 			/*
 				Event called when a block is selected
 			*/
-			app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
+			app.on('blockSelected', block => {
+
+				const { bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time } = block
+
 				ReactDOM.render(		
 					<div>	
 						<h1>Block View</h1>
@@ -116,25 +130,7 @@
 			*/
 			app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
-
-			// window resize event
-			window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
-			app.setSize(window.innerWidth, window.innerHeight)
-
-			// data about the app can be accessed via: app.state
-
-			// bind esc key to remove currently viewed block
-			document.addEventListener('keydown', event => {
-				var isEscape = false
-				if ('key' in event) {
-					isEscape = (event.key === 'Escape' || event.key === 'Esc')
-				} else {
-					isEscape = (event.keyCode === 27)
-				}
-				if (isEscape) {
-					app.resetDayView()
-				}
-			}, false)
+			
 
 			// move camera on z axis with mouse wheel
 			const onDocumentMouseWheel = function (event) {
@@ -176,4 +172,4 @@
 			}
 
 			document.addEventListener("wheel", onDocumentMouseWheel, false);
-		}</script><script type=text/javascript src=/static/js/manifest.d0d4ad8b7010b45b5b98.js></script><script type=text/javascript src=/static/js/vendor.a07de40efd87a36ed2b9.js></script><script type=text/javascript src=/static/js/app.e10e5009c51f852870e2.js></script></body></html>
+		}</script><script type=text/javascript src=/static/js/app.js></script></body></html>
