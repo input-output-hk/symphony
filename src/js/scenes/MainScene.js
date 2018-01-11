@@ -415,7 +415,7 @@ export default class MainScene extends EventEmitter {
 
     this.dayChangedEvent = document.createEvent('CustomEvent')
 
-    document.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
+    this.stage.canvas.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
 
     // document.addEventListener('touchend', this.onDocumentMouseDown.bind(this), false)
 
