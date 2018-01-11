@@ -515,7 +515,6 @@ export default class MainScene extends EventEmitter {
   // }
 
   onDocumentMouseDown (event) {
-    debugger
     event.preventDefault()
     //if (document.querySelector('.dg.ac').contains(event.target)) return
     if (this.state.isAnimating) return
@@ -523,7 +522,6 @@ export default class MainScene extends EventEmitter {
     const { intersected } = this.getIntersections()
 
     // if( intersected ){
-      debugger
     if (intersected && intersected !== this.state.currentBlockObject) this.focusOnBlock(intersected)
     else if (this.state.currentBlockObject) this.resetDayView()
 
