@@ -5,9 +5,11 @@ import Config from '../Config'
 import Tone from 'tone'
 import _ from 'lodash'
 import { map } from '../../utils/math'
+import EventEmitter from 'eventemitter3'
 
-export default class Audio {
+export default class Audio extends EventEmitter {
   constructor (camera, path) {
+    super()
     this.samplerLoaded = false
     this.camera = camera
     this.loops = []
@@ -17,6 +19,8 @@ export default class Audio {
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
+    this.isMuted = false
+    this.context = null
     this.notes = {
       55.000: 'A1',
       58.270: 'A#1',
@@ -148,7 +152,9 @@ export default class Audio {
       this.ambiencePlayer = new Tone.Player({
         'url': this.ambiencePath,
         'loop': true,
-        onload: () => {
+        onload: (player) => {
+          this.context = player.context
+          this.emit('bgAudioLoaded')
           resolve()
         }
       // }).chain(this.ambienceFilter)
@@ -215,6 +221,18 @@ export default class Audio {
         })
       })
     })
+  }
+
+  muteAudio () {
+    this.isMuted = true
+    this.masterBus.set('mute', true)
+    this.ambienceBus.set('mute', true)
+  }
+
+  unMuteAudio () {
+    this.isMuted = false
+    this.masterBus.set('mute', false)
+    this.ambienceBus.set('mute', false)
   }
 
   init () {
@@ -342,7 +360,7 @@ export default class Audio {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((point * 2.0) - frequency)
+              let diff = Math.abs((point * 4.0) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -390,6 +408,6 @@ export default class Audio {
 
     setTimeout(function () {
       Tone.Transport.stop()
-    }, 30 * 1000)
+    }, 31 * 1000)
   }
 }

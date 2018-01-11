@@ -11,7 +11,7 @@ import RGBShiftShader from './shaders/RGBShift'
 import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
-import HorizontalTiltShiftShader from './shaders/HorizontalTiltShiftShader'
+
 // import * as fboHelper from './helpers/fboHelper'
 // import EffectComposer2 from './EffectComposer'
 

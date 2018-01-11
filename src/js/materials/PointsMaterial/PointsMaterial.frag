@@ -16,7 +16,7 @@ varying float display;
 
 float circle(in float dist, in float radius) {
 	return 1.0 - smoothstep(
-		radius - (radius * 10.0),
+		radius - (radius * 6.0),
 		radius + (radius * 0.01),
         dot(dist, dist) * 3.0
 	);
@@ -49,9 +49,9 @@ void main() {
 
 	gl_FragColor = vec4( color, 1.0 );
 
-	#include <premultiplied_alpha_fragment>
-	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+//	#include <premultiplied_alpha_fragment>
+	//#include <tonemapping_fragment>
+	//#include <encodings_fragment>
 	//#include <fog_fragment>
 
 }

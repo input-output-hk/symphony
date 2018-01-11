@@ -75,7 +75,7 @@ export default class MainScene extends EventEmitter {
   destroy () {
     document.removeEventListener('preUpdate', this.onUpdateBound, false)
     cancelAnimationFrame(this.stage.reqID)
-    const scene = this.stage.scene
+    // const scene = this.stage.scene
 
     // const traverse = (obj, callback) => {
     //   obj.children.forEach(child => traverse(child, callback))
@@ -452,8 +452,8 @@ export default class MainScene extends EventEmitter {
     */
     let mesh = new THREE.Mesh(treeGeo, this.state.dayData[block.dayIndex].merkleMaterial)
     mesh.position.add(offset)
-    mesh.renderOrder = 10000000
-    mesh.onBeforeRender = renderer => renderer.clearDepth()
+    // mesh.renderOrder = 10000000
+    // mesh.onBeforeRender = renderer => renderer.clearDepth()
 
     // align with box
     mesh.translateZ(-(size.z / 2))
@@ -462,7 +462,7 @@ export default class MainScene extends EventEmitter {
       Sound Wave Geometry
     */
     let positions = new THREE.BufferAttribute(endPoints, 3, 1)
-    const indices = new Array(endPoints.length / 3).fill(0).map((a, i) => i)
+    // const indices = new Array(endPoints.length / 3).fill(0).map((a, i) => i)
 
     let geometry = new THREE.BufferGeometry()
     geometry.addAttribute('position', positions)
@@ -705,8 +705,8 @@ export default class MainScene extends EventEmitter {
       metalness: 0.8,
       roughness: 0.3,
       opacity: 0.3,
-      /* depthTest: false,
-      depthWrite: false, */
+      depthTest: false,
+      depthWrite: false,
       transparent: true,
       side: THREE.DoubleSide,
       envMap: this.bgMap
@@ -714,13 +714,13 @@ export default class MainScene extends EventEmitter {
 
     this.pointsMaterial = new PointsMaterial({
       color: 0xfff900,
-      size: 30.0,
+      size: 100.0,
       // alphaTest: 0.0001,
       transparent: true,
       blending: THREE.AdditiveBlending,
       opacity: 1.0,
-      depthTest: false
-      // depthWrite: false,
+      depthTest: false,
+      depthWrite: false
       // vertexColors: THREE.VertexColors
     })
   }
