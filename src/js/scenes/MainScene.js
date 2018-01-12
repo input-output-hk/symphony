@@ -21,9 +21,7 @@ import PointsMaterial from '../materials/PointsMaterial/PointsMaterial'
 import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
 
 const dat = require('dat-gui')
-
 const work = require('webworkify-webpack')
-
 const DayBuilderWorker = work(require.resolve('../workers/dayBuilder.js'))
 const TreeBuilderWorker = work(require.resolve('../workers/treeBuilder.js'))
 const TWEEN = require('@tweenjs/tween.js')
@@ -63,8 +61,6 @@ export default class MainScene extends EventEmitter {
       */
       this.initGui()
     }
-
-    this.initReflection()
 
     this.clock = new THREE.Clock()
 
@@ -116,10 +112,6 @@ export default class MainScene extends EventEmitter {
     this.state.closestDayIndex = dayIndex
 
     return this.loadBlocks(inputDate.valueOf(), dayIndex, focusOnBlock, dayIndex)
-  }
-
-  initReflection () {
-
   }
 
   initGui () {
@@ -405,14 +397,7 @@ export default class MainScene extends EventEmitter {
     this.onUpdateBound = this.onUpdate.bind(this)
     document.addEventListener('preUpdate', this.onUpdateBound, false)
     document.addEventListener('cameraMove', this.onCameraMove.bind(this), false)
-
-    this.selectBlock = new Event('selectBlock')
-
-    this.dayChangedEvent = document.createEvent('CustomEvent')
-
     this.stage.canvas.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
-
-    // document.addEventListener('touchend', this.onDocumentMouseDown.bind(this), false)
 
     if (window.Worker) {
       this.treeBuilderWorker = TreeBuilderWorker
