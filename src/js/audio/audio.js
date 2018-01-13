@@ -144,10 +144,10 @@ export default class Audio extends EventEmitter {
 
   loadAmbience () {
     return new Promise((resolve, reject) => {
-      this.ambienceFilter = new Tone.Filter({
+      /* this.ambienceFilter = new Tone.Filter({
         type: 'lowpass',
         Q: 5
-      }).chain(this.ambienceBus)
+      }).chain(this.ambienceBus) */
 
       this.ambiencePlayer = new Tone.Player({
         'url': this.ambiencePath,
@@ -226,19 +226,17 @@ export default class Audio extends EventEmitter {
   muteAudio () {
     this.isMuted = true
     this.masterBus.set('mute', true)
-    this.ambienceBus.set('mute', true)
   }
 
   unMuteAudio () {
     this.isMuted = false
     this.masterBus.set('mute', false)
-    this.ambienceBus.set('mute', false)
   }
 
   init () {
     return new Promise((resolve, reject) => {
       this.masterBus = new Tone.Volume(this.masterVol).toMaster()
-      this.ambienceBus = new Tone.Volume(-96).toMaster()
+      this.ambienceBus = new Tone.Volume(-96).chain(this.masterBus)
 
       /* this.convolver = new Tone.Convolver(path + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0) */
