@@ -34,6 +34,10 @@ export default class MainScene extends EventEmitter {
     this.cubeCamera = null
     this.cubeMap = cubeMap
 
+    this.path = path
+    this.font = null
+    this.fontLoader = new THREE.FontLoader()
+
     this.allBlocksObj3d = new Map()
     this.allBlocks = new Map()
     this.lastHoveredBlock = null
@@ -243,12 +247,6 @@ export default class MainScene extends EventEmitter {
   }
 
   addBlocksToStage ({ data }) {
-    // if (typeof e.data.sizes === 'undefined') {
-    //   return
-    // }
-
-    // const that = this
-
     try {
       // let workerData = e.data
       const { sizes, blockCount, timeStamp, dayIndex, blocks, focusOnBlock } = data
@@ -261,6 +259,8 @@ export default class MainScene extends EventEmitter {
         // merkleMaterial: this.merkleMaterial.clone(),
         visibleCount: 0
       }
+
+      const displayDate = moment(timeStamp).startOf('day').format('MMM Do YYYY').toUpperCase()
 
       let group = new THREE.Group()
       this.state.dayGroups[dayIndex] = group
@@ -303,21 +303,6 @@ export default class MainScene extends EventEmitter {
 
         block.dayIndex = dayIndex
 
-        // blockMeshFront.rotation.z = rotation
-        // blockMeshFront.translateY(800 + (index))
-        // blockMeshFront.rotation.z += Math.PI / 2
-        // blockMeshFront.translateZ((index * 30))
-
-        // blockMeshBack.rotation.z = rotation
-        // blockMeshBack.translateY(800 + (index))
-        // blockMeshBack.rotation.z += Math.PI / 2
-        // blockMeshBack.translateZ((index * 30))
-        // lockMeshBack.blockchainData = block
-
-        /* let edgeGeo = new THREE.EdgesGeometry(blockMesh.geometry)
-        let wireframe = new THREE.LineSegments(edgeGeo, this.blockMaterialOutline)
-        blockMesh.add(wireframe) */
-
         let blockGroup = new THREE.Group()
         blockGroup.materials = {
           front: this.state.dayData[dayIndex].blockMaterialFront,
@@ -331,7 +316,7 @@ export default class MainScene extends EventEmitter {
         blockGroup.translateY(800 + (index))
         blockGroup.rotation.z += Math.PI / 2
         blockGroup.translateZ((index * 30))
-        // blockGroup.name = block.hash
+
         this.allBlocksObj3d.set(block.hash, blockGroup)
         this.allBlocks.set(blockGroup, block)
         blockGroup.visible = false
@@ -342,8 +327,53 @@ export default class MainScene extends EventEmitter {
         group.add(blockGroup)
       }
 
+      let circleGroup = new THREE.Group()
+      let circleGeometry = new THREE.CircleGeometry(900, 128)
+      circleGeometry.vertices.shift()
+      let circleMesh = new THREE.LineLoop(circleGeometry, this.circleMat)
+      circleGroup.add(circleMesh)
+
+      let circleGeometryOuter = new THREE.CircleGeometry(920, 128)
+      circleGeometryOuter.vertices.shift()
+      let circleMeshOuter = new THREE.LineLoop(circleGeometryOuter, this.circleMatOuter)
+      circleGroup.add(circleMeshOuter)
+
+      const addText = function () {
+        let textGeometry = new THREE.TextGeometry(displayDate, {
+          font: this.font,
+          size: 30,
+          height: 1,
+          curveSegments: 12,
+          bevelEnabled: false
+        })
+
+        let textMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.7
+        })
+
+        let textMesh = new THREE.Mesh(textGeometry, textMaterial)
+        textMesh.position.x = -840.0
+        circleGroup.add(textMesh)
+      }.bind(this)
+
+      if (!this.font) {
+        this.fontLoader.load(this.path + 'fonts/helvetiker_regular.typeface.json', function (font) {
+          console.log(this)
+          this.font = font
+          addText()
+        }.bind(this))
+      } else {
+        addText()
+      }
+
+      this.stage.scene.add(circleGroup)
       let zPos = this.dayZOffset * dayIndex
       group.translateZ(zPos)
+
+      circleGroup.position.z = zPos + this.dayZOffset - 550
+
       this.state.dayData[dayIndex].zPos = zPos
       this.state.loadDayRequested = false
 
@@ -357,11 +387,6 @@ export default class MainScene extends EventEmitter {
         let group = that.state.dayGroups[key]
         that.stage.scene.add(group)
       })
-
-      // if (this.treeGroup) {
-      //   that.stage.scene.remove(this.treeGroup)
-      //   that.stage.scene.add(this.treeGroup)
-      // }
 
       if (focusOnBlock) {
         for (let index = 0; index < this.state.dayGroups[dayIndex].children.length; index++) {
@@ -704,6 +729,16 @@ export default class MainScene extends EventEmitter {
       depthTest: false,
       depthWrite: false
       // vertexColors: THREE.VertexColors
+    })
+
+    this.circleMat = new THREE.LineBasicMaterial({
+      color: 0xffffff
+    })
+
+    this.circleMatOuter = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.5
     })
   }
 
