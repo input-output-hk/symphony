@@ -360,7 +360,6 @@ export default class MainScene extends EventEmitter {
 
       if (!this.font) {
         this.fontLoader.load(this.path + 'fonts/helvetiker_regular.typeface.json', function (font) {
-          console.log(this)
           this.font = font
           addText()
         }.bind(this))
