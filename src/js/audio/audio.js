@@ -373,6 +373,9 @@ export default class Audio extends EventEmitter {
         let loop
 
         let timeLowRes = time.toFixed(1)
+        if (Config.detector.isMobile) {
+          timeLowRes = parseInt(timeLowRes)
+        }
 
         if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(

@@ -1,6 +1,11 @@
 'use strict'
 
+import Detect from './helpers/detect'
+
+const Detector = new Detect()
+
 const Config = {
+  detector: Detector,
   daysEitherSide: 4,
   showGUI: true,
   scene: {
