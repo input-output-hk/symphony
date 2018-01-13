@@ -91,9 +91,8 @@ export default class MainScene extends EventEmitter {
   }
 
   setDate (date, focusOnBlock = false) {
-
-    if( date < this.earliestDate ) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format("MMM Do YYYY"))
-    if( date > this.latestDate ) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format("MMM Do YYYY"))
+    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
+    if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
 
     if (this.state.currentDate === null) {
       this.state.currentDate = date
@@ -254,13 +253,12 @@ export default class MainScene extends EventEmitter {
       // let workerData = e.data
       const { sizes, blockCount, timeStamp, dayIndex, blocks, focusOnBlock } = data
 
-
       this.state.dayData[dayIndex] = {
         blocks,
         timeStamp,
         blockMaterialFront: this.blockMaterialFront.clone(), // each day has it's own material
         blockMaterialBack: this.blockMaterialBack.clone(),
-        merkleMaterial: this.merkleMaterial.clone(),
+        // merkleMaterial: this.merkleMaterial.clone(),
         visibleCount: 0
       }
 
@@ -364,7 +362,6 @@ export default class MainScene extends EventEmitter {
       //   that.stage.scene.remove(this.treeGroup)
       //   that.stage.scene.add(this.treeGroup)
       // }
-      
 
       if (focusOnBlock) {
         for (let index = 0; index < this.state.dayGroups[dayIndex].children.length; index++) {
@@ -435,7 +432,8 @@ export default class MainScene extends EventEmitter {
     /*
       Tree Mesh
     */
-    let mesh = new THREE.Mesh(treeGeo, this.state.dayData[block.dayIndex].merkleMaterial)
+    let merkleMaterial = this.merkleMaterial.clone()
+    let mesh = new THREE.Mesh(treeGeo, merkleMaterial)
     mesh.position.add(offset)
     // mesh.renderOrder = 10000000
     // mesh.onBeforeRender = renderer => renderer.clearDepth()
@@ -464,7 +462,7 @@ export default class MainScene extends EventEmitter {
     blockObj3D.tree = mesh
 
     // start animation
-    this.merkleMaterial.uniforms.uAnimTime.value = 0.0
+    merkleMaterial.uniforms.uAnimTime.value = 0.0
 
     this.audio.generateMerkleSound(endPoints, blockObjectPosition, block, this.pointsMaterial, this.pointsMesh)
   }
@@ -517,7 +515,7 @@ export default class MainScene extends EventEmitter {
       cubeCamera.update(this.stage.renderer, this.stage.scene)
       this.state.dayData[dayIndex].blockMaterialFront.envMap = cubeCamera.renderTarget.texture
       this.state.dayData[dayIndex].blockMaterialBack.envMap = cubeCamera.renderTarget.texture
-      this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
+      // this.state.dayData[dayIndex].merkleMaterial.envMap = cubeCamera.renderTarget.texture
 
       this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
     }
@@ -620,7 +618,7 @@ export default class MainScene extends EventEmitter {
     }
     this.state.currentBlock = block
     // this.removeTrees()
-    
+
     getTransactionsForBlock(block.hash)
       .then((transactions) => {
         block.transactions = transactions
@@ -636,7 +634,6 @@ export default class MainScene extends EventEmitter {
   }
 
   setupMaterials (textures, cubeTextures) {
-  
     this.bgMap = new THREE.CubeTexture(cubeTextures)
     this.bgMap.needsUpdate = true
     // this.stage.scene.background = this.bgMap
