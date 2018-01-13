@@ -397,17 +397,14 @@ export default class Audio extends EventEmitter {
                 this.pointColors[index] = 0
               }, 500)
             },
-              '1m'
+            '1m'
           ).start(Tone.Transport.seconds + time)
         }
-        loop.humanize = '64n'
+        loop.set('iterations', 8)
+        loop.set('humanize', '64n')
         this.loops.push(loop)
         this.loopMap[timeLowRes] = true
       }
     }
-
-    setTimeout(function () {
-      Tone.Transport.stop()
-    }, 31 * 1000)
   }
 }
