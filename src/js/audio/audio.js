@@ -14,8 +14,8 @@ export default class Audio extends EventEmitter {
     this.camera = camera
     this.loops = []
     this.quantize = 32
-    this.masterVol = -18 // db
-    this.ambienceVol = -10 // db
+    this.masterVol = -21 // db
+    this.ambienceVol = 2 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
@@ -144,10 +144,10 @@ export default class Audio extends EventEmitter {
 
   loadAmbience () {
     return new Promise((resolve, reject) => {
-      /* this.ambienceFilter = new Tone.Filter({
+      this.ambienceFilter = new Tone.Filter({
         type: 'lowpass',
         Q: 5
-      }).chain(this.ambienceBus) */
+      }).chain(this.ambienceBus)
 
       this.ambiencePlayer = new Tone.Player({
         'url': this.ambiencePath,
@@ -157,15 +157,14 @@ export default class Audio extends EventEmitter {
           this.emit('bgAudioLoaded')
           resolve()
         }
-      // }).chain(this.ambienceFilter)
-      }).chain(this.ambienceBus)
+      }).chain(this.ambienceFilter)
 
       this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
     })
   }
 
   setAmbienceFilterCutoff (value) {
-    // this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
+    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
   }
 
   unloadSound () {

@@ -13,7 +13,7 @@ import Config from '../Config'
 import Audio from '../audio/audio'
 
 // API
-import {getBlocksSince, getTransactionsForBlock, getBlock} from '../api/btc'
+import {getBlocksSince, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
 
 // Custom Materials
 import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
@@ -257,8 +257,14 @@ export default class MainScene extends EventEmitter {
         blockMaterialFront: this.blockMaterialFront.clone(), // each day has it's own material
         blockMaterialBack: this.blockMaterialBack.clone(),
         // merkleMaterial: this.merkleMaterial.clone(),
-        visibleCount: 0
+        visibleCount: 0,
+        hashRate: 0
       }
+
+      // add hash rate to day
+      getHashRateforDay(timeStamp / 1000).then(function (hashRate) {
+        this.state.dayData[dayIndex].hashRate = hashRate
+      }.bind(this))
 
       const displayDate = moment(timeStamp).startOf('day').format('MMM Do YYYY').toUpperCase()
 
@@ -852,14 +858,11 @@ export default class MainScene extends EventEmitter {
       }
     }
 
-    /* this.state.hashRate = this.state.currentDay.hashRate
+    this.state.hashRate = this.state.currentDay.hashRate
     this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
 
-    console.log(this.state.audioFreqCutoff) */
 
-   // this.state.audioFreqCutoff = 20000
-
-    // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
   }
 
   loadDay (day, closestDayIndex, index) {
