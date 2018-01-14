@@ -263,7 +263,9 @@ export default class MainScene extends EventEmitter {
 
       // add hash rate to day
       getHashRateforDay(timeStamp / 1000).then(function (hashRate) {
-        this.state.dayData[dayIndex].hashRate = hashRate
+        if (typeof this.state.dayData[dayIndex] !== 'undefined') {
+          this.state.dayData[dayIndex].hashRate = hashRate
+        }
       }.bind(this))
 
       const displayDate = moment(timeStamp).startOf('day').format('MMM Do YYYY').toUpperCase()
@@ -430,6 +432,14 @@ export default class MainScene extends EventEmitter {
       this.treeBuilderWorker = TreeBuilderWorker
       this.treeBuilderWorker.addEventListener('message', this.addTreeToStage.bind(this), false)
     }
+
+    this.on('dayChanged', function (data) {
+      if (this.state.currentDay) {
+        this.state.hashRate = this.state.currentDay.hashRate
+        this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000)
+        this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+      }
+    })
   }
 
   setSize (w, h) {
@@ -857,12 +867,6 @@ export default class MainScene extends EventEmitter {
         }
       }
     }
-
-    this.state.hashRate = this.state.currentDay.hashRate
-    this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
-
-
-    this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
   }
 
   loadDay (day, closestDayIndex, index) {

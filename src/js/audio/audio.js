@@ -15,7 +15,7 @@ export default class Audio extends EventEmitter {
     this.loops = []
     this.quantize = 32
     this.masterVol = -21 // db
-    this.ambienceVol = 2 // db
+    this.ambienceVol = -2 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
@@ -164,7 +164,7 @@ export default class Audio extends EventEmitter {
   }
 
   setAmbienceFilterCutoff (value) {
-    this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
+    this.ambienceFilter.set('frequency', value)
   }
 
   unloadSound () {
