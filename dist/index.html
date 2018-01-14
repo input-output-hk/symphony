@@ -41,7 +41,7 @@
 		canvas {
 			width: 100%!important;
 			height: 100%!important;
-		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script type=text/babel>window.onload = function(){
+		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script src=//unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js></script><script type=text/babel>window.onload = function(){
 
 			// check that browser supports webgl
 			if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
@@ -79,7 +79,28 @@
 					Event called when the first day loads
 				*/
 				app.on('firstDayLoaded', data => console.log('first day of blocks loaded'))
-				
+
+				/**
+				 * on iOS devices, the user must first interact with the page before any sound will play
+				 */
+				app.audio.on('bgAudioLoaded', function () {
+					StartAudioContext(app.audio.context, '#stage')
+
+					var muteButton = document.querySelector('#mute')
+					if (muteButton) {
+						muteButton.addEventListener('click', function () {
+							app.audio.muteAudio()
+						})
+					}
+
+					var unMuteButton = document.querySelector('#unmute')
+					if (unMuteButton) {
+						unMuteButton.addEventListener('click', function () {
+							app.audio.unMuteAudio()
+						})
+					}
+
+				})
 
 				/*
 					Event called as a user scrolls through time and the current day changes
@@ -139,9 +160,7 @@
 						return
 					}
 
-					if (app.state.view === 'block') {
-						return
-					}
+					if (app.state.currentBlock) return
 
 					event.preventDefault()
 

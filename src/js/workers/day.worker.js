@@ -5,7 +5,7 @@ import * as THREE from 'three'
 // Geometry
 import GenerateBlockGeometry from '../helpers/GenerateBlockGeometry'
 
-module.exports = function (self) {
+// module.exports = function (self) {
 
   self.addEventListener('message', function (e) {
     let data = e.data
@@ -22,7 +22,7 @@ module.exports = function (self) {
           focusOnBlock: data.focusOnBlock
         }
 
-        console.time('blocks')
+        // console.time('blocks')
         for (let index = 0; index < blocks.length; index++) {
           let block = blocks[index]
 
@@ -38,7 +38,7 @@ module.exports = function (self) {
           returnData.blocks[index].feeToInputRatio = feeToInputRatio
           returnData.blocks[index].size = size
         }
-        console.timeEnd('blocks')
+        // console.timeEnd('blocks')
         self.postMessage(returnData)
         break
       case 'stop':
@@ -52,4 +52,4 @@ module.exports = function (self) {
     // self.postMessage(e.data)
   }, false)
 
-}
+// }

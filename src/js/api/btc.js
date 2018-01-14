@@ -72,25 +72,28 @@ export const assignHashRates = daysArray => {
   })
 }
 
+const Block = block => ({
+  ...block,
+  day: new Date(block.time * 1000 ).setHours(0, 0, 0, 0)
+})
+
 /**
  * Returns a block from a given hash
  */
 export const getBlock = hash => blocks.where('hash', '==', hash)
   .get()
   .then(({docs}) => docs[0].data())
+  .then(Block)
 
 /**
- * Returns all the blocks that occured on the current date 00:01 - 00:00
+ * Returns all the blocks that occured on the current date froim 00:00 - 23:59
  */
-export const getBlocksOnDay = (date, sortDateAsc) => {
+export const getBlocksOnDay = date => {
   const fromDay = new Date(date)
-  fromDay.setMilliseconds(0)
-  fromDay.setSeconds(0)
-  fromDay.setMinutes(0)
-  fromDay.setHours(0)
+  fromDay.setHours(0, 0, 0, 0)
 
-  const toDay = new Date(fromDay.getTime())
-  toDay.setHours(toDay.getHours() + 24)
+  const toDay = new Date(fromDay)
+  toDay.setDate(toDay.getDate() + 1)
 
   return getBlocksSince(fromDay, toDay)
 }
@@ -100,28 +103,19 @@ export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
   .startAt(fromDate / 1000)
   .endAt(toDate / 1000)
   .get()
-  .then(({ docs }) => docs.map(doc => doc.data()))
-
-export const getDay = (date, toDate = new Date()) => getBlocksSince(date, toDate)
-  .then((blocks) => {
-    const fee = blocks.reduce((a, { fee }) => a + fee, 0) || 0
-    const input = blocks.reduce((a, { input }) => a + input, 0) || 0
-    const output = blocks.reduce((a, { output }) => a + output, 0) || 0
-    // const value = blocks.reduce((a, b => a + b.value, 0))
-    return { date, blocks, fee, input, output }
-  })
-
+  .then(({ docs }) => docs.map(doc => Block(doc.data())))
+  
 export const getLatestBlock = _ => blocks
   .orderBy('time')
   .limit(1)
   .get()
-  .then(({ docs }) => docs[0].data())
+  .then(({ docs }) => Block(docs[0].data()))
 
 export const getEarliestBlock = _ => blocks
   .orderBy('time', 'desc')
   .limit(1)
   .get()
-  .then(({ docs }) => docs[0].data())
+  .then(({ docs }) => Block(docs[0].data()))
 
 export const getTransactionsForBlock = (hash, tryCount = 0) => {
   return new Promise((resolve, reject) => {

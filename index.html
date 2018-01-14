@@ -76,12 +76,15 @@
 				
 			// Create the Orpeus App
 			orpheusApp({ path: './static/assets/' }).then( app => {
-
-				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
-				app.setSize(window.innerWidth, window.innerHeight)
+				console.log('App returned from promise', app)
 				window.app = app
 
-
+				/**
+				 * Setup Window resize listeners
+				 */
+				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+				app.setSize(window.innerWidth, window.innerHeight)
+				
 				/*
 					Utility methods for navigating along the block chain
 				*/
@@ -90,11 +93,8 @@
 				window.goToNextBlock = goToNextBlock
 				window.goToPrevBlock = goToPrevBlock
 
-
-				// initial date needs to be set, could be set via current date or url for example
-				const Jan1st_2018 = new Date(2018, 0, 1)
-				app.setDate(Jan1st_2018) 
-
+				// Method to navigation to a new date in the blockchain
+				// app.setDate(new Date(2018, 0, 1)) 
 
 				/*
 					Destroys the Orpheus instance and unloads all data.
@@ -133,18 +133,18 @@
 				/*
 					Event called as a user scrolls through time and the current day changes
 				*/
-				app.on('dayChanged', ({ date, input, output, fee }) => {
-					ReactDOM.render(		
-						<div>	
-							<h1>Day View</h1>
-							<br/>
-							<div>Date: { date.toString() }</div>
-							<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
-							<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
-							<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
-						</div>
-					,document.querySelector('#hud'))
-				})
+				// app.on('dayChanged', ({ date, input, output, fee }) => {
+				// 	ReactDOM.render(		
+				// 		<div>	
+				// 			<h1>Day View</h1>
+				// 			<br/>
+				// 			<div>Date: { date.toString() }</div>
+				// 			<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
+				// 			<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
+				// 			<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
+				// 		</div>
+				// 	,document.querySelector('#hud'))
+				// })
 
 				/*
 					Event called when a block is hovered over
@@ -199,16 +199,21 @@
 						}, 50)
 					}
 
-					if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.minCameraZPos
-						return
-					}
+					// if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
+					// 	app.stage.targetCameraPos.z = app.state.minCameraZPos
+					// 	return
+					// }
 
 					if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
 						app.stage.targetCameraPos.z = app.state.maxCameraZPos
 						app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
 						return
 					}
+
+
+					const dayObj3Ds = app.dayObj3Ds.children
+					const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
+    			const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
 
 					if (event.deltaY > 0) {
 						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
@@ -221,7 +226,7 @@
 
 				document.addEventListener("wheel", onDocumentMouseWheel, false);
 
-			})
+			}).catch(e => console.log(e))
 
 		}
 

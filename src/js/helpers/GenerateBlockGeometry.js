@@ -107,8 +107,8 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
     // Get the bounds
     max.max(node.endPosition)
     min.min(node.endPosition)
-    points.push(node.endPosition.clone())
-    points.push(node.startPosition.clone())
+    // points.push(node.endPosition.clone())
+    // points.push(node.startPosition.clone())
 
     if(visualise) {
       if (node.level === 0) {
@@ -138,9 +138,9 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
   // debugger
   // build(sortedTree, startingPosition, direction, visualise, hash, feeToInputRatio, treeGeo, angle, points, endPoints)
 
-  let box = new THREE.Box3().setFromPoints(points)
-  let size = /*new THREE.Vector3().subVectors( max, min )//*/box.getSize()
-  let boxCenter = box.getCenter()//new THREE.Vector3().addVectors( min, max ).multiplyScalar( 0.5 )
+  // let box = new THREE.Box3().setFromPoints(points)
+  let size = new THREE.Vector3().subVectors( max, min )////*/box.getSize()
+  let boxCenter = new THREE.Vector3().addVectors( min, max ).multiplyScalar( 0.5 )
   const offset = new THREE.Vector3().sub(min).sub(size.clone().multiplyScalar(0.5))
   // const baseGeo = new THREE.BufferGeometry()
   // const baseGeo = new THREE.Geometry()
