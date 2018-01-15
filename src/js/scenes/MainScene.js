@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
+import AddText from './circleGeometry'
 
 // Global config
 import Config from '../Config'
@@ -82,8 +83,6 @@ export default class MainScene extends EventEmitter {
     this.days = new Map()
 
     this.path = path
-    this.font = null
-    this.fontLoader = new THREE.FontLoader()
 
     this.allBlocksObj3d = new Map()
     this.lastHoveredBlock = null    
@@ -214,6 +213,10 @@ export default class MainScene extends EventEmitter {
     })
 
     // group.add(new THREE.Mesh(new THREE.SphereGeometry(100, 100)))
+
+    const circleGroup = AddText(this.path, moment(day).startOf('day').format('MMM Do YYYY').toUpperCase())
+    circleGroup.position.z = dayZOffset * 0.5
+    group.add(circleGroup)
 
     /*
       Make blocks visible
@@ -417,9 +420,9 @@ export default class MainScene extends EventEmitter {
     this.stage.canvas.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
 
     this.on('dayChanged', function ({ date }) {
-      const hashRate = getGroupForDay(date.valueOf()).hashRate
-      this.state.audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
-      this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+      const hashRate = this.getGroupForDay(date.valueOf()).hashRate
+      const audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
+      this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
     })
   }
 
@@ -615,9 +618,9 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  setupMaterials (textures, cubeTextures) {
-    const bumpMap =  new THREE.Texture(textures[0])
-    this.bgMap = new THREE.CubeTexture(cubeTextures)
+  setupMaterials ({ bumpMap }, cubeTextures) {
+    // const bumpMap =  new THREE.Texture(textures[0])
+    this.bgMap = cubeTextures
     this.bgMap.needsUpdate = true
 
     this.blockMaterialBack = new THREE.MeshStandardMaterial({
@@ -632,7 +635,7 @@ export default class MainScene extends EventEmitter {
       side: THREE.BackSide,
       envMap: this.bgMap,
       bumpMap,
-      bumpScale: 0.3
+      bumpScale: 0.03
     })
 
     this.blockMaterialFront = new THREE.MeshStandardMaterial({
@@ -647,7 +650,7 @@ export default class MainScene extends EventEmitter {
       side: THREE.FrontSide,
       envMap: this.bgMap,
       bumpMap,
-      bumpScale: 0.3
+      bumpScale: 0.03
     })
 
     this.blockMaterialOutline = new THREE.LineBasicMaterial({
@@ -690,16 +693,6 @@ export default class MainScene extends EventEmitter {
       depthTest: false,
       depthWrite: false
       // vertexColors: THREE.VertexColors
-    })
-
-    this.circleMat = new THREE.LineBasicMaterial({
-      color: 0xffffff
-    })
-
-    this.circleMatOuter = new THREE.LineBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.5
     })
   }
 

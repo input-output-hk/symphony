@@ -24,6 +24,11 @@ export const formatTimeSeries = ({ data }) => {
   return { times, values }
 }
 
+const Block = block => ({
+  ...block,
+  day: new Date(block.time * 1000 ).setHours(0, 0, 0, 0)
+})
+
 /**
  * Get a list of BTC transaction over a time period
  */
@@ -36,7 +41,7 @@ export const getTransactionVolumeOverTime = (start, end) => axios.get('https://a
 /**
  * Get hash rate to nearest day
  */
-export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp}&cors=true`)
+export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp/1000}&cors=true`)
   .then((data) => {
     let hashRates = formatTimeSeries(data)
     return hashRates && hashRates.values[0] !== undefined && hashRates.values[0]
