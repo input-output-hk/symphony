@@ -640,10 +640,8 @@ export default class MainScene extends EventEmitter {
       If an intersection occured but not on the selected block, set a highlight
     */
     if (intersected && intersected !== this.currentBlockObject) {
-      // intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
+      intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
       if (intersected !== this.lastHoveredBlock) {
-        intersected.tweenA = new TWEEN.Tween(intersected.front.material.color).to(new THREE.Color(0xFFFFFF), 1000).start()
-        intersected.tweenB = new TWEEN.Tween(intersected.front.material.color).to(new THREE.Color(0xFFFFFF), 1000).start()
         this.lastHoveredBlock = intersected
         this.emit('blockHovered', intersected.block)
         
