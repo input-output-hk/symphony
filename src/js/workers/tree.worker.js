@@ -5,7 +5,7 @@ import * as THREE from 'three'
 // Geometry
 import GenerateBlockGeometry from '../helpers/GenerateBlockGeometry'
 
-module.exports = function (self) {
+// module.exports = function (self) {
 
   self.addEventListener('message', function (e) {
     let data = e.data
@@ -20,7 +20,6 @@ module.exports = function (self) {
         block.feeToInputRatio = feeToInputRatio
 
         let geoData = GenerateBlockGeometry(block, true)
-        console.log( 'Result IS:', geoData.size )
         let returnData = {
           // vertices: geoData.treeVertices,
           vertices: geoData.treeGeo.attributes.position.array,
@@ -44,4 +43,4 @@ module.exports = function (self) {
     self.postMessage(e.data)
   }, false)
 
-}
+// }

@@ -136,7 +136,7 @@ export default class Stage {
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.autoClear = true
-    this.renderer.sortObjects = false
+    // this.renderer.sortObjects = false
 
     // fboHelper.init(this.renderer)
     this.composer = new EffectComposer(this.renderer)
@@ -263,6 +263,7 @@ export default class Stage {
 
   render () {
     this.composer.render()
+    // this.renderer.render(this.scene, this.camera)
   }
 
   /**

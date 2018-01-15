@@ -1,7 +1,7 @@
 'use strict'
 
 const Config = {
-  daysEitherSide: 4,
+  daysEitherSide: 2,
   showGUI: true,
   scene: {
     bgColor: 0x26263c,

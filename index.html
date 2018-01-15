@@ -88,8 +88,8 @@
 				/*
 					Utility methods for navigating along the block chain
 				*/
-				const goToNextBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.next_block)
-				const goToPrevBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.prev_block)
+				const goToNextBlock = app.goToBlock
+				const goToPrevBlock = app.goToBlock
 				window.goToNextBlock = goToNextBlock
 				window.goToPrevBlock = goToPrevBlock
 
@@ -133,23 +133,24 @@
 				/*
 					Event called as a user scrolls through time and the current day changes
 				*/
-				// app.on('dayChanged', ({ date, input, output, fee }) => {
-				// 	ReactDOM.render(		
-				// 		<div>	
-				// 			<h1>Day View</h1>
-				// 			<br/>
-				// 			<div>Date: { date.toString() }</div>
-				// 			<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
-				// 			<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
-				// 			<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
-				// 		</div>
-				// 	,document.querySelector('#hud'))
-				// })
+				app.on('dayChanged', ({ date, input, output, fee }) => {
+					console.log('EVENT: `dayChanged` receieved')
+					ReactDOM.render(		
+						<div>	
+							<h1>Day View</h1>
+							<br/>
+							<div>Date: { date.toString() }</div>
+							<div>Fee: BTC{ fee.toLocaleString('USD') }</div>
+							<div>Total Input Value: BTC{ input.toLocaleString('USD') }</div>
+							<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
+						</div>
+					,document.querySelector('#hud'))
+				})
 
 				/*
 					Event called when a block is hovered over
 				*/
-				//app.on('blockHovered', console.log )
+				// app.on('blockHovered', console.log )
 
 
 				/*
@@ -188,7 +189,7 @@
 						return
 					}
 
-					if (app.state.currentBlock) return
+					if (app.currentBlockObject) return
 
 					event.preventDefault()
 
@@ -203,17 +204,18 @@
 					// 	app.stage.targetCameraPos.z = app.state.minCameraZPos
 					// 	return
 					// }
-
-					if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.maxCameraZPos
-						app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
+					const maxCameraZPos = app.getPositionForDate(app.latestAvailableDate)
+      		const minCameraZPos = app.getPositionForDate(app.earliestAvailableDate)
+					if (app.stage.targetCameraPos.z > maxCameraZPos) {
+						app.stage.targetCameraPos.z = maxCameraZPos
+						app.stage.targetCameraLookAt.z = maxCameraZPos - 1000
 						return
 					}
 
 
 					const dayObj3Ds = app.dayObj3Ds.children
-					const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
-    			const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
+					// const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
+    			// const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
 
 					if (event.deltaY > 0) {
 						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
