@@ -172,10 +172,11 @@ export default class Stage {
     //   }
     // }
     // document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
-    this.canvas.addEventListener('touchmove', evt => {
-      evt.preventDefault()
-      this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
-    })
+    // this.canvas.addEventListener('touchmove', evt => {
+    //   evt.preventDefault()
+    //   console.log( evt )
+    //   this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
+    // })
   }
 
   /**
