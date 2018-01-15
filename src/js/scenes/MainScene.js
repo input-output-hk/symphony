@@ -1,6 +1,4 @@
 'use strict'
-
-// libs
 import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'

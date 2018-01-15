@@ -3,8 +3,9 @@ import MerkleMaterial from './MerkleMaterial/MerkleMaterial'
 import PointsMaterial from './PointsMaterial/PointsMaterial'
 import BlockMaterial from './BlockMaterial/BlockMaterial'
 
-export default ({ bumpMap }, cubeTextures ) => {
-  const bgMap = cubeTextures
+export default (textures, cubeTextures ) => {
+  const bgMap = new THREE.CubeTexture(cubeTextures)
+  const bumpMap = new THREE.Texture(textures[0])
   bgMap.needsUpdate = true
 
   const blockMaterialBack = new BlockMaterial({
