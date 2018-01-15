@@ -204,26 +204,30 @@
 					// 	app.stage.targetCameraPos.z = app.state.minCameraZPos
 					// 	return
 					// }
-					const maxCameraZPos = app.getPositionForDate(app.latestAvailableDate)
-      		const minCameraZPos = app.getPositionForDate(app.earliestAvailableDate)
-					if (app.stage.targetCameraPos.z > maxCameraZPos) {
-						app.stage.targetCameraPos.z = maxCameraZPos
-						app.stage.targetCameraLookAt.z = maxCameraZPos - 1000
-						return
-					}
+					// const maxCameraZPos = app.getPositionForDate(app.latestAvailableDate)
+      		// const minCameraZPos = app.getPositionForDate(app.earliestAvailableDate)
+					// if (app.stage.targetCameraPos.z > maxCameraZPos) {
+					// 	app.stage.targetCameraPos.z = maxCameraZPos
+					// 	app.stage.targetCameraLookAt.z = maxCameraZPos - 1000
+					// 	return
+					// }
 
 
-					const dayObj3Ds = app.dayObj3Ds.children
+					// const dayObj3Ds = app.dayObj3Ds.children
 					// const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
     			// const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
 
 					if (event.deltaY > 0) {
 						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
+						// app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
 					} else if (event.deltaY < 0) {
 						app.stage.targetCameraPos.z += app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
+						
 					}
+
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+					console.log(app.stage.targetCameraLookAt.z)
+
 				}
 
 				document.addEventListener("wheel", onDocumentMouseWheel, false);

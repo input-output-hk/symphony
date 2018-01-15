@@ -738,8 +738,15 @@ export default class MainScene extends EventEmitter {
   async onCameraMove () {
 
     /*
-      Get the nearest day on to the cameras target location
+      Bound the camera movement to the available block chain range
     */
+    const start = this.getPositionForDate(this.earliestDate)//
+    const end = this.getPositionForDate(this.latestDate)// - ( dayZOffset * 0.5 )
+    this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
+
+    /*
+      Get the nearest day on to the cameras target location
+    */    
     const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z)
     date.setHours(0, 0, 0, 0)
 
@@ -747,8 +754,7 @@ export default class MainScene extends EventEmitter {
       Load the relevant blocks around this date and fire an event
     */
     if (Math.abs(this.date - date) >= msInADay) {
-      console.log('onCameraMove:  changing date', date) 
-      await this.loadDate(date)
+      this.loadDate(date)
     }
   }
 
