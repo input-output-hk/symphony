@@ -8,26 +8,16 @@ export default class BlockMaterial extends THREE.MeshStandardMaterial {
     this.type = 'ShaderMaterial'
 
     this.uniforms = THREE.ShaderLib.standard.uniforms
-
-    this.uniforms.uRefractionRatio = {
-      type: 'f',
-      value: 0.8
-    }
-
-    this.uniforms.uFresnelBias = {
-      type: 'f',
-      value: 0.1
-    }
-
-    this.uniforms.uFresnelScale = {
-      type: 'f',
-      value: 0.1
-    }
-
-    this.uniforms.uFresnelPower = {
-      type: 'f',
-      value: 20.0
-    }
+    this.uniforms = THREE.UniformsUtils.merge([
+      THREE.ShaderLib.standard.uniforms,
+      {
+        uRefractionRatio: { type: 'f', value: 0.8 },
+        uFresnelBias: { type: 'f', value: 0.1 },
+        uFresnelScale: { type: 'f', value: 0.1 },
+        uFresnelPower: { type: 'f', value: 20.0 },
+        uCubePos: { type: 'v3', value: new THREE.Vector3() }
+      }
+    ])
 
     this.vertexShader = vertexShader
     this.fragmentShader = fragmentShader
