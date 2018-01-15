@@ -13,7 +13,7 @@ import Config from '../Config'
 import Audio from '../audio/audio'
 
 // API
-import {getBlocksOnDay, getTransactionsForBlock, getBlock} from '../api/btc'
+import {getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
 
 // Custom Materials
 import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
@@ -80,6 +80,11 @@ export default class MainScene extends EventEmitter {
     this.clock = new THREE.Clock()
     this.materials = new Map()
     this.days = new Map()
+
+    this.path = path
+    this.font = null
+    this.fontLoader = new THREE.FontLoader()
+
     this.allBlocksObj3d = new Map()
     this.lastHoveredBlock = null    
     this.raycaster = new THREE.Raycaster()
@@ -180,12 +185,13 @@ export default class MainScene extends EventEmitter {
   /*
     Groups blocks by days and adds them
   */
-  addDay(blocks){
+  async addDay(blocks){
     if(!blocks || blocks.length === 0) return
     const obj3ds = blocks.map(block => this.addBlock(block))
       .filter(block => block) // Remove null blocks
     const day = blocks[0].day
     const group = this.getGroupForDay(day)
+    group.hashRate = await getHashRateforDay(day)
     group.position.z = this.getPositionForDate(day)
     group.add(...obj3ds)
 
@@ -409,6 +415,12 @@ export default class MainScene extends EventEmitter {
     document.addEventListener('preUpdate', this.onUpdateBound, false)
     document.addEventListener('cameraMove', this.onCameraMove.bind(this), false)
     this.stage.canvas.addEventListener('click', this.onDocumentMouseDown.bind(this), false)
+
+    this.on('dayChanged', function ({ date }) {
+      const hashRate = getGroupForDay(date.valueOf()).hashRate
+      this.state.audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
+      this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
+    })
   }
 
   addTreeToStage(data){
@@ -446,10 +458,8 @@ export default class MainScene extends EventEmitter {
     this.pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
     this.pointsMesh.position.add(offset)
 
-
     const blockObj3D = this.allBlocksObj3d.get(block.hash)
     blockObj3D.tree = mesh
-
 
     const dayIndex = Math.round(this.getPositionForDate(blockObj3D.block.day) / dayZOffset) * 100000
     const index = blockObj3D.parent.children.indexOf(blockObj3D) * 4
@@ -506,7 +516,7 @@ export default class MainScene extends EventEmitter {
     cubeCamera.update(this.stage.renderer, this.stage.scene)
     front.envMap = cubeCamera.renderTarget.texture
     back.envMap = cubeCamera.renderTarget.texture
-    merkle.envMap = cubeCamera.renderTarget.texture
+    // merkle.envMap = cubeCamera.renderTarget.texture
 
     this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
   }
@@ -609,7 +619,6 @@ export default class MainScene extends EventEmitter {
     const bumpMap =  new THREE.Texture(textures[0])
     this.bgMap = new THREE.CubeTexture(cubeTextures)
     this.bgMap.needsUpdate = true
-    // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new THREE.MeshStandardMaterial({
       color: 0xeeeeee,
@@ -682,6 +691,16 @@ export default class MainScene extends EventEmitter {
       depthWrite: false
       // vertexColors: THREE.VertexColors
     })
+
+    this.circleMat = new THREE.LineBasicMaterial({
+      color: 0xffffff
+    })
+
+    this.circleMatOuter = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.5
+    })
   }
 
   getIntersections () {
@@ -738,12 +757,6 @@ export default class MainScene extends EventEmitter {
       console.log('onCameraMove:  changing date', date) 
       await this.loadDate(date)
     }
-
-    /* this.state.hashRate = this.state.currentDay.hashRate
-    this.state.audioFreqCutoff = map(this.state.hashRate, 0.0, 20000000.0, 50.0, 15000) // TODO: set upper bound to max hashrate from blockchain.info
-    // this.state.audioFreqCutoff = 20000
-    // this.audio.setAmbienceFilterCutoff(this.state.audioFreqCutoff)
-    */
   }
 
   async goToBlock (blockhash) {

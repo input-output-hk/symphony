@@ -3,7 +3,7 @@
 // 3rd party libs
 import * as THREE from 'three'
 
-import {EffectComposer, ShaderPass, RenderPass, UnrealBloomPass} from './postprocessing/EffectComposer'
+import {EffectComposer, ShaderPass, RenderPass, UnrealBloomPass, SMAAPass} from './postprocessing/EffectComposer'
 
 import FXAAShader from './shaders/FXAA'
 import HueSaturationShader from './shaders/HueSaturation'
@@ -53,13 +53,17 @@ export default class Stage {
     this.HueSaturationPass = new ShaderPass(HueSaturationShader)
     this.composer.addPass(this.HueSaturationPass)
 
-    this.FXAAPass = new ShaderPass(FXAAShader)
+    /* this.FXAAPass = new ShaderPass(FXAAShader)
     // this.FXAAPass.renderToScreen = true
-    this.composer.addPass(this.FXAAPass)
+    this.composer.addPass(this.FXAAPass) */
 
-    this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    this.RGBShiftPass.renderToScreen = true
-    this.composer.addPass(this.RGBShiftPass)
+   // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
+    // this.RGBShiftPass.renderToScreen = true
+ //   this.composer.addPass(this.RGBShiftPass)
+
+    this.SMAAPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio())
+    this.SMAAPass.renderToScreen = true
+    this.composer.addPass(this.SMAAPass)
 
     /* this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
     this.bloomPass.renderToScreen = true
@@ -192,7 +196,7 @@ export default class Stage {
     this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
 
-    this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / w, 1 / h)
+    // this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / w, 1 / h)
 
     this.renderer.setSize(w, h)
     this.composer.setSize(w, h)

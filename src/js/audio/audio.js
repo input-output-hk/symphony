@@ -14,8 +14,8 @@ export default class Audio extends EventEmitter {
     this.camera = camera
     this.loops = []
     this.quantize = 32
-    this.masterVol = -18 // db
-    this.ambienceVol = -10 // db
+    this.masterVol = -21 // db
+    this.ambienceVol = -2 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
@@ -157,15 +157,14 @@ export default class Audio extends EventEmitter {
           this.emit('bgAudioLoaded')
           resolve()
         }
-      // }).chain(this.ambienceFilter)
-      }).chain(this.ambienceBus)
+      }).chain(this.ambienceFilter)
 
       this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
     })
   }
 
   setAmbienceFilterCutoff (value) {
-    // this.ambienceFilter.frequency.linearRampToValueAtTime(value, Tone.Transport.seconds + 5)
+    this.ambienceFilter.set('frequency', value)
   }
 
   unloadSound () {
@@ -226,19 +225,17 @@ export default class Audio extends EventEmitter {
   muteAudio () {
     this.isMuted = true
     this.masterBus.set('mute', true)
-    this.ambienceBus.set('mute', true)
   }
 
   unMuteAudio () {
     this.isMuted = false
     this.masterBus.set('mute', false)
-    this.ambienceBus.set('mute', false)
   }
 
   init () {
     return new Promise((resolve, reject) => {
       this.masterBus = new Tone.Volume(this.masterVol).toMaster()
-      this.ambienceBus = new Tone.Volume(-96).toMaster()
+      this.ambienceBus = new Tone.Volume(-96).chain(this.masterBus)
 
       /* this.convolver = new Tone.Convolver(path + 'sounds/IR/r1_ortf.wav')
       this.convolver.set('wet', 1.0) */
@@ -373,6 +370,9 @@ export default class Audio extends EventEmitter {
         let loop
 
         let timeLowRes = time.toFixed(1)
+        if (Config.detector.isMobile) {
+          timeLowRes = parseInt(timeLowRes)
+        }
 
         if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(
@@ -397,17 +397,14 @@ export default class Audio extends EventEmitter {
                 this.pointColors[index] = 0
               }, 500)
             },
-              '1m'
+            '1m'
           ).start(Tone.Transport.seconds + time)
         }
-        loop.humanize = '64n'
+        loop.set('iterations', 8)
+        loop.set('humanize', '64n')
         this.loops.push(loop)
         this.loopMap[timeLowRes] = true
       }
     }
-
-    setTimeout(function () {
-      Tone.Transport.stop()
-    }, 31 * 1000)
   }
 }

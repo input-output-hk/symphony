@@ -15,14 +15,14 @@ firebase.initializeApp({
 const blocks = firebase.firestore().collection('block')
 
 export const formatTimeSeries = ({ data }) => {
-    const times = []
-    const values = []
-    data.values.forEach(({ x, y }) => {
-      times.push(x)
-      values.push(y)
-    })
-    return { times, values }
-  }
+  const times = []
+  const values = []
+  data.values.forEach(({ x, y }) => {
+    times.push(x)
+    values.push(y)
+  })
+  return { times, values }
+}
 
 /**
  * Get a list of BTC transaction over a time period
@@ -41,41 +41,6 @@ export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockc
     let hashRates = formatTimeSeries(data)
     return hashRates && hashRates.values[0] !== undefined && hashRates.values[0]
   })
-
-/**
- * Attach hash rates to days array
- */
-export const assignHashRates = daysArray => {
-  let numberOfDays = daysArray.length
-  let daysProcessed = 0
-  return new Promise((resolve, reject) => {
-    daysArray.forEach((dayData) => {
-      let timestampInMs = dayData.timeStamp / 1000
-      getHashRateforDay(timestampInMs)
-    .then((hashRate) => {
-      dayData.hashRate = hashRate
-      daysProcessed++
-      if (daysProcessed === numberOfDays) {
-        // add hash rate from previous day to current day if it doesn't exist
-        if (daysArray[0].hashRate === null) {
-          daysArray[0].hashRate = daysArray[1].hashRate
-        }
-        resolve()
-      }
-    })
-    .catch((error) => {
-      daysProcessed++
-      dayData.hashRate = null
-      console.log(error)
-    })
-    })
-  })
-}
-
-const Block = block => ({
-  ...block,
-  day: new Date(block.time * 1000 ).setHours(0, 0, 0, 0)
-})
 
 /**
  * Returns a block from a given hash
