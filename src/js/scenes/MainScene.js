@@ -673,10 +673,9 @@ export default class MainScene extends EventEmitter {
       })
   }
 
-  setupMaterials (textures, cubeTextures) {
-    this.bgMap = new THREE.CubeTexture(cubeTextures)
+  setupMaterials (textures, cubeMap) {
+    this.bgMap = cubeMap
     this.bgMap.needsUpdate = true
-    // this.stage.scene.background = this.bgMap
 
     this.blockMaterialBack = new BlockMaterial({
       color: 0xeeeeee,
