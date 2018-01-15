@@ -6,20 +6,10 @@ import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
 import AddText from './circleGeometry'
-
-// Global config
 import Config from '../Config'
-
-// Audio
 import Audio from '../audio/audio'
-
-// API
 import {getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
-
-// Custom Materials
-import BlockMaterial from '../materials/BlockMaterial/BlockMaterial'
-import PointsMaterial from '../materials/PointsMaterial/PointsMaterial'
-import MerkleMaterial from '../materials/MerkleMaterial/MerkleMaterial'
+import Materials from '../materials/materials'
 
 const dat = require('dat-gui')
 import DayBuilderWorker from '../workers/day.worker.js'
@@ -27,8 +17,8 @@ import TreeBuilderWorker from '../workers/tree.worker.js'
 const TWEEN = require('@tweenjs/tween.js')
 
 
-const msInADay = 86400000
-const dayZOffset = 4500 // offset for each day on z-axis
+const MS_IN_A_DAY = 86400000
+const DAY_OFFSET = 5000 // offset for each day on z-axis
 
 
 const intersection = (a, b) => new Set( [...a].filter(x => b.has(x)))
@@ -96,7 +86,7 @@ export default class MainScene extends EventEmitter {
     this.audio = new Audio(this.stage.camera, path)
     this.audio.init()
     this.addEvents()
-    this.setupMaterials(textures, cubeMap)
+    this.allMaterials = Materials(textures, cubeMap)
     this.stage.scene.add(this.dayObj3Ds)
 
 
@@ -113,14 +103,14 @@ export default class MainScene extends EventEmitter {
       let param = {
         blockMetalness: 0.9,
         blockRoughness: 0.2,
-        blockColor: this.blockMaterialFront.color.getHex(),
-        blockEmissive: this.blockMaterialFront.emissive.getHex(),
+        blockColor: this.allMaterials.blockMaterialFront.color.getHex(),
+        blockEmissive: this.allMaterials.blockMaterialFront.emissive.getHex(),
         blockLightIntesity: 5.0,
         //
         merkleMetalness: 0.9,
         merkleRoughness: 0.1,
-        merkleColor: this.merkleMaterial.color.getHex(),
-        merkleEmissive: this.merkleMaterial.emissive.getHex(),
+        merkleColor: this.allMaterials.merkleMaterial.color.getHex(),
+        merkleEmissive: this.allMaterials.merkleMaterial.emissive.getHex(),
         //
         backgroundColor: Config.scene.bgColor,
         vignetteAmount: 1.4,
@@ -198,8 +188,7 @@ export default class MainScene extends EventEmitter {
       Orientates, positions and sorts block objects
       TODO: implmenent a better depth sorting algo
     */
-    const dayIndex = Math.round(this.getPositionForDate(day) / dayZOffset) * 100000
-    // const n = obj3ds.length
+    const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 100000
     const center = obj3ds.length * 0.5 * 30
     obj3ds.forEach((obj3d, i) => {
       const index = i * 4
@@ -212,10 +201,8 @@ export default class MainScene extends EventEmitter {
       obj3d.translateZ(i * 30 - center)
     })
 
-    // group.add(new THREE.Mesh(new THREE.SphereGeometry(100, 100)))
-
     const circleGroup = AddText(this.path, moment(day).startOf('day').format('MMM Do YYYY').toUpperCase())
-    circleGroup.position.z = dayZOffset * 0.5
+    circleGroup.position.z = DAY_OFFSET * 0.5
     group.add(circleGroup)
 
     /*
@@ -274,9 +261,9 @@ export default class MainScene extends EventEmitter {
 
   getMaterialsForDay(day){
     const materials = this.materials.get(day) || {
-      front: this.blockMaterialFront.clone(),
-      back: this.blockMaterialBack.clone(),
-      merkle: this.merkleMaterial
+      front: this.allMaterials.blockMaterialFront.clone(),
+      back: this.allMaterials.blockMaterialBack.clone(),
+      merkle: this.allMaterials.merkleMaterial
     }
     this.materials.set(day, materials)
     return materials
@@ -327,7 +314,7 @@ export default class MainScene extends EventEmitter {
     if( date > this.latestDate ) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format("MMM Do YYYY"))
 
     date = new Date(new Date(date).setHours(0, 0, 0, 0))
-    if (Math.abs(this.date - date) < msInADay) return
+    if (Math.abs(this.date - date) < MS_IN_A_DAY) return
     this.date = date
 
     const numDaysToLoad = Config.daysEitherSide * 2 + 1
@@ -404,13 +391,13 @@ export default class MainScene extends EventEmitter {
   }
 
   getNearestDateForPosition(z){
-    const hOffset = dayZOffset * 0.5
-    return new Date((z + dayZOffset) / dayZOffset * msInADay + this.earliestDate.valueOf())
+    const hOffset = DAY_OFFSET * 0.5
+    return new Date((z + DAY_OFFSET) / DAY_OFFSET * MS_IN_A_DAY + this.earliestDate.valueOf())
   }
 
   getPositionForDate(date){
-    const hOffset = dayZOffset * 0.5
-    return ((date - this.earliestDate) / msInADay * dayZOffset) - hOffset
+    const hOffset = DAY_OFFSET * 0.5
+    return ((date - this.earliestDate) / MS_IN_A_DAY * DAY_OFFSET) - hOffset
   }
 
   addEvents () {
@@ -442,7 +429,7 @@ export default class MainScene extends EventEmitter {
     mesh.position.add(offset)
 
     // start animation
-    this.merkleMaterial.uniforms.uAnimTime.value = 0.0
+    this.allMaterials.merkleMaterial.uniforms.uAnimTime.value = 0.0
     new TWEEN.Tween(mesh.material.uniforms.uAnimTime)
       .to({value: 5}, 3000)
       .easing(TWEEN.Easing.Quadratic.InOut)
@@ -458,13 +445,13 @@ export default class MainScene extends EventEmitter {
     geometry.addAttribute('soundData', new THREE.BufferAttribute(new Float32Array(endPoints.length), 3))
 
     // per instance data
-    this.pointsMesh = new THREE.Points(geometry, this.pointsMaterial)
+    this.pointsMesh = new THREE.Points(geometry, this.allMaterials.pointsMaterial)
     this.pointsMesh.position.add(offset)
 
     const blockObj3D = this.allBlocksObj3d.get(block.hash)
     blockObj3D.tree = mesh
 
-    const dayIndex = Math.round(this.getPositionForDate(blockObj3D.block.day) / dayZOffset) * 100000
+    const dayIndex = Math.round(this.getPositionForDate(blockObj3D.block.day) / DAY_OFFSET) * 100000
     const index = blockObj3D.parent.children.indexOf(blockObj3D) * 4
     this.pointsMesh.renderOrder = index + dayIndex + 3
     mesh.renderOrder = index + dayIndex + 2
@@ -472,7 +459,7 @@ export default class MainScene extends EventEmitter {
     if( this.currentBlockObject === blockObj3D ){
       blockObj3D.contents.add(this.pointsMesh)
       blockObj3D.contents.add(blockObj3D.tree)
-      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition().clone(), block, this.pointsMaterial,  this.pointsMesh)
+      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition().clone(), block, this.allMaterials.pointsMaterial,  this.pointsMesh)
     }
   }
 
@@ -508,7 +495,7 @@ export default class MainScene extends EventEmitter {
 
   createCubeMap (day) {
     // if (typeof this.state.dayData[dayIndex] !== 'undefined') {
-    this.stage.scene.background = this.bgMap
+    this.stage.scene.background = this.allMaterials.bgMap
     
     const { front, back, merkle } = this.getMaterialsForDay(day)
     const group = this.getGroupForDay(day)
@@ -541,7 +528,7 @@ export default class MainScene extends EventEmitter {
         })
         .start()
 
-      new TWEEN.Tween(this.merkleMaterial.uniforms.uAnimTime)
+      new TWEEN.Tween(this.allMaterials.merkleMaterial.uniforms.uAnimTime)
         .to({ value: 10}, 3)
         .start()
 
@@ -618,84 +605,6 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  setupMaterials ({ bumpMap }, cubeTextures) {
-    // const bumpMap =  new THREE.Texture(textures[0])
-    this.bgMap = cubeTextures
-    this.bgMap.needsUpdate = true
-
-    this.blockMaterialBack = new THREE.MeshStandardMaterial({
-      color: 0xeeeeee,
-      emissive: 0x000000,
-      metalness: 0.9,
-      roughness: 0.2,
-      opacity: 0.5,
-      transparent: true,
-      depthWrite: false,
-      // depthTest: false,
-      side: THREE.BackSide,
-      envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03
-    })
-
-    this.blockMaterialFront = new THREE.MeshStandardMaterial({
-      color: 0xeeeeee,
-      emissive: 0x330000,
-      metalness: 0.9,
-      roughness: 0.2,
-      opacity: 0.5,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      side: THREE.FrontSide,
-      envMap: this.bgMap,
-      bumpMap,
-      bumpScale: 0.03
-    })
-
-    this.blockMaterialOutline = new THREE.LineBasicMaterial({
-      color: 0xaaaaaa,
-      transparent: true,
-      opacity: 0.5
-    })
-
-    this.blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: 0xffffff,
-      metalness: 0.9,
-      roughness: 0.2,
-      opacity: 0.8,
-      transparent: true,
-      side: THREE.DoubleSide
-    })
-
-    this.merkleMaterial = new MerkleMaterial({
-      color: 0xffffff,
-      emissive: 0x444444,
-      flatShading: true,
-      metalness: 0.8,
-      roughness: 0.3,
-      opacity: 0.3,
-      depthTest: false,
-      depthWrite: false,
-      transparent: true,
-      side: THREE.DoubleSide,
-      envMap: this.bgMap
-    })
-
-    this.pointsMaterial = new PointsMaterial({
-      color: 0xfff900,
-      size: 100.0,
-      // alphaTest: 0.0001,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      opacity: 1.0,
-      depthTest: false,
-      depthWrite: false
-      // vertexColors: THREE.VertexColors
-    })
-  }
-
   getIntersections () {
     var vector = new THREE.Vector3(this.stage.targetMousePos.x, this.stage.targetMousePos.y, 0.5)
     vector.unproject(this.stage.camera)
@@ -726,7 +635,7 @@ export default class MainScene extends EventEmitter {
       If an intersection occured but not on the selected block, set a highlight
     */
     if (intersected && intersected !== this.currentBlockObject) {
-      intersected.children.forEach(child => child.material = this.blockMaterialHighlight)
+      intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
         this.emit('blockHovered', intersected.block)
@@ -741,7 +650,7 @@ export default class MainScene extends EventEmitter {
       Bound the camera movement to the available block chain range
     */
     const start = this.getPositionForDate(this.earliestDate)//
-    const end = this.getPositionForDate(this.latestDate)// - ( dayZOffset * 0.5 )
+    const end = this.getPositionForDate(this.latestDate)// - ( DAY_OFFSET * 0.5 )
     this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
 
     /*
@@ -753,7 +662,7 @@ export default class MainScene extends EventEmitter {
     /*
       Load the relevant blocks around this date and fire an event
     */
-    if (Math.abs(this.date - date) >= msInADay) {
+    if (Math.abs(this.date - date) >= MS_IN_A_DAY) {
       this.loadDate(date)
     }
   }
@@ -796,15 +705,12 @@ export default class MainScene extends EventEmitter {
     this.addTreeToStage(data)
   }
 
-  updateLights () {
-    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.1)
-  }
-
   onUpdate () {
     TWEEN.update()
-    this.updateLights()
+    
     this.checkMouseIntersection()
 
+    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.1)
     this.uTime = this.clock.getElapsedTime()
 
     // this.pointsMaterial.uniforms.uTime.value = this.uTime
