@@ -262,7 +262,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			vec3 cubeMapSize = vec3(1024.0);
 			// vec3 cubeMapPos = vec3(0.0, 0.0, 230000.0);
 			vec3 rVec = parallaxCorrectNormal( queryVec, cubeMapSize, uCubePos );
-			vec4 envMapColor = textureCubeUV( rVec, 1.0 );
+			vec4 envMapColor = textureCubeUV( queryVec, 1.0 );
 
 		#else
 
@@ -313,11 +313,11 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			#ifdef TEXTURE_LOD_EXT
 
-				vec4 envMapColor = textureCubeLodEXT( envMap, rVec, specularMIPLevel );
+				vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
 
 			#else
 
-				vec4 envMapColor = textureCube( envMap, rVec, specularMIPLevel );
+				vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );
 
 			#endif
 

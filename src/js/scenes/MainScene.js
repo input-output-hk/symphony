@@ -16,7 +16,7 @@ const TWEEN = require('@tweenjs/tween.js')
 
 
 const MS_IN_A_DAY = 86400000
-const DAY_OFFSET = 5000 // offset for each day on z-axis
+const DAY_OFFSET = 5300 // offset for each day on z-axis
 
 
 const intersection = (a, b) => new Set( [...a].filter(x => b.has(x)))
@@ -161,12 +161,13 @@ export default class MainScene extends EventEmitter {
       }.bind(this))
     }
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    this.stage.camera.position.z = this.getPositionForDate(today) + 1000
+    const threeHoursBeforeLastBlock = new Date(this.latestDate)
+    threeHoursBeforeLastBlock.setHours(threeHoursBeforeLastBlock.getHours() - 12)
+    console.log(threeHoursBeforeLastBlock)
+    this.stage.camera.position.z = this.getPositionForDate(threeHoursBeforeLastBlock) + 1000
     this.stage.cameraPos.z = this.stage.camera.position.z
     this.stage.targetCameraPos.z = this.stage.cameraPos.z
-    this.setDate(today)
+    this.setDate(threeHoursBeforeLastBlock)
   }
 
   /*
@@ -188,6 +189,7 @@ export default class MainScene extends EventEmitter {
     */
     const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 100000
     const center = obj3ds.length * 0.5 * 30
+    console.log( new Date(day), dayIndex)
     obj3ds.forEach((obj3d, i) => {
       const index = i * 4
       obj3d.front.renderOrder = index + dayIndex + 1

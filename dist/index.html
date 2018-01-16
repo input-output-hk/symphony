@@ -41,32 +41,32 @@
 		canvas {
 			width: 100%!important;
 			height: 100%!important;
-		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script src=//unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js></script><script type=text/babel>window.onload = function(){
+		}</style></head><body><div id=hud></div><button id=mute style="position: absolute; z-index: 9999">Mute</button> <button id=unmute style="position: absolute; z-index: 9999; left: 50px">Un-mute</button><div class=canvas-container><canvas id=stage></canvas></div><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script src=//unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js></script><script type=text/babel>window.onload = function(){
 
 			// check that browser supports webgl
 			if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
 				
 			// Create the Orpeus App
 			orpheusApp({ path: './static/assets/' }).then( app => {
-
-				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
-				app.setSize(window.innerWidth, window.innerHeight)
+				console.log('App returned from promise', app)
 				window.app = app
 
-
+				/**
+				 * Setup Window resize listeners
+				 */
+				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+				app.setSize(window.innerWidth, window.innerHeight)
+				
 				/*
 					Utility methods for navigating along the block chain
 				*/
-				const goToNextBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.next_block)
-				const goToPrevBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.prev_block)
+				const goToNextBlock = app.goToBlock
+				const goToPrevBlock = app.goToBlock
 				window.goToNextBlock = goToNextBlock
 				window.goToPrevBlock = goToPrevBlock
 
-
-				// initial date needs to be set, could be set via current date or url for example
-				const Jan1st_2018 = new Date(2018, 0, 1)
-				app.setDate(Jan1st_2018) 
-
+				// Method to navigation to a new date in the blockchain
+				// app.setDate(new Date(2018, 0, 1)) 
 
 				/*
 					Destroys the Orpheus instance and unloads all data.
@@ -106,6 +106,7 @@
 					Event called as a user scrolls through time and the current day changes
 				*/
 				app.on('dayChanged', ({ date, input, output, fee }) => {
+					console.log('EVENT: `dayChanged` receieved')
 					ReactDOM.render(		
 						<div>	
 							<h1>Day View</h1>
@@ -121,7 +122,7 @@
 				/*
 					Event called when a block is hovered over
 				*/
-				//app.on('blockHovered', console.log )
+				// app.on('blockHovered', console.log )
 
 
 				/*
@@ -160,7 +161,7 @@
 						return
 					}
 
-					if (app.state.currentBlock) return
+					if (app.currentBlockObject) return
 
 					event.preventDefault()
 
@@ -171,28 +172,26 @@
 						}, 50)
 					}
 
-					if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.minCameraZPos
-						return
-					}
 
-					if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.maxCameraZPos
-						app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
-						return
-					}
+					// const dayObj3Ds = app.dayObj3Ds.children
+					// const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
+    			// const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
 
 					if (event.deltaY > 0) {
 						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
 					} else if (event.deltaY < 0) {
 						app.stage.targetCameraPos.z += app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
 					}
+
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+
 				}
 
 				document.addEventListener("wheel", onDocumentMouseWheel, false);
+				document.addEventListener("mousewheel", onDocumentMouseWheel, false);
+				// document.addEventListener("touchmove", onDocumentMouseWheel, false);
+				window.onscroll = onDocumentMouseWheel
 
-			})
+			}).catch(e => console.log(e))
 
 		}</script><script type=text/javascript src=/static/js/app.js></script></body></html>

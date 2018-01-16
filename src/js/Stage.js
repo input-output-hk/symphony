@@ -11,6 +11,7 @@ import RGBShiftShader from './shaders/RGBShift'
 import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
+import ham from 'hammerjs'
 
 // import * as fboHelper from './helpers/fboHelper'
 // import EffectComposer2 from './EffectComposer'
@@ -23,13 +24,13 @@ import Config from './Config'
  */
 export default class Stage {
   constructor () {
-    this.init()
-  }
-
-  /**
-   * Bootstrap
-   */
-  init () {
+    // get a reference to an element 
+    var stage = document.getElementById('stage');
+ 
+    // create a manager for that element 
+    var hammertime = new Hammer(stage);
+    hammertime.get('pinch').set({ enable: true });
+    hammertime.on( "pinch", e => console.log(e))
     this.initScene()
     this.initCamera()
     this.initRenderer()

@@ -31,7 +31,8 @@ module.exports = {
       { test: /\.(glsl|frag|vert)$/, loader: 'glslify-loader', exclude: /node_modules/ },
       {
         test: /\.worker\.js$/,
-        use: { loader: 'worker-loader' }
+        loader: 'worker-loader',
+        options: { inline: true }
       },
       {
         test: /\.js$/,
