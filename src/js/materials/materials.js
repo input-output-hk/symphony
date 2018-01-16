@@ -61,7 +61,7 @@ export default (textures, cubeTextures ) => {
     flatShading: true,
     metalness: 0.8,
     roughness: 0.3,
-    opacity: 0.3,
+    opacity: 0.7,
     depthTest: false,
     depthWrite: false,
     transparent: true,

@@ -694,18 +694,6 @@ export default class MainScene extends EventEmitter {
     this.currentBlockObject.visible = true
     this.animateBlockIn(obj3d)
     this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
-    // }else{
-    //   block = await getBlock(blockhash)
-    //   this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
-    //   this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
-    //   await this.loadDate(block.day)
-    //   this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
-    //   this.currentBlockObject.front.material = this.currentBlockObject.materials.front
-    //   this.currentBlockObject.back.material = this.currentBlockObject.materials.back
-    //   this.currentBlockObject.visible = true
-    //   this.animateBlockIn(this.currentBlockObject)
-    //   this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
-    // }
 
     const transactions = await getTransactionsForBlock(block.hash)
     const data = await generateTreeGeometry({ ...block, transactions })
