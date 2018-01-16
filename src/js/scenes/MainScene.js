@@ -187,7 +187,7 @@ export default class MainScene extends EventEmitter {
       Orientates, positions and sorts block objects
       TODO: implmenent a better depth sorting algo
     */
-    const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 100000
+    const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 1000000
     const center = obj3ds.length * 0.5 * 30
     console.log( new Date(day), dayIndex)
     obj3ds.forEach((obj3d, i) => {
@@ -691,12 +691,13 @@ export default class MainScene extends EventEmitter {
     console.log('NAVIGATING TO BLOCK :', blockhash )
     let block = this.allBlocksObj3d.has(blockhash) ? this.allBlocksObj3d.get(blockhash).block : null
     if (!block) block = await getBlock(blockhash)
-
+    
     this.emit('blockSelected', {...block, time: new Date(block.day)})
     
     await this.setDate(block.day)
 
     this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
+    console.log('RENDER ORDER', this.currentBlockObject.front.renderOrder, this.currentBlockObject.back.renderOrder)
     this.currentBlockObject.front.material = this.currentBlockObject.materials.front
     this.currentBlockObject.back.material = this.currentBlockObject.materials.back
     this.currentBlockObject.visible = true
