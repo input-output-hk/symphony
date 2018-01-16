@@ -684,7 +684,7 @@ export default class MainScene extends EventEmitter {
     let block = obj3d && obj3d.block
     const noBlockInMemory = obj3d === null
 
-    if (!noBlockInMemory) block = await getBlock(blockhash)
+    if (noBlockInMemory) block = await getBlock(blockhash)
     this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
     this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
     noBlockInMemory ? await this.loadDate(block.day) : this.loadDate(block.day)
