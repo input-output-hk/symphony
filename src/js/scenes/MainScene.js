@@ -680,27 +680,46 @@ export default class MainScene extends EventEmitter {
     }
 
     console.log('NAVIGATING TO BLOCK :', blockhash)
-    let block = this.allBlocksObj3d.has(blockhash) ? this.allBlocksObj3d.get(blockhash).block : null
-    if (!block) block = await getBlock(blockhash)
+    const obj3d = this.allBlocksObj3d.get(blockhash)
+    let block = obj3d && obj3d.block
 
-    this.emit('blockSelected', {...block, time: new Date(block.day)})
+    if (block) {
+      this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
+      this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
+      this.currentBlockObject = obj3d
+      this.currentBlockObject.front.material = this.currentBlockObject.materials.front
+      this.currentBlockObject.back.material = this.currentBlockObject.materials.back
+      this.currentBlockObject.visible = true
+      this.animateBlockIn(obj3d)
+      this.emit('blockSelected', {...block, time: new Date(block.day)})
+    }else{
+      // block = await getBlock(blockhash)
+      // this.emit('blockSelected', {...block, time: new Date(block.day)})
+      // this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
+      // this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
+      // await this.loadDate(block.day)
+      // this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
+      // this.currentBlockObject.front.material = this.currentBlockObject.materials.front
+      // this.currentBlockObject.back.material = this.currentBlockObject.materials.back
+      // this.currentBlockObject.visible = true
+      // this.animateBlockIn(this.currentBlockObject)
+    }
 
-    await this.setDate(block.day)
+    const transactions = await getTransactionsForBlock(block.hash)
+    const data = await generateTreeGeometry({ ...block, transactions })
+    this.addTreeToStage(data)
 
-    this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
-    console.log('RENDER ORDER', this.currentBlockObject.front.renderOrder, this.currentBlockObject.back.renderOrder)
-    this.currentBlockObject.front.material = this.currentBlockObject.materials.front
-    this.currentBlockObject.back.material = this.currentBlockObject.materials.back
-    this.currentBlockObject.visible = true
+    // this.emit('blockSelected', {...block, time: new Date(block.day)})
 
-    this.animateBlockIn(this.currentBlockObject)
+    // 
+    
+
+    // this.animateBlockIn(this.currentBlockObject)
 
     /*
       Generate the tree
     */
-    const transactions = await getTransactionsForBlock(block.hash)
-    const data = await generateTreeGeometry({ ...block, transactions })
-    this.addTreeToStage(data)
+    
   }
 
   onUpdate () {
