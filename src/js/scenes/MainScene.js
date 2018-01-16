@@ -208,8 +208,8 @@ export default class MainScene extends EventEmitter {
     /*
       Make blocks visible
     */
-    this.getMaterialsForDay(day).front.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
-    this.getMaterialsForDay(day).back.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
+    // this.getMaterialsForDay(day).front.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
+    // this.getMaterialsForDay(day).back.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
     
     obj3ds.forEach((obj, i) => setTimeout(_ => obj.visible = true, i * 30))
     setTimeout(_ => this.createCubeMap(day), (obj3ds.length + 1) * 30)
@@ -509,8 +509,8 @@ export default class MainScene extends EventEmitter {
     cubeCamera.update(this.stage.renderer, this.stage.scene)
     front.envMap = cubeCamera.renderTarget.texture
     back.envMap = cubeCamera.renderTarget.texture
-    front.uniforms.uCubePos.value.copy(cubeCamera.position) 
-    back.uniforms.uCubePos.value.copy(cubeCamera.position) 
+    // front.uniforms.uCubePos.value.copy(cubeCamera.position) 
+    // back.uniforms.uCubePos.value.copy(cubeCamera.position) 
     // merkle.envMap = cubeCamera.renderTarget.texture
 
     this.stage.scene.background = new THREE.Color(Config.scene.bgColor)

@@ -5,10 +5,12 @@ import BlockMaterial from './BlockMaterial/BlockMaterial'
 
 export default (textures, cubeTextures ) => {
   const bgMap = new THREE.CubeTexture(cubeTextures)
+  debugger
   const bumpMap = new THREE.Texture(textures[0])
+  bumpMap.needsUpdate = true
   bgMap.needsUpdate = true
 
-  const blockMaterialBack = new BlockMaterial({
+  const blockMaterialBack = new THREE.MeshStandardMaterial({
     color: 0xeeeeee,
     emissive: 0x000000,
     metalness: 0.9,
@@ -23,7 +25,7 @@ export default (textures, cubeTextures ) => {
     bumpScale: 0.03
   })
 
-  const blockMaterialFront = new BlockMaterial({
+  const blockMaterialFront = new THREE.MeshStandardMaterial({
     color: 0xeeeeee,
     emissive: 0x330000,
     metalness: 0.9,
