@@ -694,10 +694,10 @@ export default class MainScene extends EventEmitter {
       this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
     }else{
       block = await getBlock(blockhash)
-      this.emit('blockSelected', {...block, time: new Date(block.day)})
       this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
       this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
       await this.loadDate(block.day)
+      this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
       this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
       this.currentBlockObject.front.material = this.currentBlockObject.materials.front
       this.currentBlockObject.back.material = this.currentBlockObject.materials.back
@@ -708,18 +708,6 @@ export default class MainScene extends EventEmitter {
     const transactions = await getTransactionsForBlock(block.hash)
     const data = await generateTreeGeometry({ ...block, transactions })
     this.addTreeToStage(data)
-
-    // this.emit('blockSelected', {...block, time: new Date(block.day)})
-
-    // 
-    
-
-    // this.animateBlockIn(this.currentBlockObject)
-
-    /*
-      Generate the tree
-    */
-    
   }
 
   onUpdate () {
