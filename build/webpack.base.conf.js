@@ -32,7 +32,7 @@ module.exports = {
       {
         test: /\.worker\.js$/,
         loader: 'worker-loader',
-        options: { inline: true }
+        options: { inline: true, fallback: false }
       },
       {
         test: /\.js$/,
