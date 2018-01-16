@@ -14,17 +14,15 @@ import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
 const TWEEN = require('@tweenjs/tween.js')
 
-
 const MS_IN_A_DAY = 86400000
 const DAY_OFFSET = 5300 // offset for each day on z-axis
 
-
-const intersection = (a, b) => new Set( [...a].filter(x => b.has(x)))
+const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
 const groupBy = (arr, key) => arr.reduce((rv, x) => {
-    (rv[x[key]] = rv[x[key]] || []).push(x)
-    return rv;
-  }, {})
+  (rv[x[key]] = rv[x[key]] || []).push(x)
+  return rv
+}, {})
 
 const generateBlockGeometries = blocks => {
   return new Promise((resolve, reject) => {
@@ -48,7 +46,6 @@ const generateTreeGeometry = block => {
   })
 }
 
-
 export default class MainScene extends EventEmitter {
   constructor ({ stage, cubeMap, textures, earliestDate, latestDate, path = './static/assets/' }) {
     super()
@@ -59,7 +56,7 @@ export default class MainScene extends EventEmitter {
     this.earliestDate = earliestDate
     this.latestDate = latestDate
     this.stage = stage
-    
+
     /*
       Properties
     */
@@ -73,31 +70,29 @@ export default class MainScene extends EventEmitter {
     this.path = path
 
     this.allBlocksObj3d = new Map()
-    this.lastHoveredBlock = null    
+    this.lastHoveredBlock = null
     this.raycaster = new THREE.Raycaster()
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
     this.cameraBlockFocusDistance = -300
 
-    console.log("DATE RANGE :", this.earliestDate, this.latestDate )
-    
+    console.log('DATE RANGE :', this.earliestDate, this.latestDate)
+
     this.audio = new Audio(this.stage.camera, path)
     this.audio.init()
     this.addEvents()
     this.allMaterials = Materials(textures, cubeMap)
     this.stage.scene.add(this.dayObj3Ds)
 
-
     if (process.env.NODE_ENV !== 'production') {
-
       /*
         Dead code elimination. Only create the GUI if in dev mode
         See: https://webpack.js.org/guides/tree-shaking/
       */
-  
+
       this.gui = new dat.GUI({ width: 300 })
       this.gui.open()
-  
+
       let param = {
         blockMetalness: 0.9,
         blockRoughness: 0.2,
@@ -114,7 +109,7 @@ export default class MainScene extends EventEmitter {
         vignetteAmount: 1.4,
         cameraFOV: Config.camera.fov
       }
-  
+
       /**
        * Create a GUI for a material
        */
@@ -128,20 +123,20 @@ export default class MainScene extends EventEmitter {
         f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
         f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
       }
-  
+
        /**
        * Gui for Material
        */
       // createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
       // createGuiForMaterial(this.blockMaterialFront, 'Block Material')
       // createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
-  
+
       /*
         Light GUI
       */
       let lightFolder = this.gui.addFolder('Lighting')
       lightFolder.add(this.stage.pointLight, 'intensity', 0.0, 10.0).step(0.01)
-  
+
       /**
        * Scene
        */
@@ -150,11 +145,11 @@ export default class MainScene extends EventEmitter {
         this.stage.scene.background = new THREE.Color(val)
         this.stage.scene.fog.color = new THREE.Color(val)
       }.bind(this))
-  
+
       sceneFolder.add(param, 'vignetteAmount', 1.0, 2.0).step(0.01).onChange(function (val) {
         this.stage.VignettePass.uniforms.darkness.value = val
       }.bind(this))
-  
+
       sceneFolder.add(param, 'cameraFOV', 45.0, 100.0).step(0.01).onChange(function (val) {
         this.stage.camera.fov = val
         this.stage.camera.updateProjectionMatrix()
@@ -173,8 +168,8 @@ export default class MainScene extends EventEmitter {
   /*
     Groups blocks by days and adds them
   */
-  async addDay(blocks){
-    if(!blocks || blocks.length === 0) return
+  async addDay (blocks) {
+    if (!blocks || blocks.length === 0) return
     const obj3ds = blocks.map(block => this.addBlock(block))
       .filter(block => block) // Remove null blocks
     const day = blocks[0].day
@@ -189,7 +184,7 @@ export default class MainScene extends EventEmitter {
     */
     const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 1000000
     const center = obj3ds.length * 0.5 * 30
-    console.log( new Date(day), dayIndex)
+    console.log(new Date(day), dayIndex)
     obj3ds.forEach((obj3d, i) => {
       const index = i * 4
       obj3d.front.renderOrder = index + dayIndex + 1
@@ -208,18 +203,18 @@ export default class MainScene extends EventEmitter {
     /*
       Make blocks visible
     */
-    // this.getMaterialsForDay(day).front.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
-    // this.getMaterialsForDay(day).back.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position) 
-    
+    // this.getMaterialsForDay(day).front.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position)
+    // this.getMaterialsForDay(day).back.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position)
+
     obj3ds.forEach((obj, i) => setTimeout(_ => obj.visible = true, i * 30))
     setTimeout(_ => this.createCubeMap(day), (obj3ds.length + 1) * 30)
-    
+
     return blocks
   }
-  
-  addBlock(block){
+
+  addBlock (block) {
     const {day, size, time} = block
-    
+
     if (!day) return
     if (size.x === 0 || size.y === 0 || size.z === 0) return
     const materials = this.getMaterialsForDay(day)
@@ -242,7 +237,7 @@ export default class MainScene extends EventEmitter {
     group.block = block
     group.visible = false
     group.contents = new THREE.Group()
-    
+
     this.allBlocksObj3d.set(block.hash, group)
 
     group.add(back)
@@ -252,17 +247,17 @@ export default class MainScene extends EventEmitter {
     return group
   }
 
-  getGroupForDay(day){
-    if(!this.days.has(day)){
-      const group = new THREE.Group() 
+  getGroupForDay (day) {
+    if (!this.days.has(day)) {
+      const group = new THREE.Group()
       group.day = new Date(day)
       this.days.set(day, group)
-      this.dayObj3Ds.add(group)      
+      this.dayObj3Ds.add(group)
     }
     return this.days.get(day)
   }
 
-  getMaterialsForDay(day){
+  getMaterialsForDay (day) {
     const materials = this.materials.get(day) || {
       front: this.allMaterials.blockMaterialFront.clone(),
       back: this.allMaterials.blockMaterialBack.clone(),
@@ -298,10 +293,10 @@ export default class MainScene extends EventEmitter {
   /*
     Moves the camera to a new date in the block chain and loads data
   */
-  async setDate(date){ 
-    if( date < this.earliestDate ) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format("MMM Do YYYY"))
-    if( date > this.latestDate ) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format("MMM Do YYYY"))
-    if(this.currentBlockObject) this.resetDayView()
+  async setDate (date) {
+    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
+    if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+    if (this.currentBlockObject) this.resetDayView()
     this.stage.targetCameraPos.z = this.getPositionForDate(date) + 1000
     this.stage.targetCameraLookAt.z = this.stage.targetCameraPos.z - 1000
 
@@ -312,9 +307,8 @@ export default class MainScene extends EventEmitter {
     loads new blocks around a date
   */
   async loadDate (date) {
-
-    if( date < this.earliestDate ) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format("MMM Do YYYY"))
-    if( date > this.latestDate ) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format("MMM Do YYYY"))
+    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
+    if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
 
     date = new Date(new Date(date).setHours(0, 0, 0, 0))
     if (Math.abs(this.date - date) < MS_IN_A_DAY) return
@@ -322,7 +316,7 @@ export default class MainScene extends EventEmitter {
 
     const numDaysToLoad = Config.daysEitherSide * 2 + 1
     const days = new Array(numDaysToLoad).fill(0).map((v, i) => {
-      return new Date(this.date).setDate(this.date.getDate()- (i - Config.daysEitherSide)).valueOf()
+      return new Date(this.date).setDate(this.date.getDate() - (i - Config.daysEitherSide)).valueOf()
     })
 
     const daysToDisplay = new Set(days)
@@ -340,10 +334,10 @@ export default class MainScene extends EventEmitter {
     */
     const dayMS = date.valueOf()
     const dayIsLoaded = daysAlreadyLoaded.has(dayMS)
-    if(dayIsLoaded){
+    if (dayIsLoaded) {
       const blocks = Array.from(this.allBlocksObj3d.values())
         .map(({ block }) => block)
-        .filter(block => block.day === dayMS )
+        .filter(block => block.day === dayMS)
 
       this.emit('dayChanged', { ...this.getSumOfBlocks(blocks), date: new Date(date) })
     }
@@ -354,7 +348,7 @@ export default class MainScene extends EventEmitter {
     Array.from(daysToRemove).map(day => {
       const group = this.getGroupForDay(day)
       group.children.forEach(({ block }) => {
-        if(block) this.allBlocksObj3d.delete(block.hash)
+        if (block) this.allBlocksObj3d.delete(block.hash)
       })
       this.dayObj3Ds.remove(group)
       this.days.delete(day)
@@ -375,17 +369,17 @@ export default class MainScene extends EventEmitter {
 
     const allBlocksForDays = await Promise.all(blocksGroupedByDay)
 
-    if(!dayIsLoaded){
+    if (!dayIsLoaded) {
       const blocks = Array.from(this.allBlocksObj3d.values())
         .map(({ block }) => block)
-        .filter(block => block.day === dayMS )
+        .filter(block => block.day === dayMS)
       this.emit('dayChanged', { ...this.getSumOfBlocks(blocks), date: new Date(date) })
     }
 
     return allBlocksForDays
   }
 
-  getSumOfBlocks(blocks){
+  getSumOfBlocks (blocks) {
     return {
       input: blocks.reduce((a, b) => a + b.input, 0),
       output: blocks.reduce((a, b) => a + b.output, 0),
@@ -393,12 +387,12 @@ export default class MainScene extends EventEmitter {
     }
   }
 
-  getNearestDateForPosition(z){
+  getNearestDateForPosition (z) {
     const hOffset = DAY_OFFSET * 0.5
     return new Date((z + DAY_OFFSET) / DAY_OFFSET * MS_IN_A_DAY + this.earliestDate.valueOf())
   }
 
-  getPositionForDate(date){
+  getPositionForDate (date) {
     const hOffset = DAY_OFFSET * 0.5
     return ((date - this.earliestDate) / MS_IN_A_DAY * DAY_OFFSET) - hOffset
   }
@@ -416,7 +410,7 @@ export default class MainScene extends EventEmitter {
     })
   }
 
-  addTreeToStage(data){
+  addTreeToStage (data) {
     const { offset, size, vertices, endPoints, block } = data
     if (!vertices) return
 
@@ -459,10 +453,10 @@ export default class MainScene extends EventEmitter {
     this.pointsMesh.renderOrder = index + dayIndex + 3
     mesh.renderOrder = index + dayIndex + 2
 
-    if( this.currentBlockObject === blockObj3D ){
+    if (this.currentBlockObject === blockObj3D) {
       blockObj3D.contents.add(this.pointsMesh)
       blockObj3D.contents.add(blockObj3D.tree)
-      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition().clone(), block, this.allMaterials.pointsMaterial,  this.pointsMesh)
+      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition().clone(), block, this.allMaterials.pointsMaterial, this.pointsMesh)
     }
   }
 
@@ -470,14 +464,14 @@ export default class MainScene extends EventEmitter {
     this.stage.resize(w, h)
   }
 
-  goToNextBlock(){
-    if(this.currentBlockObject && this.currentBlockObject.block.next_block){
+  goToNextBlock () {
+    if (this.currentBlockObject && this.currentBlockObject.block.next_block) {
       this.goToBlock(this.currentBlockObject.block.next_block)
     }
   }
 
-  goToPrevBlock(){
-    if(this.currentBlockObject && this.currentBlockObject.block.prev_block){
+  goToPrevBlock () {
+    if (this.currentBlockObject && this.currentBlockObject.block.prev_block) {
       this.goToBlock(this.currentBlockObject.block.prev_block)
     }
   }
@@ -499,18 +493,18 @@ export default class MainScene extends EventEmitter {
   createCubeMap (day) {
     // if (typeof this.state.dayData[dayIndex] !== 'undefined') {
     this.stage.scene.background = this.allMaterials.bgMap
-    
+
     const { front, back, merkle } = this.getMaterialsForDay(day)
     const group = this.getGroupForDay(day)
     front.color.setHex(0xffffff)
-    let cubeCamera = new THREE.CubeCamera(100.0, 5000, 1024)
+    let cubeCamera = new THREE.CubeCamera(100.0, 5000, 512)
     cubeCamera.position.copy(group.getWorldPosition())
     cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
     cubeCamera.update(this.stage.renderer, this.stage.scene)
     front.envMap = cubeCamera.renderTarget.texture
     back.envMap = cubeCamera.renderTarget.texture
-    // front.uniforms.uCubePos.value.copy(cubeCamera.position) 
-    // back.uniforms.uCubePos.value.copy(cubeCamera.position) 
+    // front.uniforms.uCubePos.value.copy(cubeCamera.position)
+    // back.uniforms.uCubePos.value.copy(cubeCamera.position)
     // merkle.envMap = cubeCamera.renderTarget.texture
 
     this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
@@ -534,7 +528,7 @@ export default class MainScene extends EventEmitter {
         .start()
 
       new TWEEN.Tween(this.allMaterials.merkleMaterial.uniforms.uAnimTime)
-        .to({ value: 10}, 3)
+        .to({ value: 10}, 10)
         .start()
 
       new TWEEN.Tween({time: 0})
@@ -591,7 +585,7 @@ export default class MainScene extends EventEmitter {
 
       this.stage.targetCameraLookAt.z = blockWorldPos.z
       this.stage.targetCameraPos.z = blockWorldPos.z - this.cameraBlockFocusDistance
-      this.stage.targetCameraPos.z
+
       const toPos = new THREE.Vector3()
       toPos.z = blockObject.position.z
 
@@ -644,14 +638,12 @@ export default class MainScene extends EventEmitter {
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
         this.emit('blockHovered', intersected.block)
-        
       }
       this.pointLightTarget.copy(intersected.getWorldPosition())
     }
   }
 
   async onCameraMove () {
-
     /*
       Bound the camera movement to the available block chain range
     */
@@ -661,7 +653,7 @@ export default class MainScene extends EventEmitter {
 
     /*
       Get the nearest day on to the cameras target location
-    */    
+    */
     const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z)
     date.setHours(0, 0, 0, 0)
 
@@ -674,7 +666,6 @@ export default class MainScene extends EventEmitter {
   }
 
   async goToBlock (blockhash) {
-    
     if (this.currentBlockObject) {
       this.audio.unloadSound()
       this.currentBlockObject.contents.remove(this.currentBlockObject.tree)
@@ -688,12 +679,12 @@ export default class MainScene extends EventEmitter {
       return
     }
 
-    console.log('NAVIGATING TO BLOCK :', blockhash )
+    console.log('NAVIGATING TO BLOCK :', blockhash)
     let block = this.allBlocksObj3d.has(blockhash) ? this.allBlocksObj3d.get(blockhash).block : null
     if (!block) block = await getBlock(blockhash)
-    
+
     this.emit('blockSelected', {...block, time: new Date(block.day)})
-    
+
     await this.setDate(block.day)
 
     this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
@@ -714,7 +705,7 @@ export default class MainScene extends EventEmitter {
 
   onUpdate () {
     TWEEN.update()
-    
+
     this.checkMouseIntersection()
 
     this.stage.pointLight.position.lerp(this.pointLightTarget, 0.1)
