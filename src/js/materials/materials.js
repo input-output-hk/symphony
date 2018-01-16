@@ -5,7 +5,6 @@ import BlockMaterial from './BlockMaterial/BlockMaterial'
 
 export default (textures, cubeTextures ) => {
   const bgMap = new THREE.CubeTexture(cubeTextures)
-  debugger
   const bumpMap = new THREE.Texture(textures[0])
   bumpMap.needsUpdate = true
   bgMap.needsUpdate = true
