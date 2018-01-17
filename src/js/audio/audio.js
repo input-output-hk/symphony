@@ -401,7 +401,7 @@ export default class Audio extends EventEmitter {
           ).start(Tone.Transport.seconds + time)
         }
         loop.set('iterations', 8)
-        loop.set('humanize', '64n')
+        // loop.set('humanize', '64n')
         this.loops.push(loop)
         this.loopMap[timeLowRes] = true
       }

@@ -74,7 +74,12 @@ export default class MainScene extends EventEmitter {
     this.raycaster = new THREE.Raycaster()
     this.boxGeometry = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0) // block geo instance
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
-    this.cameraBlockFocusDistance = -300
+    // pull camera in closer on landscape screens
+    if (window.innerWidth < window.innerHeight) {
+      this.cameraBlockFocusDistance = -600
+    } else {
+      this.cameraBlockFocusDistance = -300
+    }
 
     console.log('DATE RANGE :', this.earliestDate, this.latestDate)
 
@@ -653,7 +658,7 @@ export default class MainScene extends EventEmitter {
     /*
       Get the nearest day on to the cameras target location
     */
-    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z + (DAY_OFFSET* 0.5) + CIRCLE_OFFSET)
+    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z + (DAY_OFFSET * 0.5) + CIRCLE_OFFSET)
     // const postionOfCurrentDate = this.getPositionForDate(this.date)
     date.setHours(0, 0, 0, 0)
 
@@ -708,7 +713,7 @@ export default class MainScene extends EventEmitter {
     this.stage.pointLight.position.lerp(this.pointLightTarget, 0.1)
     this.uTime = this.clock.getElapsedTime()
 
-    // this.pointsMaterial.uniforms.uTime.value = this.uTime
+    this.allMaterials.pointsMaterial.uniforms.uTime.value = this.uTime
     if (this.audio.pointColors && this.audio.pointColors.length > 0) {
       let pointColors = Float32Array.from(this.audio.pointColors).subarray(0, this.pointsMesh.geometry.attributes.soundData.array.length)
       this.pointsMesh.geometry.attributes.soundData.array.set(pointColors)
