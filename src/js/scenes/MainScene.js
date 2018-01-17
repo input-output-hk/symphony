@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
-import AddText from './circleGeometry'
+import AddText, { CIRCLE_OFFSET } from './circleGeometry'
 import Config from '../Config'
 import Audio from '../audio/audio'
 import {getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
@@ -157,9 +157,8 @@ export default class MainScene extends EventEmitter {
     }
 
     const threeHoursBeforeLastBlock = new Date(this.latestDate)
-    threeHoursBeforeLastBlock.setHours(threeHoursBeforeLastBlock.getHours() - 12)
-    console.log(threeHoursBeforeLastBlock)
-    this.stage.camera.position.z = this.getPositionForDate(threeHoursBeforeLastBlock) + 1000
+    threeHoursBeforeLastBlock.setHours(threeHoursBeforeLastBlock.getHours() - 3)
+    this.stage.camera.position.z = this.getPositionForDate(threeHoursBeforeLastBlock)
     this.stage.cameraPos.z = this.stage.camera.position.z
     this.stage.targetCameraPos.z = this.stage.cameraPos.z
     this.setDate(threeHoursBeforeLastBlock)
@@ -297,7 +296,7 @@ export default class MainScene extends EventEmitter {
     if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
     if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
     if (this.currentBlockObject) this.resetDayView()
-    this.stage.targetCameraPos.z = this.getPositionForDate(date) + 1000
+    this.stage.targetCameraPos.z = this.getPositionForDate(date)// + 1000
     this.stage.targetCameraLookAt.z = this.stage.targetCameraPos.z - 1000
 
     return this.loadDate(date)
@@ -389,12 +388,12 @@ export default class MainScene extends EventEmitter {
 
   getNearestDateForPosition (z) {
     const hOffset = DAY_OFFSET * 0.5
-    return new Date((z + DAY_OFFSET) / DAY_OFFSET * MS_IN_A_DAY + this.earliestDate.valueOf())
+    return new Date((z - hOffset) / DAY_OFFSET * MS_IN_A_DAY + this.earliestDate.valueOf())
   }
 
   getPositionForDate (date) {
     const hOffset = DAY_OFFSET * 0.5
-    return ((date - this.earliestDate) / MS_IN_A_DAY * DAY_OFFSET) - hOffset
+    return ((date - this.earliestDate) / MS_IN_A_DAY * DAY_OFFSET) + hOffset
   }
 
   addEvents () {
@@ -648,19 +647,20 @@ export default class MainScene extends EventEmitter {
       Bound the camera movement to the available block chain range
     */
     const start = this.getPositionForDate(this.earliestDate)//
-    const end = this.getPositionForDate(this.latestDate)// - ( DAY_OFFSET * 0.5 )
+    const end = this.getPositionForDate(this.latestDate)
     this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
 
     /*
       Get the nearest day on to the cameras target location
     */
-    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z)
+    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z + (DAY_OFFSET* 0.5) + CIRCLE_OFFSET)
+    // const postionOfCurrentDate = this.getPositionForDate(this.date)
     date.setHours(0, 0, 0, 0)
 
     /*
       Load the relevant blocks around this date and fire an event
     */
-    if (Math.abs(this.date - date) >= MS_IN_A_DAY) {
+    if (Math.abs(date - this.date) >= MS_IN_A_DAY) {
       this.loadDate(date)
     }
   }

@@ -11,6 +11,7 @@ const circleMatOuter = new THREE.LineBasicMaterial({
 let font
 const fontLoader = new THREE.FontLoader()
 
+export const CIRCLE_OFFSET = -840.0
 
 export default function AddText (path, displayDate, circle){
   let circleGroup = new THREE.Group()
@@ -40,7 +41,7 @@ export default function AddText (path, displayDate, circle){
     })
 
     let textMesh = new THREE.Mesh(textGeometry, textMaterial)
-    textMesh.position.x = -840.0
+    textMesh.position.x = CIRCLE_OFFSET
     circleGroup.add(textMesh)
   }.bind(this)
 
