@@ -615,8 +615,8 @@ export default class MainScene extends EventEmitter {
       .filter(box => box && box.visible) // Filter to only those visible with non null refs
 
     const intersections = this.raycaster.intersectObjects(boxes, false)
+      .filter(({ distance }) => distance < DAY_OFFSET * 1.5) // Only boxes in the next days and a half are allowed
     const intersected = intersections[0] && intersections[0].object.parent
-
     return { intersections, allBlocks, intersected }
   }
 
