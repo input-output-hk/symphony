@@ -715,7 +715,8 @@ export default class MainScene extends EventEmitter {
 
     this.allMaterials.pointsMaterial.uniforms.uTime.value = this.uTime
     if (this.audio.pointColors && this.audio.pointColors.length > 0) {
-      let pointColors = Float32Array.from(this.audio.pointColors).subarray(0, this.pointsMesh.geometry.attributes.soundData.array.length)
+     // let pointColors = Float32Array.from(this.audio.pointColors).subarray(0, this.pointsMesh.geometry.attributes.soundData.array.length)
+      let pointColors = Float32Array.from(this.audio.pointColors)
       this.pointsMesh.geometry.attributes.soundData.array.set(pointColors)
       this.pointsMesh.geometry.attributes.soundData.needsUpdate = true
     }

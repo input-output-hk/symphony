@@ -24,7 +24,7 @@ const yReverseRotation = new THREE.Quaternion()
 const zPosRotation = new THREE.Quaternion()
 const zNegRotation = new THREE.Quaternion()
 
-export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  {
+export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) => {
   // const { n_tx } = block
 
   // const block = block
@@ -72,19 +72,18 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
 
   let levels = tree[0].level
   const seeded = new Array(levels).fill(0).map(v => seedrandom(hash + v))
-  
+
   const N = tree.length
   let i = 0
   let node
-  while(i < N ){
+  while (i < N) {
     node = tree[i++]
     direction.copy(UP)
-    if( node.parent ){
-
+    if (node.parent) {
       node.startPosition = node.parent.endPosition
-      
+
       // add some randomness based on block network health
-      let rng = seeded[node.level]//seedrandom(hash + node.level)
+      let rng = seeded[node.level]// seedrandom(hash + node.level)
       // let rng = seedrandom(hash + node.level)
       let random = rng.quick()
       let randomness = ((random * 10000) - 5000) * feeToInputRatio
@@ -95,9 +94,8 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
       direction.copy(node.parent.endPosition).sub(node.parent.startPosition)
       const isLeft = node.parent.children.left === node
       // console.log( isLeft )
-      direction.applyQuaternion(isLeft ? zPosRotation : zNegRotation )      
+      direction.applyQuaternion(isLeft ? zPosRotation : zNegRotation)
       direction.applyQuaternion(tmpQuat.setFromAxisAngle(axis, DEG2RAD * baseAngle))
-      
     }
 
     magnitude = ((node.level + 1) * 5)
@@ -110,7 +108,7 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
     // points.push(node.endPosition.clone())
     // points.push(node.startPosition.clone())
 
-    if(visualise) {
+    if (visualise) {
       if (node.level === 0) {
         endPoints.push(node.endPosition.x, node.endPosition.y, node.endPosition.z)
       }
@@ -119,15 +117,10 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
       // debugger
       // geos.push( new THREE.TubeBufferGeometry(path, 1, magnitude / 20, 6, false))
       const tubeGeo = new THREE.TubeGeometry(path, 1, magnitude / 20, 6, false)
-      
+
       treeGeo.merge(tubeGeo)
       // debugger;
     }
-    
-    if (node.level === 1) {
-      endPoints.push(node.endPosition.x, node.endPosition.y, node.endPosition.z)
-    }
-
   }
 
   // const startingPosition = new THREE.Vector3(0, 0, 0)
@@ -139,8 +132,8 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
   // build(sortedTree, startingPosition, direction, visualise, hash, feeToInputRatio, treeGeo, angle, points, endPoints)
 
   // let box = new THREE.Box3().setFromPoints(points)
-  let size = new THREE.Vector3().subVectors( max, min )////*/box.getSize()
-  let boxCenter = new THREE.Vector3().addVectors( min, max ).multiplyScalar( 0.5 )
+  let size = new THREE.Vector3().subVectors(max, min)/// /*/box.getSize()
+  let boxCenter = new THREE.Vector3().addVectors(min, max).multiplyScalar(0.5)
   const offset = new THREE.Vector3().sub(min).sub(size.clone().multiplyScalar(0.5))
   // const baseGeo = new THREE.BufferGeometry()
   // const baseGeo = new THREE.Geometry()
@@ -149,15 +142,14 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
   // baseGeo.addAttribute( 'normal', new THREE.Float32BufferAttribute( [], 3 ) );
   // baseGeo.addAttribute( 'uv', new THREE.Float32BufferAttribute( [], 2 ) );
 
-
   // const treeGeo = geos.reduce((a, b) => a.merge(, baseGeo)
-  
+
   // if(visualise){
-    
+
     // const positions = geos.reduce((arr, {attributes}) => arr.concat(Array.from(attributes.position.array)), [])
     // const normal = geos.reduce((arr, {attributes}) => arr.concat(Array.from(attributes.normal.array)), [])
-    // const uv = geos.reduce((arr, {attributes}) => arr.concat(Array.from(attributes.uv.array)), [])  
-    
+    // const uv = geos.reduce((arr, {attributes}) => arr.concat(Array.from(attributes.uv.array)), [])
+
   // }
 
   const treeBuffer = new THREE.BufferGeometry()
@@ -167,10 +159,7 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) =>  
     // treeBuffer = bufferTreeGeometry
   }
 
-  return { size, offset, boxCenter:min/*:new THREE.Vector3(size.clone().multiplyScalar(0.5)).add(min)*/, endPoints, treeGeo: treeBuffer }
-
-  
+  return { size, offset, boxCenter: min/*: new THREE.Vector3(size.clone().multiplyScalar(0.5)).add(min) */, endPoints, treeGeo: treeBuffer }
 
   // return returnData
-
 }

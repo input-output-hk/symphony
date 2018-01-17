@@ -7,40 +7,40 @@ import GenerateBlockGeometry from '../helpers/GenerateBlockGeometry'
 
 // module.exports = function (self) {
 
-  self.addEventListener('message', function (e) {
-    let data = e.data
-    switch (data.cmd) {
-      case 'build':
-        let block = data.block
+self.addEventListener('message', function (e) {
+  let data = e.data
+  switch (data.cmd) {
+    case 'build':
+      let block = data.block
 
-        let feeToInputRatio = 0
-        if (block.fee && block.input) {
-          feeToInputRatio = block.fee / block.input
-        }
-        block.feeToInputRatio = feeToInputRatio
+      let feeToInputRatio = 0
+      if (block.fee && block.input) {
+        feeToInputRatio = block.fee / block.input
+      }
+      block.feeToInputRatio = feeToInputRatio
 
-        let geoData = GenerateBlockGeometry(block, true)
-        let returnData = {
+      let geoData = GenerateBlockGeometry(block, true)
+      let returnData = {
           // vertices: geoData.treeVertices,
-          vertices: geoData.treeGeo.attributes.position.array,
-          size: geoData.size,
-          boxCenter: geoData.boxCenter,
-          offset: geoData.offset,
-          block,
-          endPoints: new Float32Array(geoData.endPoints)
-        }
+        vertices: geoData.treeGeo.attributes.position.array,
+        size: geoData.size,
+        boxCenter: geoData.boxCenter,
+        offset: geoData.offset,
+        block,
+        endPoints: new Float32Array(geoData.endPoints)
+      }
 
-        self.postMessage(returnData)
-        break
-      case 'stop':
-        self.postMessage('WORKER STOPPED')
-        self.close()
-        break
-      default:
-        self.postMessage('Unknown command')
-    }
+      self.postMessage(returnData)
+      break
+    case 'stop':
+      self.postMessage('WORKER STOPPED')
+      self.close()
+      break
+    default:
+      self.postMessage('Unknown command')
+  }
 
-    self.postMessage(e.data)
-  }, false)
+  self.postMessage(e.data)
+}, false)
 
 // }

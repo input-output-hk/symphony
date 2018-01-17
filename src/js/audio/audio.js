@@ -15,7 +15,7 @@ export default class Audio extends EventEmitter {
     this.loops = []
     this.quantize = 32
     this.masterVol = -21 // db
-    this.ambienceVol = -2 // db
+    this.ambienceVol = 0 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 50
@@ -338,8 +338,14 @@ export default class Audio extends EventEmitter {
 
     this.pointColors = positionsArray.map(_ => 0)
 
-    for (let index = 0; index < positionsArray.length; index++) {
-      const point = positionsArray[index]
+    for (let index = 0; index < positionsArray.length / 3; index++) {
+      let xIndex = index * 3
+      let yIndex = index * 3 + 1
+      let zIndex = index * 3 + 2
+
+      let x = positionsArray[xIndex]
+      let y = positionsArray[yIndex]
+      let z = positionsArray[zIndex]
 
       /**
        * Map transaction time to new range
@@ -357,7 +363,7 @@ export default class Audio extends EventEmitter {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((point * 4.0) - frequency)
+              let diff = Math.abs((y * 4.0) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -377,24 +383,32 @@ export default class Audio extends EventEmitter {
         if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(
             () => {
+              this.pointColors[xIndex] = 1
+              this.pointColors[yIndex] = 1
+              this.pointColors[zIndex] = 1
+              setTimeout(() => {
+                this.pointColors[xIndex] = 0
+                this.pointColors[yIndex] = 0
+                this.pointColors[zIndex] = 0
+              }, 500)
               try {
                 this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
               } catch (error) {
                 console.log(error)
               }
-              this.pointColors[index] = 1
-              setTimeout(() => {
-                this.pointColors[index] = 0
-              }, 500)
             },
             '1m'
           ).start(Tone.Transport.seconds + time)
         } else {
           loop = new Tone.Loop(
             () => {
-              this.pointColors[index] = 1
+              this.pointColors[xIndex] = 1
+              this.pointColors[yIndex] = 1
+              this.pointColors[zIndex] = 1
               setTimeout(() => {
-                this.pointColors[index] = 0
+                this.pointColors[xIndex] = 0
+                this.pointColors[yIndex] = 0
+                this.pointColors[zIndex] = 0
               }, 500)
             },
             '1m'
