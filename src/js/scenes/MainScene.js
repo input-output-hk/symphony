@@ -8,21 +8,21 @@ import Config from '../Config'
 import Audio from '../audio/audio'
 import {getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
 import Materials from '../materials/materials'
-
-const dat = require('dat-gui')
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
+
+const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
 
 const MS_IN_A_DAY = 86400000
-const DAY_OFFSET = 5300 // offset for each day on z-axis
+const DAY_OFFSET = 5500 // offset for each day on z-axis
 
-const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
+// const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
-const groupBy = (arr, key) => arr.reduce((rv, x) => {
-  (rv[x[key]] = rv[x[key]] || []).push(x)
-  return rv
-}, {})
+// const groupBy = (arr, key) => arr.reduce((rv, x) => {
+//  (rv[x[key]] = rv[x[key]] || []).push(x)
+//  return rv
+// }, {})
 
 const generateBlockGeometries = blocks => {
   return new Promise((resolve, reject) => {
@@ -186,8 +186,8 @@ export default class MainScene extends EventEmitter {
       Orientates, positions and sorts block objects
       TODO: implmenent a better depth sorting algo
     */
-    const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET) * 1000000
-    const center = obj3ds.length * 0.5 * 30
+    const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET)
+    // const center = obj3ds.length * 0.5
     console.log(new Date(day), dayIndex)
     obj3ds.forEach((obj3d, i) => {
       const index = i * 4
@@ -197,11 +197,12 @@ export default class MainScene extends EventEmitter {
       obj3d.rotation.z = -(((25 * Math.PI) / 200) * i)
       obj3d.translateY(800 + i)
       obj3d.rotation.z += Math.PI / 2
-      obj3d.translateZ(i * 30 - center)
+      obj3d.translateZ(-(obj3d.block.size.z * 0.5))
+      obj3d.translateZ((i * 30))
     })
 
     const circleGroup = AddText(this.path, moment(day).startOf('day').format('MMM Do YYYY').toUpperCase())
-    circleGroup.position.z = DAY_OFFSET * 0.5
+    circleGroup.position.z -= 300.0
     group.add(circleGroup)
 
     /*
@@ -532,7 +533,7 @@ export default class MainScene extends EventEmitter {
         .start()
 
       new TWEEN.Tween(this.allMaterials.merkleMaterial.uniforms.uAnimTime)
-        .to({ value: 10}, 10)
+        .to({value: 10}, 10)
         .start()
 
       new TWEEN.Tween({time: 0})
@@ -651,7 +652,7 @@ export default class MainScene extends EventEmitter {
     /*
       Bound the camera movement to the available block chain range
     */
-    const start = this.getPositionForDate(this.earliestDate)//
+    const start = this.getPositionForDate(this.earliestDate) + 1000
     const end = this.getPositionForDate(this.latestDate)
     this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
 

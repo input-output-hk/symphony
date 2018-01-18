@@ -1,11 +1,14 @@
 import * as THREE from 'three'
 const circleMat = new THREE.LineBasicMaterial({
-  color: 0xffffff
+  transparent: true,
+  color: 0xffffff,
+  depthWrite: false
 })
 
 const circleMatOuter = new THREE.LineBasicMaterial({
   color: 0xffffff,
   transparent: true,
+  depthWrite: false,
   opacity: 0.5
 })
 let font
@@ -13,7 +16,7 @@ const fontLoader = new THREE.FontLoader()
 
 export const CIRCLE_OFFSET = -840.0
 
-export default function AddText (path, displayDate, circle){
+export default function AddText (path, displayDate, circle) {
   let circleGroup = new THREE.Group()
   let circleGeometry = new THREE.CircleGeometry(900, 128)
   circleGeometry.vertices.shift()
@@ -43,10 +46,11 @@ export default function AddText (path, displayDate, circle){
     let textMesh = new THREE.Mesh(textGeometry, textMaterial)
     textMesh.position.x = CIRCLE_OFFSET
     circleGroup.add(textMesh)
-  }.bind(this)
+  }
 
-  if(font) addText()
-  else {
+  if (font) {
+    addText()
+  } else {
     fontLoader.load(path + 'fonts/helvetiker_regular.typeface.json', f => {
       font = f
       addText()
