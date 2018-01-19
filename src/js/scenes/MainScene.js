@@ -202,7 +202,7 @@ export default class MainScene extends EventEmitter {
     })
 
     const circleGroup = AddText(this.path, moment(day).startOf('day').format('MMM Do YYYY').toUpperCase())
-    circleGroup.position.z -= 300.0
+    circleGroup.position.z += (DAY_OFFSET - 200.0)
     group.add(circleGroup)
 
     /*
