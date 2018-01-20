@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang=en><head><title>IOHK Implementation Example</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no"><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Inconsolata"><style>* {
+<!DOCTYPE html><html lang=en><head><title>IOHK Implementation Example</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no"><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Inconsolata"><script src=https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js></script><style>* {
 			padding: 0;
 			margin: 0;
 		}
@@ -153,7 +153,27 @@
 				*/
 				app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
-				
+				/**
+				 * touch navigation
+				 */
+				var stageEl = document.getElementById('stage')
+
+				var hammer = new Hammer(stageEl)
+				hammer.get('pinch').set({ enable: true })
+				hammer.on('pinchin', function(e) {
+					if (app.currentBlockObject) {
+						return
+					}
+					app.stage.targetCameraPos.z += app.stage.cameraMoveStep * 0.5
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+				})
+				hammer.on('pinchout', function(e) {
+					if (app.currentBlockObject) {
+						return
+					}
+					app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * 0.5
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+				})
 
 				// move camera on z axis with mouse wheel
 				const onDocumentMouseWheel = function (event) {
