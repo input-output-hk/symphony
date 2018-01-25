@@ -176,6 +176,7 @@ export default class Audio extends EventEmitter {
       }
       this.loops = []
     }
+    this.pointColors = []
   }
 
   preloadNotes () {
