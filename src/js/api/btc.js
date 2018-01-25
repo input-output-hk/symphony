@@ -26,7 +26,7 @@ export const formatTimeSeries = ({ data }) => {
 
 const Block = block => ({
   ...block,
-  day: new Date(block.time * 1000 ).setHours(0, 0, 0, 0)
+  day: new Date(block.time * 1000).setHours(0, 0, 0, 0)
 })
 
 /**
@@ -41,7 +41,7 @@ export const getTransactionVolumeOverTime = (start, end) => axios.get('https://a
 /**
  * Get hash rate to nearest day
  */
-export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp/1000}&cors=true`)
+export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp / 1000}&cors=true`)
   .then((data) => {
     let hashRates = formatTimeSeries(data)
     return hashRates && hashRates.values[0] !== undefined && hashRates.values[0]
@@ -74,14 +74,14 @@ export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
   .endAt(toDate / 1000)
   .get()
   .then(({ docs }) => docs.map(doc => Block(doc.data())))
-  
-export const getLatestBlock = _ => blocks
-  .orderBy('time')
+
+export const getEarliestBlock = _ => blocks
+  .orderBy('time', 'asc')
   .limit(1)
   .get()
   .then(({ docs }) => Block(docs[0].data()))
 
-export const getEarliestBlock = _ => blocks
+export const getLatestBlock = _ => blocks
   .orderBy('time', 'desc')
   .limit(1)
   .get()
@@ -111,4 +111,3 @@ export const getTransactionsForBlock = (hash, tryCount = 0) => {
       })
   })
 }
-// }

@@ -1,9 +1,8 @@
 'use strict'
-import * as THREE from 'three'
+
 import Stage from './Stage'
 import MainScene from './scenes/MainScene'
 import { imageLoader } from '../utils/loader'
-import TextureLoaderWrapper from '../utils/textureLoader'
 import { getEarliestBlock, getLatestBlock } from './api/btc'
 
 const orpheusApp = async function (params) {
@@ -27,8 +26,8 @@ const orpheusApp = async function (params) {
 
   const earliestBlock = await getEarliestBlock()
   const latestBlock = await getLatestBlock()
-  const earliestDate = new Date(latestBlock.time * 1000 )
-  const latestDate = new Date(earliestBlock.time * 1000)
+  const earliestDate = new Date(earliestBlock.time * 1000)
+  const latestDate = new Date(latestBlock.time * 1000)
 
   const loader = imageLoader(params.path)
   const loadImage = image => loader.get(image).then(({data}) => data)
