@@ -11,7 +11,7 @@ Symphony as a scriptable API to navigate through the blockchain, focus on specif
 
 
 
-# Initialisation
+### Initialisation
 
 `orpheus() Promise` is an asynchronous global function that returns a promise which resolves to the symphony api
 
@@ -20,7 +20,7 @@ const api = await orpheus()
 ```
 Once you have your api object you can call the following methods
 
-# setDate
+### setDate
 
 Navigates to the requested `Date` object in the block chain. For example to navigate to the genesis block call `api.setDate(new Date(2009, 0, 3))`. This method returns a Promise which rejects if the date requested is outside the available range, for example, in the futureu, or before the beginning of the blockchain.
 
@@ -28,7 +28,7 @@ Navigates to the requested `Date` object in the block chain. For example to navi
 setDate(Date)Promise
 ```
 
-# goToBlock
+### goToBlock
 
 Accepts a string indicating a block hash and navigates to the relavent block in the block chain. The method returns a promise which rejects if the block doesn't exist, or is invalid
 
@@ -36,19 +36,33 @@ Accepts a string indicating a block hash and navigates to the relavent block in 
 goToBlock(hash String) Promise
 ```
 
-# goToNextBlock, goToPreviousBlock
+### goToNextBlock
 
-Whilst viewing a block, calling `goToNextBlock()` or `PreviousBlock()` will navigate to the relative block in the chain
+Whilst viewing a block, calling `goToNextBlock()` will navigate to the next block in the chain
 
-# setSize
+```javascript
+goToNextBlock()
+```
+
+### goToPreviousBlock
+
+```javascript
+goToPreviousBlock()
+```
+
+### setSize
 
 Call `setSize(w, h)` to set the size of canvas syphony renders to
 
-# destroy
+```javascript
+setSize(w Number, h Number)
+```
+
+### destroy
 
 Call `destroy()` to stop the application and free memory. The app cannot be run after this.
 
-# Feature Detection
+### Feature Detection
 
 The library requires certain platform features to run. We've bundled these checks under a flag which can be queried using `orpheus.canRun`
 
