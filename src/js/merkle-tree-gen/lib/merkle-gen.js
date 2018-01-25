@@ -36,7 +36,8 @@
 
         // Push all of the leaves onto the main queue
     for (i = 0; i < nl; i++) {
-      nextval = fastMap.get(i)
+      // nextval = fastMap.get(i)
+      nextval = fastMap[i]
 
       // Add the leaves to the 'tree' object
       tree[nextval] = {

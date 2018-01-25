@@ -10,6 +10,7 @@ varying vec3 vRefract[3];
 #define PHYSICAL
 
 varying vec3 vViewPosition;
+varying vec3 vPosition;
 
 #ifndef FLAT_SHADED
 
@@ -56,6 +57,7 @@ void main() {
 	#include <clipping_planes_vertex>
 
 	vViewPosition = - mvPosition.xyz;
+	vPosition = vec3(modelMatrix * vec4(position, 1.0));
 
 	#include <worldpos_vertex>
 	#include <shadowmap_vertex>

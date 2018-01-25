@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
 	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"> -->
 	<style>
 		* {
@@ -76,25 +77,25 @@
 				
 			// Create the Orpeus App
 			orpheusApp({ path: './static/assets/' }).then( app => {
-
-				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
-				app.setSize(window.innerWidth, window.innerHeight)
+				console.log('App returned from promise', app)
 				window.app = app
 
-
+				/**
+				 * Setup Window resize listeners
+				 */
+				window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+				app.setSize(window.innerWidth, window.innerHeight)
+				
 				/*
 					Utility methods for navigating along the block chain
 				*/
-				const goToNextBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.next_block)
-				const goToPrevBlock = _ => app.goToBlock(app.state.currentBlock && app.state.currentBlock.prev_block)
+				const goToNextBlock = app.goToBlock
+				const goToPrevBlock = app.goToBlock
 				window.goToNextBlock = goToNextBlock
 				window.goToPrevBlock = goToPrevBlock
 
-
-				// initial date needs to be set, could be set via current date or url for example
-				const Jan1st_2018 = new Date(2018, 0, 1)
-				app.setDate(Jan1st_2018) 
-
+				// Method to navigation to a new date in the blockchain
+				// app.setDate(new Date(2018, 0, 1)) 
 
 				/*
 					Destroys the Orpheus instance and unloads all data.
@@ -134,6 +135,7 @@
 					Event called as a user scrolls through time and the current day changes
 				*/
 				app.on('dayChanged', ({ date, input, output, fee }) => {
+					console.log('EVENT: `dayChanged` receieved')
 					ReactDOM.render(		
 						<div>	
 							<h1>Day View</h1>
@@ -149,7 +151,7 @@
 				/*
 					Event called when a block is hovered over
 				*/
-				//app.on('blockHovered', console.log )
+				// app.on('blockHovered', console.log )
 
 
 				/*
@@ -180,7 +182,27 @@
 				*/
 				app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
-				
+				/**
+				 * touch navigation
+				 */
+				var stageEl = document.getElementById('stage')
+
+				var hammer = new Hammer(stageEl)
+				hammer.get('pinch').set({ enable: true })
+				hammer.on('pinchin', function(e) {
+					if (app.currentBlockObject) {
+						return
+					}
+					app.stage.targetCameraPos.z += app.stage.cameraMoveStep * 0.5
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+				})
+				hammer.on('pinchout', function(e) {
+					if (app.currentBlockObject) {
+						return
+					}
+					app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * 0.5
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+				})
 
 				// move camera on z axis with mouse wheel
 				const onDocumentMouseWheel = function (event) {
@@ -188,7 +210,7 @@
 						return
 					}
 
-					if (app.state.currentBlock) return
+					if (app.currentBlockObject) return
 
 					event.preventDefault()
 
@@ -199,29 +221,27 @@
 						}, 50)
 					}
 
-					if (app.stage.targetCameraPos.z < app.state.minCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.minCameraZPos
-						return
-					}
 
-					if (app.stage.targetCameraPos.z > app.state.maxCameraZPos) {
-						app.stage.targetCameraPos.z = app.state.maxCameraZPos
-						app.stage.targetCameraLookAt.z = app.state.maxCameraZPos - 1000
-						return
-					}
+					// const dayObj3Ds = app.dayObj3Ds.children
+					// const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
+    			// const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
 
 					if (event.deltaY > 0) {
 						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z -= app.stage.cameraMoveStep
 					} else if (event.deltaY < 0) {
 						app.stage.targetCameraPos.z += app.stage.cameraMoveStep
-						app.stage.targetCameraLookAt.z += app.stage.cameraMoveStep
 					}
+
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+
 				}
 
 				document.addEventListener("wheel", onDocumentMouseWheel, false);
+				document.addEventListener("mousewheel", onDocumentMouseWheel, false);
+				// document.addEventListener("touchmove", onDocumentMouseWheel, false);
+				window.onscroll = onDocumentMouseWheel
 
-			})
+			}).catch(e => console.log(e))
 
 		}
 

@@ -14,7 +14,6 @@ export default class BlockMaterial extends THREE.MeshStandardMaterial {
         invProjMat: { type: 'm4', value: new THREE.Matrix4() }
       }
     ])
-    this.type = 'ShaderMaterial'
 
     this.vertexShader = vertexShader
     this.fragmentShader = fragmentShader
