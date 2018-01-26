@@ -15,9 +15,9 @@
      *
      */
 
-    var array
-    var hashalgo
-    var hashlist
+  var array
+  var hashalgo
+  var hashlist
 
   hashalgo = 'md5'
 
@@ -29,52 +29,46 @@
 
   var arrayHasher = new HashArray(hashalgo, hashlist)
 
-
   function fromArray (args, cb) {
-    
-
     // if (!args.array || args.array.length === 0) {
     //   cb('An array with at least 1 element is required', null)
     //   return null
     // } else {
-      array = args.array
+    array = args.array
 
-
-      const fastMap = array;//arrayHasher.hashElements(array)//, function (fastMap) {
+    const fastMap = array// arrayHasher.hashElements(array)//, function (fastMap) {
 
       // Generate a Merkle Tree from the leaves
-      const treeObj = genMerkle(fastMap, hashalgo)//, function (tree) {
-        
-      let sortedTree
-      const tree = []
-      for (var key in treeObj) {
+    const treeObj = genMerkle(fastMap, hashalgo)//, function (tree) {
+
+    let sortedTree
+    const tree = []
+    for (var key in treeObj) {
         // if (treeObj.hasOwnProperty(key)) {
-          var element = treeObj[key]
-          if( element.type === 'root' ){
-             element.parent = null
-          } else if (element.type === 'node' || element.type === 'leaf' ) {
-            element.parent = treeObj[element.parent]
-          }
-          if (element.type === 'root' || element.type === 'node') {
-            
-            element.children = {}
-            element.children.left = treeObj[element.left]
-            element.children.right = treeObj[element.right]
-            if (element.type === 'root') {
-              sortedTree = element
-            }
-          }
-          tree.push(element)
-        // }
+      var element = treeObj[key]
+      if (element.type === 'root') {
+        element.parent = null
+      } else if (element.type === 'node' || element.type === 'leaf') {
+        element.parent = treeObj[element.parent]
       }
+      if (element.type === 'root' || element.type === 'node') {
+        element.children = {}
+        element.children.left = treeObj[element.left]
+        element.children.right = treeObj[element.right]
+        if (element.type === 'root') {
+          sortedTree = element
+        }
+      }
+      tree.push(element)
+        // }
+    }
 
       // Get a flat heirachy sorted by depth
       // let tree = Object.values(treeObj)
-      tree.sort((a, b) => b.level - a.level)
+    tree.sort((a, b) => b.level - a.level)
 
-      return { tree, sortedTree }
-
-    }
+    return { tree, sortedTree }
+  }
   // }
 
     // Export the fromArray() and fromFile() functions

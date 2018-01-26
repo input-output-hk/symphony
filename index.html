@@ -53,6 +53,25 @@
 			width: 100%!important;
 			height: 100%!important;
 		}
+
+		#symphony-search-form {
+			position: fixed;
+			bottom: 5%;
+			left: 5%;
+			width: 40%;
+		}
+
+		#symphony-search-form #symphony-search-field {
+			padding: 10px;
+			width: 80%;
+			display: inline-block;
+		}
+
+		#symphony-search-button {
+			padding: 10px;
+			display: inline-block;
+		}
+
 	</style>
 </head>
 
@@ -63,6 +82,10 @@
 	<div class="canvas-container">
 		<canvas id="stage"></canvas>
 	</div>
+	<form id="symphony-search-form">
+		<input id="symphony-search-field" type="text" placeholder="Enter Block Hash..." />
+		<button id="symphony-search-button">Go</button>
+	</form>
 	<!-- <script src="app.js"></script> -->
 	<script src="//unpkg.com/react@16/umd/react.development.js"></script>
 	<script src="//unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
@@ -182,6 +205,29 @@
 				*/
 				app.on('blockUnselected', _ => console.log('BLOCK UNSELECTED'))
 
+				const cameraMove = function (direction = 'positive', speedMultiplier = 1, lookatOffset = 1000) {
+					if (app.scrollBlocked) {
+						return
+					}
+					if (app.currentBlockObject) {
+						return
+					}
+
+					app.scrollBlocked = true
+
+					setTimeout(() => {
+						app.scrollBlocked = false
+					}, 50)
+
+					if (direction === 'positive') {
+						app.stage.targetCameraPos.z += app.stage.cameraMoveStep * speedMultiplier
+					} else {
+						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * speedMultiplier
+					}
+
+					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - lookatOffset
+				}
+
 				/**
 				 * touch navigation
 				 */
@@ -190,56 +236,42 @@
 				var hammer = new Hammer(stageEl)
 				hammer.get('pinch').set({ enable: true })
 				hammer.on('pinchin', function(e) {
-					if (app.currentBlockObject) {
-						return
-					}
-					app.stage.targetCameraPos.z += app.stage.cameraMoveStep * 0.5
-					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+					cameraMove('positive', 0.5)
 				})
 				hammer.on('pinchout', function(e) {
-					if (app.currentBlockObject) {
-						return
-					}
-					app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * 0.5
-					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
+					cameraMove('negative', 0.5)
 				})
 
 				// move camera on z axis with mouse wheel
 				const onDocumentMouseWheel = function (event) {
-					if (app.scrollBlocked) {
-						return
-					}
-
-					if (app.currentBlockObject) return
-
-					event.preventDefault()
-
-					if (Math.abs(event.deltaY) > 0) {
-						app.scrollBlocked = true
-						setTimeout(() => {
-							app.scrollBlocked = false
-						}, 50)
-					}
-
-
-					// const dayObj3Ds = app.dayObj3Ds.children
-					// const maxCameraZPos = dayObj3Ds[dayObj3Ds.length - 1].position.z +  + app.stage.defaultCameraPos.z
-    			// const minCameraZPos = dayObj3Ds[0].position.z + 1000.0
-
 					if (event.deltaY > 0) {
-						app.stage.targetCameraPos.z -= app.stage.cameraMoveStep
-					} else if (event.deltaY < 0) {
-						app.stage.targetCameraPos.z += app.stage.cameraMoveStep
+						cameraMove('negative')
+					} else {
+						cameraMove('positive')
 					}
-
-					app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - 1000
-
 				}
 
 				document.addEventListener("wheel", onDocumentMouseWheel, false);
 				document.addEventListener("mousewheel", onDocumentMouseWheel, false);
-				// document.addEventListener("touchmove", onDocumentMouseWheel, false);
 				window.onscroll = onDocumentMouseWheel
+
+				document.querySelector('#symphony-search-form').addEventListener('submit', function(e){
+					e.preventDefault()
+					var searchInput = document.querySelector('#symphony-search-field')
+
+					searchInput.value = searchInput.value.trim()
+
+					if (searchInput.value !== '') {
+						app.goToBlock(searchInput.value)
+						.then(function(data) {
+							console.log(data)
+						})
+						.catch(function(error) {
+							console.log(error)
+						})
+					}
+
+				})
 
 			}).catch(e => console.log(e))
 

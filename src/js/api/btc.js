@@ -32,16 +32,16 @@ const Block = block => ({
 /**
  * Get a list of BTC transaction over a time period
  */
-export const getTransactionFeesOverTime = (start, end) => axios.get('https://api.blockchain.info/charts/transaction-fees?timespan=all&format=json&cors=true')
+export const getTransactionFeesOverTime = async (start, end) => axios.get('https://api.blockchain.info/charts/transaction-fees?timespan=all&format=json&cors=true')
   .then(formatTimeSeries)
 
-export const getTransactionVolumeOverTime = (start, end) => axios.get('https://api.blockchain.info/charts/estimated-transaction-volume?format=json&cors=true')
+export const getTransactionVolumeOverTime = async (start, end) => axios.get('https://api.blockchain.info/charts/estimated-transaction-volume?format=json&cors=true')
   .then(formatTimeSeries)
 
 /**
  * Get hash rate to nearest day
  */
-export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp / 1000}&cors=true`)
+export const getHashRateforDay = async startTimestamp => axios.get(`https://api.blockchain.info/charts/hash-rate?timespan=1days&format=json&start=${startTimestamp / 1000}&cors=true`)
   .then((data) => {
     let hashRates = formatTimeSeries(data)
     return hashRates && hashRates.values[0] !== undefined && hashRates.values[0]
@@ -50,7 +50,7 @@ export const getHashRateforDay = startTimestamp => axios.get(`https://api.blockc
 /**
  * Returns a block from a given hash
  */
-export const getBlock = hash => blocks.where('hash', '==', hash)
+export const getBlock = async hash => blocks.where('hash', '==', hash)
   .get()
   .then(({docs}) => docs[0].data())
   .then(Block)
@@ -58,7 +58,7 @@ export const getBlock = hash => blocks.where('hash', '==', hash)
 /**
  * Returns all the blocks that occured on the current date froim 00:00 - 23:59
  */
-export const getBlocksOnDay = date => {
+export const getBlocksOnDay = async date => {
   const fromDay = new Date(date)
   fromDay.setHours(0, 0, 0, 0)
 
@@ -68,7 +68,7 @@ export const getBlocksOnDay = date => {
   return getBlocksSince(fromDay, toDay)
 }
 
-export const getBlocksSince = (fromDate, toDate = new Date()) => blocks
+export const getBlocksSince = async (fromDate, toDate = new Date()) => blocks
   .orderBy('time', 'asc')
   .startAt(fromDate / 1000)
   .endAt(toDate / 1000)
@@ -81,13 +81,13 @@ export const getEarliestBlock = _ => blocks
   .get()
   .then(({ docs }) => Block(docs[0].data()))
 
-export const getLatestBlock = _ => blocks
+export const getLatestBlock = async _ => blocks
   .orderBy('time', 'desc')
   .limit(1)
   .get()
   .then(({ docs }) => Block(docs[0].data()))
 
-export const getTransactionsForBlock = (hash, tryCount = 0) => {
+export const getTransactionsForBlock = async (hash, tryCount = 0) => {
   return new Promise((resolve, reject) => {
     blocks.where('hash', '==', hash).get()
       .then(({docs}) => docs[0].ref.collection('metadata').get())

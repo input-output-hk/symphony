@@ -410,8 +410,10 @@ export default class MainScene extends EventEmitter {
 
     this.on('dayChanged', function ({ date }) {
       const hashRate = this.getGroupForDay(date.valueOf()).hashRate
-      const audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
-      this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
+      if (hashRate) {
+        const audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
+        this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
+      }
     })
   }
 
@@ -687,10 +689,16 @@ export default class MainScene extends EventEmitter {
 
     console.log('NAVIGATING TO BLOCK :', blockhash)
     const obj3d = this.allBlocksObj3d.get(blockhash)
-    let block = obj3d && obj3d.block
-    const noBlockInMemory = obj3d === null
 
-    if (noBlockInMemory) block = await getBlock(blockhash)
+    let block
+    let noBlockInMemory = true
+    if (typeof obj3d !== 'undefined') {
+      noBlockInMemory = false
+      block = obj3d.block
+    } else {
+      block = await getBlock(blockhash)
+    }
+
     this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
     this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
     noBlockInMemory ? await this.loadDate(block.day) : this.loadDate(block.day)
@@ -698,7 +706,7 @@ export default class MainScene extends EventEmitter {
     this.currentBlockObject.front.material = this.currentBlockObject.materials.front
     this.currentBlockObject.back.material = this.currentBlockObject.materials.back
     this.currentBlockObject.visible = true
-    this.animateBlockIn(obj3d)
+    this.animateBlockIn(this.currentBlockObject)
     this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
 
     const transactions = await getTransactionsForBlock(block.hash)
@@ -716,8 +724,7 @@ export default class MainScene extends EventEmitter {
 
     this.allMaterials.pointsMaterial.uniforms.uTime.value = this.uTime
     if (this.audio.pointColors && this.audio.pointColors.length > 0) {
-     // let pointColors = Float32Array.from(this.audio.pointColors).subarray(0, this.pointsMesh.geometry.attributes.soundData.array.length)
-      let pointColors = Float32Array.from(this.audio.pointColors)
+      let pointColors = Float32Array.from(this.audio.pointColors.slice(0, 10000))
       this.pointsMesh.geometry.attributes.soundData.array.set(pointColors)
       this.pointsMesh.geometry.attributes.soundData.needsUpdate = true
     }
