@@ -299,8 +299,8 @@ export default class MainScene extends EventEmitter {
     Moves the camera to a new date in the block chain and loads data
   */
   async setDate (date) {
-    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
-    if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
+    if (date > this.latestDate) return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
     if (this.currentBlockObject) this.resetDayView()
     this.stage.targetCameraPos.z = this.getPositionForDate(date)// + 1000
     this.stage.targetCameraLookAt.z = this.stage.targetCameraPos.z - 1000
@@ -312,11 +312,17 @@ export default class MainScene extends EventEmitter {
     loads new blocks around a date
   */
   async loadDate (date) {
-    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earlestDate).format('MMM Do YYYY'))
-    if (date > this.latestDate) return Promise.reject('Requested date is after the lateset available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+    if (date < this.earliestDate) {
+      return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
+    }
+    if (date > this.latestDate) {
+      return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+    }
 
     date = new Date(new Date(date).setHours(0, 0, 0, 0))
-    if (Math.abs(this.date - date) < MS_IN_A_DAY) return
+    if (Math.abs(this.date - date) < MS_IN_A_DAY) {
+      return
+    }
     this.date = date
 
     const numDaysToLoad = Config.daysEitherSide * 2 + 1
