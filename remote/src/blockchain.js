@@ -1,5 +1,5 @@
-const btc = require('blockchain.info/blockexplorer')
 import { addBlock } from './db'
+const btc = require('blockchain.info/blockexplorer')
 export const apiCode = 'f1dd94da-bfc0-46b2-932c-935f53bb352d'
 export const getLatestFullBlock = async () => btc.getLatestBlock({apiCode}).then(({ hash }) => btc.getBlock(hash, {apiCode}))
 

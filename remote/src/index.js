@@ -1,8 +1,8 @@
 import 'babel-polyfill'
 import { checkForNewBlocks } from './populate'
 import merkle from './merkle-tree'
-const functions = require('firebase-functions')
 import { getBlock } from './db'
+const functions = require('firebase-functions')
 // const THREE = require('three')
 const { ConvexBufferGeometry } = require('./ConvexGeometry')
 const cors = require('cors')({origin: true})

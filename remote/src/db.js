@@ -1,11 +1,10 @@
+import { getLatestFullBlock } from './blockchain'
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
-import { getLatestFullBlock } from './blockchain'
 
 try {
   admin.initializeApp(functions.config().firebase)
-}
-catch (error) {
+} catch (error) {
   console.log('No Firebase config available. Using IAM Service Account')
   admin.initializeApp({
     credential: admin.credential.cert(require('./Orpheus-aa43993dd965.json')),
@@ -48,7 +47,6 @@ export const addBlock = async block => {
 export const getTransactionsForBlock = async hash => db.where('hash', '==', hash).get()
   .then(({docs}) => docs[0].ref.collection('metadata').get())
   .then(transactions => transactions.docs[0].data().transaction)
-
 
 const Block = block => ({ ...block, fee: block.output - block.input })
 

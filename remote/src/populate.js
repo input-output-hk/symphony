@@ -1,20 +1,19 @@
-import "babel-polyfill"
+import 'babel-polyfill'
 import { addBlock, earliestKnownBlock, lastKnownBlock } from './db'
 import { getLatestBlocksSince, apiCode } from './blockchain'
 import { getBlock } from 'blockchain.info/blockexplorer'
 import axios from 'axios'
 
 // Should really remove this
-const getAverageBlockTime = async () => axios('https://blockchain.info/q/interval').then(({ data }) => data )
+const getAverageBlockTime = async () => axios('https://blockchain.info/q/interval').then(({ data }) => data)
 
 const populate = async () => {
   let earliest = await earliestKnownBlock()
   let block = await getBlock(earliest.hash, {apiCode})
-  console.log( 'Starting from', block.height )
-  while( block ){
-
+  console.log('Starting from', block.height)
+  while (block) {
     block = await getBlock(block.prev_block, {apiCode})
-    console.log( 'Adding block', block.height )
+    console.log('Adding block', block.height)
     await addBlock(block)
   }
   return block.block_index
@@ -32,7 +31,7 @@ export const checkForNewBlocks = async function () {
   console.log('Time passed', Date.now() / 1000 - block.time)
   console.log('block time', blocktime)
   if (Date.now() / 1000 - block.time > blocktime) {
-    console.log('Enough time has passed for a new block to appear', Date.now() / 1000 , block.time, blocktime )
+    console.log('Enough time has passed for a new block to appear', Date.now() / 1000, block.time, blocktime)
     // Get all the latest BTC blocks since the last one in the db
     await getLatestBlocksSince(block.hash)
     // block.forEach(block => addBlock(block))
@@ -47,13 +46,13 @@ export const checkForNewBlocks = async function () {
   before starting again
 */
 const run = async () => {
-  console.log( '--- RESUMING ----')
-  try{
+  console.log('--- RESUMING ----')
+  try {
     await populate()
-  } catch(e){
-    console.error( e)
-    console.log( '--- PAUSING FOR 10 ----' )
-    setTimeout( run, 10000 )
+  } catch (e) {
+    console.error(e)
+    console.log('--- PAUSING FOR 10 ----')
+    setTimeout(run, 10000)
   }
 }
 

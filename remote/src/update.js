@@ -1,7 +1,7 @@
-const admin = require('firebase-admin')
-import "babel-polyfill"
+import 'babel-polyfill'
 import { earliestKnownBlock, lastKnownBlock, getBlock, db } from './db'
 import { getLatestBlocksSince, apiCode } from './blockchain'
+const admin = require('firebase-admin')
 // import { getBlock } from 'blockchain.info/blockexplorer'
 
 const update = async () => {

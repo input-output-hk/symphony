@@ -1,7 +1,7 @@
 {
   "name": "orpheus-node",
   "version": "1.0.0",
-  "description": "Cloudbase functions for populating Blockchain",
+  "description": "Firebase Cloud Functions for populating Blockchain data",
   "main": "index.js",
   "scripts": {
     "transpile": "babel src --out-dir functions --presets=env --plugins transform-object-rest-spread --copy-files --ignore 'node_modules'",
@@ -22,7 +22,12 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "standard": "^10.0.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "blockchain.info": "^2.11.0",
+    "firebase-admin": "^5.8.1",
+    "firebase-functions": "^0.8.1"
+  }
 }
