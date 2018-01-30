@@ -14,54 +14,78 @@ export default class Audio extends EventEmitter {
     this.camera = camera
     this.loops = []
     this.quantize = 32
-    this.masterVol = -21 // db
+    this.masterVol = -16 // db
     this.ambienceVol = 0 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
-    this.bpm = 50
+    this.bpm = 45
     this.isMuted = false
     this.context = null
     this.notes = {
+    //  27.5000: 'A0',
+    //  29.1352: 'A#0',
+    //  30.8677: 'B0',
+    //  32.7032: 'C1',
+    //  34.6478: 'C#1',
+    //  36.7081: 'D1',
+    //  38.8909: 'D#1',
+    //  41.2034: 'E1',
+    //  43.6535: 'F1',
+    //  46.2493: 'F#1',
+    //  48.9994: 'G1',
+    //  51.9131: 'G#1',
       55.000: 'A1',
-      58.270: 'A#1',
-      61.735: 'B1',
-      65.406: 'C1',
-      69.296: 'C#1',
-      73.416: 'D1',
-      77.782: 'D#1',
-      82.407: 'E1',
-      87.307: 'F1',
-      92.499: 'F#1',
-      97.999: 'G1',
-      103.826: 'G#1',
+      58.2705: 'A#1',
+      61.7354: 'B1',
+      65.4064: 'C2',
+      69.2957: 'C#2',
+      73.4162: 'D2',
+      77.7817: 'D#2',
+      82.4069: 'E2',
+      87.3071: 'F2',
+      92.4986: 'F#2',
+      97.9989: 'G2',
+      103.826: 'G#2',
       110.000: 'A2',
       116.541: 'A#2',
       123.471: 'B2',
-      130.813: 'C2',
-      138.591: 'C#2',
-      146.832: 'D2',
-      155.563: 'D#2',
-      164.814: 'E2',
-      174.614: 'F2',
-      184.997: 'F#2',
-      195.998: 'G2',
-      207.652: 'G#2',
+      130.813: 'C3',
+      138.591: 'C#3',
+      146.832: 'D3',
+      155.563: 'D#3',
+      164.814: 'E3',
+      174.614: 'F3',
+      184.997: 'F#3',
+      195.998: 'G3',
+      207.652: 'G#3',
       220.000: 'A3',
       233.082: 'A#3',
       246.942: 'B3',
-      261.626: 'C3',
-      277.183: 'C#3',
-      293.665: 'D3',
-      311.127: 'D#3',
-      329.628: 'E3',
-      349.228: 'F3',
-      369.994: 'F#3',
-      391.995: 'G3',
-      415.305: 'G#3',
+      261.626: 'C4',
+      277.183: 'C#4',
+      293.665: 'D4',
+      311.127: 'D#4',
+      329.628: 'E4',
+      349.228: 'F4',
+      369.994: 'F#4',
+      391.995: 'G4',
+      415.305: 'G#4',
       440.000: 'A4',
       466.164: 'A#4',
       493.883: 'B4',
-      523.251: 'C4'
+      523.251: 'C5',
+      554.365: 'C#5',
+      587.330: 'D5',
+      622.254: 'D#5',
+      659.255: 'E5',
+      698.456: 'F5',
+      739.989: 'F#5',
+      783.991: 'G5',
+      830.609: 'G#5',
+      880.000: 'A5',
+      932.328: 'A#5',
+      987.767: 'B5',
+      1046.50: 'C6'
     }
 
     this.pointColors = []
@@ -339,14 +363,23 @@ export default class Audio extends EventEmitter {
 
     this.pointColors = positionsArray.map(_ => 0)
 
+    // compute single digit from hash
+    let total = 0
+    for (let i = 0; i < block.hash.length; i++) {
+      // convert from base 16
+      total += parseInt(block.hash[i], 16)
+    }
+
+    // set unique mode for this block hash
+    let modeIndex = total % Object.keys(this.modes).length
+    this.mode = this.modes[Object.keys(this.modes)[modeIndex]]
+
     for (let index = 0; index < positionsArray.length / 3; index++) {
       let xIndex = index * 3
       let yIndex = index * 3 + 1
       let zIndex = index * 3 + 2
 
-      let x = positionsArray[xIndex]
       let y = positionsArray[yIndex]
-      let z = positionsArray[zIndex]
 
       /**
        * Map transaction time to new range
@@ -359,18 +392,23 @@ export default class Audio extends EventEmitter {
         let minDiff = Number.MAX_SAFE_INTEGER
         let note = 'C1'
 
-        let mode = this.modes.aeolian
         for (var frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
-            if (mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((y * 4.0) - frequency)
+            if (this.mode.indexOf(noteName) !== -1) { // filter out notes not in mode
+              let diff = Math.abs((y * 1.5) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
               }
             }
           }
+        }
+
+        let weight = map(transaction.weight, 0, 2000, 0, 1)
+
+        if (weight > 2.0) {
+          weight = 2.0
         }
 
         let that = this
@@ -393,7 +431,7 @@ export default class Audio extends EventEmitter {
                 this.pointColors[zIndex] = 0
               }, 500)
               try {
-                this.sampler.triggerAttack(note, '@' + that.quantize + 'n', 1.0)
+                this.sampler.triggerAttack(note, '@' + that.quantize + 'n', weight)
               } catch (error) {
                 console.log(error)
               }
