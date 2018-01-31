@@ -15,7 +15,7 @@ export default class Audio extends EventEmitter {
     this.loops = []
     this.quantize = 32
     this.masterVol = -16 // db
-    this.ambienceVol = 0 // db
+    this.ambienceVol = -12 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 45
@@ -363,7 +363,7 @@ export default class Audio extends EventEmitter {
 
     this.pointColors = positionsArray.map(_ => 0)
 
-    // compute single digit from hash
+    // compute number from hash
     let total = 0
     for (let i = 0; i < block.hash.length; i++) {
       // convert from base 16

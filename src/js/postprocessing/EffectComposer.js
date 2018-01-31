@@ -5,10 +5,6 @@ import CopyShader from './CopyShader'
  * @author alteredq / http://alteredqualia.com/
  */
 
- /**
- * @author alteredq / http://alteredqualia.com/
- */
-
 const EffectComposer = function (renderer, renderTarget) {
   this.renderer = renderer
 

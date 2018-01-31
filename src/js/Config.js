@@ -10,12 +10,8 @@ const Config = {
   showGUI: true,
   scene: {
     bgColor: 0x26263c,
-    shadowsOn: false,
     fogFar: 0.00040,
-    antialias: true
-  },
-  postProcessing: {
-    effectDownscaleDivisor: 2
+    antialias: false
   },
   camera: {
     fov: 80
