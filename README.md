@@ -5,66 +5,8 @@ An interactive, visual and auditory exploration of BitCoin, Cryptocurrency and B
 
 ![The Blockchain](./static/assets/gh-meta.jpg)
 
-## API
-
-Symphony as a scriptable API to navigate through the blockchain, focus on specific blocks and retrieve information about the blockchain.
 
 
-
-### Initialisation
-
-`orpheus() Promise` is an asynchronous global function that returns a promise which resolves to the symphony api
-
-```javascript
-const api = await orpheus()
-```
-Once you have your api object you can call the following methods
-
-### setDate
-
-Navigates to the requested `Date` object in the block chain. For example to navigate to the genesis block call `api.setDate(new Date(2009, 0, 3))`. This method returns a Promise which rejects if the date requested is outside the available range, for example, in the futureu, or before the beginning of the blockchain.
-
-```javascript
-setDate(Date)Promise
-```
-
-### goToBlock
-
-Accepts a string indicating a block hash and navigates to the relavent block in the block chain. The method returns a promise which rejects if the block doesn't exist, or is invalid
-
-```javascript
-goToBlock(hash String) Promise
-```
-
-### goToNextBlock
-
-Whilst viewing a block, calling `goToNextBlock()` will navigate to the next block in the chain
-
-```javascript
-goToNextBlock()
-```
-
-### goToPreviousBlock
-
-```javascript
-goToPreviousBlock()
-```
-
-### setSize
-
-Call `setSize(w, h)` to set the size of canvas syphony renders to
-
-```javascript
-setSize(w Number, h Number)
-```
-
-### destroy
-
-Call `destroy()` to stop the application and free memory. The app cannot be run after this.
-
-### Feature Detection
-
-The library requires certain platform features to run. We've bundled these checks under a flag which can be queried using `orpheus.canRun`
 
 ## Build Setup
 
@@ -84,6 +26,143 @@ npm run build --report
 # Run Standard.js test over code
 npm run test
 ```
+
+
+
+
+## API
+
+Symphony as a scriptable API to navigate through the blockchain, focus on specific blocks and retrieve information about the blockchain.
+
+
+### Initialisation
+
+#### WebGL support check
+
+Use `orpheusApp.canRun` to detect WebGL.
+
+```javascript
+if (!orpheusApp.canRun) {
+  console.log("No webgl support");
+}
+```
+
+
+
+#### Create the Orpeus App
+
+Create the Orpeus App and pass `path` variable for Symphony static assets.
+
+```javascript
+orpheusApp({ path: './static/assets/' }).then( app => {
+  window.app = app
+  ...
+})
+```
+
+
+
+### Functions
+
+#### setSize
+
+Call `setSize` to resize or adapt the canvas.
+
+```javascript
+app.setSize(window.innerWidth, window.innerHeight)
+window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+```
+
+#### setDate
+
+Call `setDate` to start from particular date.
+
+```javascript
+app.setDate(date)
+```
+
+#### goToPrevBlock
+
+Call `goToPrevBlock` to navigate to previous block.
+
+```javascript
+app.goToPrevBlock()
+```
+
+#### goToNextBlock
+
+Call `goToNextBlock` to navigate to previous block.
+
+```javascript
+app.goToNextBlock()
+```
+
+#### resetDayView
+
+Call `resetDayView` cancel block selection.
+
+```javascript
+app.resetDayView()
+```
+
+#### destroy
+
+Call `destroy()` to stop the application and free memory. The app cannot be run after this.
+
+```javascript
+app.destroy()
+```
+
+
+
+### Events
+
+#### dayChanged
+
+Get properties when day gets changed.
+
+```javascript
+app.on('dayChanged', ({ date, input, output, fee }) => {
+  ...
+})
+```
+
+#### blockSelected
+
+Event called when a block is selected.
+
+```javascript
+app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
+  ...
+})
+```
+
+#### blockUnselected
+
+Event called when a block is deselected.
+
+```javascript
+app.on('blockUnselected', _ => {
+  ...
+})
+```
+
+#### blockHovered
+
+Event called when a block is hovered.
+
+```javascript
+app.on('blockHovered', data => {
+  ...
+})
+```
+
+
+
+
+
+
+
 
 ## Code Style
 
