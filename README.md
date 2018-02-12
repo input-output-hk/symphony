@@ -1,9 +1,9 @@
 # Symphony
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-An interactive, visual and auditory exploration of BitCoin, Cryptocurrency and Blockchain technology. A singular aim, to help bring about greater understanding of both Blockchain technology and the ever expanding (and contracting) Cryptocurrency marketplace. 
+An interactive, visual and auditory exploration of BitCoin, Cryptocurrency and Blockchain technology. A singular aim, to help bring about greater understanding of both Blockchain technology and the ever expanding (and contracting) Cryptocurrency marketplace.
 
-![The Blockchain](./static/assets/cylindar.png)
+![The Blockchain](./static/assets/gh-meta.jpg)
 
 ## API
 
