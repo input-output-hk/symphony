@@ -94,7 +94,7 @@ export default class Stage {
     }
 
     this.cameraMoveStep = 200.0 // how much to move the camera forward on z-axis
-    this.cameraLerpSpeed = 0.03 // speed of camera lerp
+    this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 5000)
@@ -217,9 +217,7 @@ export default class Stage {
   /**
    * Move camera based on mouse position
    */
-  cameraFollowMouse () {
-    document.dispatchEvent(this.cameraMoveEvent)
-
+  cameraFollowTarget () {
     this.camera.lookAt(this.cameraLookAtPos)
     this.targetCameraPos.x += this.mousePos.x
     this.targetCameraPos.y += this.mousePos.y
@@ -237,9 +235,21 @@ export default class Stage {
       this.targetCameraPos.y = this.cameraDriftLimitMin.y + 1
     }
 
-    // lerp camera posiiton to target
+    // lerp camera position to target
     this.cameraPos.lerp(this.targetCameraPos, this.cameraLerpSpeed)
     this.camera.position.copy(this.cameraPos)
+
+    let camPosNearest1000 = Math.ceil(this.camera.position.z / 1000) * 1000
+    let targetCamPosNearest1000 = Math.ceil(this.targetCameraPos.z / 1000) * 1000
+
+    if (camPosNearest1000 !== targetCamPosNearest1000 && !this.camMoveBlocked) {
+      setTimeout(() => {
+        this.camMoveBlocked = false
+        document.dispatchEvent(this.cameraMoveEvent)
+      }, 100)
+
+      this.camMoveBlocked = true
+    }
 
     // constantly look at target
     this.cameraLookAtPos.lerp(this.targetCameraLookAt, this.cameraLerpSpeed)
@@ -252,7 +262,7 @@ export default class Stage {
     document.dispatchEvent(this.preUpdate)
 
     this.updateMouse()
-    this.cameraFollowMouse()
+    this.cameraFollowTarget()
 
     this.render()
 

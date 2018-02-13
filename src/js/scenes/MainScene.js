@@ -6,7 +6,7 @@ import EventEmitter from 'eventemitter3'
 import AddText, { CIRCLE_OFFSET } from './circleGeometry'
 import Config from '../Config'
 import Audio from '../audio/audio'
-import {getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay} from '../api/btc'
+import { getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay } from '../api/btc'
 import Materials from '../materials/materials'
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
@@ -17,14 +17,9 @@ const TWEEN = require('@tweenjs/tween.js')
 const MS_IN_A_DAY = 86400000
 const DAY_OFFSET = 5500 // offset for each day on z-axis
 
-// const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
-// const groupBy = (arr, key) => arr.reduce((rv, x) => {
-//  (rv[x[key]] = rv[x[key]] || []).push(x)
-//  return rv
-// }, {})
 
-const generateBlockGeometries = blocks => {
+const generateBlockGeometries = async blocks => {
   return new Promise((resolve, reject) => {
     const worker = new DayBuilderWorker()
     worker.onmessage = ({ data }) => {
@@ -115,27 +110,6 @@ export default class MainScene extends EventEmitter {
         cameraFOV: Config.camera.fov
       }
 
-      /**
-       * Create a GUI for a material
-       */
-      const createGuiForMaterial = (mat, title) => {
-        let f = this.gui.addFolder(title)
-        f.add(mat, 'metalness', 0.0, 1.0).step(0.01)
-        f.add(mat, 'roughness', 0.0, 1.0).step(0.01)
-        f.add(mat, 'bumpScale', 0.0, 1.0).step(0.01)
-        f.add(mat, 'opacity', 0.0, 1.0).step(0.01)
-        if (mat.reflectivity) f.add(mat, 'reflectivity', 0.0, 1.0).step(0.01)
-        f.addColor({color: mat.color.getHex()}, 'color').onChange(val => mat.color.setHex(val))
-        f.addColor({emissive: mat.emissive.getHex()}, 'emissive').onChange(val => mat.emissive.setHex(val))
-      }
-
-       /**
-       * Gui for Material
-       */
-      // createGuiForMaterial(this.centralBlockMaterial, 'Central Block Material')
-      // createGuiForMaterial(this.blockMaterialFront, 'Block Material')
-      // createGuiForMaterial(this.merkleMaterial, 'Merkle Block Material')
-
       /*
         Light GUI
       */
@@ -173,7 +147,9 @@ export default class MainScene extends EventEmitter {
     Groups blocks by days and adds them
   */
   async addDay (blocks) {
-    if (!blocks || blocks.length === 0) return
+    if (!blocks || blocks.length === 0) {
+      return
+    }
     const obj3ds = blocks.map(block => this.addBlock(block))
       .filter(block => block) // Remove null blocks
     const day = blocks[0].day
@@ -218,10 +194,20 @@ export default class MainScene extends EventEmitter {
   }
 
   addBlock (block) {
-    const {day, size, time} = block
+    const { day, size } = block
 
-    if (!day) return
-    if (size.x === 0 || size.y === 0 || size.z === 0) return
+    if (!day) {
+      return
+    }
+
+    if (size.x === 0 || size.y === 0 || size.z === 0) {
+      return
+    }
+
+    size.x = Math.max(size.x, 1.0)
+    size.y = Math.max(size.y, 1.0)
+    size.z = Math.max(size.z, 1.0)
+
     const materials = this.getMaterialsForDay(day)
 
     let front = new THREE.Mesh(this.boxGeometry, materials.front)
@@ -272,24 +258,20 @@ export default class MainScene extends EventEmitter {
     return materials
   }
 
-  // start(){ console.warn("'start' method yet to be implemented") }
   destroy () {
     document.removeEventListener('preUpdate', this.onUpdateBound, false)
     cancelAnimationFrame(this.stage.reqID)
-    // const scene = this.stage.scene
-
-    // const traverse = (obj, callback) => {
-    //   obj.children.forEach(child => traverse(child, callback))
-    //   callback(obj)
-    // }
 
     const dispose = function (object) {
-      if (object.geometry) object.geometry.dispose()
+      if (object.geometry) {
+        object.geometry.dispose()
+      }
       if (object.material) {
-        if (object.material.map) object.material.map.dispose()
+        if (object.material.map) {
+          object.material.map.dispose()
+        }
         object.material.dispose()
       }
-      // if( object.parent ) object.parent.remove(object)
     }
 
     this.stage.scene.traverse(dispose)
@@ -299,10 +281,16 @@ export default class MainScene extends EventEmitter {
     Moves the camera to a new date in the block chain and loads data
   */
   async setDate (date) {
-    if (date < this.earliestDate) return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
-    if (date > this.latestDate) return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
-    if (this.currentBlockObject) this.resetDayView()
-    this.stage.targetCameraPos.z = this.getPositionForDate(date)// + 1000
+    if (date < this.earliestDate) {
+      return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
+    }
+    if (date > this.latestDate) {
+      return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+    }
+    if (this.currentBlockObject) {
+      this.resetDayView()
+    }
+    this.stage.targetCameraPos.z = this.getPositionForDate(date)
     this.stage.targetCameraLookAt.z = this.stage.targetCameraPos.z - 1000
 
     return this.loadDate(date)
@@ -336,9 +324,6 @@ export default class MainScene extends EventEmitter {
     const daysToLoad = difference(daysToDisplay, daysAlreadyLoaded)
 
     console.log('LOAD DATE :', this.date)
-    // console.log('DAYS TO ADD :', Array.from(daysToLoad).map(date => new Date(date)))
-    // console.log('DAYS TO REMOVE :', Array.from(daysToRemove).map(date => new Date(date)))
-    // console.log('=========================================')
 
     /*
       If the day is in memory, then emit an event straight away
@@ -359,7 +344,9 @@ export default class MainScene extends EventEmitter {
     Array.from(daysToRemove).map(day => {
       const group = this.getGroupForDay(day)
       group.children.forEach(({ block }) => {
-        if (block) this.allBlocksObj3d.delete(block.hash)
+        if (block) {
+          this.allBlocksObj3d.delete(block.hash)
+        }
       })
       this.dayObj3Ds.remove(group)
       this.days.delete(day)
@@ -367,9 +354,6 @@ export default class MainScene extends EventEmitter {
 
     this.date = date
 
-    /*
-      This load
-    */
     const isWithinAvailableDates = day => day <= this.latestDate && day >= this.earliestDate
     const constrainedDaysToLoad = Array.from(daysToLoad).filter(isWithinAvailableDates)
     constrainedDaysToLoad.forEach(day => this.getGroupForDay(day))
@@ -405,7 +389,7 @@ export default class MainScene extends EventEmitter {
 
   getPositionForDate (date) {
     const hOffset = DAY_OFFSET * 0.5
-    return ((date - this.earliestDate) / MS_IN_A_DAY * DAY_OFFSET) + hOffset
+    return (((date - this.earliestDate) / MS_IN_A_DAY) * DAY_OFFSET) + hOffset
   }
 
   addEvents () {
@@ -424,8 +408,10 @@ export default class MainScene extends EventEmitter {
   }
 
   addTreeToStage (data) {
-    const { offset, size, vertices, endPoints, block } = data
-    if (!vertices) return
+    const { offset, vertices, endPoints, block } = data
+    if (!vertices) {
+      return
+    }
 
     let treeGeo = new THREE.BufferGeometry()
     treeGeo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
@@ -444,8 +430,6 @@ export default class MainScene extends EventEmitter {
       .to({value: 5}, 3000)
       .easing(TWEEN.Easing.Quadratic.InOut)
       .start()
-    // mesh.renderOrder = 10000000
-    // mesh.onBeforeRender = renderer => renderer.clearDepth()
 
     /*
       Sound Wave Geometry
@@ -461,7 +445,7 @@ export default class MainScene extends EventEmitter {
     const blockObj3D = this.allBlocksObj3d.get(block.hash)
     blockObj3D.tree = mesh
 
-    const dayIndex = Math.round(this.getPositionForDate(blockObj3D.block.day) / DAY_OFFSET) * 100000
+    const dayIndex = Math.round(this.getPositionForDate(blockObj3D.block.day) / DAY_OFFSET)
     const index = blockObj3D.parent.children.indexOf(blockObj3D) * 4
     this.pointsMesh.renderOrder = index + dayIndex + 3
     mesh.renderOrder = index + dayIndex + 2
@@ -495,19 +479,23 @@ export default class MainScene extends EventEmitter {
 
   onDocumentMouseDown (event) {
     event.preventDefault()
-    if (this.isAnimating) return
+    if (this.isAnimating) {
+      return
+    }
 
     const { intersected } = this.getIntersections()
 
-    if (intersected && intersected !== this.currentBlockObject) this.goToBlock(intersected.block.hash)
-    else if (this.currentBlockObject) this.goToBlock(null)
+    if (intersected && intersected !== this.currentBlockObject) {
+      this.goToBlock(intersected.block.hash)
+    } else if (this.currentBlockObject) {
+      this.goToBlock(null)
+    }
   }
 
   createCubeMap (day) {
-    // if (typeof this.state.dayData[dayIndex] !== 'undefined') {
     this.stage.scene.background = this.allMaterials.bgMap
 
-    const { front, back, merkle } = this.getMaterialsForDay(day)
+    const { front, back } = this.getMaterialsForDay(day)
     const group = this.getGroupForDay(day)
     front.color.setHex(0xffffff)
     let cubeCamera = new THREE.CubeCamera(100.0, 5000, 512)
@@ -516,16 +504,12 @@ export default class MainScene extends EventEmitter {
     cubeCamera.update(this.stage.renderer, this.stage.scene)
     front.envMap = cubeCamera.renderTarget.texture
     back.envMap = cubeCamera.renderTarget.texture
-    // front.uniforms.uCubePos.value.copy(cubeCamera.position)
-    // back.uniforms.uCubePos.value.copy(cubeCamera.position)
-    // merkle.envMap = cubeCamera.renderTarget.texture
 
     this.stage.scene.background = new THREE.Color(Config.scene.bgColor)
   }
 
-  animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
+  async animateBlock (blockObject, fromPos, fromQuaternion, toPos, toQuaternion, duration) {
     return new Promise((resolve, reject) => {
-      this.isAnimating = true
       let moveQuaternion = new THREE.Quaternion()
       blockObject.quaternion.set(moveQuaternion)
 
@@ -535,7 +519,6 @@ export default class MainScene extends EventEmitter {
         .to(toPos, duration)
         .easing(this.easing)
         .onComplete(() => {
-          this.isAnimating = false
           resolve()
         })
         .start()
@@ -572,7 +555,7 @@ export default class MainScene extends EventEmitter {
           fromQuaternion,
           toPos,
           toQuaternion,
-          500
+          300
         ).then(() => {
           resolve()
         })
@@ -583,37 +566,34 @@ export default class MainScene extends EventEmitter {
   }
 
   animateBlockIn (blockObject) {
-    return new Promise((resolve, reject) => {
-      let blockPos = blockObject.position.clone()
+    this.isAnimating = true
 
-      let targetRotation = new THREE.Euler(0.0, 0.0, 0.0)
-      let fromQuaternion = new THREE.Quaternion().copy(blockObject.quaternion)
-      let toQuaternion = new THREE.Quaternion().setFromEuler(targetRotation)
+    let blockPos = blockObject.position.clone()
 
-      blockObject.initialPosition = blockObject.position.clone()
-      blockObject.initialRotation = blockObject.rotation.clone()
+    let targetRotation = new THREE.Euler(0.0, 0.0, 0.0)
+    let fromQuaternion = new THREE.Quaternion().copy(blockObject.quaternion)
+    let toQuaternion = new THREE.Quaternion().setFromEuler(targetRotation)
 
+    blockObject.initialPosition = blockObject.position.clone()
+    blockObject.initialRotation = blockObject.rotation.clone()
+
+    const toPos = new THREE.Vector3()
+    toPos.z = blockObject.position.clone().z
+
+    this.animateBlock(
+      blockObject,
+      blockPos,
+      fromQuaternion,
+      toPos,
+      toQuaternion,
+      1500,
+      true
+    ).then(() => {
       // focus camera on block
       let blockWorldPos = blockObject.getWorldPosition()
-
       this.stage.targetCameraLookAt.z = blockWorldPos.z
       this.stage.targetCameraPos.z = blockWorldPos.z - this.cameraBlockFocusDistance
-
-      const toPos = new THREE.Vector3()
-      toPos.z = blockObject.position.z
-
-      this.animateBlock(
-        blockObject,
-        blockPos,
-        fromQuaternion,
-        // this.stage.targetCameraLookAt,
-        toPos,
-        toQuaternion,
-        2000,
-        true
-      ).then(() => {
-        resolve()
-      })
+      this.isAnimating = false
     })
   }
 
@@ -650,24 +630,28 @@ export default class MainScene extends EventEmitter {
       intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
-        this.emit('blockHovered', intersected.block)
+        this.emit('blockMouseOver', intersected.block)
       }
       this.pointLightTarget.copy(intersected.getWorldPosition())
+    } else {
+      this.emit('blockMouseOut')
     }
   }
 
-  async onCameraMove () {
+  onCameraMove () {
     /*
       Bound the camera movement to the available block chain range
     */
     const start = this.getPositionForDate(this.earliestDate) + 1000
     const end = this.getPositionForDate(this.latestDate)
+
     this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
 
     /*
-      Get the nearest day on to the cameras target location
+      Get the nearest day to the camera's target location
     */
     const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z + (DAY_OFFSET * 0.5) + CIRCLE_OFFSET)
+
     // const postionOfCurrentDate = this.getPositionForDate(this.date)
     date.setHours(0, 0, 0, 0)
 
@@ -705,17 +689,30 @@ export default class MainScene extends EventEmitter {
       block = await getBlock(blockhash)
     }
 
-    this.stage.targetCameraLookAt.z = this.getPositionForDate(block.time * 1000)
-    this.stage.targetCameraPos.z = this.stage.targetCameraLookAt.z - this.cameraBlockFocusDistance
-    noBlockInMemory ? await this.loadDate(block.day) : this.loadDate(block.day)
+    // blocks with a large number of transactions are stored as a JSON string
+    if (typeof block.tx === 'string') {
+      block.tx = JSON.parse(block.tx)
+    }
+
+    if (noBlockInMemory) {
+      await this.loadDate(block.day)
+    }
     this.currentBlockObject = this.allBlocksObj3d.get(blockhash)
-    this.currentBlockObject.front.material = this.currentBlockObject.materials.front
-    this.currentBlockObject.back.material = this.currentBlockObject.materials.back
-    this.currentBlockObject.visible = true
+
     this.animateBlockIn(this.currentBlockObject)
     this.emit('blockSelected', {...block, time: new Date(block.time * 1000)})
 
-    const transactions = await getTransactionsForBlock(block.hash)
+    this.currentBlockObject.front.material = this.currentBlockObject.materials.front
+    this.currentBlockObject.back.material = this.currentBlockObject.materials.back
+    this.currentBlockObject.visible = true
+
+    let transactions
+    if (typeof block.tx === 'undefined') {
+      transactions = await getTransactionsForBlock(block.hash)
+    } else {
+      transactions = block.tx
+    }
+
     const data = await generateTreeGeometry({ ...block, transactions })
     this.addTreeToStage(data)
   }
