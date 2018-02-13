@@ -140,8 +140,12 @@
 				/*
 					Event called when a block is hovered over
 				*/
-				// app.on('blockHovered', console.log )
-
+				app.on('blockMouseOver', () => {
+					document.body.style.cursor = "pointer";
+				})
+				app.on('blockMouseOut', () => {
+					document.body.style.cursor = "default";
+				})
 
 				/*
 					Event called when a block is selected
