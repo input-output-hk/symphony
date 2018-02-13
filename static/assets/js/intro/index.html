@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Experiment</title>
+    <!-- LIBS  -->
+    <script src="libs/three76.min.js"></script>
+
+
+    <style>
+    body{
+        background-color: #777777;
+        margin:0;
+        padding:0;
+
+    }
+    #gui {
+        position: absolute; width: 245px; top:50px;
+    }
+    #stats {
+        position: absolute; width: 245px; top:0px;
+    }
+
+    #renderer {
+        position: absolute; width: 245px; left: 400px;
+    }
+
+
+    #container {
+    background-color: #333;
+    height: 600px;
+    width: 600px;
+    border: 1px solid white;
+    }
+    
+    #gui .slider-fg{
+        background: #FF1A3A !important; 
+    }
+    #gui .slider {
+        background: #515053 !important; 
+    }
+    #gui .title{
+        background: #393636 !important; 
+    }
+    #gui .cr{
+        border-left: 3px solid #FF1A3A !important;
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script src="libs/animation.min.js"></script>
+    
+        <script>
+
+setTimeout(function(){
+
+
+        function onDocumentKeyDown( event ) {
+            console.log("asd")
+            if (event.keyCode == 32){
+                if (animation.isRunning()){
+                    animation.stop();
+                }else{
+                    animation.run();
+                }
+            }
+        }
+
+        document.addEventListener('keydown',onDocumentKeyDown,false);
+
+
+          parameters = { 
+            'particle_path' : "textures/particle3.png",
+            'container_id' : "container",
+            'renderer_id' : "renderer",
+            'stats_id' : "stats",
+            "gui_id" : "gui",
+            "electrolized_path" : 'libs/electrolized.js',
+            "spec_path1"  : 'textures/spec_body_squared.jpg',
+            "spec_path2"  : 'textures/spec_body5.jpg',
+            "spec_path3"  : 'textures/spec_line2.jpg',
+            "spec_path4"  : 'textures/spec_body11.jpg'
+        }
+
+        var animation = new Animation01();
+        animation.setup(parameters,function(){animation.run()})
+}, 1000);
+ </script>
+</body>
+</html>
+
+

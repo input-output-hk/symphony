@@ -1,0 +1,65 @@
+
+{% if include.item %}
+
+{% if page.layout == 'project-blog' %}
+<li class="about "><a class="" href="{{ site.baseurl }}/projects/{{ page.parent }}/">{{ site.data.i18n[page.language].about }}</a></li>
+{% else %}
+<li class="about active"><a href="#about" aria-controls="about" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].about }}</a></li>
+{% endif %}
+
+
+{% if include.item.teamgantt %}
+<li class="roadmap"><a href="#roadmap" aria-controls="roadmap" role="tab" data-toggle="tab">Roadmap</a></li>
+{% endif %}
+
+
+{% if include.item.devupdates %}
+<li class="devupdates"><a href="#devupdates" aria-controls="devupdates" role="tab" data-toggle="tab">Dev Updates</a></li>
+{% endif %}
+
+
+{% if page.layout == 'project-blog' %}
+<li class="blog active"><a href="{{ site.baseurl }}/projects/{{ page.parent }}/blog/">{{ site.data.i18n[page.language].blog }}</a></li>
+
+{% else %}
+
+{% if blog_cnt > 0 %}
+<li class="blog"><a href="{{ site.baseurl }}/projects/{{ page.parent }}/blog/">{{ site.data.i18n[page.language].blog }}</a></li>
+{% endif %}
+{% endif %}
+
+
+{% if member_cnt > 0 %}
+{% if page.layout == 'project-blog' %}
+
+<li class="team"><a href="{{ site.baseurl }}/projects/{{ page.parent }}/#team">{{ site.data.i18n[page.language].team }}</a></li>
+
+{% else %}
+<li class="team"><a href="#team" aria-controls="team" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].team }}</a></li>
+
+{% endif %}
+
+{% endif %}
+
+
+{% if include.item.menuitems %}
+{{include.item.menuitems}}
+{% endif %}
+
+
+
+
+
+
+{% if include.item.contact %}
+{% if page.layout == 'project-blog' %}
+<li class="contact"><a href="{{ site.baseurl }}/projects/{{ page.parent }}/#contact">{{ site.data.i18n[page.language].contact }}</a></li>
+{% else %}
+<li class="contact"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].contact }}</a></li>
+{% endif %}
+{% endif %}
+
+
+
+
+{% endif %}

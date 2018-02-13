@@ -1,0 +1,14 @@
+
+<a class="nomobile brand pull-right" href="/">
+{% if page.layout == "page-research" %}
+	<img class="" src="{{ '/images/iohk-logo.png' | prepend: site.baseurl }}" width="110" height="25" alt="{{ site.title }}" />
+{% else %}
+	<img class="" src="{{ '/images/iohk-logo-white.png' | prepend: site.baseurl }}" width="110" height="25" alt="{{ site.title }}" />
+{% endif %}
+</a>
+
+<div class="social nomobile">
+  <a href="{% if page.github %}{{page.github}}{% else %}https://github.com/input-output-hk/{% endif %}" class="big c_999" target="_blank"><em class="fa fa-github"></em></a> &nbsp;
+  <a href="{% if page.linkedin %}{{page.linkedin}}{% else %}https://www.linkedin.com/company/input-output-global{% endif %}" class="big c_999" target="_blank"><em class="fa fa-linkedin"></em></a> &nbsp;
+  <!--<a href="{% if page.twitter %}{{page.twitter}}{% else %}https://twitter.com/InputOuput{% endif %}" class="big c_999" target="_blank"><em class="fa fa-twitter"></em></a> &nbsp;-->
+</div>
