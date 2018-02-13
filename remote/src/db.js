@@ -24,8 +24,8 @@ export const earliestKnownBlock = async () => db.orderBy('time')
   .then(snapshot => snapshot.empty ? getLatestFullBlock() : snapshot.docs[0].data())
   // .then(doc => doc.exists ? )
 
-const dbBlock = ({hash = '', time = 0, prev_block = '', next_block = '', size = 0, height = 0, relayed_by = '0.0.0.0', n_tx = 0, bits = 0, fee = 0 }) => ({
-  hash, time, prev_block, size, height, relayed_by, n_tx, bits, fee, next_block
+const dbBlock = ({ hash = '', time = 0, prev_block = '', next_block = '', size = 0, height = 0, relayed_by = '0.0.0.0', n_tx = 0, bits = 0, fee = 0, tx = '' }) => ({
+  hash, time, prev_block, size, height, relayed_by, n_tx, bits, fee, next_block, tx
 })
 
 const dbTransaction = ({ time = 0, relayed_by = '0.0.0.0', hash = 0, tx_index = 0, size = 0, weight = 0, out = [], inputs = [] }) => {
@@ -38,10 +38,22 @@ export const addBlock = async block => {
   const transaction = block.tx.map(dbTransaction)
   const output = transaction.reduce((a, { output }) => a + output, 0) || 0
   const input = transaction.reduce((a, { input }) => a + input, 0) || 0
-  // const fee = output - input
+
   const dbBlockRef = db.doc(String(block.block_index))
-  await dbBlockRef.set({ ...dbBlock(block), input, output }, { merge: true })
-  await dbBlockRef.collection('metadata').add({ transaction })
+
+  // add tx data as JSON if over 3000 tx
+  if (block.n_tx > 3000) {
+    try {
+      block.tx = JSON.stringify(transaction)
+      await dbBlockRef.set({ ...dbBlock(block), input, output }, { merge: true })
+    } catch (error) {
+      console.log(error)
+    }
+  } else {
+    // add tx data as metadata
+    await dbBlockRef.set({ ...dbBlock(block), input, output }, { merge: true })
+    await dbBlockRef.collection('metadata').add({ transaction })
+  }
 }
 
 export const getTransactionsForBlock = async hash => db.where('hash', '==', hash).get()
