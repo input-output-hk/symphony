@@ -221,11 +221,11 @@ function rm_item(item){
   }*/
   var updated_label = '';
   if(updated_item != ''){
-    links_arr.push('<span class="updated_label text-center"><img src="/images/issue/updated-label.svg" alt="" /></span>');
+    links_arr.push('<span class="updated_label text-center"><img src="/static/assets/images/issue/updated-label.svg" alt="" /></span>');
   }
   var new_label = '';
   if(new_item != ''){
-    links_arr.push('<span class="new_label text-center"><img src="/images/issue/new-label.svg" alt="" /></span>');
+    links_arr.push('<span class="new_label text-center"><img src="/static/assets/images/issue/new-label.svg" alt="" /></span>');
   }
   links = links_arr.join('<span class="dash">—</span>');
 
@@ -284,7 +284,7 @@ function rm_item(item){
           }
 		      owner += '<a href="'+owner_link+'/" title="'+io_team_arr[auth_id]['tit']+'" target="_blank"><img src="/'+io_team_arr[auth_id]['pic']+'" width="40" height="40" alt="'+io_team_arr[auth_id]['tit']+'" /></a>';
 				}else{
-          owner += '<img src="/images/team/member.png" width="40" height="40" alt="" class="img-circle blank-member" />';
+          owner += '<img src="/static/assets/images/team/member.png" width="40" height="40" alt="" class="img-circle blank-member" />';
         }
 	    }
 	    if(links_arr.length != 0){
@@ -296,7 +296,7 @@ function rm_item(item){
 			}
 	  }
 	}else{
-    owner += '<img src="/images/blank.gif" width="40" height="40" alt="" class="img-circle blank-member" />';
+    owner += '<img src="/static/assets/images/blank.gif" width="40" height="40" alt="" class="img-circle blank-member" />';
   }
 
 
@@ -343,7 +343,7 @@ function rm_item(item){
   var icon_cls = 'noicon';
   if(icon != ''){
     icon_cls = '';
-		icon = '<img class="icon" src="/images/issue/'+icon+'" alt="" />';
+		icon = '<img class="icon" src="/static/assets/images/issue/'+icon+'" alt="" />';
   }
 
   var title = item.gsx$title.$t;
@@ -374,7 +374,7 @@ function rm_item(item){
     milestone_img = item.gsx$erapic.$t;
 
     if(milestone_img){
-      milestone_img = '<div id="'+io_slug(milestone_header)+'" class="img milestone"><span class="author"><a href="'+milestone_link+'" target="_blank"><img src="/images/eras/'+milestone_img+'" alt="" width="70" height="70" class="img-circle" /></a></span></div>';
+      milestone_img = '<div id="'+io_slug(milestone_header)+'" class="img milestone"><span class="author"><a href="'+milestone_link+'" target="_blank"><img src="/static/assets/images/eras/'+milestone_img+'" alt="" width="70" height="70" class="img-circle" /></a></span></div>';
     }
 
     milestone_heading = '<h1 class="text-center milestone heading"><span>'+milestone_header+'</span></h1>';
@@ -398,7 +398,7 @@ function rm_item(item){
 
   /*var new_label = '';
   if(new_item == 'yes'){
-    new_label = '<div class="new_label text-center"><img src="/images/issue/new-label.svg" alt="" /></div><div class="timeline"></div>';
+    new_label = '<div class="new_label text-center"><img src="/static/assets/images/issue/new-label.svg" alt="" /></div><div class="timeline"></div>';
   }*/
 
 
@@ -445,7 +445,7 @@ function rm_item(item){
       </div>\
       <br><br>\
       <div class="text-center">\
-        <img src="/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
+        <img src="/static/assets/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
       </div>\
       ';
     }
@@ -495,7 +495,7 @@ function rm_load(){
   out += '\
   <br>\
   <div class="text-center">\
-    <img src="/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
+    <img src="/static/assets/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
   </div>\
   ';
 
