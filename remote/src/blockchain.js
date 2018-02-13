@@ -8,8 +8,6 @@ export const getLatestBlocksSince = async function (lastKnownHash) {
   let block = await getLatestFullBlock()
   let blockhash = block.hash
 
-  // if (block.hash === blockhash) return arr
-
   while (block.next_block !== lastKnownHash) {
     console.log('adding', block)
     await addBlock(block)

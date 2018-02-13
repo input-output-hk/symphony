@@ -35,7 +35,7 @@ export const checkForNewBlocks = async function () {
     // Get all the latest BTC blocks since the last one in the db
     await getLatestBlocksSince(block.hash)
     // block.forEach(block => addBlock(block))
-    return 'Blocks addeds'
+    return 'Blocks added'
   }
 
   return 'no blocks added'
