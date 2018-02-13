@@ -147,12 +147,22 @@ app.on('blockUnselected', _ => {
 })
 ```
 
-#### blockHovered
+#### blockMouseOver
 
-Event called when a block is hovered.
+Event called when a mouse pointer is over one block.
 
 ```javascript
-app.on('blockHovered', data => {
+app.on('blockMouseOver', data => {
+  ...
+})
+```
+
+#### blockMouseOut
+
+Event called when a mouse pointer leaves block.
+
+```javascript
+app.on('blockMouseOut', data => {
   ...
 })
 ```
