@@ -1,0 +1,10 @@
+
+                                    <ul>
+                                    {% for post in site.categories['jobs'] %}
+                                    {% if page.language == post.language %}
+                                    {% if post.visible == true %}
+                                        <li><a class="io_ajax_load" data-target="#jobs_loader" data-load="#jobs_load" href="{{ site.baseurl }}{{ post.permalink }}">{{ post.title }}</a></li>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    </ul>

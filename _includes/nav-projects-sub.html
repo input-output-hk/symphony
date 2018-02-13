@@ -1,0 +1,9 @@
+<ul class="uppercase project-nav nav-tabs">
+	<li class="about"><a href="#about" aria-controls="contact" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].about }}</a></li>
+	<li class="blog"><a class="ajaxhref" href="{{ site.baseurl }}/projects/{{ page.parent }}/blog{% if page.language != 'en' %}/{{ page.language }}/{% endif %}">{{ site.data.i18n[page.language].blog }}</a></li>
+	<li class="team"><a href="#team" aria-controls="contact" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].team }}</a></li>
+	<li class="contact"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">{{ site.data.i18n[page.language].contact }}</a></li>
+</ul>
+
+
+ 

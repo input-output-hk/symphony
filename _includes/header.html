@@ -1,0 +1,73 @@
+
+{% assign pageclass = 'home' %}
+{% if page.parent %}
+{% assign pageclass = page.parent %}
+{% else %}
+{% assign pageclass = page.slug %}
+{% endif %}
+
+{% include analytics.html %}
+
+
+<div id="iohk" class="{{ site.themed }}">
+  <div id="page" class="{{ pageclass }} {{page.layout | slugify }}">
+    <header>
+
+
+<script>
+(function(){
+   var xdsa = document.getElementsByTagName("body")[0];
+    xdsa.className='transin';
+})();
+
+//jQuery("body").removeClass('transin');
+
+{% if page.layout == "page-home-new" %}
+
+//document.getElementsById("page").className='intropage';
+jQuery("#page").addClass('intropage home');
+
+{% endif %}
+
+</script>
+
+      <img class="none printyes" src="{{ '/images/iohk-share-logo.jpg' | prepend: site.baseurl }}" width="150" height="40" alt="{{ site.title }}" style="margin:0 0 1em 0" />
+
+      <div id="navbar" class="navbar navbar-fixed-top navbar-default navbar-inverse " role="navigation">
+        <noscript class="noscript">
+               <div id="div100">
+               Please enable scripts for all features of this site to work.
+               </div>
+        </noscript>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-24 col-md-24 text-center">
+
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navhider" aria-expanded="false">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                  <a class="navbar-brand" href="{{ site.baseurl }}/{% if page.language != 'en' %}{{ page.language }}/{% endif %}">{{site.title}}</a>
+              </div>
+
+              <div id="navhider" class="collapse navbar-collapse">
+                {% include nav-main.html %}
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+
+    </header>
+
+
+
+    <div id="main-body">

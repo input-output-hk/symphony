@@ -1,0 +1,222 @@
+en:
+    name: Name
+    phone: Phone
+    email: Email
+    subject: Subject
+    message: Message
+    head_office: Office
+    newsletter: Newsletter
+    submit: Submit
+    submit_application: Submit Application
+    apply_now: Apply Now!
+    your_cv: Your CV
+    cv_url: Your CV file URL address
+    subscribe: Subscribe
+    subscribe_to_nl: Subscribe to IOHK Newsletter
+    rights: All Rights Reserved
+    home: Home
+    about: About
+    careers: Careers
+    contact: Contact
+    projects: Projects
+    library: Library
+    development: Development
+    research: Research
+    researchers: Researchers
+    blog: Blog
+    news: Blog
+    team: Team
+    founder: Founder
+    founders: Founders
+    executives: Executives
+    research_and_development: Research &amp; Development
+    cardano_and_serokell: Cardano &amp; Serokell
+    operations_and_creative: Operations &amp; Creative
+    operations: Operations
+    creative: Creative
+    coreteam: Core team
+    veritas: Veritas
+    scorex: Scorex
+    seeking: Seeking
+    back: Back
+    article: Blog post
+    articles: Blog posts
+    active_members: Active members
+    latest_commits: Latest commits
+    chief_executive_officer: Chief Executive Officer
+    chief_strategy_officer: Chief Strategy Officer
+    chief_operations_officer: Chief Operations Officer
+    chief_communications_officer: Chief Communications Officer
+    chief_design_officer: Chief Design Officer
+    full_stack_developer: Full Stack Developer
+    email_to_friend: Email link to this page
+    comments: Comments
+    submit_paper: Submit paper
+    document_title: Document title
+    description: Description
+    tags: Tags
+    URL: URL
+    full_name: Full name
+    your_email: Your E-mail
+    cancel: Cancel
+    type_to_search: Type to search ...
+    read_more: Read more
+    link: Link
+    close: Close
+    open: Open
+    share_on_Twitter: Share on Twitter
+    share_on_Facebook: Share on Facebook
+    share_on_LinkedIn: Share on LinkedIn
+    share_on_Google_Plus: Share on Google Plus
+    share_on_Reddit: Share on Reddit
+    web_technologies: Web Technologies
+    search: Search
+
+ja:
+    name: 名
+    phone: 電話
+    email: Eメール
+    subject: テーマ
+    message: メッセージ
+    head_office: 本社
+    newsletter: ニュースレター
+    submit: 提出します
+    submit_application: 申請書を提出
+    apply_now: 今すぐ申し込みます！
+    your_cv: あなたの履歴書
+    cv_url: あなたの履歴書ファイルのURLアドレス
+    subscribe: 申し込む
+    subscribe_to_nl: IOHKニュースレターの購読
+    rights: 全著作権所有
+    home: ホーム
+    about: IOHKについて
+    careers: 求人
+    contact: 連絡先
+    projects: プロジェクト
+    library: ライブラリ
+    development: Development
+    research: 研究
+    researchers: 研究者
+    blog: ブログ
+    news: ニュース
+    team: チーム
+    founder: 創業者
+    founders: ファウンダーズ
+    executives: エグゼクティブ
+    research_and_development: 研究開発
+    cardano_and_serokell: Cardano &amp; Serokell
+    operations_and_creative: Operations &amp; Creative
+    operations: オペレーション
+    creative: クリエイティブ
+    coreteam: コアチーム
+    veritas: Veritas
+    scorex: Scorex
+    seeking: Seeking
+    back: バック
+    article: 記事
+    articles: 物品
+    active_members: アクティブメンバー
+    latest_commits: 最新のコミット
+    chief_executive_officer: 最高経営責任者
+    chief_strategy_officer: 最高戦略責任者
+    chief_operations_officer: 最高執行責任者
+    chief_communications_officer: チーフ・コミュニケーション・オフィサー
+    chief_design_officer: チーフデザインオフィサー
+    full_stack_developer: フルスタックの開発
+    email_to_friend: このページをメールで送信リンク
+    comments: 注釈
+    submit_paper: 論文を提出
+    document_title: ドキュメントのタイトル
+    description: 説明
+    tags: タグ
+    URL: URL
+    full_name: フルネーム
+    your_email: あなたのEメール
+    cancel: キャンセル
+    type_to_search: 検索すると入力...
+    read_more: 続きを読む
+    link: リンク
+    close: 閉じる
+    open: 開いた
+    share_on_Twitter: Twitterでシェア
+    share_on_Facebook: Facebookでシェア
+    share_on_LinkedIn: LinkedInでシェア
+    share_on_Google_Plus: Google Plusでシェア
+    share_on_Reddit: Redditでシェア
+    web_technologies: ウェブテクノロジ
+    search: Search
+
+ru:
+    name: имя
+    phone: Телефон
+    email: Эл. адрес
+    subject: Тема
+    message: Сообщение
+    head_office: Главный офис
+    newsletter: ПОЧТОВАЯ РАССЫЛКА
+    submit: Подтвердить
+    submit_application: Подать заявку
+    apply_now: Применить сейчас!
+    your_cv: Ваше резюме
+    cv_url: Ваш адрес URL CV файл
+    subscribe: Подписывайся
+    subscribe_to_nl: Подпишитесь на рассылку от IOHK
+    rights: ВСЕ АВТОРСКИЕ ПРАВА ЗАЩИЩЕНЫ
+    home: Главная
+    about: О нас
+    careers: Карьера
+    contact: контакт
+    projects: проектов
+    library: Библиотека
+    development: Development
+    research: Исследование
+    researchers: Исследователи
+    blog: блог
+    news: Новости
+    team: команда
+    founder: основатель
+    founders: Создатели
+    executives: руководство
+    research_and_development: Исследования и разработки
+    cardano_and_serokell: Cardano &amp; Serokell
+    operations_and_creative: Операции и творчество
+    operations: Операции
+    creative: творчество
+    coreteam: Основная команда
+    veritas: Veritas
+    scorex: Scorex
+    seeking: ищет
+    back: назад
+    article: Статья
+    articles: Статьи
+    active_members: Активные участники
+    latest_commits: Последние фиксаций
+    chief_executive_officer: ГЛАВНЫЙ ИСПОЛНИТЕЛЬНЫЙ ДИРЕКТОР
+    chief_strategy_officer: ГЛАВНЫЙ ДИРЕКТОР ПО СТРАТЕГИЯМ
+    chief_operations_officer: ГЛАВНЫЙ ОПЕРАЦИОННЫЙ ДИРЕКТОР
+    chief_communications_officer: ГЛАВНЫЙ ДИРЕКТОР ПО КОММУНИКАЦИЯМ 
+    chief_design_officer: ГЛАВНЫЙ ДИРЕКТОР ПО ДИЗАЙНУ
+    full_stack_developer: FULL STACK РАЗРАБОТЧИК
+    email_to_friend: Отправить ссылку на эту страницу
+    comments: Комментарии
+    submit_paper: Отправить документ
+    document_title: Заголовок документа
+    description: Описание
+    tags: Теги
+    URL: URL
+    full_name: Полное имя
+    your_email: Ваш эл. адрес
+    cancel: Отмена
+    type_to_search: Введите поисковый запрос ...
+    read_more: Прочитайте больше
+    link: Ссылка
+    close: Закрыть
+    open: открыто
+    share_on_Twitter: Поделиться ссылкой на Twitter
+    share_on_Facebook: Поделиться через фейсбук
+    share_on_LinkedIn: Выложить на LinkedIn
+    share_on_Google_Plus: Выложить на Google Plus
+    share_on_Reddit: Выложить на Reddit
+    web_technologies: веб-технологии
+    search: Search
+

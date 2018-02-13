@@ -1,0 +1,30 @@
+
+{% if page.slug == 'about' or page.slug == 'team' or page.slug == 'contact' or page.slug == 'video' or page.slug == 'press' or page.slug == 'msa' or page.layout == 'member' %}
+{% include nav-about.html %}
+{% endif %}
+
+
+{% if page.slug == 'careers' %}
+<div class="uppercase navbar subnav nomobile"></div>
+{% endif %}
+
+
+{% if page.layout == 'job' %}
+<div class="uppercase navbar subnav nomobile"></div>
+{% endif %}
+
+
+
+{% if page.layout == 'page-blog' %}
+<div class="uppercase navbar subnav nomobile"></div>
+{% endif %}
+
+
+
+{% if page.categories contains 'projects' or  page.categories contains 'blog' or  page.categories contains 'projects-blog' %}
+{% if page.categories contains 'research' %}
+<div class="uppercase navbar subnav nomobile"></div>
+{% else %}
+{% include nav-projects.html %}
+{% endif %}
+{% endif %}

@@ -1,0 +1,160 @@
+---
+layout: page-404
+---
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+  <link rel="stylesheet" href="../css/font-awesome.min.css"/>
+  <base href="/">
+  <body>
+
+    {% include header.html %}
+
+    <div id="middle" class="middle">
+      <div id="main" class="page-404">
+
+
+            <div id="subheader" class="banner particles"><div id="subheader-particles"></div>
+                <div class="container">
+                  <div class="row">
+                    <div class="title_block title-block-404 col-md-24">
+                        <div class="image_block">
+                          <!--<img class="iohk-icon animated zoomInLeft" src="/images/iohk-icon-red.png" alt="IOHK Logo"/>
+                            <img class="iohk-icon animated zoomInRight" src="/images/iohk-icon-white.png" alt="IOHK Logo"/>-->
+
+                        </div>
+                        <h1 style="margin-bottom:25px" class="clear"><span class="c_f00">Error | </span> <span class="title">{{ page.title }}</span></h1>
+                        <p class="center desc"><span class="clear">Page not found. The requested URL does not exist.</span></p>
+                    </div>
+                  </div>
+
+                </div>
+
+
+            <div class="container">
+              <div class="row projects404">
+                    <h6 class="uppercase">View our projects</h6>
+                        <div class="col-md-offset-2 col-sm-offset-2 col-md-4 col-sm-4 col-xs-24">
+                          <a href="/projects/cardano">
+                            <div id="project-cardano" class="project-item"></div>
+                            <h3>Cardano</h3>
+                          </a>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <a href="/projects/ethereum-classic">
+                            <div id="project-etc" class="project-item"></div>
+                            <h3>Ethereum Classic</h3>
+                          </a>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <a href="/projects/qeditas">
+                          <div id="project-qeditas" class="project-item"></div>
+                            <h3>Qeditas</h3>
+                          </a>
+
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <a href="/projects/scorex">
+                          <div id="project-scorex" class="project-item"></div>
+                            <h3>Scorex</h3>
+                          </a>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <a href="/projects/rscoin">
+                          <div id="project-rscoin" class="project-item"></div>
+                            <h3>RS|Coin</h3>
+                          </a>
+                        </div>
+                        <!--<div class="col-md-4 col-sm-4 col-xs-12">
+                          <a href="/projects/daedalus">
+                            <img src="https://iohk.io/images/logo/daedalus.png"/>
+                            <h3>Daedalus</h3>
+                          </a>
+                        </div>-->
+                      </div>
+                    </div>
+                  </div>
+
+          <div class="section404">
+            <div class="container">
+              <div class="row posts404">
+                <h6 class="uppercase">Latest posts from our blog</h6>
+                  {% for post in site.categories.blog limit:4 %}
+                  {% if post.visible %}
+                    <div class="col-md-6 col-sm-6 col-xs-24">
+
+                      <article class="{% if forloop.first %}first{% elsif forloop.last %}last{% else %}middle{% endif %}">
+                        <div class="article-head">
+
+                          <h2 class="title"><a href="{{ site.baseurl }}{{ post.permalink }}" class="js-pjax">{{ post.title }}</a></h2>
+
+                          <div class="date inline-block"><span class=""><em class="fa fa-clock-o"></em> {{ post.date | date: '%B %d, %Y' }}</span></div> &nbsp;&nbsp;
+                                      {% if post.author %}
+                                        <div class="author inline-block">
+                                          {% for member in site.pages %}
+                                            {% if member.layout == 'member' %}
+                                            {% if member.contact == post.author %}
+                                            <em class="fa fa-user"></em>  <a class="ajaxhref" href="{{ site.baseurl }}{{ member.permalink }}{% if page.language != 'en' %}{{ page.language }}/{% endif %}">{{ member.title }}</a>
+                                            {% endif %}
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div> &nbsp;&nbsp; {% endif %}
+
+
+                          <div class="post-content">
+                          {{ post.content | strip_html | strip_newlines | truncatewords: 35 }}
+                          </div>
+                           <a href="{{ site.baseurl }}{{ post.permalink }}"><span>Read more »</span></a></p>
+
+                                  <div class="clear small"><br></div>
+                        </div><!--/.article-head-->
+                      </article>
+                    </div>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="social-icons">
+              <div class="container">
+                <div class="row">
+                  <div class="col-md-offset-6 col-sm-offset-6 col-xs-offset-2 col-md-3 col-sm-3 col-xs-5">
+                    <a target="_blank" href="https://github.com/input-output-hk">
+                      <div class="social-icon fa fa-github fa-3x"></div>
+                    </a>
+                  </div>
+                  <div class="col-md-3 col-sm-3 col-xs-5">
+                    <a target="_blank" href="https://www.linkedin.com/company/input-output-global">
+                      <div class="social-icon fa fa-linkedin fa-3x"></div>
+                    </a>
+                  </div>
+                  <div class="col-md-3 col-sm-3 col-xs-5">
+                    <a target="_blank" href="https://twitter.com/inputoutputhk">
+                      <div class="social-icon fa fa-twitter fa-3x"></div>
+                    </a>
+                  </div>
+                  <div class="col-md-3 col-sm-3 col-xs-5">
+                    <a target="_blank" href="https://www.youtube.com/channel/UCBJ0p9aCW-W82TwNM-z3V2w">
+                      <div class="social-icon fa fa-youtube fa-3x"></div>
+                    </a>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+  </div>
+
+
+
+{% include nav-footer.html %}
+
+
+{% include footer.html %}
+</body>
+
+</html>

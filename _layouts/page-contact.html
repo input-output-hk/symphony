@@ -1,0 +1,137 @@
+---
+layout: page-contact
+---
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    <div id="middle" class="middle">
+        <div id="main">
+
+
+            <div id="subheader" class="banner particles"><div id="subheader-particles"></div>
+                <div class="container">
+                                {% include nav-sub.html %}
+
+                    <div class="title_block">
+                        <h1 class=" uppercase clear"><span class="c_f00">IOHK | </span> <span class="title">{{ page.title }}</span></h1>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="subheader-grad"></div>
+
+                            <div class="subheader-shade">
+
+                            </div>
+
+
+
+            <div class="container">
+
+
+                            <div class="row fader">
+
+                                <div class="col-lg-6 col-md-8 col-sm-10 sidecol">
+                                    <div class="text">
+                                        <h3>{{ site.data.i18n[page.language].head_office }}</h3>
+                                        <p>
+                                          Suites 2001-3, 20th Floor, <br />St. George's Building 2, <br />Ice House Street Central
+                                          <br />
+                                          Hong Kong
+                                        </p>
+                                        <div class="networks">
+                                          {% include ui-social-networks.html %}
+                                        </div>
+                                        <br><br>
+                                    </div>
+                                </div>
+                                <div class="maincol col-lg-18 col-md-16 col-sm-14">
+
+                                    <div class="post">
+                                        <div class="entry" title="{{ page.title }}">
+
+
+
+
+                                            <form class="form_project" action="https://docs.google.com/a/iohk.io/forms/d/1_cceHP1a4gxJ-yyzPi5JbZ3S1G_lW6aOUt_cdAAp2nQ/formResponse?embedded=true" method="POST" id="form_contact"  target="hidden_iframe" onsubmit="form_submit=true;">
+
+                                                <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(form_submit) {window.location='{{ '/thank-you/' | prepend: site.baseurl }}{% if page.language != 'en' %}{{ page.language }}/{% endif %}';}"></iframe>
+
+                                                <input type="hidden" name="draftResponse" value="[,,&quot;-2454698966209542536&quot;]">
+                                                <input type="hidden" name="pageHistory" value="0">
+                                                <input type="hidden" name="fvv" value="0">
+                                                <input type="hidden" name="fbzx" value="-2454698966209542536">
+
+
+                                                <div class="row contact_form">
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="none">{{ site.data.i18n[page.language].name }}</label>
+                                                            <input type="text" name="entry.1155327763" value="" placeholder="{{ site.data.i18n[page.language].name }}" size="" class="required form-control" aria-required="true" aria-invalid="false" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="none">{{ site.data.i18n[page.language].email }}</label>
+                                                            <input type="email" name="entry.1804371133" value="" placeholder="{{ site.data.i18n[page.language].email }}" size="" class="required form-control" aria-required="true" aria-invalid="false" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="none">{{ site.data.i18n[page.language].phone }}</label>
+                                                            <input type="text" name="entry.1847584835" value="" placeholder="{{ site.data.i18n[page.language].phone }}" size="" class="required form-control" aria-required="true" aria-invalid="false" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="none">{{ site.data.i18n[page.language].subject }}</label>
+                                                            <input type="text" name="entry.1838650375" value="" placeholder="{{ site.data.i18n[page.language].subject }}" size="" class="required form-control" aria-required="true" aria-invalid="false" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-24">
+                                                        <div class="form-group">
+                                                            <label class="none">{{ site.data.i18n[page.language].message }}</label>
+                                                            <textarea name="entry.461665999" cols="40" rows="10" placeholder="{{ site.data.i18n[page.language].message }}" required="required" class="form-control required" aria-invalid="false"></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-24 text-right">
+                                                        <input type="submit" class="btn btn-default" id="btn-submit" value="{{ site.data.i18n[page.language].submit }}" />
+                                                    </div>
+                                                </div>
+
+                                            </form>
+
+
+
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+            </div>
+
+                        {% include nav-footer.html %}
+
+        </div>
+    </div>
+
+    {% include footer.html %}
+
+
+
+
+  </body>
+
+</html>

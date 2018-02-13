@@ -1,0 +1,156 @@
+
+
+<div id="io_intro_nav" class="intro_nav opened ok">
+
+	<div id="io_intro_label">
+		<strong></strong>
+		<div class="desc"></div>
+	</div>
+
+	<!--a id="io_intro_nav-opener" type="button" class="btn btn-default btn-sm rounded" href="javascript:io_class_toggle('#io_intro_nav','opened')"><em class="fa fa-chevron-down"></em><em class="fa fa-chevron-up"></em></a-->
+	<a id="io_intro_nav-opener" type="button" class="btn btn-default btn-sm rounded" href="javascript:io_class_toggle('#io_intro_nav','opened')"><em class="fa fa-chevron-down"></em><em class="fa fa-chevron-up"></em></a>
+	<div class="wrap">
+		<div class="row">
+			<div class="col col-lg-2">
+				<div class="player bigbig">
+					<a id="io_intro_gui-play" class="play pause" href="javascript:io_class_toggle('#io_intro_gui-play','pause')" title="Pause/Play animation"><em class="fa fa-play"></em><em class="fa fa-pause"></em></a> &nbsp; 
+					<a id="io_intro_gui-refresh" class="refresh" href="javascript:;" title="Reset animation"><em class="fa fa-refresh"></em></a> &nbsp; 
+					<a id="io_intro_gui-forward" class="forward" href="javascript:;" title="Next animation"><em class="fa fa-fast-forward"></em></a>
+				</div>
+			</div>
+			<div class="col-lg-22">
+
+				<div id="ttt"></div>
+				<input type="hidden" id="io_intro_zoom_val" value="20" />
+
+				<div id="" class="row intro_gui_row intro_gui-0">
+
+					<div class="col col-lg-11 col-md-24 col-sm-24 nomobile">
+						<div class="palette zoom">
+							<b>Zoom</b>
+							<div class="io_intro_zoom io_slider"></div>
+						</div>
+						<div class="palette quality">
+							<div class="btn-group dropup">
+								<a href="javascript:;" class="btn btn-default btn-sm  dropdown-toggle rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<b class="lab">Default</b> Quality
+								</a>
+								<ul class="dropdown-menu">
+									<li><a id="intro_quality-1" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateQuality(0);">Default</a></li>
+									<li><a id="intro_quality-2" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateQuality(1);">Low</a></li>
+									<li><a id="intro_quality-3" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateQuality(2);">Medium</a></li>
+									<li><a id="intro_quality-4" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateQuality(3);">High</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="palette theme">
+							<div class="btn-group dropup">
+								<a href="javascript:;" class="btn btn-default btn-sm  dropdown-toggle rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<b class="lab"></b> Theme
+								</a>
+								<ul class="dropdown-menu">
+									<li><a id="intro_quality-1" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateTheme(1);">Red</a></li>
+									<li><a id="intro_quality-2" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateTheme(0);">Grey</a></li>
+									<li><a id="intro_quality-3" class="btn btn-default btn-sm" href="javascript:io_intro_animation.updateTheme(2);">Blue</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="col col-lg-13 col-md-24 col-sm-24 nomobile">
+						<div class="colors">
+							<div class="palette primary">
+								<b>Primary</b>
+								<span class="swatches"></span>
+							</div>
+							<div class="palette secondary">
+								<b>Secondary</b>
+								<span class="swatches"></span>
+							</div>
+							<div class="palette node">
+								<b>Node</b>
+								<span class="swatches"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+		
+
+
+				<div id="" class="row intro_gui_row intro_gui-1">
+
+					<div class="col col-lg-19 col-md-24 col-sm-24 nomobile">
+						
+						<div class="palette zoom with_slider">
+							<b>Zoom</b>
+							<div class="io_intro_zoom io_slider"></div>
+						</div>
+
+						<div class="palette expand with_slider">
+							<b>Expand</b>
+							<div id="io_intro2_expand" class="io_slider"></div>
+						</div>
+
+						<div class="palette size with_slider">
+							<b>Size</b>
+							<div id="io_intro2_size" class="io_slider"></div>
+						</div>
+
+						<div class="palette distance with_slider">
+							<b>Fragment</b>
+							<div id="io_intro2_distance" class="io_slider"></div>
+						</div>
+
+						<div class="palette wave with_slider">
+							<b>Wave</b>
+							<div id="io_intro2_wave" class="io_slider"></div>
+						</div>
+
+						<div class="palette theme">
+							<div class="btn-group dropup">
+								<a href="javascript:;" class="btn btn-default btn-sm dropdown-toggle rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<b class="lab">Theme</b> 
+								</a>
+								<ul class="dropdown-menu">
+									<li><a id="" class="btn btn-default btn-sm rounded" href="javascript:io_intro_theme_update(1,0);">Bright</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded" href="javascript:io_intro_theme_update(1,1);">Blue</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded" href="javascript:io_intro_theme_update(1,2);">Red</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded" href="javascript:io_intro_theme_update(1,3);">Blurred</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="palette rule">
+							<div class="btn-group dropup">
+								<a href="javascript:;" class="btn btn-default btn-sm dropdown-toggle rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<b class="lab">Standard Rule</b> 
+								</a>
+								<ul class="dropdown-menu">
+									<li><a id="" class="btn btn-default btn-sm rounded changeRule" href="javascript:io_intro_animation.changeRuleTo('prime number');">Prime number</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded changeRule" href="javascript:io_intro_animation.changeRuleTo('exponentiation');">exponentiation</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded changeRule" href="javascript:io_intro_animation.changeRuleTo('inversion');">inversion</a></li>
+									<li><a id="" class="btn btn-default btn-sm rounded changeRule" href="javascript:io_intro_animation.changeRuleTo('standard life');">standard life</a></li>
+								</ul>
+							</div>
+						</div>
+
+
+
+					</div>
+					<div class="col col-lg-5 col-md-24 col-sm-24 nomobile">
+						<div class="colors">
+							<div class="palette primary">
+								<b>Colors</b>
+								<span class="swatches"></span>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+			
+		</div>
+	</div>
+</div>
+

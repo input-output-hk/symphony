@@ -1,0 +1,4 @@
+<li class="{{ include.item.slug }}">
+<p class="date marginb0"><span class="c_f00">{{ include.item.date | date: '%B %d, %Y' }}</span></p>
+<h3 class="margint0"><a class="" href="{{ site.baseurl }}{{ include.item.permalink }}{% if page.language != 'en' %}/{{ page.language }}/{% endif %}">{{ include.item.title }}</a></h3>
+</li>

@@ -1,0 +1,251 @@
+{% if page.redirect %}
+<script>location.href='{{page.redirect}}';</script>
+{% endif %}
+
+<head>
+
+
+{% assign title = page.title %}
+{% assign thumbnail = "/images/meta-logo.jpg" %}
+{% assign urlprefix = site.baseurl %}
+{% assign description = site.description %}
+{% assign slash = "" %}
+{% assign creator = site.title %}
+
+{% if page.description %}
+{% assign description = page.description | strip_html  %}
+{% endif %}
+
+{% if page.subtitle %}
+{% assign description = page.subtitle | strip_html  %}
+{% endif %}
+
+{% if page.thumbnail %}
+{% assign thumbnail = page.thumbnail %}
+{% endif %}
+
+{% if page.metaimage %}
+{% assign thumbnail = page.metaimage %}
+{% endif %}
+
+{% if page.layout == "member" %}
+
+{% assign title = page.title | prepend: " " | prepend: page.prefix %}
+
+{% if page.sufix %}
+{% assign title = title | append: ", " | append: page.sufix %}
+{% endif %}
+
+{% assign description = page.role | strip_html %}
+{% assign thumbnail = page.metaimage | prepend: '/' %}
+
+{% endif %}
+
+
+
+{% if page.layout == "blog-post" %}
+{% assign description = page.content | strip_html %}
+{% assign description = description | strip_newlines %}
+{% assign description = description | slice: 0,300 %}
+{% assign description = description | append: " ..." %}
+
+{% assign creator = page.author %}
+{% for member in site.pages reversed %}{% if member.contact == creator %}
+{% assign creator = member.title %}
+{% endif %}{% endfor %}
+
+{% endif %}
+
+{% if page.layout == "page-blog" %}
+
+{% assign blog_post_cnt = 0 %}
+
+{% for post in site.posts %}
+{% if post.visible %}
+{% if post.categories contains 'blog' %}
+
+{% assign blog_post_cnt = blog_post_cnt | plus:1 %}
+
+{% if blog_post_cnt == 1 %}
+
+
+
+{% assign title = post.title %}
+
+{% assign description = post.content | strip_html %}
+{% assign description = description | strip_newlines %}
+{% assign description = description | slice: 0,300 %}
+{% assign description = description | append: " ..." %}
+
+{% assign creator = post.author %}
+{% for member in site.pages reversed %}{% if member.contact == creator %}
+{% assign creator = member.title %}
+{% endif %}{% endfor %}
+
+{% assign thumbnail = post.thumbnail %}
+
+
+
+{% endif %}
+
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+
+{% feed_meta %}
+
+<title>{{ title }} - {{ site.title }}</title>
+<meta charset="utf-8">
+
+<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta id="lang_meta" name="language" content="{{ page.language }}">
+
+<meta name="title" content="{{ title }}">
+<meta name="description" content="{{ description }}">
+<meta name="thumbnail" content="{{site.url}}{{ thumbnail }}">
+
+<meta name="twitter:card" content="{{ title }}">
+<meta name="twitter:site" content="{{ site.title }}">
+<meta name="twitter:creator" content="{{ creator }}">
+<meta name="twitter:image" content="{{site.url}}{{ thumbnail }}">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ description }}">
+
+<meta property="og:title" content="{{ title }}" />
+<meta property="og:site_name" content="{{ site.title }}" />
+<meta property="og:type" content="page" />
+<meta property="og:url" content="{{site.url}}{{page.permalink}}" />
+<meta property="og:image" content="{{site.url}}{{ thumbnail }}" />
+<meta property="og:description" content="{{description}}" />
+
+
+{% if site.url != "https://iohk.io" %}
+<meta name="robots" content="noindex,nofollow" />
+{% endif %}
+
+<script>(function(){document.documentElement.className='js'})();</script>
+<script>
+var buster = {{ site.time | date: '%s' }};
+var form_submit = false;
+var lowie = false;
+var lowerie = false;
+var webglIE = true;
+var IE = false;
+var iolang = '{{ page.language }}';
+var servername = 'iohk.io';
+var requesturi = '/';
+var homeurl = '{{ site.url }}';
+var sitename = '{{ site.title }}';
+var homename = '{{ page.title | smartify }}';
+var temppath = '/js/globe/';
+var pageslug = '{{ page.slug }}';
+var teampage = 'team';
+var jobspage = 'careers';
+var projectspage = 'projects';
+
+var iolab_read_more = 'Read more';
+var iolab_link = '{{ site.data.i18n[page.language].link }}';
+var iolab_open = '{{ site.data.i18n[page.language].open }}';
+var iolab_close = '{{ site.data.i18n[page.language].close }}';
+var iolab_back = '{{ site.data.i18n[page.language].back }}';
+
+var iolab_share_on_Twitter = '{{ site.data.i18n[page.language].share_on_Twitter }}';
+var iolab_share_on_Facebook = '{{ site.data.i18n[page.language].share_on_Facebook }}';
+var iolab_share_on_LinkedIn = '{{ site.data.i18n[page.language].share_on_LinkedIn }}';
+var iolab_share_on_Google_Plus = '{{ site.data.i18n[page.language].share_on_Google_Plus }}';
+var iolab_share_on_Reddit = '{{ site.data.i18n[page.language].share_on_Reddit }}';
+
+
+</script>
+<script>
+var lowerie = false;
+var permalink = '{{page.permalink}}';
+var rm_labels = new Object();
+rm_labels['en'] = new Object();
+rm_labels['en']['days'] = '{{site.data.i18n['en'].days}}';
+rm_labels['en']['hours'] = '{{site.data.i18n['en'].hours}}';
+rm_labels['en']['minutes'] = '{{site.data.i18n['en'].minutes}}';
+rm_labels['en']['seconds'] = '{{site.data.i18n['en'].seconds}}';
+rm_labels['en']['readmorein'] = '{{site.data.i18n['en'].readmorein}}';
+rm_labels['cn'] = new Object();
+rm_labels['cn']['days'] = '{{site.data.i18n['cn'].days}}';
+rm_labels['cn']['hours'] = '{{site.data.i18n['cn'].hours}}';
+rm_labels['cn']['minutes'] = '{{site.data.i18n['cn'].minutes}}';
+rm_labels['cn']['seconds'] = '{{site.data.i18n['cn'].seconds}}';
+rm_labels['cn']['readmorein'] = '{{site.data.i18n['cn'].readmorein}}';
+rm_labels['jp'] = new Object();
+rm_labels['jp']['days'] = '{{site.data.i18n['jp'].days}}';
+rm_labels['jp']['hours'] = '{{site.data.i18n['jp'].hours}}';
+rm_labels['jp']['minutes'] = '{{site.data.i18n['jp'].minutes}}';
+rm_labels['jp']['seconds'] = '{{site.data.i18n['jp'].seconds}}';
+rm_labels['jp']['readmorein'] = '{{site.data.i18n['jp'].readmorein}}';
+rm_labels['kr'] = new Object();
+rm_labels['kr']['days'] = '{{site.data.i18n['kr'].days}}';
+rm_labels['kr']['hours'] = '{{site.data.i18n['kr'].hours}}';
+rm_labels['kr']['minutes'] = '{{site.data.i18n['kr'].minutes}}';
+rm_labels['kr']['seconds'] = '{{site.data.i18n['kr'].seconds}}';
+rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
+
+</script>
+<link rel="icon" href="{{ '/images/favicon.ico' | prepend: urlprefix }}" type="image/x-icon">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" media="screen">
+<link rel="stylesheet" href="{{ '/css/app.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="screen" />
+<link rel="stylesheet" href="/css/melon.datepicker.css" media="screen">
+<link rel="stylesheet" href="{{ '/css/base.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
+<link rel="stylesheet" href="{{ '/css/rd.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
+<link rel="stylesheet" href="{{ '/css/symphony.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto%3A100%2C300%2C700%2C500&#038;subset=latin%2Ccyrillic&#038;ver=4.4.2" type="text/css" media="all" />
+
+<link href="https://fonts.googleapis.com/css?family=Electrolize" rel="stylesheet" type="text/css">
+<style>
+#entry h1,#entry .h1,
+#subheader h1,#subheader .h1,.electrolize{font-family: 'Electrolize', sans-serif;text-transform: uppercase; letter-spacing: .05em}
+</style>
+
+<!--[if IE]>
+<script>IE = true;</script>
+<![endif]-->
+
+<!--[if lte IE 11]>
+<script>webglIE = false;</script>
+<style>#io_intro_nav {display: none !important}</style>
+<![endif]-->
+
+<!--[if lte IE 10]>
+<script src="{{ "/js/lowie.js" | prepend: site.baseurl }}"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+<link rel="stylesheet"  href="{{ "/css/ie.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<script src="{{ "/js/html5.js" | prepend: site.baseurl }}"></script>
+<![endif]-->
+<!--[if lt IE 8]>
+<script>lowerie = true;</script>
+<script>location.href='http://iohk.io/old-browser.html';</script>
+<link rel="stylesheet"  href="{{ "/css/ieoff.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<![endif]-->
+
+<link rel="stylesheet" href="/css/jquery-ui.css" />
+<script type="text/javascript" src="{{ '/js/app/jquery-1.11.2.min.js' | prepend: urlprefix }}"></script>
+<script type="text/javascript" src="{{ '/js/app/jquery-ui.js' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}"></script>
+<script type="text/javascript" src="{{ '/js/app/app.js' | prepend: urlprefix }}"></script>
+<script type="text/javascript" src="{{ '/js/history.js' | prepend: site.baseurl }}"></script>
+<script type="text/javascript" src="/js/showdown.min.js"></script>
+<script type="text/javascript" src="/js/jquery.fancybox.js"></script>
+<script type="text/javascript" src="{{ '/js/history.adapter.jquery.js' | prepend: site.baseurl }}"></script>
+<script type="text/javascript" src="{{ '/js/jquery.mousewheel.min.js' | prepend: site.baseurl }}"></script>
+<script type="text/javascript" src="{{ '/js/app/base.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+<script type="text/javascript" src="{{ '/js/app/roadmap.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+<script type="text/javascript" src="{{ '/js/team.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+<script type="text/javascript" src="{{ '/js/intro/home.jan.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+<script type="text/javascript" src="{{ '/js/app/functions.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+
+
+
+
+
+</head>

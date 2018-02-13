@@ -1,0 +1,21 @@
+---
+layout: feed
+---
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ site.name }}</title>
+    <description>{{ site.description }}</description>
+    <link>{{ site.url }}</link>
+    {% for post in site.categories['blog'] %}
+      {% if post.visible == true %}
+        <item>
+          <title>{{ post.title | xml_escape }}</title>
+          <pubDate>{{ post.date | date: '%B %d %Y' }}</pubDate>
+          <link>{{ post.url | prepend: site.url }}</link>
+          <guid isPermaLink="true">{{ post.url | prepend: site.url }}</guid>
+        </item>
+      {% endif %}
+    {% endfor %}
+  </channel>
+</rss>

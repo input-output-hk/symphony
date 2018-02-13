@@ -1,0 +1,74 @@
+---
+layout: page-roadmap
+---
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body class="{{page.defaultlink | slugify }}">
+
+    {% include header.html %}
+
+    <div id="middle" class="middle">
+      <div id="main" class="container-fluid">
+
+
+        <div class="intro box bigger">
+          <div class="fader">
+
+
+            <div class="roadmap {{page.defaultlink | slugify }}">
+
+            <div class="container">
+
+
+              <div id="roadmap-load" class="ready show-version-1 show-version-2  show-version-3">
+
+                <div id="circlenone" class="text-center" style="padding:150px 0 50px 0">
+                    <svg width="120px" class="" height="120px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-ring-alt">
+                        <rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect>
+                        <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="10" stroke-linecap="round"></circle>
+                        <circle cx="50" cy="50" r="40" stroke="#099cb3" fill="none" stroke-width="6" stroke-linecap="round">
+                            <animate attributeName="stroke-dashoffset" dur="2s" repeatCount="indefinite" from="0" to="502"></animate>
+                            <animate attributeName="stroke-dasharray" dur="2s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate>
+                        </circle>
+                    </svg>
+                </div>
+
+              </div><!-- .timeline -->
+              <div class="clear"></div>
+
+
+            <div class="countdown--wrap none">
+
+            </div>
+
+
+
+              <div class="roadmap--foot uppercase text-center">
+                <!--<h6 class="">Learn More</h6>-->
+
+                <!--<a href="https://iohk.io/projects/cardano/" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-cardano.svg" alt="" /> Cardano Project</a>
+                <a href="https://github.com/input-output-hk/cardano-sl" target="_blank" class="btn bnt-default rounded"><em class="fa fa-github"></em> Cardano SL </a>
+                <a href="https://iohk.io/research/papers/#9BKRHCSI" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-ouroboros.svg" alt="" /> Ouroboros Algorithm</a>
+                <a href="https://iohk.io/" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-research.svg" alt="" /> Input Output</a>-->
+
+              </div>
+
+            </div>
+            </div><!-- .roadmap -->
+
+          </div>
+        </div>
+
+        {% include nav-footer.html %}
+
+      </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>

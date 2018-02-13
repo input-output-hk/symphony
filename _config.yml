@@ -1,0 +1,17 @@
+title: Symphony
+email: admin@iohk.io
+description: Blockchain explorer
+baseurl: ""
+url: "https://symphony.iohk.io"
+include: ["_pages"]
+permalink: /:title
+twitter_username: InputOuput
+gems:
+  - jekyll-feed
+
+markdown: kramdown
+highlighter: rouge
+array: []
+
+languages:          ['en', 'ru', 'ja']
+language_default:   'en'
