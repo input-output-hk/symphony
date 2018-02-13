@@ -91,7 +91,7 @@ app.goToPrevBlock()
 
 #### goToNextBlock
 
-Call `goToNextBlock` to navigate to previous block.
+Call `goToNextBlock` to navigate to next block.
 
 ```javascript
 app.goToNextBlock()
@@ -119,11 +119,12 @@ app.destroy()
 
 #### dayChanged
 
-Get properties when day gets changed.
+Event called when day gets changed.
 
 ```javascript
 app.on('dayChanged', ({ date, input, output, fee }) => {
-  ...
+  console.log('dayChanged');
+  console.log('date: '+date+', input '+input+', output: '+output+', fee: '+fee+'');
 })
 ```
 
@@ -133,7 +134,8 @@ Event called when a block is selected.
 
 ```javascript
 app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
-  ...
+  console.log('blockSelected');
+  console.log('bits: '+bits+', fee '+fee+', feeToInputRatio: '+feeToInputRatio+', hash: '+hash+', height: '+height+', input: '+input+', n_tx: '+n_tx+', output: '+output+', size: '+size+', time: '+time+'');
 })
 ```
 
@@ -153,7 +155,8 @@ Event called when a mouse pointer is over one block.
 
 ```javascript
 app.on('blockMouseOver', data => {
-  ...
+  console.log('blockMouseOver');
+  console.log(data);
 })
 ```
 
@@ -162,7 +165,7 @@ app.on('blockMouseOver', data => {
 Event called when a mouse pointer leaves block.
 
 ```javascript
-app.on('blockMouseOut', data => {
+app.on('blockMouseOut', _ => {
   ...
 })
 ```
