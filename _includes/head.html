@@ -3,7 +3,7 @@
 {% endif %}
 
 <head>
-
+  {% include analytics.html %}
 
 {% assign title = page.title %}
 {% assign thumbnail = "/images/meta-logo.jpg" %}
@@ -93,8 +93,6 @@
 {% endfor %}
 
 {% endif %}
-
-{% feed_meta %}
 
 <title>{{ title }} - {{ site.title }}</title>
 <meta charset="utf-8">
