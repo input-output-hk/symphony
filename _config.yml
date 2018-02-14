@@ -4,9 +4,10 @@ description: Blockchain explorer
 baseurl: ""
 url: "https://symphony.iohk.io"
 include: ["_pages"]
+exclude: ['node_modules', 'remote', 'functions']
 permalink: /:title
 twitter_username: InputOuput
-gems:
+plugins:
   - jekyll-feed
 
 markdown: kramdown

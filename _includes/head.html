@@ -193,7 +193,7 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 <link rel="icon" href="{{ '/images/favicon.ico' | prepend: urlprefix }}" type="image/x-icon">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" media="screen">
 <link rel="stylesheet" href="{{ '/static/assets/css/app.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="screen" />
-<link rel="stylesheet" href="/css/melon.datepicker.css" media="screen">
+<link rel="stylesheet" href="{{ '/static/assets/css/melon.datepicker.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" media="screen">
 <link rel="stylesheet" href="{{ '/static/assets/css/base.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 <link rel="stylesheet" href="{{ '/static/assets/css/rd.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 <link rel="stylesheet" href="{{ '/static/assets/css/symphony.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
@@ -243,6 +243,8 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 <script type="text/javascript" src="{{ '/static/assets/js/team.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 <script type="text/javascript" src="{{ '/static/assets/js/intro/home.jan.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 <script type="text/javascript" src="{{ '/static/assets/js/app/functions.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+
+<script type="text/javascript" src="{{ '/dist/static/js/app.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 
 
 
