@@ -72,7 +72,7 @@ export default class Stage {
    */
   initScene () {
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, Config.scene.fogFar)
+    this.scene.fog = new THREE.FogExp2(Config.scene.bgColor, Config.scene.fogDensity)
     this.scene.background = new THREE.Color(Config.scene.bgColor)
   }
 
@@ -97,7 +97,7 @@ export default class Stage {
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
-    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 5000)
+    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 6000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 

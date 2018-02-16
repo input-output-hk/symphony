@@ -150,6 +150,7 @@ export default class MainScene extends EventEmitter {
     if (!blocks || blocks.length === 0) {
       return
     }
+
     const obj3ds = blocks.map(block => this.addBlock(block))
       .filter(block => block) // Remove null blocks
     const day = blocks[0].day
@@ -200,13 +201,9 @@ export default class MainScene extends EventEmitter {
       return
     }
 
-    if (size.x === 0 || size.y === 0 || size.z === 0) {
-      return
-    }
-
-    size.x = Math.max(size.x, 1.0)
-    size.y = Math.max(size.y, 1.0)
-    size.z = Math.max(size.z, 1.0)
+    size.x += 20.0
+    size.y += 20.0
+    size.z += 20.0
 
     const materials = this.getMaterialsForDay(day)
 
@@ -628,9 +625,9 @@ export default class MainScene extends EventEmitter {
     */
     if (intersected && intersected !== this.currentBlockObject) {
       intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
+      this.emit('blockMouseOver', intersected.block)
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
-        this.emit('blockMouseOver', intersected.block)
       }
       this.pointLightTarget.copy(intersected.getWorldPosition())
     } else {

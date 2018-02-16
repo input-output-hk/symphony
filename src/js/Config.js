@@ -10,7 +10,7 @@ const Config = {
   showGUI: true,
   scene: {
     bgColor: 0x26263c,
-    fogFar: 0.00040,
+    fogDensity: 0.00030,
     antialias: false
   },
   camera: {
