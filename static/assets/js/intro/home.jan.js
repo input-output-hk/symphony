@@ -212,6 +212,7 @@ function io_intro_explorer () {
     $('.datepicker').datepicker({
       dateFormat: 'dd/mm/yy',
       maxDate: 0,
+      minDate: new Date(2009, 0, 9),
       beforeShow: function () {
         $(this).datepicker('widget').wrap('<div class="ll-skin-melon">')
       },
@@ -461,6 +462,14 @@ function io_intro_explorer () {
       app.resetDayView()
     })
   	})
+
+
+    app.on('blockMouseOver', () => {
+        document.body.style.cursor = "pointer";
+    })
+    app.on('blockMouseOut', () => {
+        document.body.style.cursor = "default";
+    })
 
     /**
      * on iOS devices, the user must first interact with the page before any sound will play
