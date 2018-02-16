@@ -644,37 +644,11 @@ function io_which_way_alter(){
 		$("#main").attr('class','container-fluid');
 		$("#page").addClass('intropage home');
 
-		//<script type="text/javascript" src="{{ '/js/intro/libs/three761.min.js' | prepend: site.baseurl }}"></script>
-		//<script type="text/javascript" src="{{ '/js/fluid/GPUFluid-1.3.js' | prepend: site.baseurl }}"></script>
-		//<script type="text/javascript" src="{{ '/js/intro/intro.0.23.js' | prepend: site.baseurl }}"></script>
-		//<script type="text/javascript" src="{{ '/js/intro/home.0.399.94.js' | prepend: site.baseurl }}"></script>
-/*
-		$.getScript( "//static.iohk.io/iohk/js/fluid/GPUFluid-1.3.js", function( data, textStatus, jqxhr ) {
-
-			homeloaded = true;
-			$("#io_intro .preloader").remove();
-			$("#entry").removeClass('opa0');
-			$("#entry").removeClass('out');
-
-			$.getScript( "//static.iohk.io/iohk/js/intro/libs/three761.min.js", function( data, textStatus, jqxhr ) {
-				$.getScript( "//static.iohk.io/iohk/js/intro/intro.0.23.js", function( data, textStatus, jqxhr ) {
-					$.getScript( "//static.iohk.io/iohk/js/intro/home.0.399.94.js", function( data, textStatus, jqxhr ) {
-						$("#entry .buttons").removeClass('opa0');
-
-						io_intro();
-
-					});
-				});
-			});
-		});
-*/
-		//$.getScript( "//static.iohk.io/iohk/js/fluid/GPUFluid-1.3.js", function( data, textStatus, jqxhr ) {
-
 
 
 				$.getScript( "//static.iohk.io/js/orpheus/static/js/StartAudioContext.js", function( data, textStatus, jqxhr ) {
 					$.getScript( "//static.iohk.io/js/orpheus/static/js/hammer.min.js", function( data, textStatus, jqxhr ) {
-						$.getScript( "//input-output-hk.github.io/symphony/dist/static/js/app.js", function( data, textStatus, jqxhr ) {
+						//$.getScript( "//input-output-hk.github.io/symphony/dist/static/js/app.js", function( data, textStatus, jqxhr ) {
 							//$.getScript( "//static.iohk.io/js/orpheus/static/js/app.js", function( data, textStatus, jqxhr ) {
 
 								homeloaded = true;
@@ -683,28 +657,12 @@ function io_which_way_alter(){
 					      $("#app").remove();
 						    io_intro();
 							//});
-						});
+						//});
 					});
 				});
 
 
 
-				/*
-
-				<script type="text/javascript" src="/js/orpheus/static/js/StartAudioContext.js"></script>
-				<script type="text/javascript" src="/js/orpheus/static/js/app.js"></script>
-				<script type="text/javascript" src="/js/orpheus/static/js/hammer.min.js"></script>
-
-
-*/
-
-		//});
-
-
-	}else{
-		//io_intro_kill();
-		//io_title_typing();
-		//$("h1").typewriter();
 	}
 
 
