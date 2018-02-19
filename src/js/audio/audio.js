@@ -3,7 +3,6 @@
 import * as THREE from 'three'
 import Config from '../Config'
 import Tone from 'tone'
-import _ from 'lodash'
 import { map } from '../../utils/math'
 import EventEmitter from 'eventemitter3'
 
@@ -13,27 +12,27 @@ export default class Audio extends EventEmitter {
     this.samplerLoaded = false
     this.camera = camera
     this.loops = []
-    this.quantize = 32
-    this.masterVol = -16 // db
-    this.ambienceVol = -12 // db
+    this.quantize = 16
+    this.masterVol = 0 // db
+    this.ambienceVol = -96 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
-    this.bpm = 45
+    this.bpm = 90
     this.isMuted = false
     this.context = null
     this.notes = {
-    //  27.5000: 'A0',
-    //  29.1352: 'A#0',
-    //  30.8677: 'B0',
-    //  32.7032: 'C1',
-    //  34.6478: 'C#1',
-    //  36.7081: 'D1',
-    //  38.8909: 'D#1',
-    //  41.2034: 'E1',
-    //  43.6535: 'F1',
-    //  46.2493: 'F#1',
-    //  48.9994: 'G1',
-    //  51.9131: 'G#1',
+      27.5000: 'A0',
+      29.1352: 'A#0',
+      30.8677: 'B0',
+      32.7032: 'C1',
+      34.6478: 'C#1',
+      36.7081: 'D1',
+      38.8909: 'D#1',
+      41.2034: 'E1',
+      43.6535: 'F1',
+      46.2493: 'F#1',
+      48.9994: 'G1',
+      51.9131: 'G#1',
       55.000: 'A1',
       58.2705: 'A#1',
       61.7354: 'B1',
@@ -86,6 +85,171 @@ export default class Audio extends EventEmitter {
       932.328: 'A#5',
       987.767: 'B5',
       1046.50: 'C6'
+    }
+
+    this.presets = {
+
+      'tiny': {
+        'harmonicity': 2,
+        'oscillator': {
+          'type': 'amsine2',
+          'modulationType': 'sine',
+          'harmonicity': 1.01
+        },
+        'envelope': {
+          'attack': 0.106,
+          'decay': 4,
+          'sustain': 5.04,
+          'release': 20.2
+        },
+        'modulation': {
+          'volume': 13,
+          'type': 'amsine2',
+          'modulationType': 'sine',
+          'harmonicity': 12
+        },
+        'modulationEnvelope': {
+          'attack': 2.006,
+          'decay': 1.2,
+          'sustain': 0.2,
+          'release': 7.4
+        }
+      },
+
+      'harmonics': {
+        'harmonicity': 3.999,
+        'oscillator': {
+          'type': 'square'
+        },
+        'envelope': {
+          'attack': 0.03,
+          'decay': 3.3,
+          'sustain': 0.7,
+          'release': 10.8
+        },
+        'modulation': {
+          'volume': 12,
+          'type': 'square6'
+        },
+        'modulationEnvelope': {
+          'attack': 2,
+          'decay': 3,
+          'sustain': 0.8,
+          'release': 0.1
+        }
+      },
+
+      'metallic_fizz': {
+        'oscillator': {
+          'type': 'pulse',
+          'width': 0.8
+        },
+        'envelope': {
+          'attack': 0.01,
+          'decay': 0.05,
+          'sustain': 0.2,
+          'releaseCurve': 'bounce',
+          'release': 0.4
+        }
+      },
+      'koto': {
+        'oscillator': {
+          'partials': [1, 0, 2, 0, 3]
+        },
+        'envelope': {
+          'attack': 0.001,
+          'decay': 1.2,
+          'sustain': 0,
+          'release': 0.5
+        }
+      },
+      'wind': {
+        'portamento': 0.0,
+        'oscillator': {
+          'type': 'square4'
+        },
+        'envelope': {
+          'attack': 2,
+          'decay': 1,
+          'sustain': 0.2,
+          'release': 2
+        }
+      },
+      'steel': {
+        'oscillator': {
+          'type': 'fatcustom',
+          'partials': [
+            0.2, 1, 0, 0.5, 0.1
+          ],
+          'spread': 40,
+          'count': 3
+        },
+        'envelope': {
+          'attack': 0.001,
+          'decay': 1.6,
+          'sustain': 0,
+          'release': 10.6
+        }
+      },
+      'marimba': {
+        'oscillator': {
+          'partials': [1, 0, 2, 0, 3]
+        },
+        'envelope': {
+          'attack': 0.001,
+          'decay': 1.2,
+          'sustain': 0,
+          'release': 10.2
+        }
+
+      },
+      'custom': {
+        'oscillator': {
+          'type': 'custom',
+          'partials': [1, 1, 1, 1]
+        },
+        'envelope': {
+          'attack': 10.001,
+          'decay': 10.00,
+          'sustain': 10.01,
+          'release': 30.0
+        }
+      },
+      'drop': {
+        'oscillator': {
+          'type': 'pulse',
+          'width': 0.8
+        },
+        'envelope': {
+          'attack': 0.01,
+          'decay': 0.05,
+          'sustain': 0.2,
+          'releaseCurve': 'bounce',
+          'release': 0.4
+        }
+      },
+      'eleccello': {
+        'harmonicity': 3.01,
+        'modulationIndex': 14,
+        'oscillator': {
+          'type': 'triangle'
+        },
+        'envelope': {
+          'attack': 2.2,
+          'decay': 3.3,
+          'sustain': 3.1,
+          'release': 10.2
+        },
+        'modulation': {
+          'type': 'square'
+        },
+        'modulationEnvelope': {
+          'attack': 0.01,
+          'decay': 0.5,
+          'sustain': 0.2,
+          'release': 5.1
+        }
+      }
     }
 
     this.pointColors = []
@@ -164,6 +328,71 @@ export default class Audio extends EventEmitter {
     }
 
     this.audioLoader = new THREE.AudioLoader()
+
+    this.MIDIEnabled = false
+    this.MIDIObject = null
+    this.MIDIDevice = null
+    this.noteReleaseTime = 0.5 // (seconds)
+    this.MIDIChannel = '0'
+    this.MIDIClockStarted = false
+    this.MIDILoops = []
+
+    this.enableMIDI()
+  }
+
+  /**
+   * Enable MIDI output
+   */
+  enableMIDI () {
+    // check browser support for WebMIDI
+    if (navigator.requestMIDIAccess) {
+      navigator.requestMIDIAccess({
+        sysex: false
+      }).then(this.onMIDISuccess.bind(this), this.onMIDIFailure.bind(this))
+    } else {
+      alert('No MIDI support in your browser.')
+    }
+  }
+
+  onMIDISuccess (MIDIObject) {
+    this.MIDIObject = MIDIObject
+
+    let MIDIOutputs = this.MIDIObject.outputs.values()
+
+    let selectMIDIOut = document.getElementById('midiOut')
+    selectMIDIOut.onchange = this.changeMIDIOut.bind(this)
+    selectMIDIOut.disabled = false
+
+    // build dropdown of available devices
+    let outputs = []
+    for (let output = MIDIOutputs.next(); output && !output.done; output = MIDIOutputs.next()) {
+      outputs.push(output.value)
+      selectMIDIOut.appendChild(new Option(output.value.name, output.value.id, false, false))
+    }
+  }
+
+  changeMIDIOut (selectElement) {
+    let id = selectElement.target[selectElement.target.selectedIndex].value
+
+    if (id === '0') {
+      this.MIDIEnabled = false
+      return
+    }
+
+    if ((typeof this.MIDIObject.outputs === 'function')) {
+      this.MIDIDevice = this.MIDIObject.outputs()[selectElement.target.selectedIndex]
+    } else {
+      this.MIDIDevice = this.MIDIObject.outputs.get(id)
+    }
+
+    this.MIDIEnabled = true
+    // this.sendMIDIClock()
+  }
+
+  onMIDIFailure (error) {
+    alert('No MIDI support in your browser.')
+    document.getElementById('midiOut').appendChild(new Option('No Device Available', 0, false, false))
+    console.log('No midi ' + error)
   }
 
   loadAmbience () {
@@ -199,6 +428,18 @@ export default class Audio extends EventEmitter {
         loop.dispose()
       }
       this.loops = []
+    }
+    if (this.MIDILoops.length) {
+      this.MIDIClockStarted = false
+      this.MIDIClock.cancel()
+      this.MIDIClock.dispose()
+      this.MIDIDevice.send([0xFC]) // stop MIDI clock
+      for (let index = 0; index < this.MIDILoops.length; index++) {
+        const loop = this.MIDILoops[index]
+        loop.cancel()
+        loop.dispose()
+      }
+      this.MIDILoops = []
     }
     this.pointColors = []
   }
@@ -262,33 +503,49 @@ export default class Audio extends EventEmitter {
       this.masterBus = new Tone.Volume(this.masterVol).toMaster()
       this.ambienceBus = new Tone.Volume(-96).chain(this.masterBus)
 
-      /* this.convolver = new Tone.Convolver(path + 'sounds/IR/r1_ortf.wav')
-      this.convolver.set('wet', 1.0) */
+      this.convolver = new Tone.Convolver(this.path + 'sounds/IR/r1_ortf.wav').fan(this.masterBus)
+      this.convolver.set('wet', 0.25)
 
-      // this.pingPong = new Tone.PingPongDelay('16n', 0.85)
+      this.freeverb = new Tone.Freeverb().fan(this.masterBus)
+      this.freeverb.dampening.value = 20000
+      this.freeverb.wet.value = 0.7
+      this.freeverb.roomSize.value = 0.85
 
       Tone.Transport.bpm.value = this.bpm
 
-      /* Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-
-      document.addEventListener('cameraMove', function () {
-        Tone.Listener.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-      }.bind(this), false) */
-
-      /* let cameraForwardVector = new THREE.Vector3()
-      let quaternion = new THREE.Quaternion()
-      cameraForwardVector.set(0, 0, -1).applyQuaternion(quaternion)
-
-      Tone.Listener.setOrientation(cameraForwardVector.x, cameraForwardVector.y, cameraForwardVector.z, this.camera.up.x, this.camera.up.y, this.camera.up.z) */
-
-      // this.preload().then(() => {
       this.loadAmbience().then(() => {
         this.ambiencePlayer.start()
         Tone.Transport.start()
         resolve()
       })
-      // })
     })
+  }
+
+  /**
+   * Send MIDI clock messsage
+   */
+  sendMIDIClock () {
+    if (!this.MIDIEnabled) {
+      return
+    }
+    this.MIDIClock = new Tone.Loop(
+      () => {
+        // send MIDI clock start message once if not already running
+        if (!this.MIDIClockStarted) {
+          this.sendMIDIClockStart()
+          this.MIDIClockStarted = true
+        }
+        this.MIDIDevice.send([0xF8])
+      },
+      '96n'
+    ).start()
+  }
+
+  /**
+   * Send MIDI clock start message
+   */
+  sendMIDIClockStart () {
+    this.MIDIDevice.send([0xFA])
   }
 
   loadSampler () {
@@ -337,11 +594,12 @@ export default class Audio extends EventEmitter {
       this.loadSampler()
     }
 
-    Tone.Transport.start()
-
     this.samplerLoaded = true
 
     this.loopMap = []
+
+    this.sampler = new Tone.PolySynth(3, Tone.AMSynth, this.presets['koto']).chain(this.convolver)
+    // this.sampler = new Tone.PolySynth(6, Tone.AMSynth, this.presets['koto']).chain(this.freeverb)
 
     this.black = new THREE.Color(0x000000)
     this.white = new THREE.Color(0xffffff)
@@ -358,7 +616,7 @@ export default class Audio extends EventEmitter {
     }
 
     block.transactions.sort((a, b) => {
-      return a.time > b.time
+      return a.time - b.time
     })
 
     this.pointColors = positionsArray.map(_ => 0)
@@ -375,6 +633,7 @@ export default class Audio extends EventEmitter {
     this.mode = this.modes[Object.keys(this.modes)[modeIndex]]
 
     for (let index = 0; index < positionsArray.length / 3; index++) {
+      let isFirst = index === 0
       let xIndex = index * 3
       let yIndex = index * 3 + 1
       let zIndex = index * 3 + 2
@@ -396,7 +655,7 @@ export default class Audio extends EventEmitter {
           if (this.notes.hasOwnProperty(frequency)) {
             let noteName = this.notes[frequency].replace(/[0-9]/g, '')
             if (this.mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((y * 1.5) - frequency)
+              let diff = Math.abs((y * 2.0) - frequency)
               if (diff < minDiff) {
                 minDiff = diff
                 note = this.notes[frequency]
@@ -411,39 +670,63 @@ export default class Audio extends EventEmitter {
           weight = 2.0
         }
 
-        let that = this
         let loop
 
         let timeLowRes = time.toFixed(1)
+        let timeInt = parseInt(time)
         if (Config.detector.isMobile) {
-          timeLowRes = parseInt(timeLowRes)
+          timeLowRes = timeInt
         }
 
         if (typeof this.loopMap[timeLowRes] === 'undefined') {
           loop = new Tone.Loop(
-            () => {
-              this.pointColors[xIndex] = 1
-              this.pointColors[yIndex] = 1
-              this.pointColors[zIndex] = 1
+            (loopTime) => {
+              if (isFirst && !this.MIDIClockStarted) {
+                this.sendMIDIClock()
+              }
+
+              this.pointColors[xIndex] = weight
+              this.pointColors[yIndex] = weight
+              this.pointColors[zIndex] = weight
+
               setTimeout(() => {
                 this.pointColors[xIndex] = 0
                 this.pointColors[yIndex] = 0
                 this.pointColors[zIndex] = 0
-              }, 500)
-              try {
-                this.sampler.triggerAttack(note, '@' + that.quantize + 'n', weight)
-              } catch (error) {
-                console.log(error)
+              }, this.noteReleaseTime * 1000)
+
+              if (this.MIDIEnabled) {
+                try {
+                  let innerLoop = new Tone.Loop(function (time) {
+                    let MIDINote = Tone.Frequency(note).toMidi()
+
+                    // send MIDI note on
+                    this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, 0x40])
+
+                    // send MIDI note off
+                    setTimeout(() => {
+                      this.MIDIDevice.send(['0x8' + this.MIDIChannel, MIDINote, 0x00])
+                    }, loopTime + (this.noteReleaseTime * 1000))
+                  }.bind(this), '1n').start('@' + this.quantize + 'n')
+                  this.MIDILoops.push(innerLoop)
+                  innerLoop.set('iterations', 1)
+                } catch (error) {
+                  console.log(error)
+                }
+              } else {
+                this.sampler.triggerAttack(note, Tone.Time(loopTime).quantize(this.quantize + 'n'), weight)
               }
             },
             '1m'
-          ).start(Tone.Transport.seconds + time)
+          ).start(
+            Tone.Transport.seconds + time
+          )
         } else {
           loop = new Tone.Loop(
             () => {
-              this.pointColors[xIndex] = 1
-              this.pointColors[yIndex] = 1
-              this.pointColors[zIndex] = 1
+              this.pointColors[xIndex] = weight
+              this.pointColors[yIndex] = weight
+              this.pointColors[zIndex] = weight
               setTimeout(() => {
                 this.pointColors[xIndex] = 0
                 this.pointColors[yIndex] = 0
@@ -453,6 +736,7 @@ export default class Audio extends EventEmitter {
             '1m'
           ).start(Tone.Transport.seconds + time)
         }
+
         loop.set('iterations', 8)
         // loop.set('humanize', '64n')
         this.loops.push(loop)
