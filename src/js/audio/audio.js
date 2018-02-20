@@ -329,6 +329,15 @@ export default class Audio extends EventEmitter {
 
     this.audioLoader = new THREE.AudioLoader()
 
+    // midi options
+    this.initMIDIOptions()
+    this.enableMIDI()
+  }
+
+  /**
+   * Params specific to MIDI output
+   */
+  initMIDIOptions () {
     this.MIDIEnabled = false
     this.MIDIObject = null
     this.MIDIDevice = null
@@ -336,8 +345,8 @@ export default class Audio extends EventEmitter {
     this.MIDIChannel = '0'
     this.MIDIClockStarted = false
     this.MIDILoops = []
-
-    this.enableMIDI()
+    this.MIDIDeviceDOMElementID = 'midiOut'
+    this.MIDIChannelDOMElementID = 'midiChannel'
   }
 
   /**
@@ -359,9 +368,12 @@ export default class Audio extends EventEmitter {
 
     let MIDIOutputs = this.MIDIObject.outputs.values()
 
-    let selectMIDIOut = document.getElementById('midiOut')
+    let selectMIDIOut = document.getElementById(this.MIDIDeviceDOMElementID)
     selectMIDIOut.onchange = this.changeMIDIOut.bind(this)
     selectMIDIOut.disabled = false
+
+    let selectMIDIChannel = document.getElementById(this.MIDIChannelDOMElementID)
+    selectMIDIChannel.onchange = this.changeMIDIChannel.bind(this)
 
     // build dropdown of available devices
     let outputs = []
@@ -371,11 +383,18 @@ export default class Audio extends EventEmitter {
     }
   }
 
+  changeMIDIChannel (selectElement) {
+    let channel = selectElement.target[selectElement.target.selectedIndex].value
+    if (channel !== '') {
+      this.MIDIChannel = channel
+    }
+  }
+
   changeMIDIOut (selectElement) {
     let id = selectElement.target[selectElement.target.selectedIndex].value
 
     if (id === '0') {
-      this.MIDIEnabled = false
+      this.setMIDIDisabled()
       return
     }
 
@@ -385,8 +404,25 @@ export default class Audio extends EventEmitter {
       this.MIDIDevice = this.MIDIObject.outputs.get(id)
     }
 
+    this.setMIDIEnabled()
+  }
+
+  setMIDIDisabled () {
+    this.MIDIEnabled = false
+
+    // hide channel <select>
+    let selectMIDIChannel = document.getElementById(this.MIDIChannelDOMElementID)
+    selectMIDIChannel.classList.add('hide')
+    selectMIDIChannel.disabled = true
+  }
+
+  setMIDIEnabled () {
     this.MIDIEnabled = true
-    // this.sendMIDIClock()
+
+    // show channel <select>
+    let selectMIDIChannel = document.getElementById(this.MIDIChannelDOMElementID)
+    selectMIDIChannel.classList.remove('hide')
+    selectMIDIChannel.disabled = false
   }
 
   onMIDIFailure (error) {
@@ -429,6 +465,18 @@ export default class Audio extends EventEmitter {
       }
       this.loops = []
     }
+
+    this.resetMIDI()
+
+    this.pointColors = []
+  }
+
+  resetMIDI () {
+    let selectMIDIOut = document.getElementById(this.MIDIDeviceDOMElementID)
+    if (selectMIDIOut) {
+      selectMIDIOut.disabled = false
+    }
+
     if (this.MIDILoops.length) {
       this.MIDIClockStarted = false
       this.MIDIClock.cancel()
@@ -441,7 +489,6 @@ export default class Audio extends EventEmitter {
       }
       this.MIDILoops = []
     }
-    this.pointColors = []
   }
 
   preloadNotes () {
@@ -528,6 +575,7 @@ export default class Audio extends EventEmitter {
     if (!this.MIDIEnabled) {
       return
     }
+
     this.MIDIClock = new Tone.Loop(
       () => {
         // send MIDI clock start message once if not already running
@@ -539,6 +587,13 @@ export default class Audio extends EventEmitter {
       },
       '96n'
     ).start()
+  }
+
+  disableMIDIInteraction () {
+    let selectMIDIOut = document.getElementById(this.MIDIDeviceDOMElementID)
+    if (selectMIDIOut) {
+      selectMIDIOut.disabled = true
+    }
   }
 
   /**
@@ -593,6 +648,9 @@ export default class Audio extends EventEmitter {
     if (!this.samplerLoaded) {
       this.loadSampler()
     }
+
+    // disable changing MIDI device while MIDI is playing so that clock stays in sync
+    this.disableMIDIInteraction()
 
     this.samplerLoaded = true
 
@@ -665,10 +723,15 @@ export default class Audio extends EventEmitter {
         }
 
         let weight = map(transaction.weight, 0, 2000, 0, 1)
-
         if (weight > 2.0) {
           weight = 2.0
         }
+
+        let rawVelocity = parseInt(map(transaction.weight, 0, 2000, 0, 127))
+        if (rawVelocity > 127) {
+          rawVelocity = 127
+        }
+        let velocity = rawVelocity.toString(16)
 
         let loop
 
@@ -701,7 +764,7 @@ export default class Audio extends EventEmitter {
                     let MIDINote = Tone.Frequency(note).toMidi()
 
                     // send MIDI note on
-                    this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, 0x40])
+                    this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity])
 
                     // send MIDI note off
                     setTimeout(() => {

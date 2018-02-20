@@ -72,6 +72,22 @@
 			display: inline-block;
 		}
 
+		#symphony-MIDI-form {
+			position: fixed;
+			bottom: 5%;
+			right: 5%;
+			width: 40%;
+		}
+
+		#symphony-MIDI-form select {
+			float: right;
+			margin: 0 0 0 2em
+		}
+
+		.hide {
+			display: none
+		}
+
 	</style>
 </head>
 
@@ -85,10 +101,33 @@
 	<form id="symphony-search-form">
 		<input id="symphony-search-field" type="text" placeholder="Enter Block Hash..." />
 		<button id="symphony-search-button">Go</button>
+	</form>
+
+	<form id="symphony-MIDI-form">
 		<select id="midiOut" disabled>
 			<option value="0">No MIDI Output</option>
 		</select>
+		<select id="midiChannel" disabled class="hide">
+			<option value="">MIDI Channel</option>
+			<option value="0">1</option>
+			<option value="1">2</option>
+			<option value="2">3</option>
+			<option value="3">4</option>
+			<option value="4">5</option>
+			<option value="5">6</option>
+			<option value="6">7</option>
+			<option value="7">8</option>
+			<option value="8">9</option>
+			<option value="9">10</option>
+			<option value="A">11</option>
+			<option value="B">12</option>
+			<option value="C">13</option>
+			<option value="D">14</option>
+			<option value="E">15</option>
+			<option value="F">16</option>
+		</select>
 	</form>
+
 	<!-- <script src="app.js"></script> -->
 	<!--<script src="//unpkg.com/react@16/umd/react.development.js"></script>
 	<script src="//unpkg.com/react-dom@16/umd/react-dom.development.js"></script>-->
