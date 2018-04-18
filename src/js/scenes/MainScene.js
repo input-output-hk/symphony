@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
-import AddText, { CIRCLE_OFFSET } from './circleGeometry'
+import AddText, { CIRCLE_OFFSET } from '../geometry/circleGeometry'
 import Config from '../Config'
 import Audio from '../audio/audio'
 import { getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay } from '../api/btc'
@@ -16,6 +16,7 @@ const TWEEN = require('@tweenjs/tween.js')
 
 const MS_IN_A_DAY = 86400000
 const DAY_OFFSET = 5500 // offset for each day on z-axis
+const MAX_HASH_RATE = 35000000 // maximum hash rate
 
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
 
@@ -164,7 +165,6 @@ export default class MainScene extends EventEmitter {
       TODO: implmenent a better depth sorting algo
     */
     const dayIndex = Math.round(this.getPositionForDate(day) / DAY_OFFSET)
-    // const center = obj3ds.length * 0.5
     console.log(new Date(day), dayIndex)
     obj3ds.forEach((obj3d, i) => {
       const index = i * 4
@@ -185,10 +185,7 @@ export default class MainScene extends EventEmitter {
     /*
       Make blocks visible
     */
-    // this.getMaterialsForDay(day).front.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position)
-    // this.getMaterialsForDay(day).back.uniforms.uCubePos.value.copy(this.getGroupForDay(day).position)
-
-    obj3ds.forEach((obj, i) => setTimeout(_ => obj.visible = true, i * 30))
+    obj3ds.forEach((obj, i) => setTimeout(_ => { obj.visible = true }, i * 30))
     setTimeout(_ => this.createCubeMap(day), (obj3ds.length + 1) * 30)
 
     return blocks
@@ -275,14 +272,14 @@ export default class MainScene extends EventEmitter {
   }
 
   /*
-    Moves the camera to a new date in the block chain and loads data
+    Moves the camera to a new date in the blockchain and loads data
   */
   async setDate (date) {
     if (date < this.earliestDate) {
-      return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
+      return Promise.reject(new Error('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY')))
     }
     if (date > this.latestDate) {
-      return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+      return Promise.reject(new Error('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY')))
     }
     if (this.currentBlockObject) {
       this.resetDayView()
@@ -298,10 +295,10 @@ export default class MainScene extends EventEmitter {
   */
   async loadDate (date) {
     if (date < this.earliestDate) {
-      return Promise.reject('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY'))
+      return Promise.reject(new Error('Requested date is before the earliest available block date of ' + moment(this.earliestDate).format('MMM Do YYYY')))
     }
     if (date > this.latestDate) {
-      return Promise.reject('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY'))
+      return Promise.reject(new Error('Requested date is after the latest available block date of ' + moment(this.latestDate).format('MMM Do YYYY')))
     }
 
     date = new Date(new Date(date).setHours(0, 0, 0, 0))
@@ -398,7 +395,11 @@ export default class MainScene extends EventEmitter {
     this.on('dayChanged', function ({ date }) {
       const hashRate = this.getGroupForDay(date.valueOf()).hashRate
       if (hashRate) {
-        const audioFreqCutoff = map(hashRate, 0.0, 20000000.0, 50.0, 15000)
+        let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 15000.0)
+        if (audioFreqCutoff > 15000) {
+          audioFreqCutoff = 15000
+        }
+        console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
         this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
       }
     })
@@ -450,7 +451,13 @@ export default class MainScene extends EventEmitter {
     if (this.currentBlockObject === blockObj3D) {
       blockObj3D.contents.add(this.pointsMesh)
       blockObj3D.contents.add(blockObj3D.tree)
-      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition(new THREE.Vector3()).clone(), block, this.allMaterials.pointsMaterial, this.pointsMesh)
+      this.audio.generateSound(
+        endPoints,
+        this.currentBlockObject.getWorldPosition(new THREE.Vector3()).clone(),
+        block,
+        this.allMaterials.pointsMaterial,
+        this.pointsMesh
+      )
     }
   }
 

@@ -1,7 +1,5 @@
 'use strict'
 
-import * as THREE from 'three'
-
 // Geometry
 import GenerateBlockGeometry from '../helpers/GenerateBlockGeometry'
 

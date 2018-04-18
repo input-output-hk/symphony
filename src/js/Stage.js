@@ -5,15 +5,11 @@ import * as THREE from 'three'
 
 import {EffectComposer, ShaderPass, RenderPass, UnrealBloomPass, SMAAPass} from './postprocessing/EffectComposer'
 
-import FXAAShader from './shaders/FXAA'
 import HueSaturationShader from './shaders/HueSaturation'
 import RGBShiftShader from './shaders/RGBShift'
 import VignetteShader from './shaders/Vignette'
 import FilmShader from './shaders/Film'
 import BrightnessContrastShader from './shaders/BrightnessContrast'
-
-// import * as fboHelper from './helpers/fboHelper'
-// import EffectComposer2 from './EffectComposer'
 
 // Global config
 import Config from './Config'
@@ -46,25 +42,19 @@ export default class Stage {
     this.HueSaturationPass = new ShaderPass(HueSaturationShader)
     this.composer.addPass(this.HueSaturationPass)
 
-    /* this.FXAAPass = new ShaderPass(FXAAShader)
-    // this.FXAAPass.renderToScreen = true
-    this.composer.addPass(this.FXAAPass) */
+    // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
+    // this.composer.addPass(this.RGBShiftPass)
 
-   // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
-    // this.RGBShiftPass.renderToScreen = true
- //   this.composer.addPass(this.RGBShiftPass)
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
+    this.composer.addPass(this.bloomPass)
 
     this.SMAAPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio())
     this.SMAAPass.renderToScreen = true
     this.composer.addPass(this.SMAAPass)
 
-    /* this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
-    this.bloomPass.renderToScreen = true
-    this.composer.addPass(this.bloomPass) */
-
-    /* this.FilmShaderPass = new ShaderPass(FilmShader)
-    this.FilmShaderPass.renderToScreen = true
-    this.composer.addPass(this.FilmShaderPass) */
+    // this.FilmShaderPass = new ShaderPass(FilmShader)
+    // this.FilmShaderPass.renderToScreen = true
+    // this.composer.addPass(this.FilmShaderPass)
   }
 
   /**
@@ -158,18 +148,6 @@ export default class Stage {
 
     // event fired when mouse is moved
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
-
-    // function _getTouchBound (fn) {
-    //   return function (evt) {
-    //     fn.call(this, evt.changedTouches[0] || evt.touches[0])
-    //   }
-    // }
-    // document.addEventListener('touchmove', _getTouchBound(this.onDocumentMouseMove))
-    // this.canvas.addEventListener('touchmove', evt => {
-    //   evt.preventDefault()
-    //   console.log( evt )
-    //   this.onDocumentMouseMove(evt.changedTouches[0] || evt.touches[0])
-    // })
   }
 
   /**
@@ -179,7 +157,7 @@ export default class Stage {
     let ambLight = new THREE.AmbientLight(0xffffff)
     this.scene.add(ambLight)
 
-    this.pointLight = new THREE.PointLight(0xffffff, 5, 5000, 3)
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 5000, 3)
     this.scene.add(this.pointLight)
   }
 
@@ -189,8 +167,6 @@ export default class Stage {
   resize (w, h) {
     this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
-
-    // this.FXAAPass.material.uniforms.resolution.value = new THREE.Vector2(1 / w, 1 / h)
 
     this.renderer.setSize(w, h)
     this.composer.setSize(w, h)
@@ -265,13 +241,10 @@ export default class Stage {
     this.cameraFollowTarget()
 
     this.render()
-
-    // this.dispatchEvent(this.postUpdate)
   }
 
   render () {
     this.composer.render()
-    // this.renderer.render(this.scene, this.camera)
   }
 
   /**

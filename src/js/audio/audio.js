@@ -1,6 +1,5 @@
 'use strict'
 
-import * as THREE from 'three'
 import Config from '../Config'
 import Tone from 'tone'
 import { map } from '../../utils/math'
@@ -14,10 +13,11 @@ export default class Audio extends EventEmitter {
     this.loops = []
     this.quantize = 16
     this.masterVol = 0 // db
-    this.ambienceVol = -96 // db
+    this.samplerVol = -6 // db
+    this.ambienceVol = -24 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
-    this.bpm = 90
+    this.bpm = 80
     this.isMuted = false
     this.context = null
     this.notes = {
@@ -153,11 +153,12 @@ export default class Audio extends EventEmitter {
         }
       },
       'koto': {
+        'harmonicity': 0.0,
         'oscillator': {
-          'partials': [1, 0, 2, 0, 3]
+          'partials': [1, 0, 2, 0, 3, 0, 4]
         },
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.01,
           'decay': 1.2,
           'sustain': 0,
           'release': 0.5
@@ -327,8 +328,6 @@ export default class Audio extends EventEmitter {
       ]
     }
 
-    this.audioLoader = new THREE.AudioLoader()
-
     // midi options
     this.initMIDIOptions()
     this.enableMIDI()
@@ -359,7 +358,7 @@ export default class Audio extends EventEmitter {
         sysex: false
       }).then(this.onMIDISuccess.bind(this), this.onMIDIFailure.bind(this))
     } else {
-      alert('No MIDI support in your browser.')
+      console.log('Your browser doesn\'t support WebMIDI.')
     }
   }
 
@@ -447,8 +446,6 @@ export default class Audio extends EventEmitter {
           resolve()
         }
       }).chain(this.ambienceFilter)
-
-      this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, 20)
     })
   }
 
@@ -467,6 +464,8 @@ export default class Audio extends EventEmitter {
     }
 
     this.resetMIDI()
+
+    this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, Tone.now() + 2)
 
     this.pointColors = []
   }
@@ -491,50 +490,6 @@ export default class Audio extends EventEmitter {
     }
   }
 
-  preloadNotes () {
-    return new Promise((resolve, reject) => {
-      let loadCount = 0
-      let self = this
-      resolve()
-      /* _.forIn(this.notes, (note, key) => {
-        this.audioLoader.load(
-          // resource URL
-          path + 'sounds/kalimba/' + note.replace('#', 'S') + '.mp3',
-          // Function when resource is loaded
-          function (audioBuffer) {
-            loadCount++
-            if (loadCount === Object.keys(self.notes).length) {
-              resolve()
-            }
-          }
-        )
-      }) */
-    })
-  }
-
-  preloadAmbience () {
-    return new Promise((resolve, reject) => {
-      resolve()
-     /* this.audioLoader.load(
-        this.ambiencePath,
-        function (audioBuffer) {
-          resolve()
-        }
-      ) */
-    })
-  }
-
-  preload () {
-    return new Promise((resolve, reject) => {
-      this.preloadNotes().then(() => {
-        this.preloadAmbience().then(() => {
-          console.log('sound loaded')
-          resolve()
-        })
-      })
-    })
-  }
-
   muteAudio () {
     this.isMuted = true
     this.masterBus.set('mute', true)
@@ -548,9 +503,10 @@ export default class Audio extends EventEmitter {
   init () {
     return new Promise((resolve, reject) => {
       this.masterBus = new Tone.Volume(this.masterVol).toMaster()
-      this.ambienceBus = new Tone.Volume(-96).chain(this.masterBus)
+      this.samplerBus = new Tone.Volume(this.samplerVol).toMaster()
+      this.ambienceBus = new Tone.Volume(this.ambienceVol).chain(this.masterBus)
 
-      this.convolver = new Tone.Convolver(this.path + 'sounds/IR/r1_ortf.wav').fan(this.masterBus)
+      this.convolver = new Tone.Convolver(this.path + 'sounds/IR/r1_ortf.mp3').fan(this.masterBus)
       this.convolver.set('wet', 0.25)
 
       this.freeverb = new Tone.Freeverb().fan(this.masterBus)
@@ -559,6 +515,10 @@ export default class Audio extends EventEmitter {
       this.freeverb.roomSize.value = 0.85
 
       Tone.Transport.bpm.value = this.bpm
+
+      this.synth = new Tone.PolySynth(12, Tone.AMSynth, this.presets['koto']).chain(this.convolver)
+
+      this.loadSampler()
 
       this.loadAmbience().then(() => {
         this.ambiencePlayer.start()
@@ -641,37 +601,47 @@ export default class Audio extends EventEmitter {
       'F#3': this.path + 'sounds/kalimba/FS3.mp3',
       'G3': this.path + 'sounds/kalimba/G3.mp3',
       'G#3': this.path + 'sounds/kalimba/GS3.mp3'
-    }).chain(this.masterBus)
+    }).chain(this.samplerBus)
   }
 
-  generateMerkleSound (positionsArray, blockObjectPosition, block, pointsMaterial, pointsMesh) {
-    if (!this.samplerLoaded) {
-      this.loadSampler()
-    }
-
+  generateSound (
+    positionsArray,
+    blockObjectPosition,
+    block,
+    pointsMaterial,
+    pointsMesh
+  ) {
     // disable changing MIDI device while MIDI is playing so that clock stays in sync
     this.disableMIDIInteraction()
 
-    this.samplerLoaded = true
+    let harmonicity = Math.round(map(block.feeToInputRatio, 0.00001, 0.001, 0, 20))
+    let detune = map(block.feeToInputRatio, 0.00001, 0.001, 0, -2000)
+
+    this.synth.set('harmonicity', harmonicity)
+    this.synth.set('detune', detune)
+
+    this.ambienceBus.volume.linearRampToValueAtTime(-96, Tone.now() + 2)
 
     this.loopMap = []
-
-    this.sampler = new Tone.PolySynth(3, Tone.AMSynth, this.presets['koto']).chain(this.convolver)
-    // this.sampler = new Tone.PolySynth(6, Tone.AMSynth, this.presets['koto']).chain(this.freeverb)
-
-    this.black = new THREE.Color(0x000000)
-    this.white = new THREE.Color(0xffffff)
 
     this.pointsMaterial = pointsMaterial
 
     let minTime = Number.MAX_SAFE_INTEGER
     let maxTime = 0
 
+    let minOutput = Number.MAX_SAFE_INTEGER
+    let maxOutput = 0
+
     for (let index = 0; index < block.transactions.length; index++) {
       const transaction = block.transactions[index]
       minTime = Math.min(transaction.time, minTime)
       maxTime = Math.max(transaction.time, maxTime)
+      minOutput = Math.min(transaction.output, minOutput)
+      maxOutput = Math.max(transaction.output, maxOutput)
     }
+
+    minOutput = Math.log(minOutput + 1.0)
+    maxOutput = Math.log(maxOutput + 1.0)
 
     block.transactions.sort((a, b) => {
       return a.time - b.time
@@ -696,8 +666,6 @@ export default class Audio extends EventEmitter {
       let yIndex = index * 3 + 1
       let zIndex = index * 3 + 2
 
-      let y = positionsArray[yIndex]
-
       /**
        * Map transaction time to new range
        */
@@ -705,29 +673,43 @@ export default class Audio extends EventEmitter {
         const transaction = block.transactions[index]
         let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
 
-        // get closest note
-        let minDiff = Number.MAX_SAFE_INTEGER
-        let note = 'C1'
-
-        for (var frequency in this.notes) {
+        // filter out notes not in mode
+        let filteredNotes = {}
+        for (const frequency in this.notes) {
           if (this.notes.hasOwnProperty(frequency)) {
-            let noteName = this.notes[frequency].replace(/[0-9]/g, '')
+            const note = this.notes[frequency]
+            const noteName = note.replace(/[0-9]/g, '')
             if (this.mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              let diff = Math.abs((y * 2.0) - frequency)
-              if (diff < minDiff) {
-                minDiff = diff
-                note = this.notes[frequency]
-              }
+              filteredNotes[frequency] = note
             }
           }
         }
 
-        let weight = map(transaction.weight, 0, 2000, 0, 1)
-        if (weight > 2.0) {
-          weight = 2.0
+        let pitchIndex = Math.floor(map(Math.log(transaction.output + 1.0), minOutput, maxOutput, Object.keys(filteredNotes).length, 0))
+
+        let note
+
+        let i = 0
+        for (const frequency in filteredNotes) {
+          if (filteredNotes.hasOwnProperty(frequency)) {
+            if (pitchIndex === i) {
+              note = filteredNotes[frequency]
+              break
+            }
+            i++
+          }
         }
 
-        let rawVelocity = parseInt(map(transaction.weight, 0, 2000, 0, 127))
+        if (typeof note === 'undefined') {
+          continue
+        }
+
+        let txSize = map(transaction.size, 0, 1000, 0, 1)
+        if (txSize > 1.0) {
+          txSize = 1.0
+        }
+
+        let rawVelocity = parseInt(map(transaction.size, 0, 1000, 0, 127))
         if (rawVelocity > 127) {
           rawVelocity = 127
         }
@@ -741,16 +723,18 @@ export default class Audio extends EventEmitter {
           timeLowRes = timeInt
         }
 
-        if (typeof this.loopMap[timeLowRes] === 'undefined') {
+        let quantizedTime = Tone.Time(timeLowRes).quantize(this.quantize + 'n')
+
+        if (typeof this.loopMap[quantizedTime] === 'undefined') {
           loop = new Tone.Loop(
             (loopTime) => {
               if (isFirst && !this.MIDIClockStarted) {
                 this.sendMIDIClock()
               }
 
-              this.pointColors[xIndex] = weight
-              this.pointColors[yIndex] = weight
-              this.pointColors[zIndex] = weight
+              this.pointColors[xIndex] = txSize
+              this.pointColors[yIndex] = txSize
+              this.pointColors[zIndex] = txSize
 
               setTimeout(() => {
                 this.pointColors[xIndex] = 0
@@ -777,7 +761,17 @@ export default class Audio extends EventEmitter {
                   console.log(error)
                 }
               } else {
-                this.sampler.triggerAttack(note, Tone.Time(loopTime).quantize(this.quantize + 'n'), weight)
+                this.synth.triggerAttackRelease(
+                  note,
+                  '16n',
+                  Tone.Time(loopTime).quantize(this.quantize + 'n'),
+                  txSize
+                )
+                /* this.sampler.triggerAttack(
+                  note,
+                  Tone.Time(loopTime).quantize(this.quantize + 'n'),
+                  txSize
+                ) */
               }
             },
             '1m'
@@ -787,9 +781,9 @@ export default class Audio extends EventEmitter {
         } else {
           loop = new Tone.Loop(
             () => {
-              this.pointColors[xIndex] = weight
-              this.pointColors[yIndex] = weight
-              this.pointColors[zIndex] = weight
+              this.pointColors[xIndex] = txSize
+              this.pointColors[yIndex] = txSize
+              this.pointColors[zIndex] = txSize
               setTimeout(() => {
                 this.pointColors[xIndex] = 0
                 this.pointColors[yIndex] = 0
@@ -800,10 +794,9 @@ export default class Audio extends EventEmitter {
           ).start(Tone.Transport.seconds + time)
         }
 
-        loop.set('iterations', 8)
-        // loop.set('humanize', '64n')
+        loop.set('iterations', 4)
         this.loops.push(loop)
-        this.loopMap[timeLowRes] = true
+        this.loopMap[quantizedTime] = true
       }
     }
   }
