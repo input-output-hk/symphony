@@ -450,7 +450,7 @@ export default class MainScene extends EventEmitter {
     if (this.currentBlockObject === blockObj3D) {
       blockObj3D.contents.add(this.pointsMesh)
       blockObj3D.contents.add(blockObj3D.tree)
-      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition().clone(), block, this.allMaterials.pointsMaterial, this.pointsMesh)
+      this.audio.generateMerkleSound(endPoints, this.currentBlockObject.getWorldPosition(new THREE.Vector3()).clone(), block, this.allMaterials.pointsMaterial, this.pointsMesh)
     }
   }
 
@@ -496,7 +496,7 @@ export default class MainScene extends EventEmitter {
     const group = this.getGroupForDay(day)
     front.color.setHex(0xffffff)
     let cubeCamera = new THREE.CubeCamera(100.0, 5000, 512)
-    cubeCamera.position.copy(group.getWorldPosition())
+    cubeCamera.position.copy(group.getWorldPosition(new THREE.Vector3()))
     cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter
     cubeCamera.update(this.stage.renderer, this.stage.scene)
     front.envMap = cubeCamera.renderTarget.texture
@@ -587,7 +587,7 @@ export default class MainScene extends EventEmitter {
       true
     ).then(() => {
       // focus camera on block
-      let blockWorldPos = blockObject.getWorldPosition()
+      let blockWorldPos = blockObject.getWorldPosition(new THREE.Vector3())
       this.stage.targetCameraLookAt.z = blockWorldPos.z
       this.stage.targetCameraPos.z = blockWorldPos.z - this.cameraBlockFocusDistance
       this.isAnimating = false
@@ -629,7 +629,7 @@ export default class MainScene extends EventEmitter {
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
       }
-      this.pointLightTarget.copy(intersected.getWorldPosition())
+      this.pointLightTarget.copy(intersected.getWorldPosition(new THREE.Vector3()))
     } else {
       this.emit('blockMouseOut')
     }
