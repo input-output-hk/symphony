@@ -282,7 +282,7 @@ function rm_item(item){
               owner_link = io_team_arr[auth_id]['redirect'];
             }
           }
-		      owner += '<a href="'+owner_link+'/" title="'+io_team_arr[auth_id]['tit']+'" target="_blank"><img src="/'+io_team_arr[auth_id]['pic']+'" width="40" height="40" alt="'+io_team_arr[auth_id]['tit']+'" /></a>';
+		      owner += '<a href="'+owner_link+'/" title="'+io_team_arr[auth_id]['tit']+'" target="_blank"><img src="/static/assets/'+io_team_arr[auth_id]['pic']+'" width="40" height="40" alt="'+io_team_arr[auth_id]['tit']+'" /></a>';
 				}else{
           owner += '<img src="/static/assets/images/team/member.png" width="40" height="40" alt="" class="img-circle blank-member" />';
         }

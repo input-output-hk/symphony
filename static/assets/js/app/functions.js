@@ -646,8 +646,8 @@ function io_which_way_alter(){
 
 
 
-				$.getScript( "//static.iohk.io/js/orpheus/static/js/StartAudioContext.js", function( data, textStatus, jqxhr ) {
-					$.getScript( "//static.iohk.io/js/orpheus/static/js/hammer.min.js", function( data, textStatus, jqxhr ) {
+				$.getScript( "//static.iohk.io/js/symphony/static/js/StartAudioContext.js", function( data, textStatus, jqxhr ) {
+					$.getScript( "//static.iohk.io/js/symphony/static/js/hammer.min.js", function( data, textStatus, jqxhr ) {
 						//$.getScript( "//input-output-hk.github.io/symphony/dist/static/js/app.js", function( data, textStatus, jqxhr ) {
 							//$.getScript( "//static.iohk.io/js/orpheus/static/js/app.js", function( data, textStatus, jqxhr ) {
 

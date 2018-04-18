@@ -105,10 +105,10 @@ p{line-height: 1.5;}
 .roadmap .nav--lines .dot{display:inline-block;position:absolute;margin:-20px 0 0 -5px;border:0}
 .roadmap .nav--lines .dot.active{border:2px solid #fff}
 
-.roadmap .nav--lines {border-bottom:1px solid #409c9e; max-width:185px;margin:auto;background:url('/images/timeline.svg') repeat-y right}
-.roadmap .nav--line {background:url('/images/timeline.svg') repeat-y left;height:20px;width:33.33%;display: inline-block;}
+.roadmap .nav--lines {border-bottom:1px solid #409c9e; max-width:185px;margin:auto;background:url('/static/assets/images/timeline.svg') repeat-y right}
+.roadmap .nav--line {background:url('/static/assets/images/timeline.svg') repeat-y left;height:20px;width:33.33%;display: inline-block;}
 
-.roadmap  .timeline{background:url('/images/timeline.svg') repeat-y center;padding:20px 0}
+.roadmap  .timeline{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:20px 0}
 
 .roadmap  .timestamp{text-align: center;line-height: 2;font-size:300%;color:rgba(60,200,200,1);}
 
@@ -119,7 +119,7 @@ p{line-height: 1.5;}
 .roadmap--foot a:hover,.roadmap--foot a:focus{color:#fff;opacity:.6}
 .roadmap--foot a em{font-size:340%;display: inline-block;margin:-20px 10px -20px 0}
 
-.roadmap .item{clear:both;margin:0 0 63px 0;padding:0px 0 20px 0;background:url('/images/timeline.svg') repeat-y center;}
+.roadmap .item{clear:both;margin:0 0 63px 0;padding:0px 0 20px 0;background:url('/static/assets/images/timeline.svg') repeat-y center;}
 .roadmap .show-version-1 .version-1{display: block}
 .roadmap .show-version-2 .version-2{display: block}
 .roadmap .show-version-3 .version-3{display: block}
@@ -195,9 +195,9 @@ p{line-height: 1.5;}
 .roadmap .item .content .desc.opened .opener .fa-chevron-up{display: inherit}
 
 
-.roadmap .item .content .symphony .logo {width:30px;height:30px;display:inline-block;vertical-align: middle;background:url('/images/ico-symphony.svg');background-size:contain;margin-left:0px;}
-.roadmap .item .content .symphony.emurgo .logo {display:inline-block;vertical-align: middle;background:url('/images/emurgo.svg');background-size:contain;margin-left:0px;}
-.roadmap .item-daedalus .content .symphony .logo {background:url('/images/ico-daedalus.svg');background-size: contain;}
+.roadmap .item .content .symphony .logo {width:30px;height:30px;display:inline-block;vertical-align: middle;background:url('/static/assets/images/ico-symphony.svg');background-size:contain;margin-left:0px;}
+.roadmap .item .content .symphony.emurgo .logo {display:inline-block;vertical-align: middle;background:url('/static/assets/images/emurgo.svg');background-size:contain;margin-left:0px;}
+.roadmap .item-daedalus .content .symphony .logo {background:url('/static/assets/images/ico-daedalus.svg');background-size: contain;}
 
 .roadmap .item .content .symphony {font-weight: 400;vertical-align: middle;line-height:auto;opacity:.6;font-size:85%;position:relative;margin:5px 0 0 240px;width: 170px;text-align: left;}
 .roadmap .item.noexpand .content .symphony {margin:5px 0 0 0px;text-align:right;width:auto}
@@ -344,7 +344,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#007486', end
 .roadmap .nav--lines {max-width:170px;}
 
 .roadmap .item,
-.roadmap  .timeline{background:url('/images/timeline.svg') repeat-y left;margin:0 42px}
+.roadmap  .timeline{background:url('/static/assets/images/timeline.svg') repeat-y left;margin:0 42px}
 
 .roadmap  .timestamp{text-align: left}
 
@@ -434,10 +434,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#007486', end
 .parallax {    height: 100vh;    overflow-x: hidden;    overflow-y: scroll;    -webkit-perspective: 1px;    perspective: 1px;overflow: -moz-scrollbars-vertical;   }
 .parallax__layer {    position: absolute;    top: 0;    left: 0;    right: 0;    bottom: 0;  }
 .parallax__layer--content {   -webkit-transform: translateZ(0);    transform: translateZ(0);    height: 700vh;  }
-.parallax__layer--base {    background: url("/images/stars-pattern-100-opacity.png") repeat-y center;    background-size: contain;    -webkit-transform: translateZ(0);    transform: translateZ(-2px) scale(3);    height: 365vh;  }
-.parallax__layer--mid {    background: url("/images/small-stars-pattern-60-opacity.png") repeat-y center;    background-size: contain;    opacity: 0.6;    -webkit-transform: translateZ(0);    transform: translateZ(-5px) scale(6);    height: 200vh;  }
-.parallax__layer--small {    background: url("/images/smallest-stars-pattern-40-opacity.png") repeat-y center;    background-size: contain;    opacity: 0.4;    -webkit-transform: translateZ(0);    transform: translateZ(-8px) scale(9);    height: 145vh;  }
-.parallax__layer--back {    background: url("/images/car-bg-v1.jpg") no-repeat center;    background-size: contain;    -webkit-transform: translateZ(-1px);    transform: translateZ(-10px) scale(11);    height: 200vh;  }
+.parallax__layer--base {    background: url("/static/assets/images/stars-pattern-100-opacity.png") repeat-y center;    background-size: contain;    -webkit-transform: translateZ(0);    transform: translateZ(-2px) scale(3);    height: 365vh;  }
+.parallax__layer--mid {    background: url("/static/assets/images/small-stars-pattern-60-opacity.png") repeat-y center;    background-size: contain;    opacity: 0.6;    -webkit-transform: translateZ(0);    transform: translateZ(-5px) scale(6);    height: 200vh;  }
+.parallax__layer--small {    background: url("/static/assets/images/smallest-stars-pattern-40-opacity.png") repeat-y center;    background-size: contain;    opacity: 0.4;    -webkit-transform: translateZ(0);    transform: translateZ(-8px) scale(9);    height: 145vh;  }
+.parallax__layer--back {    background: url("/static/assets/images/car-bg-v1.jpg") no-repeat center;    background-size: contain;    -webkit-transform: translateZ(-1px);    transform: translateZ(-10px) scale(11);    height: 200vh;  }
 
 
 
