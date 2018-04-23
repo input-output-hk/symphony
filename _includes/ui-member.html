@@ -1,0 +1,96 @@
+{% if include.item %}
+{% assign in_member_cnt = 0 %}
+
+{% for post in site.pages reversed %}
+  {% if post.layout == 'member' %}
+  {% if include.item == post.contact %}
+
+<!-- src="{{ site.baseurl }}/images/iohk_animation.gif" -->
+
+
+<div class="profile team {{ post.key }} smaller">
+    {% if post.redirect %}
+    <div class="img"><a target="_blank" href="{{ post.redirect }}" class="profile-link" rel="{{in_member_cnt}}" title="IOHK profile of {{ post.title }}"><img data-src="{{ site.baseurl }}/{{ post.thumbnail }}" src="{{ site.baseurl }}/{{ post.thumbnail }}" alt="" class="b-lazy img-circle fullwidth ajaxhref" /></a></div>
+    {% elsif include.side %}
+    <div class="img"><a href="{{ site.baseurl }}{{ post.permalink }}" class="ajaxhref profile-link" rel="{{in_member_cnt}}" title="IOHK profile of {{ post.title }}"><img data-src="{{ site.baseurl }}/{{ post.thumbnail }}" src="{{ site.baseurl }}/{{ post.thumbnail }}" alt="" class="b-lazy img-circle fullwidth ajaxhref" /></a></div>
+    {% else %}
+    <div class="img"><a href="{{ site.baseurl }}{{ post.permalink }}" class="ajaxhref profile-link" rel="{{in_member_cnt}}" title="IOHK profile of {{ post.title }}"><img data-src="{{ site.baseurl }}/{{ post.thumbnail }}" src="{{ site.baseurl }}/{{ post.thumbnail }}"  alt="" class="b-lazy img-circle fullwidth ajaxhref" /></a></div>
+    {% endif %}
+    {% if post.redirect %}
+    <h2>
+        <a target="_blank" href="{{ post.redirect }}" rel="{{in_member_cnt}}" class="profile-link" title="IOHK profile of {{ post.title }}">
+            {% if post.prefix %}<span style="text-transform:capitalize">{{ post.prefix }}</span>{% endif %}
+            {{ post.title }}{% if post.sufix %}<span style="text-transform:capitalize">,&nbsp;{{ post.sufix }}</span>{% endif %}
+        </a>
+    </h2>
+    {% else %}
+    <h2>
+        <a href="{{ site.baseurl }}{{ post.permalink }}" rel="{{in_member_cnt}}" class="ajaxhref profile-link" title="IOHK profile of {{ post.title }}">
+            {% if post.prefix %}<span style="text-transform:capitalize">{{ post.prefix }}</span>{% endif %}
+            {{ post.title }}{% if post.sufix %}<span style="text-transform:capitalize">,&nbsp;{{ post.sufix }}</span>{% endif %}
+        </a>
+    </h2>
+    {% endif %}
+    <h4>{{ post.role }}</h4>
+
+       {% if page.url contains "/team/" %}
+    {% if post.video %}
+    <a href="{{post.video}}" target="_blank" role="button" class="btn btn-success profile-button rounded"><em class="fa fa-1x fa-play-circle" ></em></a>
+
+    {% else %}
+    <a href="https://www.youtube.com/watch?v=KkcAic12dvc" target="_blank" role="button" class="btn btn-success profile-button rounded"><em class="fa fa-1x fa-play-circle"></em></a>
+
+    {% endif %}
+    {% if post.twitter %}
+    <a href="{{ post.twitter }}" target="_blank" class="btn btn-success profile-button rounded" role="button"><i class="fa fa-1x fa-twitter" aria-hidden="true"></i></a>
+    {% endif %}
+    {% if post.linkedin %}
+    <a href="{{ post.linkedin }}" target="_blank" class="btn btn-success profile-button rounded" role="button"><i class="fa fa-1x fa-linkedin" aria-hidden="true"></i></a>
+    {% endif %}
+    {% if post.github %}
+    <a href="{{ post.github }}" target="_blank" class="btn btn-success profile-button rounded" role="button"><i class="fa fa-1x fa-github" aria-hidden="true"></i></a>
+    {% endif %}
+
+
+    {% assign profilePost = site.posts | where:"author", post.contact  | first %}
+    {% if post.contact == profilePost.author %}
+    <a class="ajaxhref btn btn-success profile-button rounded" href="{{profilePost.permalink}}" title="Latest blog post from {{post.title}} - {{profilePost.title}}"><em class="fa fa-pencil"></em></a>
+    {% endif %}
+    {% endif %}
+
+    {% if include.side %}
+
+    <div class="contact">
+        <div class="social inline-block">
+            {% include ui-social.html item=post %}
+        </div>
+    </div>
+
+    {% else %}
+
+
+
+    <!--div class="social">
+        {% include ui-social.html item=post %}
+    </div>
+    <div class="finger_print">
+        <p>{{ post.fingerprint }}</p>
+    </div>
+    <div class="contact_but">
+        <a href="javascript:io_class_toggle('.{{ post.key }}','contacting')" class="btn btn-default bg_trans">{{ site.data.i18n[page.language].contact }}</a>
+        <div class="none input">
+            <input type="text" class="form-control text-center" value="{{ post.contact }}" />
+        </div>
+    </div-->
+
+    {% endif %}
+
+</div>
+
+
+{% endif %}
+{% assign in_member_cnt = in_member_cnt | plus:1 %}
+{% endif %}
+{% endfor %}
+
+{% endif %}

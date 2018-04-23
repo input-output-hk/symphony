@@ -1,6 +1,6 @@
 ---
 layout: page-team
-title: Symphony team
+title: Team
 language: en
 permalink: /team/
 defaulturl: /team/
