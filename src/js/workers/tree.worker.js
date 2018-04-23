@@ -1,7 +1,7 @@
 'use strict'
 
 // Geometry
-import GenerateBlockGeometry from '../helpers/GenerateBlockGeometry'
+import GenerateBlockGeometry from '../geometry/GenerateBlockGeometry'
 
 self.addEventListener('message', function (e) {
   let data = e.data

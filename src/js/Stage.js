@@ -33,9 +33,6 @@ export default class Stage {
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
 
-    this.VignettePass = new ShaderPass(VignetteShader)
-    this.composer.addPass(this.VignettePass)
-
     this.BrightnessContrastPass = new ShaderPass(BrightnessContrastShader)
     this.composer.addPass(this.BrightnessContrastPass)
 
@@ -45,16 +42,19 @@ export default class Stage {
     // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
     // this.composer.addPass(this.RGBShiftPass)
 
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.3, 0.915) // 1.0, 9, 0.5, 512);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.35, 0.45, 0.4) // 1.0, 9, 0.5, 512);
     this.composer.addPass(this.bloomPass)
+
+    this.VignettePass = new ShaderPass(VignetteShader)
+    this.composer.addPass(this.VignettePass)
+
+    this.FilmShaderPass = new ShaderPass(FilmShader)
+    // this.FilmShaderPass.renderToScreen = true
+    this.composer.addPass(this.FilmShaderPass)
 
     this.SMAAPass = new SMAAPass(window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio())
     this.SMAAPass.renderToScreen = true
     this.composer.addPass(this.SMAAPass)
-
-    // this.FilmShaderPass = new ShaderPass(FilmShader)
-    // this.FilmShaderPass.renderToScreen = true
-    // this.composer.addPass(this.FilmShaderPass)
   }
 
   /**
@@ -87,7 +87,7 @@ export default class Stage {
     this.cameraLerpSpeed = 0.05 // speed of camera lerp
 
     // scene camera
-    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 6000)
+    this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 5000)
     this.camera.position.set(this.defaultCameraPos.x, this.defaultCameraPos.y, this.defaultCameraPos.z)
     this.camera.updateMatrixWorld()
 
@@ -154,10 +154,16 @@ export default class Stage {
    * Add lights to the stage
    */
   addLights () {
-    let ambLight = new THREE.AmbientLight(0xffffff)
+    // let ambLight = new THREE.AmbientLight(0x333333)
+    let ambLight = new THREE.AmbientLight(0x555555)
     this.scene.add(ambLight)
 
-    this.pointLight = new THREE.PointLight(0xffffff, 1, 5000, 3)
+    this.pointLight = new THREE.RectAreaLight(0xfd8054, 0.8, 2000, 2000)
+
+    /* let rectLightHelper = new THREE.RectAreaLightHelper(this.pointLight)
+    this.scene.add(rectLightHelper) */
+
+    // this.pointLight = new THREE.PointLight(0xfd8054, 1, 50000, 3)
     this.scene.add(this.pointLight)
   }
 

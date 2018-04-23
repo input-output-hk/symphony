@@ -16,12 +16,12 @@ const orpheusApp = async function (params) {
   ]
 
   const assets = {
-    // ['map', 'textures/Marble068_COL_1K.jpg'],
-    // ['metalnessMap', 'textures/Marble068_REFL_1K.jpg'],
-    // ['roughnessMap', 'textures/Marble068_GLOSS_1K.jpg'],
-    // ['glossMap', 'textures/Marble068_GLOSS_1K.jpg'],
-    // {normalMap: 'textures/Marble068_NRM_1K.jpg'},
-    bumpMap: 'textures/IceBlock008_OVERLAY_1K.jpg'
+    bumpMap: 'textures/IceBlock008_OVERLAY_1K.jpg',
+    metalnessMap: 'textures/Marble068_REFL_1K.jpg',
+    roughnessMap: 'textures/Marble068_GLOSS_1K.jpg',
+    alphaMap: 'textures/alphaMap.jpg'
+    // glossMap: 'textures/Marble068_GLOSS_1K.jpg',
+    // normalMap: 'textures/Marble068_NRM_1K.jpg',
   }
 
   const earliestBlock = await getEarliestBlock()

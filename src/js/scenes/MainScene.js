@@ -11,6 +11,8 @@ import Materials from '../materials/materials'
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
 
+require('../lights/RectAreaLightUniforms')
+
 const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
 
@@ -72,9 +74,9 @@ export default class MainScene extends EventEmitter {
     this.pointLightTarget = new THREE.Vector3(0.0, 0.0, 0.0)
     // pull camera in closer on landscape screens
     if (window.innerWidth < window.innerHeight) {
-      this.cameraBlockFocusDistance = -600
+      this.cameraBlockFocusDistance = -750
     } else {
-      this.cameraBlockFocusDistance = -300
+      this.cameraBlockFocusDistance = -450
     }
 
     console.log('DATE RANGE :', this.earliestDate, this.latestDate)
@@ -395,9 +397,9 @@ export default class MainScene extends EventEmitter {
     this.on('dayChanged', function ({ date }) {
       const hashRate = this.getGroupForDay(date.valueOf()).hashRate
       if (hashRate) {
-        let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 15000.0)
-        if (audioFreqCutoff > 15000) {
-          audioFreqCutoff = 15000
+        let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 10000.0)
+        if (audioFreqCutoff > 10000) {
+          audioFreqCutoff = 10000
         }
         console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
         this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
@@ -631,12 +633,17 @@ export default class MainScene extends EventEmitter {
       If an intersection occured but not on the selected block, set a highlight
     */
     if (intersected && intersected !== this.currentBlockObject) {
-      intersected.children.forEach(child => child.material = this.allMaterials.blockMaterialHighlight)
+      intersected.children.forEach(child => {
+        child.material = this.allMaterials.blockMaterialHighlight
+      })
+
       this.emit('blockMouseOver', intersected.block)
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
       }
       this.pointLightTarget.copy(intersected.getWorldPosition(new THREE.Vector3()))
+
+      this.pointLightTarget.z -= intersected.block.size.z * 0.5
     } else {
       this.emit('blockMouseOut')
     }
@@ -726,7 +733,8 @@ export default class MainScene extends EventEmitter {
 
     this.checkMouseIntersection()
 
-    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.1)
+    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.2)
+
     this.uTime = this.clock.getElapsedTime()
 
     this.allMaterials.pointsMaterial.uniforms.uTime.value = this.uTime

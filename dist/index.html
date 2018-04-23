@@ -59,7 +59,23 @@
 		#symphony-search-button {
 			padding: 10px;
 			display: inline-block;
-		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><form id=symphony-search-form><input id=symphony-search-field type=text placeholder="Enter Block Hash..."> <button id=symphony-search-button>Go</button></form><script src=//unpkg.com/react@16/umd/react.development.js></script><script src=//unpkg.com/react-dom@16/umd/react-dom.development.js></script><script src=//unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script src=//unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js></script><script type=text/babel>window.onload = function(){
+		}
+
+		#symphony-MIDI-form {
+			position: fixed;
+			bottom: 5%;
+			right: 5%;
+			width: 40%;
+		}
+
+		#symphony-MIDI-form select {
+			float: right;
+			margin: 0 0 0 2em
+		}
+
+		.hide {
+			display: none
+		}</style></head><body><div id=hud></div><div class=canvas-container><canvas id=stage></canvas></div><form id=symphony-search-form><input id=symphony-search-field type=text placeholder="Enter Block Hash..."> <button id=symphony-search-button>Go</button></form><form id=symphony-MIDI-form><select id=midiOut disabled=disabled><option value=0>No MIDI Output</option></select> <select id=midiChannel disabled=disabled class=hide><option value="">MIDI Channel</option><option value=0>1</option><option value=1>2</option><option value=2>3</option><option value=3>4</option><option value=4>5</option><option value=5>6</option><option value=6>7</option><option value=7>8</option><option value=8>9</option><option value=9>10</option><option value=A>11</option><option value=B>12</option><option value=C>13</option><option value=D>14</option><option value=E>15</option><option value=F>16</option></select></form><script src=https://unpkg.com/babel-standalone@6.15.0/babel.min.js></script><script src=https://unpkg.com/startaudiocontext@1.2.1/StartAudioContext.js></script><script type=text/babel>window.onload = function(){
 
 			// check that browser supports webgl
 			if ( !orpheusApp.canRun ) console.error('Orpheus cannot run :(')
@@ -123,7 +139,7 @@
 				/*
 					Event called as a user scrolls through time and the current day changes
 				*/
-				app.on('dayChanged', ({ date, input, output, fee }) => {
+				/*app.on('dayChanged', ({ date, input, output, fee }) => {
 					console.log('EVENT: `dayChanged` receieved')
 					ReactDOM.render(		
 						<div>	
@@ -135,22 +151,18 @@
 							<div>Total Output Value: BTC{ output.toLocaleString('USD') }</div>
 						</div>
 					,document.querySelector('#hud'))
-				})
+				})*/
 
 				/*
 					Event called when a block is hovered over
 				*/
-				app.on('blockMouseOver', () => {
-					document.body.style.cursor = "pointer";
-				})
-				app.on('blockMouseOut', () => {
-					document.body.style.cursor = "default";
-				})
+				// app.on('blockHovered', console.log )
+
 
 				/*
 					Event called when a block is selected
 				*/
-				app.on('blockSelected', block => {
+				/*app.on('blockSelected', block => {
 
 					const { bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time } = block
 
@@ -168,7 +180,7 @@
 							<div >Number of Transactions: { n_tx }</div>				
 						</div>
 					,document.querySelector('#hud'))
-				})
+				})*/
 
 				/*
 					Event for whenever a block is unselected
@@ -245,4 +257,4 @@
 
 			}).catch(e => console.log(e))
 
-		}</script><script type=text/javascript src=/static/js/app.js></script></body></html>
+		}</script><script type=text/javascript src=./static/js/app.js></script></body></html>

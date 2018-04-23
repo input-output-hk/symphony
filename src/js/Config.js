@@ -9,12 +9,12 @@ const Config = {
   detector: Detector,
   showGUI: true,
   scene: {
-    bgColor: 0x26263c,
+    bgColor: 0x141414,
     fogDensity: 0.00030,
     antialias: false
   },
   camera: {
-    fov: 80
+    fov: 70
   }
 }
 

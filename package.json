@@ -35,7 +35,7 @@
     "moment": "^2.21.0",
     "npm": "^5.7.1",
     "seedrandom": "^2.4.3",
-    "three": "^0.91.0",
+    "three": "^0.92.0",
     "three-orbit-controls": "^82.1.0",
     "tone": "^0.12.80",
     "webworkify-webpack": "^2.1.0",

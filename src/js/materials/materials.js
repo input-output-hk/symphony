@@ -1,42 +1,53 @@
 import * as THREE from 'three'
 import MerkleMaterial from './MerkleMaterial/MerkleMaterial'
 import PointsMaterial from './PointsMaterial/PointsMaterial'
-import BlockMaterial from './BlockMaterial/BlockMaterial'
 
 export default (textures, cubeTextures) => {
   const bgMap = new THREE.CubeTexture(cubeTextures)
   const bumpMap = new THREE.Texture(textures[0])
+  const map = new THREE.Texture(textures[0])
+
+  const metalnessMap = new THREE.Texture(textures[1])
+  const roughnessMap = new THREE.Texture(textures[2])
+  const alphaMap = new THREE.Texture(textures[3])
+
+  alphaMap.wrapS = THREE.RepeatWrapping
+  alphaMap.wrapT = THREE.RepeatWrapping
+
+  map.needsUpdate = true
+  alphaMap.needsUpdate = true
   bumpMap.needsUpdate = true
   bgMap.needsUpdate = true
+  metalnessMap.needsUpdate = true
+  roughnessMap.needsUpdate = true
 
   const blockMaterialBack = new THREE.MeshStandardMaterial({
-    color: 0xeeeeee,
+    color: 0x7fa9fc,
     emissive: 0x000000,
-    metalness: 0.9,
-    roughness: 0.2,
-    opacity: 0.5,
+    metalness: 0.7,
+    roughness: 0.1,
+    opacity: 1.0,
     transparent: true,
     depthWrite: false,
-    // depthTest: false,
     side: THREE.BackSide,
     envMap: bgMap,
     bumpMap,
-    bumpScale: 0.03
+    bumpScale: 0.4,
+    alphaMap
   })
 
   const blockMaterialFront = new THREE.MeshStandardMaterial({
-    color: 0xeeeeee,
-    emissive: 0x330000,
-    metalness: 0.9,
-    roughness: 0.2,
-    opacity: 0.5,
+    color: 0x7fa9fc,
+    emissive: 0x000000,
+    metalness: 0.7,
+    roughness: 0.1,
+    opacity: 1.0,
     transparent: true,
-    // depthTest: false,
-    // depthWrite: false,
     side: THREE.FrontSide,
     envMap: bgMap,
     bumpMap,
-    bumpScale: 0.03
+    bumpScale: 0.4,
+    alphaMap
   })
 
   const blockMaterialOutline = new THREE.LineBasicMaterial({
@@ -45,23 +56,28 @@ export default (textures, cubeTextures) => {
     opacity: 0.5
   })
 
-  const blockMaterialHighlight = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    emissive: 0xffffff,
-    metalness: 0.9,
-    roughness: 0.2,
-    opacity: 0.5,
+  const blockMaterialHighlight = new THREE.MeshStandardMaterial({
+    color: 0xffcdbb,
+    emissive: 0x333333,
+    metalness: 0.7,
+    roughness: 0.1,
+    opacity: 1.0,
     transparent: true,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    envMap: bgMap,
+    bumpMap,
+    bumpScale: 0.4,
+    alphaMap
   })
 
   const merkleMaterial = new MerkleMaterial({
-    color: 0xffffff,
-    emissive: 0x444444,
+    color: 0xfff7ca,
+    // color: 0xffffff,
+    emissive: 0x666666,
     flatShading: true,
-    metalness: 0.8,
+    metalness: 0.5,
     roughness: 0.3,
-    opacity: 0.7,
+    opacity: 1.0,
     depthTest: false,
     depthWrite: false,
     transparent: true,
@@ -70,15 +86,14 @@ export default (textures, cubeTextures) => {
   })
 
   const pointsMaterial = new PointsMaterial({
-    color: 0xfff900,
-    size: 100.0,
-    // alphaTest: 0.0001,
+    color: 0xfff7ca,
+    // color: 0xffffff,
+    size: 60.0,
     transparent: true,
     blending: THREE.AdditiveBlending,
     opacity: 1.0,
     depthTest: false,
     depthWrite: false
-    // vertexColors: THREE.VertexColors
   })
 
   return {bgMap, pointsMaterial, merkleMaterial, blockMaterialBack, blockMaterialFront, blockMaterialHighlight, blockMaterialOutline}

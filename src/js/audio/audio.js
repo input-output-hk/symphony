@@ -12,8 +12,8 @@ export default class Audio extends EventEmitter {
     this.camera = camera
     this.loops = []
     this.quantize = 16
-    this.masterVol = 0 // db
-    this.samplerVol = -6 // db
+    this.masterVol = -1 // db
+    this.samplerVol = -4 // db
     this.ambienceVol = -24 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
@@ -21,7 +21,7 @@ export default class Audio extends EventEmitter {
     this.isMuted = false
     this.context = null
     this.notes = {
-      27.5000: 'A0',
+      /* 27.5000: 'A0',
       29.1352: 'A#0',
       30.8677: 'B0',
       32.7032: 'C1',
@@ -32,7 +32,7 @@ export default class Audio extends EventEmitter {
       43.6535: 'F1',
       46.2493: 'F#1',
       48.9994: 'G1',
-      51.9131: 'G#1',
+      51.9131: 'G#1', */
       55.000: 'A1',
       58.2705: 'A#1',
       61.7354: 'B1',
@@ -87,169 +87,16 @@ export default class Audio extends EventEmitter {
       1046.50: 'C6'
     }
 
-    this.presets = {
-
-      'tiny': {
-        'harmonicity': 2,
-        'oscillator': {
-          'type': 'amsine2',
-          'modulationType': 'sine',
-          'harmonicity': 1.01
-        },
-        'envelope': {
-          'attack': 0.106,
-          'decay': 4,
-          'sustain': 5.04,
-          'release': 20.2
-        },
-        'modulation': {
-          'volume': 13,
-          'type': 'amsine2',
-          'modulationType': 'sine',
-          'harmonicity': 12
-        },
-        'modulationEnvelope': {
-          'attack': 2.006,
-          'decay': 1.2,
-          'sustain': 0.2,
-          'release': 7.4
-        }
+    this.preset = {
+      'harmonicity': 0.0,
+      'oscillator': {
+        'partials': [1, 0, 2, 0, 3, 0, 4]
       },
-
-      'harmonics': {
-        'harmonicity': 3.999,
-        'oscillator': {
-          'type': 'square'
-        },
-        'envelope': {
-          'attack': 0.03,
-          'decay': 3.3,
-          'sustain': 0.7,
-          'release': 10.8
-        },
-        'modulation': {
-          'volume': 12,
-          'type': 'square6'
-        },
-        'modulationEnvelope': {
-          'attack': 2,
-          'decay': 3,
-          'sustain': 0.8,
-          'release': 0.1
-        }
-      },
-
-      'metallic_fizz': {
-        'oscillator': {
-          'type': 'pulse',
-          'width': 0.8
-        },
-        'envelope': {
-          'attack': 0.01,
-          'decay': 0.05,
-          'sustain': 0.2,
-          'releaseCurve': 'bounce',
-          'release': 0.4
-        }
-      },
-      'koto': {
-        'harmonicity': 0.0,
-        'oscillator': {
-          'partials': [1, 0, 2, 0, 3, 0, 4]
-        },
-        'envelope': {
-          'attack': 0.01,
-          'decay': 1.2,
-          'sustain': 0,
-          'release': 0.5
-        }
-      },
-      'wind': {
-        'portamento': 0.0,
-        'oscillator': {
-          'type': 'square4'
-        },
-        'envelope': {
-          'attack': 2,
-          'decay': 1,
-          'sustain': 0.2,
-          'release': 2
-        }
-      },
-      'steel': {
-        'oscillator': {
-          'type': 'fatcustom',
-          'partials': [
-            0.2, 1, 0, 0.5, 0.1
-          ],
-          'spread': 40,
-          'count': 3
-        },
-        'envelope': {
-          'attack': 0.001,
-          'decay': 1.6,
-          'sustain': 0,
-          'release': 10.6
-        }
-      },
-      'marimba': {
-        'oscillator': {
-          'partials': [1, 0, 2, 0, 3]
-        },
-        'envelope': {
-          'attack': 0.001,
-          'decay': 1.2,
-          'sustain': 0,
-          'release': 10.2
-        }
-
-      },
-      'custom': {
-        'oscillator': {
-          'type': 'custom',
-          'partials': [1, 1, 1, 1]
-        },
-        'envelope': {
-          'attack': 10.001,
-          'decay': 10.00,
-          'sustain': 10.01,
-          'release': 30.0
-        }
-      },
-      'drop': {
-        'oscillator': {
-          'type': 'pulse',
-          'width': 0.8
-        },
-        'envelope': {
-          'attack': 0.01,
-          'decay': 0.05,
-          'sustain': 0.2,
-          'releaseCurve': 'bounce',
-          'release': 0.4
-        }
-      },
-      'eleccello': {
-        'harmonicity': 3.01,
-        'modulationIndex': 14,
-        'oscillator': {
-          'type': 'triangle'
-        },
-        'envelope': {
-          'attack': 2.2,
-          'decay': 3.3,
-          'sustain': 3.1,
-          'release': 10.2
-        },
-        'modulation': {
-          'type': 'square'
-        },
-        'modulationEnvelope': {
-          'attack': 0.01,
-          'decay': 0.5,
-          'sustain': 0.2,
-          'release': 5.1
-        }
+      'envelope': {
+        'attack': 0.05,
+        'decay': 1.0,
+        'sustain': 0,
+        'release': 0.5
       }
     }
 
@@ -340,10 +187,10 @@ export default class Audio extends EventEmitter {
     this.MIDIEnabled = false
     this.MIDIObject = null
     this.MIDIDevice = null
-    this.noteReleaseTime = 0.5 // (seconds)
+    this.noteReleaseTime = 0.25 // (seconds)
     this.MIDIChannel = '0'
     this.MIDIClockStarted = false
-    this.MIDILoops = []
+    this.MIDINotes = []
     this.MIDIDeviceDOMElementID = 'midiOut'
     this.MIDIChannelDOMElementID = 'midiChannel'
   }
@@ -465,7 +312,8 @@ export default class Audio extends EventEmitter {
 
     this.resetMIDI()
 
-    this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, Tone.now() + 2)
+    this.ambiencePlayer.start()
+    this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, Tone.now())
 
     this.pointColors = []
   }
@@ -476,17 +324,18 @@ export default class Audio extends EventEmitter {
       selectMIDIOut.disabled = false
     }
 
-    if (this.MIDILoops.length) {
+    if (this.MIDINotes.length) {
       this.MIDIClockStarted = false
       this.MIDIClock.cancel()
       this.MIDIClock.dispose()
       this.MIDIDevice.send([0xFC]) // stop MIDI clock
-      for (let index = 0; index < this.MIDILoops.length; index++) {
-        const loop = this.MIDILoops[index]
-        loop.cancel()
-        loop.dispose()
+      for (let index = 0; index < this.MIDINotes.length; index++) {
+        const note = this.MIDINotes[index]
+        note.stop()
+        note.cancel()
+        note.dispose()
       }
-      this.MIDILoops = []
+      this.MIDINotes = []
     }
   }
 
@@ -516,7 +365,7 @@ export default class Audio extends EventEmitter {
 
       Tone.Transport.bpm.value = this.bpm
 
-      this.synth = new Tone.PolySynth(12, Tone.AMSynth, this.presets['koto']).chain(this.convolver)
+      this.synth = new Tone.PolySynth(48, Tone.AMSynth, this.preset).chain(this.convolver)
 
       this.loadSampler()
 
@@ -614,13 +463,16 @@ export default class Audio extends EventEmitter {
     // disable changing MIDI device while MIDI is playing so that clock stays in sync
     this.disableMIDIInteraction()
 
-    let harmonicity = Math.round(map(block.feeToInputRatio, 0.00001, 0.001, 0, 20))
+    let harmonicity = Math.round(map(block.feeToInputRatio, 0.00001, 0.001, 0, 40))
     let detune = map(block.feeToInputRatio, 0.00001, 0.001, 0, -2000)
 
     this.synth.set('harmonicity', harmonicity)
     this.synth.set('detune', detune)
 
     this.ambienceBus.volume.linearRampToValueAtTime(-96, Tone.now() + 2)
+    setTimeout(() => {
+      this.ambiencePlayer.stop()
+    }, 2000)
 
     this.loopMap = []
 
@@ -661,71 +513,70 @@ export default class Audio extends EventEmitter {
     this.mode = this.modes[Object.keys(this.modes)[modeIndex]]
 
     for (let index = 0; index < positionsArray.length / 3; index++) {
-      let isFirst = index === 0
-      let xIndex = index * 3
-      let yIndex = index * 3 + 1
-      let zIndex = index * 3 + 2
+      const transaction = block.transactions[index]
+      let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
+      let timeLowRes = time.toFixed(1)
+      let timeInt = parseInt(time)
+      if (Config.detector.isMobile) {
+        timeLowRes = timeInt
+      }
 
-      /**
-       * Map transaction time to new range
-       */
-      if (typeof block.transactions[index] !== 'undefined') {
-        const transaction = block.transactions[index]
-        let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
+      let txSize = map(transaction.size, 0, 1000, 0, 1)
+      if (txSize > 1.0) {
+        txSize = 1.0
+      }
 
-        // filter out notes not in mode
-        let filteredNotes = {}
-        for (const frequency in this.notes) {
-          if (this.notes.hasOwnProperty(frequency)) {
-            const note = this.notes[frequency]
-            const noteName = note.replace(/[0-9]/g, '')
-            if (this.mode.indexOf(noteName) !== -1) { // filter out notes not in mode
-              filteredNotes[frequency] = note
+      let quantizedTime = Tone.Time(timeLowRes).quantize(this.quantize + 'n')
+
+      let loop
+
+      if (typeof this.loopMap[timeLowRes] === 'undefined') {
+        let isFirst = index === 0
+        let xIndex = index * 3
+        let yIndex = index * 3 + 1
+        let zIndex = index * 3 + 2
+
+        /**
+           * Map transaction time to new range
+           */
+        if (typeof block.transactions[index] !== 'undefined') {
+          // filter out notes not in mode
+          let filteredNotes = {}
+          for (const frequency in this.notes) {
+            if (this.notes.hasOwnProperty(frequency)) {
+              const note = this.notes[frequency]
+              const noteName = note.replace(/[0-9]/g, '')
+              if (this.mode.indexOf(noteName) !== -1) { // filter out notes not in mode
+                filteredNotes[frequency] = note
+              }
             }
           }
-        }
 
-        let pitchIndex = Math.floor(map(Math.log(transaction.output + 1.0), minOutput, maxOutput, Object.keys(filteredNotes).length, 0))
+          let pitchIndex = Math.floor(map(Math.log(transaction.output + 1.0), minOutput, maxOutput, Object.keys(filteredNotes).length, 0))
 
-        let note
+          let note
 
-        let i = 0
-        for (const frequency in filteredNotes) {
-          if (filteredNotes.hasOwnProperty(frequency)) {
-            if (pitchIndex === i) {
-              note = filteredNotes[frequency]
-              break
+          let i = 0
+          for (const frequency in filteredNotes) {
+            if (filteredNotes.hasOwnProperty(frequency)) {
+              if (pitchIndex === i) {
+                note = filteredNotes[frequency]
+                break
+              }
+              i++
             }
-            i++
           }
-        }
 
-        if (typeof note === 'undefined') {
-          continue
-        }
+          if (typeof note === 'undefined') {
+            continue
+          }
 
-        let txSize = map(transaction.size, 0, 1000, 0, 1)
-        if (txSize > 1.0) {
-          txSize = 1.0
-        }
+          let rawVelocity = parseInt(map(transaction.size, 0, 1000, 0, 127))
+          if (rawVelocity > 127) {
+            rawVelocity = 127
+          }
+          let velocity = rawVelocity.toString(16)
 
-        let rawVelocity = parseInt(map(transaction.size, 0, 1000, 0, 127))
-        if (rawVelocity > 127) {
-          rawVelocity = 127
-        }
-        let velocity = rawVelocity.toString(16)
-
-        let loop
-
-        let timeLowRes = time.toFixed(1)
-        let timeInt = parseInt(time)
-        if (Config.detector.isMobile) {
-          timeLowRes = timeInt
-        }
-
-        let quantizedTime = Tone.Time(timeLowRes).quantize(this.quantize + 'n')
-
-        if (typeof this.loopMap[quantizedTime] === 'undefined') {
           loop = new Tone.Loop(
             (loopTime) => {
               if (isFirst && !this.MIDIClockStarted) {
@@ -744,7 +595,7 @@ export default class Audio extends EventEmitter {
 
               if (this.MIDIEnabled) {
                 try {
-                  let innerLoop = new Tone.Loop(function (time) {
+                  let playMIDINote = new Tone.Event(function (time) {
                     let MIDINote = Tone.Frequency(note).toMidi()
 
                     // send MIDI note on
@@ -754,9 +605,9 @@ export default class Audio extends EventEmitter {
                     setTimeout(() => {
                       this.MIDIDevice.send(['0x8' + this.MIDIChannel, MIDINote, 0x00])
                     }, loopTime + (this.noteReleaseTime * 1000))
-                  }.bind(this), '1n').start('@' + this.quantize + 'n')
-                  this.MIDILoops.push(innerLoop)
-                  innerLoop.set('iterations', 1)
+                  }.bind(this)).start()
+
+                  this.MIDINotes.push(playMIDINote)
                 } catch (error) {
                   console.log(error)
                 }
@@ -764,7 +615,7 @@ export default class Audio extends EventEmitter {
                 this.synth.triggerAttackRelease(
                   note,
                   '16n',
-                  Tone.Time(loopTime).quantize(this.quantize + 'n'),
+                  Tone.Time(loopTime),
                   txSize
                 )
                 /* this.sampler.triggerAttack(
@@ -776,7 +627,7 @@ export default class Audio extends EventEmitter {
             },
             '1m'
           ).start(
-            Tone.Transport.seconds + time
+            Tone.Time(Tone.Transport.seconds + time).quantize(this.quantize + 'n')
           )
         } else {
           loop = new Tone.Loop(
@@ -796,7 +647,7 @@ export default class Audio extends EventEmitter {
 
         loop.set('iterations', 4)
         this.loops.push(loop)
-        this.loopMap[quantizedTime] = true
+        this.loopMap[timeLowRes] = true
       }
     }
   }
