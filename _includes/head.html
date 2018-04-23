@@ -43,6 +43,8 @@
 
 
 
+
+
 {% if page.layout == "blog-post" %}
 {% assign description = page.content | strip_html %}
 {% assign description = description | strip_newlines %}
@@ -202,27 +204,27 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 {% include css/symphony.css %}
 </style>
 
+
 <!--[if IE]>
 <script>IE = true;</script>
 <![endif]-->
 
 <!--[if lte IE 11]>
 <script>webglIE = false;</script>
-<style>#io_intro_nav {display: none !important}</style>
 <![endif]-->
 
 <!--[if lte IE 10]>
-<script src="{{ "/js/lowie.js" | prepend: site.baseurl }}"></script>
+<script src="{{ "/static/assets/js/lowie.js" | prepend: site.baseurl }}"></script>
 <![endif]-->
 
 <!--[if lt IE 9]>
-<link rel="stylesheet"  href="{{ "/css/ie.css" | prepend: site.baseurl }}" type="text/css" media="all" />
-<script src="{{ "/js/html5.js" | prepend: site.baseurl }}"></script>
+<link rel="stylesheet"  href="{{ "/static/assets/css/ie.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<script src="{{ "/static/assets/js/html5.js" | prepend: site.baseurl }}"></script>
 <![endif]-->
 <!--[if lt IE 8]>
 <script>lowerie = true;</script>
 <script>location.href='http://iohk.io/old-browser.html';</script>
-<link rel="stylesheet"  href="{{ "/css/ieoff.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<link rel="stylesheet"  href="{{ "/static/assets/css/ieoff.css" | prepend: site.baseurl }}" type="text/css" media="all" />
 <![endif]-->
 
 <script>
