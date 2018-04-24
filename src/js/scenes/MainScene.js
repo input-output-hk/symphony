@@ -11,7 +11,7 @@ import Materials from '../materials/materials'
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
 
-require('../lights/RectAreaLightUniforms')
+// require('../lights/RectAreaLightUniforms')
 
 const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
@@ -641,9 +641,10 @@ export default class MainScene extends EventEmitter {
       if (intersected !== this.lastHoveredBlock) {
         this.lastHoveredBlock = intersected
       }
-      this.pointLightTarget.copy(intersected.getWorldPosition(new THREE.Vector3()))
 
-      this.pointLightTarget.z -= intersected.block.size.z * 0.5
+      let blockWorldPos = intersected.getWorldPosition(new THREE.Vector3())
+      this.pointLightTarget.copy(blockWorldPos)
+      this.pointLightTarget.z += (intersected.block.size.z * 0.5) + 100.0
     } else {
       this.emit('blockMouseOut')
     }
@@ -654,7 +655,7 @@ export default class MainScene extends EventEmitter {
       Bound the camera movement to the available block chain range
     */
     const start = this.getPositionForDate(this.earliestDate) + 1000
-    const end = this.getPositionForDate(this.latestDate)
+    const end = this.getPositionForDate(this.latestDate) + 2000
 
     this.stage.targetCameraPos.z = Math.max(start, Math.min(end, this.stage.targetCameraPos.z))
 

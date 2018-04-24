@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@fabienmotte/three-first-person-controls@^73.0.1":
+  version "73.0.1"
+  resolved "https://registry.yarnpkg.com/@fabienmotte/three-first-person-controls/-/three-first-person-controls-73.0.1.tgz#754781c48753d997cff75bee8459f28a4b660f26"
+
 "@firebase/app-types@0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.1.2.tgz#a20cb346e3be374c0bdee6b102de0ea5e8e6fa27"
@@ -6950,6 +6954,10 @@ term-size@^1.2.0:
 text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
+
+three-first-person-controls@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/three-first-person-controls/-/three-first-person-controls-0.2.1.tgz#ff793b9c930ee49c5308dede9b7513f946b7c08c"
 
 three-orbit-controls@^82.1.0:
   version "82.1.0"

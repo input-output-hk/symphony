@@ -42,7 +42,7 @@ export default class Stage {
     // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
     // this.composer.addPass(this.RGBShiftPass)
 
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.35, 0.45, 0.4) // 1.0, 9, 0.5, 512);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.25, 0.35, 0.4) // 1.0, 9, 0.5, 512);
     this.composer.addPass(this.bloomPass)
 
     this.VignettePass = new ShaderPass(VignetteShader)
@@ -75,16 +75,16 @@ export default class Stage {
 
     // xy bounds of the ambient camera movement
     this.cameraDriftLimitMax = {
-      x: 100.0,
-      y: 100.0
+      x: 300.0,
+      y: 300.0
     }
     this.cameraDriftLimitMin = {
-      x: -100.0,
-      y: -100.0
+      x: -300.0,
+      y: -300.0
     }
 
-    this.cameraMoveStep = 200.0 // how much to move the camera forward on z-axis
-    this.cameraLerpSpeed = 0.05 // speed of camera lerp
+    this.cameraMoveStep = 300.0 // how much to move the camera forward on z-axis
+    this.cameraLerpSpeed = 0.08 // speed of camera lerp
 
     // scene camera
     this.camera = new THREE.PerspectiveCamera(Config.camera.fov, window.innerWidth / window.innerHeight, 1, 5000)
@@ -158,12 +158,7 @@ export default class Stage {
     let ambLight = new THREE.AmbientLight(0x555555)
     this.scene.add(ambLight)
 
-    this.pointLight = new THREE.RectAreaLight(0xfd8054, 0.8, 2000, 2000)
-
-    /* let rectLightHelper = new THREE.RectAreaLightHelper(this.pointLight)
-    this.scene.add(rectLightHelper) */
-
-    // this.pointLight = new THREE.PointLight(0xfd8054, 1, 50000, 3)
+    this.pointLight = new THREE.PointLight(0xfd8054, 1, 50000, 3)
     this.scene.add(this.pointLight)
   }
 
@@ -193,7 +188,7 @@ export default class Stage {
    * Lerp current mouse position to target position
    */
   updateMouse () {
-    this.mousePos.lerp(new THREE.Vector2(this.targetMousePos.x, this.targetMousePos.y), this.cameraLerpSpeed)
+    this.mousePos = new THREE.Vector2(this.targetMousePos.x, this.targetMousePos.y)
   }
 
   /**
@@ -201,8 +196,8 @@ export default class Stage {
    */
   cameraFollowTarget () {
     this.camera.lookAt(this.cameraLookAtPos)
-    this.targetCameraPos.x += this.mousePos.x
-    this.targetCameraPos.y += this.mousePos.y
+    this.targetCameraPos.x -= this.mousePos.x
+    this.targetCameraPos.y -= this.mousePos.y
 
     if (this.targetCameraPos.x > this.cameraDriftLimitMax.x) {
       this.targetCameraPos.x = this.cameraDriftLimitMax.x - 1
