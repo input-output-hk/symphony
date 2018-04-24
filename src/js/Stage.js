@@ -187,7 +187,7 @@ export default class Stage {
    * Lerp current mouse position to target position
    */
   updateMouse () {
-    this.mousePos = new THREE.Vector2(this.targetMousePos.x, this.targetMousePos.y)
+    this.mousePos.lerp(new THREE.Vector2(this.targetMousePos.x, this.targetMousePos.y), this.cameraLerpSpeed)
   }
 
   /**
