@@ -22,6 +22,15 @@ export default ({ n_tx, output, hash, feeToInputRatio }, visualise = false) => {
   zPosRotation.setFromAxisAngle(Z, DEG2RAD * angle)
   zNegRotation.setFromAxisAngle(Z, DEG2RAD * -angle)
 
+  // bitcoin merkle trees are always power of 2 (https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2)
+  n_tx--
+  n_tx |= n_tx >> 1
+  n_tx |= n_tx >> 2
+  n_tx |= n_tx >> 4
+  n_tx |= n_tx >> 8
+  n_tx |= n_tx >> 16
+  n_tx++
+
   // Generate an incremental array of `n_tx` length [0, 1, 2, 3, 4, ...n_tx]
   const array = new Array(n_tx).fill(0).map((v, i) => i.toString())
 

@@ -5,6 +5,8 @@ import Tone from 'tone'
 import { map } from '../../utils/math'
 import EventEmitter from 'eventemitter3'
 
+const MAX_HASH_RATE = 35000000 // maximum hash rate
+
 export default class Audio extends EventEmitter {
   constructor (camera, path) {
     super()
@@ -12,9 +14,9 @@ export default class Audio extends EventEmitter {
     this.camera = camera
     this.loops = []
     this.quantize = 16
-    this.masterVol = -1 // db
-    this.samplerVol = -4 // db
-    this.ambienceVol = -24 // db
+    this.masterVol = 0 // db
+    this.samplerVol = 0 // db
+    this.ambienceVol = -12 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 80
@@ -296,8 +298,13 @@ export default class Audio extends EventEmitter {
     })
   }
 
-  setAmbienceFilterCutoff (value) {
-    this.ambienceFilter.set('frequency', value)
+  setAmbienceFilterCutoff (hashRate) {
+    let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 15000.0)
+    if (audioFreqCutoff > 15000) {
+      audioFreqCutoff = 15000
+    }
+    console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
+    this.ambienceFilter.set('frequency', audioFreqCutoff)
   }
 
   unloadSound () {
@@ -514,6 +521,11 @@ export default class Audio extends EventEmitter {
 
     for (let index = 0; index < positionsArray.length / 3; index++) {
       const transaction = block.transactions[index]
+
+      if (typeof transaction === 'undefined') {
+        continue
+      }
+
       let time = map(transaction.time, minTime, maxTime, 0, 30) + 1.0
       let timeLowRes = time.toFixed(1)
       let timeInt = parseInt(time)
@@ -525,8 +537,6 @@ export default class Audio extends EventEmitter {
       if (txSize > 1.0) {
         txSize = 1.0
       }
-
-      let quantizedTime = Tone.Time(timeLowRes).quantize(this.quantize + 'n')
 
       let loop
 

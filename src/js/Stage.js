@@ -154,7 +154,6 @@ export default class Stage {
    * Add lights to the stage
    */
   addLights () {
-    // let ambLight = new THREE.AmbientLight(0x333333)
     let ambLight = new THREE.AmbientLight(0x555555)
     this.scene.add(ambLight)
 

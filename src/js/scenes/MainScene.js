@@ -1,6 +1,5 @@
 'use strict'
 import * as THREE from 'three'
-import { map } from '../../utils/math'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
 import AddText, { CIRCLE_OFFSET } from '../geometry/circleGeometry'
@@ -11,14 +10,11 @@ import Materials from '../materials/materials'
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
 
-// require('../lights/RectAreaLightUniforms')
-
 const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
 
 const MS_IN_A_DAY = 86400000
 const DAY_OFFSET = 5500 // offset for each day on z-axis
-const MAX_HASH_RATE = 35000000 // maximum hash rate
 
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
 
@@ -397,12 +393,7 @@ export default class MainScene extends EventEmitter {
     this.on('dayChanged', function ({ date }) {
       const hashRate = this.getGroupForDay(date.valueOf()).hashRate
       if (hashRate) {
-        let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 10000.0)
-        if (audioFreqCutoff > 10000) {
-          audioFreqCutoff = 10000
-        }
-        console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
-        this.audio.setAmbienceFilterCutoff(audioFreqCutoff)
+        this.audio.setAmbienceFilterCutoff(hashRate)
       }
     })
   }
