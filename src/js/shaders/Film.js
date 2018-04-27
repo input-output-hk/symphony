@@ -4,7 +4,7 @@ const Film = {
 
     tDiffuse: { value: null },
     time: { value: 0.0 },
-    nIntensity: { value: 0.2 },
+    nIntensity: { value: 0.15 },
     sIntensity: { value: 0.0 },
     sCount: { value: 0 },
     grayscale: { value: 0 }

@@ -42,7 +42,7 @@ export default class Stage {
     // this.RGBShiftPass = new ShaderPass(RGBShiftShader)
     // this.composer.addPass(this.RGBShiftPass)
 
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.25, 0.35, 0.4) // 1.0, 9, 0.5, 512);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.2, 0.3, 0.4) // 1.0, 9, 0.5, 512);
     this.composer.addPass(this.bloomPass)
 
     this.VignettePass = new ShaderPass(VignetteShader)
@@ -154,10 +154,16 @@ export default class Stage {
    * Add lights to the stage
    */
   addLights () {
+    // let ambLight = new THREE.AmbientLight(0x333333)
     let ambLight = new THREE.AmbientLight(0x555555)
     this.scene.add(ambLight)
 
-    this.pointLight = new THREE.PointLight(0xfd8054, 1, 50000, 3)
+    this.pointLight = new THREE.RectAreaLight(0xfd8054, 0.8, 2000, 2000)
+
+    /* let rectLightHelper = new THREE.RectAreaLightHelper(this.pointLight)
+        this.scene.add(rectLightHelper) */
+
+    // this.pointLight = new THREE.PointLight(0xfd8054, 1, 50000, 3)
     this.scene.add(this.pointLight)
   }
 

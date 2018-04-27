@@ -16,7 +16,7 @@ export default class Audio extends EventEmitter {
     this.quantize = 16
     this.masterVol = 0 // db
     this.samplerVol = 0 // db
-    this.ambienceVol = -12 // db
+    this.ambienceVol = -18 // db
     this.path = path
     this.ambiencePath = path + 'sounds/ambience/mining.mp3'
     this.bpm = 80
@@ -95,7 +95,7 @@ export default class Audio extends EventEmitter {
         'partials': [1, 0, 2, 0, 3, 0, 4]
       },
       'envelope': {
-        'attack': 0.05,
+        'attack': 0.01,
         'decay': 1.0,
         'sustain': 0,
         'release': 0.5
@@ -372,8 +372,6 @@ export default class Audio extends EventEmitter {
 
       Tone.Transport.bpm.value = this.bpm
 
-      this.synth = new Tone.PolySynth(48, Tone.AMSynth, this.preset).chain(this.convolver)
-
       this.loadSampler()
 
       this.loadAmbience().then(() => {
@@ -467,6 +465,10 @@ export default class Audio extends EventEmitter {
     pointsMaterial,
     pointsMesh
   ) {
+    Tone.Transport.stop()
+
+    this.synth = new Tone.PolySynth(48, Tone.AMSynth, this.preset).chain(this.convolver)
+
     // disable changing MIDI device while MIDI is playing so that clock stays in sync
     this.disableMIDIInteraction()
 
@@ -519,6 +521,10 @@ export default class Audio extends EventEmitter {
     let modeIndex = total % Object.keys(this.modes).length
     this.mode = this.modes[Object.keys(this.modes)[modeIndex]]
 
+    const startSeconds = JSON.parse(JSON.stringify(Tone.Transport.seconds))
+
+    let noteMap = []
+
     for (let index = 0; index < positionsArray.length / 3; index++) {
       const transaction = block.transactions[index]
 
@@ -539,6 +545,8 @@ export default class Audio extends EventEmitter {
       }
 
       let loop
+
+      let quantizedTime = Tone.Time(startSeconds + time).quantize(this.quantize + 'n')
 
       if (typeof this.loopMap[timeLowRes] === 'undefined') {
         let isFirst = index === 0
@@ -580,6 +588,12 @@ export default class Audio extends EventEmitter {
           if (typeof note === 'undefined') {
             continue
           }
+
+          // don't play the same note at the same time
+          if (noteMap[quantizedTime] === note) {
+            continue
+          }
+          noteMap[quantizedTime] = note
 
           let rawVelocity = parseInt(map(transaction.size, 0, 1000, 0, 127))
           if (rawVelocity > 127) {
@@ -624,7 +638,7 @@ export default class Audio extends EventEmitter {
               } else {
                 this.synth.triggerAttackRelease(
                   note,
-                  '16n',
+                  '0.4',
                   Tone.Time(loopTime),
                   txSize
                 )
@@ -637,7 +651,7 @@ export default class Audio extends EventEmitter {
             },
             '1m'
           ).start(
-            Tone.Time(Tone.Transport.seconds + time).quantize(this.quantize + 'n')
+            quantizedTime
           )
         } else {
           loop = new Tone.Loop(
@@ -652,7 +666,7 @@ export default class Audio extends EventEmitter {
               }, 500)
             },
             '1m'
-          ).start(Tone.Transport.seconds + time)
+          ).start(startSeconds + time)
         }
 
         loop.set('iterations', 4)
@@ -660,5 +674,7 @@ export default class Audio extends EventEmitter {
         this.loopMap[timeLowRes] = true
       }
     }
+
+    Tone.Transport.start()
   }
 }

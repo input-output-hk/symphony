@@ -12,7 +12,7 @@ const Vignette = {
 
     tDiffuse: { value: null },
     offset: { value: 1.0 },
-    darkness: { value: 1.4 }
+    darkness: { value: 1.6 }
 
   },
 

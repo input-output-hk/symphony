@@ -10,6 +10,8 @@ import Materials from '../materials/materials'
 import DayBuilderWorker from '../workers/day.worker.js'
 import TreeBuilderWorker from '../workers/tree.worker.js'
 
+require('../lights/RectAreaLightUniforms')
+
 const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
 
@@ -725,7 +727,7 @@ export default class MainScene extends EventEmitter {
 
     this.checkMouseIntersection()
 
-    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.2)
+    this.stage.pointLight.position.lerp(this.pointLightTarget, 0.3)
 
     this.uTime = this.clock.getElapsedTime()
 

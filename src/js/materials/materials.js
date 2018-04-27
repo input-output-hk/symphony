@@ -25,14 +25,14 @@ export default (textures, cubeTextures) => {
     color: 0x7fa9fc,
     emissive: 0x000000,
     metalness: 0.7,
-    roughness: 0.1,
+    roughness: 0.0,
     opacity: 1.0,
     transparent: true,
     depthWrite: false,
     side: THREE.BackSide,
     envMap: bgMap,
     bumpMap,
-    bumpScale: 0.4,
+    bumpScale: 0.2,
     alphaMap
   })
 
@@ -40,13 +40,13 @@ export default (textures, cubeTextures) => {
     color: 0x7fa9fc,
     emissive: 0x000000,
     metalness: 0.7,
-    roughness: 0.1,
+    roughness: 0.0,
     opacity: 1.0,
     transparent: true,
     side: THREE.FrontSide,
     envMap: bgMap,
     bumpMap,
-    bumpScale: 0.4,
+    bumpScale: 0.2,
     alphaMap
   })
 
@@ -60,24 +60,23 @@ export default (textures, cubeTextures) => {
     color: 0xffcdbb,
     emissive: 0x333333,
     metalness: 0.7,
-    roughness: 0.1,
+    roughness: 0.0,
     opacity: 1.0,
     transparent: true,
     side: THREE.DoubleSide,
     envMap: bgMap,
     bumpMap,
-    bumpScale: 0.4,
+    bumpScale: 0.2,
     alphaMap
   })
 
   const merkleMaterial = new MerkleMaterial({
-    color: 0xfff7ca,
-    // color: 0xffffff,
-    emissive: 0x666666,
+    color: 0xffffff,
+    emissive: 0x555555,
     flatShading: true,
-    metalness: 0.5,
-    roughness: 0.3,
-    opacity: 1.0,
+    metalness: 1.0,
+    roughness: 0.76,
+    opacity: 0.7,
     depthTest: false,
     depthWrite: false,
     transparent: true,
@@ -86,9 +85,8 @@ export default (textures, cubeTextures) => {
   })
 
   const pointsMaterial = new PointsMaterial({
-    color: 0xfff7ca,
-    // color: 0xffffff,
-    size: 60.0,
+    color: 0xfff493,
+    size: 80.0,
     transparent: true,
     blending: THREE.AdditiveBlending,
     opacity: 1.0,
