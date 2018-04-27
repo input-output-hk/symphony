@@ -1,6 +1,6 @@
 ---
 layout: page-roadmap
-title: Symphony roadmap
+title: Roadmap
 language: en
 permalink: /roadmap/
 defaulturl: /roadmap/

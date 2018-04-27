@@ -30,9 +30,11 @@ jQuery("#page").addClass('intropage home');
 
 </script>
 
-      <img class="none printyes" src="{{ '/images/iohk-share-logo.jpg' | prepend: site.baseurl }}" width="150" height="40" alt="{{ site.title }}" style="margin:0 0 1em 0" />
 
-      <div id="navbar" class="navbar navbar-fixed-top navbar-default navbar-inverse " role="navigation">
+
+
+
+      <div id="navbar" class="navbar navbar-default navbar-inverse " role="navigation">
         <noscript class="noscript">
                <div id="div100">
                Please enable scripts for all features of this site to work.
@@ -45,16 +47,16 @@ jQuery("#page").addClass('intropage home');
               <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navhider" aria-expanded="false">
                   <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
+                  <span class="fa fa-bars"></span>
+                  <span class="fa fa-times"></span>
                 </button>
-                  <a class="navbar-brand" href="{{ site.baseurl }}/{% if page.language != 'en' %}{{ page.language }}/{% endif %}">{{site.title}}</a>
+                  <a class="navbar-brand home" href="{{ site.baseurl }}/{% if page.language != 'en' %}{{ page.language }}/{% endif %}"><img src="/static/assets/images/symphony-logo.svg" width="100" height="100" alt="" /></a>
               </div>
 
-              <div id="navhider" class="collapse navbar-collapse">
+              <div id="navhider" class="collapse navbar-collapse ">
                 {% include nav-main.html %}
               </div>
+
 
 
             </div>
@@ -66,6 +68,7 @@ jQuery("#page").addClass('intropage home');
       </div>
 
     </header>
+
 
 
 

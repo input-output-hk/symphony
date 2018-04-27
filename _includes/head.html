@@ -43,6 +43,8 @@
 
 
 
+
+
 {% if page.layout == "blog-post" %}
 {% assign description = page.content | strip_html %}
 {% assign description = description | strip_newlines %}
@@ -120,7 +122,7 @@
 <meta property="og:description" content="{{description}}" />
 
 
-{% if site.url != "https://iohk.io" %}
+{% if site.url != "https://symphony.iohk.io" %}
 <meta name="robots" content="noindex,nofollow" />
 {% endif %}
 
@@ -189,20 +191,19 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 
 </script>
 <link rel="icon" href="{{ '/images/favicon.ico' | prepend: urlprefix }}" type="image/x-icon">
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" media="screen">
-<link rel="stylesheet" href="{{ '/static/assets/css/app.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="screen" />
-<link rel="stylesheet" href="{{ '/static/assets/css/melon.datepicker.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" media="screen">
-<link rel="stylesheet" href="{{ '/static/assets/css/base.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
-<link rel="stylesheet" href="{{ '/static/assets/css/rd.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
-<link rel="stylesheet" href="{{ '/static/assets/css/symphony.css' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css" media="all" />
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto%3A100%2C300%2C700%2C500&#038;subset=latin%2Ccyrillic&#038;ver=4.4.2" type="text/css" media="all" />
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,700i" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css?family=Electrolize" rel="stylesheet" type="text/css">
 <style>
-#entry h1,#entry .h1,
-#subheader h1,#subheader .h1,.electrolize{font-family: 'Electrolize', sans-serif;text-transform: uppercase; letter-spacing: .05em}
+{% include css/jquery-ui.css %}
+{% include css/melon.datepicker.css %}
+{% include css/app.css %}
+{% include css/fa.css %}
+{% include css/simple-line-icons.css %}
+{% include css/base.css %}
+{% include css/rd.css %}
+{% include css/symphony.css %}
 </style>
+
 
 <!--[if IE]>
 <script>IE = true;</script>
@@ -210,42 +211,41 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 
 <!--[if lte IE 11]>
 <script>webglIE = false;</script>
-<style>#io_intro_nav {display: none !important}</style>
 <![endif]-->
 
 <!--[if lte IE 10]>
-<script src="{{ "/js/lowie.js" | prepend: site.baseurl }}"></script>
+<script src="{{ "/static/assets/js/lowie.js" | prepend: site.baseurl }}"></script>
 <![endif]-->
 
 <!--[if lt IE 9]>
-<link rel="stylesheet"  href="{{ "/css/ie.css" | prepend: site.baseurl }}" type="text/css" media="all" />
-<script src="{{ "/js/html5.js" | prepend: site.baseurl }}"></script>
+<link rel="stylesheet"  href="{{ "/static/assets/css/ie.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<script src="{{ "/static/assets/js/html5.js" | prepend: site.baseurl }}"></script>
 <![endif]-->
 <!--[if lt IE 8]>
 <script>lowerie = true;</script>
 <script>location.href='http://iohk.io/old-browser.html';</script>
-<link rel="stylesheet"  href="{{ "/css/ieoff.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<link rel="stylesheet"  href="{{ "/static/assets/css/ieoff.css" | prepend: site.baseurl }}" type="text/css" media="all" />
 <![endif]-->
 
-<link rel="stylesheet" href="/css/jquery-ui.css" />
-<script type="text/javascript" src="{{ '/static/assets/js/app/jquery-1.11.2.min.js' | prepend: urlprefix }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/app/jquery-ui.js' | prepend: urlprefix }}?bust={{ site.time | date: '%s' }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/app/app.js' | prepend: urlprefix }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/history.js' | prepend: site.baseurl }}"></script>
-<script type="text/javascript" src="/static/assets/js/showdown.min.js"></script>
-<script type="text/javascript" src="/static/assets/js/jquery.fancybox.js"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/history.adapter.jquery.js' | prepend: site.baseurl }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/jquery.mousewheel.min.js' | prepend: site.baseurl }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/app/base.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/app/roadmap.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/team.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/intro/home.jan.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
-<script type="text/javascript" src="{{ '/static/assets/js/app/functions.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
+<script>
+{% include js/app/jquery.js %}
+{% include js/app/jquery-ui.js %}
+{% include js/app/app.js %}
+{% include js/blazy.js %}
+{% include js/intro/hammer.min.js %}
+{% include js/intro/StartAudioContext.min.js %}
+{% include js/showdown.min.js %}
+{% include js/jquery.fancybox.js %}
+{% include js/app/base.js %}
+{% include js/jquery.mousewheel.min.js %}
+{% include js/team.js %}
+{% include js/history.js %}
+{% include js/history.adapter.jquery.js %}
+{% include js/intro/intro.js %}
+{% include js/app/roadmap.js %}
+{% include js/app/functions.js %}
+</script>
 
 <script type="text/javascript" src="{{ '/dist/static/js/app.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
-
-
-
-
 
 </head>

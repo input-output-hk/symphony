@@ -1,0 +1,24 @@
+
+
+{% if page.layout == 'member' %}
+
+
+
+{% if include.item.linkedin %}<a class="rounded " href="{{ include.item.linkedin }}" target="_blank"><em class="fa fa-linkedin"></em></a>{% endif %}
+{% if include.item.twitter %}<a class="rounded " href="{{ include.item.twitter }}" target="_blank"><em class="fa fa-twitter"></em></a>{% endif %}
+{% if include.item.github %}<a class="rounded" href="{{ include.item.github }}" target="_blank"><em class="fa fa-github"></em></a>{% endif %}
+{% if include.item.slack %}<a class="rounded" href="{{ include.item.slack }}" target="_blank"><em class="fa fa-slack"></em></a>{% endif %}
+
+
+
+{% else %}
+
+
+
+{% if include.item.linkedin %}<a class="" href="{{ include.item.linkedin }}" target="_blank"><em class="fa fa-linkedin"></em></a>&nbsp;{% endif %}
+{% if include.item.twitter %}<a class="" href="{{ include.item.twitter }}" target="_blank"><em class="fa fa-twitter"></em></a>&nbsp;{% endif %}
+{% if include.item.github %}<a class="" href="{{ include.item.github }}" target="_blank"><em class="fa fa-github"></em></a>&nbsp;{% endif %}
+{% if include.item.slack %}<a class="" href="{{ include.item.slack }}" target="_blank"><em class="fa fa-slack"></em></a>{% endif %}
+
+
+{% endif %}

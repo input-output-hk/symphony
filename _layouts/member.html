@@ -1,0 +1,97 @@
+---
+layout: member
+---
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body class="{{page.defaultlink | slugify }}">
+
+    {% include header.html %}
+
+    <div id="middle" class="middle">
+      <div id="main" class="container-fluid">
+
+
+        <div class="intro box bigger">
+          <div class="fader">
+
+            <div class="block title text-center uppercase"><h1><a href="/"><span class="site">{{site.title}}</span><span class="dot"> • </span><b class="title">{{page.title}}</b></a></h1></div>
+
+            <div class="roadmap {{page.defaultlink | slugify }}">
+
+            <div class="container">
+
+              <div class="col-lg-20 col-lg-offset-2 text-center">
+
+
+                <div id="team-load" class="ready">
+
+
+
+                            <div class="profile team {{page.key}} smaller">
+                                <div class="img">
+                                <div class="link"></div>
+                                  <a href="//iohk.io/team/{{page.key}}" class="ajaxhref profile-link" rel="" title="{{page.title}}" target="_blank">
+                                    <img src="//iohk.io/{{page.thumbnail}}" alt="" class="img-circle fullwidth" style="">
+                                  </a>
+                                </div>
+                                <div class="content">
+                                  <span class="glow"><img src="/static/assets/images/glow.png" alt="" /></span>
+                                  <h2><a href="//iohk.io/team/{{page.key}}" rel="30" class=" profile-link" title="IOHK profile of {{page.title}}" target="_blank">{{page.title}}</a></h2>
+                                  <div class="role">{{page.role}}</div>
+                                  <hr />
+                                  <div class="info">{{page.content}}</div>
+                                  <hr />
+                                  {% include ui-social.html item=member %}
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+
+
+
+
+
+
+                </div><!-- .timeline -->
+
+
+              </div>
+
+
+              <div class="clear"></div>
+
+
+            <div class="countdown--wrap none">
+
+            </div>
+
+
+
+              <div class="roadmap--foot uppercase text-center">
+                <!--<h6 class="">Learn More</h6>-->
+
+                <!--<a href="https://iohk.io/projects/cardano/" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-cardano.svg" alt="" /> Cardano Project</a>
+                <a href="https://github.com/input-output-hk/cardano-sl" target="_blank" class="btn bnt-default rounded"><em class="fa fa-github"></em> Cardano SL </a>
+                <a href="https://iohk.io/research/papers/#9BKRHCSI" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-ouroboros.svg" alt="" /> Ouroboros Algorithm</a>
+                <a href="https://iohk.io/" target="_blank" class="btn bnt-default rounded"><img src="/images/ico-research.svg" alt="" /> Input Output</a>-->
+
+              </div>
+
+            </div>
+            </div><!-- .roadmap -->
+
+          </div>
+        </div>
+
+        {% include nav-footer.html %}
+
+      </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>

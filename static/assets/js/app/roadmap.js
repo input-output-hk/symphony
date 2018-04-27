@@ -410,7 +410,6 @@ function rm_item(item){
       <div class="spacer clear"></div>\
       <div class="content">\
        '+icon+'\
-       <h2>'+time+' <span class="dot left"></span> '+title+' <span class="dot right"></span></h2>\
        <!--<h2><span class="dot left"></span> '+title+' <span class="dot right"></span></h2>-->\
         <div class="desc">\
           <div class="inner">\
@@ -420,6 +419,7 @@ function rm_item(item){
         </div>\
       </div><!-- .content -->\
       <div class="attributes">\
+        <h2>'+time+' <span class="dot left"></span> '+title+' <span class="dot right"></span></h2>\
         <div class="links"> \
           '+owner+'\
           '+links+'\

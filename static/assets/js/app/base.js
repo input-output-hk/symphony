@@ -187,7 +187,7 @@ textzoom_arr[2] = '',
 textzoom_arr[3] = 'font-big',
 textzoom_arr[4] = 'font-bigger';
 
-var dayname = new Array('January','February','March','April','May','June','July','August','September','October','November','December');
+var dayname = new Array('Jan<span class="nomobile">uary</span>','Feb<span class="nomobile">ruary</span>','Mar<span class="nomobile">ch</span>','April','May','June','July','August','September','October','November','December');
 
 
 function textzoom(num) {
@@ -276,8 +276,9 @@ io_intro_colors.random = function() {
 
 var io_weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var io_days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-var io_months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var io_months = ['Jan<span class="nomobile">uary</span>','Feb<span class="nomobile">ruary</span>','Mar<span class="nomobile">ch</span>',"April","May","June","July","August","September","October","November","December"];
 var io_mons = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
 
 function ordinal_suffix_of(i) {
     var j = i % 10,

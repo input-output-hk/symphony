@@ -1,262 +1,48 @@
 ---
 layout: page-about
 ---
-{% assign charles = '' %}
-{% assign jeremy = '' %}
-{% assign in_mem_cnt = 0 %}
-{% for post in site.pages reversed %}
-  {% if post.layout == 'member' %}
-
-  {% if post.contact == 'charles.hoskinson@iohk.io' %}
-  {% assign charles = in_mem_cnt %}
-  {% endif %}
-
-  {% if post.contact == 'jeremy.wood@iohk.io' %}
-  {% assign jeremy = in_mem_cnt %}
-  {% endif %}
-
-  {% assign in_mem_cnt = in_mem_cnt | plus:1 %}
-  {% endif %}
-{% endfor %}
-
-
 <!DOCTYPE html>
 <html>
 
   {% include head.html %}
 
-  <body>
+  <body class="{{page.defaultlink | slugify }}">
 
     {% include header.html %}
 
     <div id="middle" class="middle">
-        <div id="main" class="about">
+      <div id="main" class="container-fluid">
 
 
-
-            <div id="subheader" class="banner particles"><div id="subheader-particles"></div>
-                <div class="container">
-                    {% include nav-sub.html %}
-
-                    <div class="title_block">
-                        <h1 class=" uppercase clear"><span class="c_f00">IOHK | </span> <span class="title">About</span></h1>
+        <div class="intro box bigger">
+          <div class="fader">
+            <div class="block title text-center uppercase"><h1><a href="/"><span class="site">{{site.title}}</span><span class="dot"> • </span><b class="title">{{page.title}}</b></a></h1></div>
 
 
-                                <blockquote>
-                                    <p>Founded in 2015 by <a rel="{{charles}}" class="ajaxhref profile-link" title="" href="/team/charles-hoskinson/">Charles Hoskinson</a> and <a rel="{{jeremy}}" class="ajaxhref profile-link" title="" href="/team/jeremy-wood/">Jeremy Wood</a>, IOHK is a technology company committed to using peer-to-peer innovations to provide financial services to the three billion people who don’t have them. </p>
-
-                                    <p>We are an engineering company that builds cryptocurrencies and blockchains for academic institutions, government entities and corporations. We are a decentralized company that loves small, innovative teams forming and executing ideas that cause cascading disruption.</p>
-                                </blockquote>
+            <div class="{{page.defaultlink | slugify }}">
 
 
-                    </div>
+              <div class="container">
+
+                <div class="entry">
+
+                  {{content}}
 
                 </div>
-            </div>
-            <div class="subheader-grad"></div>
-            <!--div class="subheader-shade"></div-->
 
 
+              </div>
+            </div><!-- .roadmap -->
 
-
-            <div class="section press">
-
-                  <h6>FEATURED IN THE PRESS</h6>
-                  <a href="/press/" class="ajaxhref" style="text-decoration:none">
-                    <img src="/images/logo/logo-forbes.jpg" width="174" height="50" alt="" />
-                    <img src="/images/logo/logo-times.jpg" width="132" height="50" alt="" />
-                    <img src="/images/logo/logo-bloomberg.jpg" width="196" height="50" alt="" />
-                    <img src="/images/logo/logo-nasdaq.jpg" width="174" height="50" alt="" />
-                    <img src="/images/logo/logo-ft.jpg" width="174" height="50" alt="" />
-                    <img src="/images/logo/logo-bi-2.jpg" width="132" height="50" alt="" />
-                    <img src="/images/logo/logo-coindesk.jpg" width="174" height="50" alt="" />
-                    <img src="/images/logo/logo-abc-news.jpg" width="130" height="50" alt="" />
-                  </a>
-
-            </div>
-
-
-
-            <div class="section what-is">
-                <div class="container">
-
-                    <!--div class="steps">
-                        <img src="/images/about/s1-a.png" alt="" width="" height="" />
-                        <img src="/images/about/s1-b.png" alt="" width="" height="" />
-                        <img src="/images/about/s1-c.png" alt="" width="" height="" />
-                    </div-->
-
-                    <h2>Cascading disruption</h2>
-                    <p>It is the founding principle of IOHK. Cascading disruption is the idea that most of the structures that form the world’s financial, governance and social systems are inherently unstable and thus minor perturbations can cause a ripple effect that fundamentally reconfigures the entire system. Our company is committed to identifying and developing technology to force these perturbations in order to push towards a more fair and transparent order.</p>
-
-
-                    <!--p class="uppercase"><br class="nodesktop nolandscape" /><a href="javascript:;" id="io_intro_start-0" class="btn btn-default">Distributed systems &nbsp;<em class="fa fa-play"></em></a> &nbsp;<br class="nodesktop nolandscape" /><br class="nodesktop nolandscape" />
-  <a href="javascript:;" id="io_intro_start-1" class="btn btn-default">Complexity is beautiful &nbsp;<em class="fa fa-play"></em></a></p-->
-
-
-                </div>
-            </div>
-
-
-
-            <div class="section what-we-work">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-10 col-lg-offset-1 col-md-11 col-md-offset-1 about">
-
-                            <h2>Projects we work on</h2>
-                            <p>Currently IOHK is studying new tools and paradigms for cryptographic research and the architecture of cryptocurrencies. More specifically, we are collaboratively developing an open-source library for universal composability and the Scorex project. We also do for-profit work aligned with our mission, vision and goals.</p>
-
-                        </div>
-                        <div class="col-lg-12 col-lg-offset-1 col-md-11 col-md-offset-1 projects">
-
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="wrap">
-
-                                        <!--a href="/projects/scorex/" class="thumb ajaxhref"><img src="/images/about/s2-scorex.png" alt="" width="120" height="120" /></a-->
-                                        <h3><a href="/projects/cardano/" class="ajaxhref">Cardano</a></h3>
-                                        <p>Cardano is a blockchain platform with more advanced features than any protocol yet developed, and the first to evolve out of a scientific philosophy. </p>
-
-                                    </div>
-                                </div>
-                                <div class="col-xs-12">
-                                    <div class="wrap">
-                                        <!--a href="/projects/rscoin/" class="thumb ajaxhref"><img src="/images/about/s2-rscoin.png" alt="" width="120" height="120" /></a-->
-                                        <h3><a href="/projects/ethereum-classic/" class="ajaxhref">Ethereum Classic</a></h3>
-                                        <p>Ethereum Classic (ETC) is a continuation of the original Ethereum blockchain - the classic version preserving untampered history. Free from any external interference.</p>
-
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <div class="section what-mission">
-                <div class="container">
-
-                    <!--div class="steps">
-                        <img src="/images/about/s3-a.png" alt="" class="img " height="" />
-                        <img src="/images/about/symbol.png" class="symbol glowing" alt="" width="" height="" />
-                        <img src="/images/about/s3-b.png" alt="" class="img pulsing" height="" />
-                    </div-->
-
-                    <h2>The mission of IOHK</h2>
-                    <p>We view the world as a series of giant and mostly interconnected social graphs with hundreds of complex systems embedded. Our mission is to perturb the graphs to a more connected, transparent and fair configuration for both the flow of ideas and value.</p>
-
-                </div>
-            </div>
-
-
-
-            <div class="section who-is">
-                <div class="container">
-
-
-
-                        <div class="row">
-                            <div class="col-lg-6 col-lg-offset-9 col-md-6 col-md-offset-8 col-sm-6 col-sm-offset-7">
-
-<!--
-
-                                <div class="globe_holder text-left ">
-
-
-                                    <div class="clear globe widget">
-                                        <div id="io_data_globe-box" class="globe preview io_webgl">
-                                            <div id="io_data_globe" class="multi" data-img="/images/globe-ww.jpg" data-var=""></div>
-
-                                            <div id="io_data_globe-marker" class="spinner marker">
-
-                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40px" height="40px">
-                                                <defs>
-                                                    <circle id="def-circle1" style="fill:rgba(255,255,255,0.2);" cx="0" cy="0" r="20" />
-                                                </defs>
-                                                <defs>
-                                                    <circle id="def-circle2" style="fill:rgba(255,255,255,0.4);" cx="0" cy="0" r="10" />
-                                                </defs>
-
-
-                                                <use xlink:href="#def-circle1" transform="translate(20 20)">
-                                                    <animateTransform attributeName="transform"
-                                                    type="scale"  additive="sum"   from="0 0"  to="1 1"  beg="0s" dur="2s" repeatCount="indefinite" />
-                                                </use>
-                                                <use xlink:href="#def-circle2" transform="translate(20 20)">
-                                                    <animateTransform attributeName="transform"
-                                                    type="scale" additive="sum" from="0 0" to="1 1" beg="0s" dur="1s" repeatCount="indefinite" />
-                                                </use>
-                                            </svg>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div id="io_data_globe_desc" class="clear io_webgl">
-
-
-
-                                        {% assign researchers = 0 %}
-
-                                        {% for researcher in site.pages %}
-                                        {% if researcher.layout == 'member' %}
-
-                                        {% assign researchers = researchers | plus:1 %}
-
-                                            <div class="io_data_globe_profile" data-coords="{{researcher.coords}}" data-key="{{researcher.key}}">
-                                                <a href="{{researcher.permalink}}"><img src="/{{researcher.thumbnail}}" alt="" class="img-circle" /></a>
-                                                <div class="desc">
-                                                    <a href="{{researcher.permalink}}"><strong class="title block">{{researcher.title}}</strong></a>
-
-                                                    <div class="role">{{researcher.role}}</div>
-                                                    <div class="location">{{researcher.location}}</div>
-
-                                                </div>
-                                                <div class="clear"></div>
-                                            </div>
-
-
-                                        {% endif %}
-                                        {% endfor %}
-
-                                    </div>
-
-
-
-
-                                </div>
--->
-
-                            </div>
-                        </div>
-
-
-
-
-
-
-
-
-                    <h2>Input Output the company</h2>
-                    <p>In addition to our founders, IOHK enjoys having a diverse, geographically distributed team of engineers, scientists, business professionals, a few teachers and open-source collaborators. We are always looking for new <a href="/team/" class="ajaxhref">team members</a> and <a href="/contact/" class="ajaxhref">partnerships</a>.</p>
-
-                </div>
-            </div>
-
-
-
-
-            {% include nav-footer.html %}
+          </div>
         </div>
-    </div>
-    {% include footer.html %}
 
+        {% include nav-footer.html %}
+
+      </div>
+    </div>
+
+    {% include footer.html %}
 
   </body>
 

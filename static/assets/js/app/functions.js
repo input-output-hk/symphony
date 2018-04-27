@@ -3,6 +3,7 @@ var homeloaded = false;
 
 var io_loadto = ['#middle','#main'];
 
+
 function io_disqus(){
 	var disqus_config = function () {
 	    this.page.url = document.location.href;
@@ -179,148 +180,6 @@ function io_cut_arr(arr){
 }
 
 
-function io_crypto_chart(exchange,currency,compare){
-
-
-	//https://www.cryptocompare.com/api/data/histohour/?e=Poloniex&fsym=ETC&limit=10&tsym=USD
-	//$.getJSON('https://cors.io/?https://blockchain.info/stats?format=json',function(){})
-	$.getJSON('https://min-api.cryptocompare.com/data/histoday?fsym='+currency+'&tsym='+compare+'&limit=30&aggregate=3&e=CCCAGG', function (data) {
-		if(data){
-			//
-			$("#cryptochart").html('<canvas id="chart_canvas" height="170"></canvas>');
-
-
-
-			var labels_arr = new Array();
-			var data_high = new Array();
-			var data_low = new Array();
-			var data_open = new Array();
-			var data_close = new Array();
-
-			for(var i=0; i<data.Data.length; i++){
-
-			  var a = new Date(data.Data[i].time * 1000);
-			  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-			  var year = a.getFullYear();
-			  var month = months[a.getMonth()];
-			  var date = a.getDate();
-
-				labels_arr.push(date+'. '+month);
-				data_high.push(data.Data[i].high);
-				data_low.push(data.Data[i].low);
-				data_open.push(data.Data[i].open);
-				data_close.push(data.Data[i].close);
-			}
-
-
-      var config = {
-          type: 'line',
-          data: {
-              labels: io_cut_arr(labels_arr),
-              datasets: [{
-                  label: ""+currency+"/"+compare+" LOW",
-                  data: data_low,
-                  backgroundColor: '#0F0F0F',
-                  borderColor: '#ff0000',
-                  fill: true,
-									borderWidth: 1,
-                  pointRadius: 1,
-                  pointHoverRadius: 4,
-              },{
-								label: ""+currency+"/"+compare+" HIGH",
-                  data: data_high,
-                  backgroundColor: '#222222',
-                  borderColor: '#00aa00',
-                  fill: true,
-                  borderWidth: 1,
-                  pointRadius: 1,
-                  pointHoverRadius: 4,
-              }]
-          },
-          options: {
-              responsive: true,
-              legend: {
-									display: false,
-                  position: 'bottom',
-              },
-							scales: {
-		            xAxes: [{
-		                scaleType: "linear", // scatter should not use a dataset axis
-		                display: true,
-		                position: "bottom",
-		                id: "x-axis-1", // need an ID so datasets can reference the scale
-
-		                // grid line settings
-		                gridLines: {
-		                    show: true,
-		                    color: "rgba(0, 0, 0, 0.05)",
-		                    lineWidth: 1,
-		                    drawOnChartArea: true, // if true, draw these grid lines on the chart area
-		                    drawTicks: true, // if true, draw these grid lines as ticks on the axis
-		                    zeroLineWidth: 1,
-		                    zeroLineColor: "rgba(0,0,0,0.25)",
-		                },
-
-		                // scale numbers
-		                beginAtZero: false,
-		                integersOnly: false,
-		                override: null,
-
-		                // label settings
-		                labels: {
-		                    show: true,
-		                    template: "<%=value%>",
-		                    fontSize: 9,
-		                    fontStyle: "normal",
-		                    fontColor: "#666",
-		                    fontFamily: "Helvetica Neue",
-		                },
-		            }],
-		            yAxes: [{
-		                scaleType: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-		                display: true,
-		                position: "right",
-		                id: "y-axis-1",
-
-		                // grid line settings
-		                gridLines: {
-		                    show: true,
-		                    color: "rgba(0, 0, 0, 0.05)",
-		                    lineWidth: 1,
-		                    drawOnChartArea: true,
-		                    drawTicks: true, // draw ticks extending towards the label
-		                    zeroLineWidth: 1,
-		                    zeroLineColor: "rgba(0,0,0,0.25)",
-		                },
-
-		                // scale numbers
-		                beginAtZero: false,
-		                integersOnly: false,
-		                override: null,
-
-		                // label settings
-		                labels: {
-		                    show: true,
-		                    template: "<%=value%>",
-		                    fontSize: 9,
-		                    fontStyle: "normal",
-		                    fontColor: "#666",
-		                    fontFamily: "Helvetica Neue",
-		                }
-		            }],
-		        }
-          }
-
-      };
-
-      var ctx = document.getElementById("chart_canvas").getContext("2d");
-      window.myLine = new Chart(ctx, config);
-
-		}
-	});
-
-}
-
 
 var allVideos = jQuery("iframe[src^='//www.youtube.com']");
 var fluidEl = jQuery("body");
@@ -371,6 +230,7 @@ function io_load_page(url,obj,hash,callback){
 	}else{
 		chosen = url_a[url_a.length-3];
 	}
+	console.log(chosen);
 	if(url.match('team')){
 		chosen = 'team';
 	}
@@ -384,7 +244,7 @@ function io_load_page(url,obj,hash,callback){
 		$(obj).load(url+' '+hash,function(){
 			io_nav();
 			var bodyvar = chosen;
-			if(bodyvar == ''){
+			if(bodyvar == '' || bodyvar == 'symp.com' || bodyvar == 'symphony.iohk.io' || bodyvar == 'symphonydev.iohk.io'){
 				bodyvar = 'home';
 			}
 			$("#page").attr('class',bodyvar);
@@ -416,14 +276,15 @@ function io_load_page(url,obj,hash,callback){
 
 
 
+function io_navbar() {
+
+
 $(".navbar a").click(function(e){
-	if(!$(this).hasClass('careers')){
 
 		e.preventDefault();
 		if(homeloaded){
 			io_intro_kill();
 		}
-
 		io_zotero_setup = false;
 		$(".navbar .active").removeClass('active');
 		$(this).parent().addClass('active');
@@ -441,16 +302,7 @@ $(".navbar a").click(function(e){
 		 	$("#navhider").removeClass('in');
 		}
 
-	}
-
 });
-
-function io_retitle() {
-	//var h1 = $(".entry").attr('title');
-	//if(chosen == 'team'){
-	//	h1_arr = h1.split('/');
-	//}
-	//$("h1").html(h1);
 }
 
 function io_translate_update() {
@@ -490,16 +342,7 @@ function io_nav() {
 				//alert("hash");
 				document.location.href = urlchoice;
 			}
-			/*
-			setTimeout(function(){
-			if(document.location.hash){
-				//alert("hash");
-				io_load_page(urlchoice,'#middle','#main',null);
-			}else{
-				//alert("no hash");
-			}
-			},500);
-*/
+
 		}else{
 			document.location.href = urlchoice;
 		}
@@ -631,47 +474,20 @@ function io_which_way_alter(){
 
 
 
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	if($("#io_intro").hasClass('ready')){
-		$("#main").attr('class','container-fluid');
-		$("#page").addClass('intropage home');
-
-
-
-				$.getScript( "//static.iohk.io/js/symphony/static/js/StartAudioContext.js", function( data, textStatus, jqxhr ) {
-					$.getScript( "//static.iohk.io/js/symphony/static/js/hammer.min.js", function( data, textStatus, jqxhr ) {
-						//$.getScript( "//input-output-hk.github.io/symphony/dist/static/js/app.js", function( data, textStatus, jqxhr ) {
-							//$.getScript( "//static.iohk.io/js/orpheus/static/js/app.js", function( data, textStatus, jqxhr ) {
-
-								homeloaded = true;
-								$("#io_intro .preloader").remove();
-								io_intro_num = 2;
-					      $("#app").remove();
-						    io_intro();
-							//});
-						//});
-					});
-				});
-
-
-
+	if($("#symphony").hasClass('ready')){
+		if(!$("#symphony").hasClass('loaded')){
+			$("#symphony").addClass('loaded');
+			$("#main").attr('class','container-fluid');
+			//$("#page").addClass('intropage home');
+			homeloaded = true;
+			$("#symphony .preloader").remove();
+			io_intro_num = 2;
+	    $("#app").remove();
+	    io_intro();
+		}
 	}
 
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		if($("#team-load").hasClass('ready')){
+	if($("#team-load").hasClass('ready')){
 
 		function team_member(nam){
 			var out = '';
@@ -721,55 +537,18 @@ function io_which_way_alter(){
 		io_fluid_videos();
 	}
 
-
 	if($("#nav-tabs").hasClass('nav-tabs')){
 		io_hash_tabs();
-	}
-
-	if($("#io_project_commits").hasClass('ready')){
-		$.getScript( "//static.iohk.io/iohk/js/rss/jquery.rss.js", function( data, textStatus, jqxhr ) {
-			$("#io_project_commits").empty();
-			io_load_commits();
-		});
-
-	}
-	if($("#zotero_load").hasClass('ready')){
-		//$.getScript( "//static.iohk.io/iohk/js/zotero/lib.js?bust="+buster, function( data, textStatus, jqxhr ) {
-			io_zotero_setup = false;
-			io_zotero();
-		//});
 	}
 
 	if(!$("body").hasClass('transin')){
 	 	$("body").addClass('transin');
 	}
-	if($("#crypto_prices").hasClass('crypto_prices')){
-		//<script type="text/javascript" src="{{ '/js/chart/Chart.js' | prepend: site.baseurl }}"></script>
-		//$.getScript( "https://iohk.io/js/chart/Chart.js", function( data, textStatus, jqxhr ) {
-			//	setTimeout(function(){
-					io_crypto_prices();
-			//	},1000);
-
-		//});
-	}
 
 	if($("#form_contact").hasClass('form_contact')){
 	 	io_form_contact();
 	}
-	if($("#twitter_fetcher").hasClass('fetch')){
-		$.getScript( "//static.iohk.io/iohk/js/twitterFetcher_min.js", function( data, textStatus, jqxhr ) {
-			var username = $("#twitter_fetcher").attr('username');
-			var count = $("#twitter_fetcher").attr('count');
-			io_twitter_fetcher(username,count);
-		});
-		//<script type="text/javascript" src="{{ '/js/twitterFetcher.js' | prepend: site.baseurl }}"></script>
-	}
-	if($("#cryptochart").hasClass('cryptochart')){
-		var exchange = $("#cryptochart").data('exchange');
-		var currency = $("#cryptochart").data('currency');
-		var compare = $("#cryptochart").data('compare');
-	 	io_crypto_chart(exchange,currency,compare);
-	}
+
 	if($("#main").hasClass('blog')){
 		$(".entry a[href^='http://']").attr("target","_blank");
 		$(".entry a[href^='https://']").attr("target","_blank");
@@ -788,29 +567,6 @@ function io_which_way_alter(){
 		iohk_videos();
 	}
 
-	//io_pop();
-	//$('[data-toggle="tooltip"]').tooltip();
-
-	if($(".entry").data('type') == 'blog-post'){
-		$.getScript( "//iohk.disqus.com/count.js", function( data, textStatus, jqxhr ) {
-				io_disqus();
-		});
-	}
-
-
-	if(webglAvailable){
-		if(!IE){
-			if($("#subheader").hasClass('particles')){
-
-
-				$("#subheader-particles").height($("#subheader").height());
-				$("#subheader-particles").css({overflow: 'hidden'});
-				particlesJS.load('subheader-particles', '');
-
-
-			}
-		}
-	}
 
 }
 
@@ -923,7 +679,7 @@ function io_which_way(){
 	var row = wh/20;
 	chosen = pageslug;
 	io_nav();
-	io_retitle();
+	//io_retitle();
 	io_which_way_alter();
 	if(!$("body").hasClass('introin')){
 	 	$("body").addClass('introin');
@@ -988,109 +744,13 @@ $(window).resize(function(){
 	}
 
 
-	if($("#io_intro").hasClass('ready')){
+	if($("#symphony").hasClass('ready')){
 		//io_intro_frame();
 	}
 
 });
 
-/*
-
-function generateRandomPosts()
-    {
-        $.getJSON("/posts.json", function(data) {
-            console.log("[posts.json loaded for extra posts]");
-
-
-  			//console.log(template);
-
-            var postsCount = data.length;
-            var posts = data;
-
-
-            var counter = 9;
-            var numberOfPosts = 5;
-
-            var extraPosts = $("#extra_posts");
-
-            extraPosts.append('<h2>Extra Posts</h2><hr />');
-
-            while (counter >= 9)
-            {
-
-
-                	var open = '<div class="maincol blogpost col-lg-18 col-md-18 col-sm-18"><div class="post">';
-                	var close = '</div></div>'
-                    var postHREF = posts[counter].href;
-                    var postTitle = posts[counter].title;
-                    var postSubtitle = posts[counter].subtitle;
-                    var postDate = '<div class="date inline-block"><span class=""><em class="fa fa-clock-o"></em>&nbsp;' + posts[counter].date + '</span></div>';
-                    var postAuthorLink = posts[counter].authorLink;
-                    var postAuthor = ' &nbsp;&nbsp; <div class="author inline-block"><em class="fa fa-user c_f00"></em>&nbsp;<a href="' + postAuthorLink + '">' + posts[counter].author + '</a></div>';
-                    var postReadtime = ' &nbsp;&nbsp; <div class="readtime inline-block"><em class="fa fa-bookmark"></em>&nbsp;' + posts[counter].readtime + '</div>';
-                    var postThumbnail = '<a class="ajaxhref" href="' + postHREF + '"><hr class="margin0 opa10" /><div class="blog-image"><img src="' + posts[counter].thumbnail + '" class="fullwidth"/></div></a>';
-                    var description = posts[counter].description;
-                    var postId = posts[counter].id;
-                    var ccl = '<p class="text-left"><img src="/images/ccl.png" alt="" /></p>';
-
-                    var postKey = posts[counter].key;
-                    var authorImage = posts[counter].authorImage;
-                    var profile = '<div class="profile team' + postKey + 'smaller"><div class="img"><a href="' + '" class="ajaxhref profile-link" rel="" title="IOHK profile of' +postAuthor+ '"><img data-src="' +authorImage+'" alt="" class="b-lazy img-circle fullwidth ajaxhref" /></a></div>';
-
-                    //{{ site.baseurl }}{{ post.permalink }}" class="ajaxhref profile-link" rel="{{in_member_cnt}}" title="IOHK profile of {{ post.title }}"><img data-src="{{ site.baseurl }}/{{ post.thumbnail }}" alt="" class="b-lazy img-circle fullwidth ajaxhref" /></a></div>
-
-                    var side = '<div class="col-lg-6 col-md-6 col-sm-6 rightcol post-side"><div class="wrap">' + '</div></div><div class="clear post-break"><br><br></div>';
-                    if (postThumbnail == 'undefined') {postThumbnail = '';}
-
-                    extraPosts.append(open + '<h2 class="marginb0 blogtitle"><a class="ajaxhref" href="' + postHREF + '">' + postTitle + '</a></h2>' + '<h3 class="subtitle">' + postSubtitle + '</h3>' + '<div class="meta clear">' + postDate + postAuthor + postReadtime + '</div><div class="clear small"><br></div><hr>' + postThumbnail + '<div class="clear small"><br></div><div class="blog entry"><p>' + description + '&nbsp;<a href="' + postHREF + '">Read More »</a></p></div><hr class="margin0">' + ccl + '<div id="io_comment_area-' + postId + '" class="io_comment_area opened"><a href="' + postHREF + '#io_comment_area" class="comment_opener"><em class="fa fa-bookmark"></em></a></div>' + side + close + '');
-
-
-                    counter++;
-            }
-        });
-    }
-
-    $(window).load(function() {
-        generateRandomPosts();
-    });
-
-*/
-
 var moreloaded = 0;
-/*
-$(window).scroll(function(){
-	if($("#main").hasClass('blog_page')){
-	  if ($(window).scrollTop() == $(document).height()-$(window).height()){
-			moreloaded++;
-			$("#blog-bottom").html(svgloader);
-			if($("#blog-bottom").hasClass('clear')){
-				$("#loading-"+moreloaded).load('/blog/'+moreloaded+'  #loading-0',function(){
-					$("#loading-"+moreloaded+" .loader").unwrap('.loading');
-					$("#blog-bottom").html('');
-					var len = $("#loading-"+moreloaded+" .blogpost").length;
-					if(len == 0){
-						$("#blog-bottom").remove();
-					}
-					var bLazy = new Blazy({
-				    breakpoints: [{
-				     width: 420 // Max-width
-				    , src: 'data-src'
-				     }]
-				    , success: function(element){
-				    setTimeout(function(){
-				    var parent = element.parentNode;
-				    parent.className = parent.className.replace(/\bloading\b/,'');
-				    }, 200);
-				    }
-			    });
-				});
-			}
-
-
-		}
-	}
-});
-*/
 
 
 $(window).load(function(){
@@ -1238,6 +898,7 @@ function goBack() {
 
 
 $(document).ready(function() {
+	io_navbar();
 	History.Adapter.bind(window, 'statechange', function() {
 		var State = History.getState();
 		//console.log(State.url);

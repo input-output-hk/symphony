@@ -1,0 +1,44 @@
+---
+layout: page-docs
+---
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body class="{{page.defaultlink | slugify }}">
+
+    {% include header.html %}
+
+    <div id="middle" class="middle">
+      <div id="main" class="container-fluid">
+
+
+        <div class="intro box bigger">
+          <div class="fader">
+
+            <div class="block title text-center uppercase"><h1><a href="/"><span class="site">{{site.title}}</span><span class="dot"> • </span><b class="title">{{page.title}}</b></a></h1></div>
+
+            <div class="roadmap {{page.defaultlink | slugify }}">
+
+              <div class="container">
+                <div class="col-lg-20 col-lg-offset-2">
+                  {{content}}
+
+                </div>
+              </div>
+            </div><!-- .roadmap -->
+
+          </div>
+        </div>
+
+        {% include nav-footer.html %}
+
+      </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>
