@@ -14,6 +14,9 @@ export default class Detect {
     this.isRetina = window.devicePixelRatio && window.devicePixelRatio >= 1.5
     this.isSupportOpacity = this.dummyStyle.opacity !== this.undefined
 
+    this.isWindows = this.ua.indexOf('windows') > -1
+    this.isMac = this.ua.indexOf('macintosh') > -1
+
     this.isChrome = this.ua.indexOf('chrome') > -1
     this.isFirefox = this.ua.indexOf('firefox') > -1
     this.isSafari = this.ua.indexOf('safari') > -1

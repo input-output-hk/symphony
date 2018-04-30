@@ -394,16 +394,21 @@ export default class Audio extends EventEmitter {
       return
     }
 
-    this.MIDIClock = new Tone.Loop(
-      () => {
-        // send MIDI clock start message once if not already running
-        if (!this.MIDIClockStarted) {
-          this.sendMIDIClockStart()
-          this.MIDIClockStarted = true
-        }
+    this.MIDIClock = new Tone.Loop((loopTime) => {
+      // send MIDI clock start message once if not already running
+      if (!this.MIDIClockStarted) {
+        this.sendMIDIClockStart()
+        this.MIDIClockStarted = true
+      }
+
+      // adding a timestamp to output.send() doesn't work on windows :'(
+      if (Config.detector.isMac) {
+        this.MIDIDevice.send([0xF8], (loopTime * 1000))
+      } else {
         this.MIDIDevice.send([0xF8])
-      },
-      '96n'
+      }
+    },
+    '96n'
     ).start()
   }
 
@@ -617,6 +622,11 @@ export default class Audio extends EventEmitter {
           }
           let velocity = rawVelocity.toString(16)
 
+          let loopStart = startTime
+          if (this.MIDIEnabled) {
+            loopStart = quantizedTime
+          }
+
           loop = new Tone.Loop(
             (loopTime) => {
               if (isFirst && !this.MIDIClockStarted) {
@@ -641,7 +651,13 @@ export default class Audio extends EventEmitter {
                     let MIDINote = Tone.Frequency(note).toMidi()
 
                     // send MIDI note on
-                    this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity])
+
+                    // adding a timestamp to output.send() doesn't work on windows :'(
+                    if (Config.detector.isMac) {
+                      this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity], (time * 1000))
+                    } else {
+                      this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity])
+                    }
 
                     // send MIDI note off
                     setTimeout(() => {
@@ -667,7 +683,7 @@ export default class Audio extends EventEmitter {
             },
             '1m'
           ).start(
-            startTime
+            loopStart
           )
         } else {
           loop = new Tone.Loop(
