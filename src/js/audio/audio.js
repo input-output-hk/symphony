@@ -4,6 +4,7 @@ import Config from '../Config'
 import Tone from 'tone'
 import { map } from '../../utils/math'
 import EventEmitter from 'eventemitter3'
+import WebMidi from 'WebMidi'
 
 const MAX_HASH_RATE = 35000000 // maximum hash rate
 

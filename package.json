@@ -38,6 +38,7 @@
     "three": "^0.92.0",
     "three-orbit-controls": "^82.1.0",
     "tone": "^0.12.80",
+    "webmidi": "^2.0.4",
     "webworkify-webpack": "^2.1.0",
     "worker-loader": "^1.1.0"
   },
