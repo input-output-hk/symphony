@@ -95,10 +95,10 @@ export default class Audio extends EventEmitter {
         'partials': [1, 0, 2, 0, 3, 0, 4]
       },
       'envelope': {
-        'attack': 0.01,
+        'attack': 0.001,
         'decay': 1.0,
-        'sustain': 0,
-        'release': 0.5
+        'sustain': 0.0,
+        'release': 0.001
       }
     }
 
@@ -217,6 +217,9 @@ export default class Audio extends EventEmitter {
     let MIDIOutputs = this.MIDIObject.outputs.values()
 
     let selectMIDIOut = document.getElementById(this.MIDIDeviceDOMElementID)
+    if (selectMIDIOut === null) {
+      return
+    }
     selectMIDIOut.onchange = this.changeMIDIOut.bind(this)
     selectMIDIOut.disabled = false
 
@@ -467,7 +470,18 @@ export default class Audio extends EventEmitter {
   ) {
     Tone.Transport.stop()
 
-    this.synth = new Tone.PolySynth(48, Tone.AMSynth, this.preset).chain(this.convolver)
+    if (this.synth) {
+      this.synth.releaseAll()
+      this.synth.dispose()
+      this.synth = null
+    }
+
+    // webaudio in chrome is much more performant so allow it to use more voices
+    if (Config.detector.isChrome) {
+      this.synth = new Tone.PolySynth(12, Tone.AMSynth, this.preset).chain(this.convolver)
+    } else {
+      this.synth = new Tone.PolySynth(6, Tone.AMSynth, this.preset).chain(this.convolver)
+    }
 
     // disable changing MIDI device while MIDI is playing so that clock stays in sync
     this.disableMIDIInteraction()
@@ -547,6 +561,7 @@ export default class Audio extends EventEmitter {
       let loop
 
       let quantizedTime = Tone.Time(startSeconds + time).quantize(this.quantize + 'n')
+      let startTime = Tone.Time(startSeconds + time)
 
       if (typeof this.loopMap[timeLowRes] === 'undefined') {
         let isFirst = index === 0
@@ -590,10 +605,10 @@ export default class Audio extends EventEmitter {
           }
 
           // don't play the same note at the same time
-          if (noteMap[quantizedTime] === note) {
-            continue
+          if (typeof noteMap[startTime] === 'undefined') {
+            noteMap[startTime] = []
           }
-          noteMap[quantizedTime] = note
+          noteMap[startTime].push(note)
 
           let rawVelocity = parseInt(map(transaction.size, 0, 1000, 0, 127))
           if (rawVelocity > 127) {
@@ -607,15 +622,17 @@ export default class Audio extends EventEmitter {
                 this.sendMIDIClock()
               }
 
-              this.pointColors[xIndex] = txSize
-              this.pointColors[yIndex] = txSize
-              this.pointColors[zIndex] = txSize
+              Tone.Draw.schedule(function () {
+                this.pointColors[xIndex] = txSize
+                this.pointColors[yIndex] = txSize
+                this.pointColors[zIndex] = txSize
 
-              setTimeout(() => {
-                this.pointColors[xIndex] = 0
-                this.pointColors[yIndex] = 0
-                this.pointColors[zIndex] = 0
-              }, this.noteReleaseTime * 1000)
+                setTimeout(() => {
+                  this.pointColors[xIndex] = 0
+                  this.pointColors[yIndex] = 0
+                  this.pointColors[zIndex] = 0
+                }, this.noteReleaseTime * 1000)
+              }.bind(this), loopTime)
 
               if (this.MIDIEnabled) {
                 try {
@@ -636,34 +653,34 @@ export default class Audio extends EventEmitter {
                   console.log(error)
                 }
               } else {
-                this.synth.triggerAttackRelease(
+                this.synth.triggerAttack(
                   note,
-                  '0.4',
-                  Tone.Time(loopTime),
+                  '@16n',
                   txSize
                 )
-                /* this.sampler.triggerAttack(
+                this.synth.triggerRelease(
                   note,
-                  Tone.Time(loopTime).quantize(this.quantize + 'n'),
-                  txSize
-                ) */
+                  '+8n'
+                )
               }
             },
             '1m'
           ).start(
-            quantizedTime
+            startTime
           )
         } else {
           loop = new Tone.Loop(
-            () => {
-              this.pointColors[xIndex] = txSize
-              this.pointColors[yIndex] = txSize
-              this.pointColors[zIndex] = txSize
-              setTimeout(() => {
-                this.pointColors[xIndex] = 0
-                this.pointColors[yIndex] = 0
-                this.pointColors[zIndex] = 0
-              }, 500)
+            (loopTime) => {
+              Tone.Draw.schedule(function () {
+                this.pointColors[xIndex] = txSize
+                this.pointColors[yIndex] = txSize
+                this.pointColors[zIndex] = txSize
+                setTimeout(() => {
+                  this.pointColors[xIndex] = 0
+                  this.pointColors[yIndex] = 0
+                  this.pointColors[zIndex] = 0
+                }, 500)
+              }.bind(this), loopTime)
             },
             '1m'
           ).start(startSeconds + time)
@@ -675,6 +692,6 @@ export default class Audio extends EventEmitter {
       }
     }
 
-    Tone.Transport.start()
+    Tone.Transport.start('+0.5')
   }
 }
