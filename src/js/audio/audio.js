@@ -402,7 +402,13 @@ export default class Audio extends EventEmitter {
       }
 
       // adding a timestamp to output.send() doesn't work on windows :'(
-      if (Config.detector.isMac) {
+      if (
+        Config.detector.isMac ||
+          Config.detector.isChrome67 || // remove this when chrome 67 reaches stable channel
+          Config.detector.isChrome68 ||
+          Config.detector.isChrome69
+      ) {
+        console.log('asdfas6d54')
         this.MIDIDevice.send([0xF8], (loopTime * 1000))
       } else {
         this.MIDIDevice.send([0xF8])
@@ -651,9 +657,13 @@ export default class Audio extends EventEmitter {
                     let MIDINote = Tone.Frequency(note).toMidi()
 
                     // send MIDI note on
-
                     // adding a timestamp to output.send() doesn't work on windows :'(
-                    if (Config.detector.isMac) {
+                    if (
+                      Config.detector.isMac ||
+                      Config.detector.isChrome67 || // remove this when chrome 67 reaches stable channel
+                      Config.detector.isChrome68 ||
+                      Config.detector.isChrome69
+                    ) {
                       this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity], (time * 1000))
                     } else {
                       this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity])

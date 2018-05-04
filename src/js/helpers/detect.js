@@ -18,6 +18,10 @@ export default class Detect {
     this.isMac = this.ua.indexOf('macintosh') > -1
 
     this.isChrome = this.ua.indexOf('chrome') > -1
+    this.isChrome66 = this.ua.indexOf('chrome/66.') > -1
+    this.isChrome67 = this.ua.indexOf('chrome/67.') > -1
+    this.isChrome68 = this.ua.indexOf('chrome/68.') > -1
+    this.isChrome69 = this.ua.indexOf('chrome/69.') > -1
     this.isFirefox = this.ua.indexOf('firefox') > -1
     this.isSafari = this.ua.indexOf('safari') > -1
     this.isEdge = this.ua.indexOf('edge') > -1

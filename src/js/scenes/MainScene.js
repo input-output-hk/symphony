@@ -16,7 +16,7 @@ const dat = require('dat-gui')
 const TWEEN = require('@tweenjs/tween.js')
 
 const MS_IN_A_DAY = 86400000
-const DAY_OFFSET = 5500 // offset for each day on z-axis
+const DAY_OFFSET = 6500 // offset for each day on z-axis
 
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
 
@@ -179,7 +179,7 @@ export default class MainScene extends EventEmitter {
     })
 
     const circleGroup = AddText(this.path, moment(day).startOf('day').format('MMM Do YYYY').toUpperCase())
-    circleGroup.position.z += (DAY_OFFSET - 200.0)
+    circleGroup.position.z += (DAY_OFFSET - 1000.0)
     group.add(circleGroup)
 
     /*
