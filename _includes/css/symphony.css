@@ -674,7 +674,7 @@ h1,
 #roadmap-load{position: relative;z-index: 9}
 #gource-root{position:absolute;top:500px;right:0;width:1000px;height:1000px;z-index: 0;overflow:hidden;}
 #gource-root .App{position:absolute;left:-10%;width:100%;height:auto;}
-
+#gource-root .App .gource-ui{display: none}
 
 #gource-box a{display: inline-block;text-decoration:none;outline:0 }
 #gource-box .opener .off{display: none}
