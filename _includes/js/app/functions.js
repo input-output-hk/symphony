@@ -517,7 +517,8 @@ function io_which_way_alter(){
           },
           display: {
             showUI: false,
-						customUI: false
+						customUI: false,
+						showSidebar: false
           },
           FDG: {
             nodeSpritePath: '/static/assets/textures/gource/dot.png', // path to node texture
@@ -653,30 +654,6 @@ function io_which_way_alter(){
 									$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
 								}
 							});
-							/*
-							$( ".date--slider.vertical" ).slider({
-								orientation: 'vertical',
-								min: min_val,
-								max: max_val,
-								value: min_val,
-								slide: function( event, ui ) {
-									manual = true;
-									var dt_cur_from = new Date(ui.value*1000);
-									$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-								}
-								,
-								change: function( event, ui ) {
-									var dt_cur_from = new Date(ui.value*1000);
-									$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-									if(manual){
-										gource.setDate(formatBot(dt_cur_from));
-									}
-								},
-								create: function( event, ui ) {
-									var dt_cur_from = new Date(min_val*1000);
-									$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-								}
-							});*/
 
 							$('.datepicker').datepicker({
 								dateFormat: 'yy-mm-dd',
