@@ -49,10 +49,6 @@ pre.highlight{margin-bottom: 10px}
 
 #navbar .navbar-toggle{border:0;padding:18px}
 
-#page{background: url('/static/assets/images/sub-bg.jpg') no-repeat top center;}
-#page.home,#page.home-page{background:transparent;}
-
-
 @media (min-width:768px){
 
 #page{padding:300px 0 0 0}
@@ -672,9 +668,15 @@ h1,
 #page.home #symphony_hud{display:block;}
 
 #roadmap-load{position: relative;z-index: 9}
-#gource-root{position:absolute;top:500px;right:0;width:1000px;height:1000px;z-index: 0;overflow:hidden;}
-#gource-root .App{position:absolute;left:-10%;width:100%;height:auto;}
+
+
+
+
+
+#gource-root{position:absolute;top:0px;right:0;width:100%;height:100%;z-index: 0;overflow:hidden;}
+#gource-root .App{position:absolute;left:0;top:-340px;width:100%;height:auto;}
 #gource-root .App .gource-ui{display: none}
+
 
 #gource-box a{display: inline-block;text-decoration:none;outline:0 }
 #gource-box .opener .off{display: none}
@@ -683,7 +685,7 @@ h1,
 #gource-box.fullscreen .opener .on{display: none}
 
 #gource-box .opener {position: absolute;z-index:10;margin:12% 0 0 0px;right:0;width:120px;height:120px;background:url('/static/assets/images/mouseglow.svg') center no-repeat;color:#fff;line-height:120px;text-align: center;}
-#gource-box.fullscreen .opener {position: absolute;font-size: 200%;opacity: 0.8;z-index:9999;top:60px;right:110px;background:transparent;width: auto;height: auto;margin:0;line-height:20px}
+#gource-box.fullscreen .opener {position: absolute;font-size: 200%;opacity: 0.8;z-index:9999;top:60px;right:100px;left:auto;background:transparent;width: 80px;height: 80px;margin:0;line-height:20px}
 #gource-box.fullscreen .opener:hover{opacity: 1}
 
 #gource-box .commit--switcher,
@@ -695,7 +697,7 @@ h1,
 
 
 @media (min-width:768px){
-#gource-box .opener {right:auto;margin:12% 0 0 1070px;}
+#gource-box .opener {right:auto;left:50%;margin:-125px 0 0 570px;}
 
 #gource-box.fullscreen .daterange{display:block;position:absolute;z-index:999;width:100%;}
 #gource-box.fullscreen .switcher{display: block;position:absolute;z-index:999;width: 50px;padding:4px 10px;top:55%;left:40px;border:1px solid #652d90;border-radius:30px}
@@ -750,10 +752,9 @@ h1,
 @media (max-width:1350px){
 #gource-root{right:auto;left:-15%}
 #gource-root .App{left:0%;}
-#gource-box .opener {margin:15% 0 0 1000px;}
 }
 @media (max-width:1199px){
-#gource-box .opener {margin:20% 0 0 850px;}
+
 }
 
 @media (max-width:1030px){
@@ -811,6 +812,11 @@ h1,
 
 
 }
+
+
+
+
+
 
 
 
