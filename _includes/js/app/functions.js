@@ -504,8 +504,8 @@ function io_which_way_alter(){
 	}
 
 	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
-
-		if($("#page").hasClass('roadmap')){
+	console.log(chosen);
+		if(chosen == 'roadmap'){
 			$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
 				var config = {
 	          git: {

@@ -3,7 +3,22 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="120px" height="120px" viewBox="0 0 120 120" enable-background="new 0 0 120 120" xml:space="preserve">
-<circle opacity="0.51" fill="#4BBBC5" cx="60" cy="60" r="50.692"/>
-<circle opacity="0.51" fill="#4BBBC5" cx="60" cy="60" r="35.292"/>
-<circle opacity="0.51" fill="#4BBBC5" cx="60.001" cy="60" r="18.649"/>
+	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
+	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="15%" to="25%"/>
+	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+	 </circle>
+	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
+	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="20%" to="40%"/>
+	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+	 </circle>
+	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
+	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="30%" to="50%"/>
+	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+	 </circle>
+	 <g>
+	 	<path transform="translate(46,46)" fill="#FFFFFF" d="M14.042,10.676h0.864v7.726l0.262,0.271l1.004,0.069v0.804h-4.688v-0.804l0.969-0.069l0.253-0.271v-6.172
+	 		h-1.178v-0.716L14.042,10.676z M13.85,6.6c0.39,0,0.709,0.124,0.96,0.371c0.25,0.247,0.375,0.56,0.375,0.938
+	 		c0,0.396-0.124,0.72-0.371,0.974c-0.247,0.253-0.563,0.379-0.947,0.379c-0.372,0-0.684-0.125-0.934-0.375
+	 		c-0.25-0.25-0.375-0.564-0.375-0.942c0-0.384,0.124-0.704,0.371-0.96C13.176,6.728,13.483,6.6,13.85,6.6z"/>
+	 </g>
 </svg>
