@@ -4,21 +4,23 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="120px" height="120px" viewBox="0 0 120 120" enable-background="new 0 0 120 120" xml:space="preserve">
 	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
-	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="15%" to="25%"/>
-	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
-	 </circle>
-	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
-	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="20%" to="40%"/>
-	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
-	 </circle>
-	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
-	 	<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="30%" to="50%"/>
-	 	<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
-	 </circle>
-	 <g>
-	 	<path transform="translate(46,46)" fill="#FFFFFF" d="M14.042,10.676h0.864v7.726l0.262,0.271l1.004,0.069v0.804h-4.688v-0.804l0.969-0.069l0.253-0.271v-6.172
-	 		h-1.178v-0.716L14.042,10.676z M13.85,6.6c0.39,0,0.709,0.124,0.96,0.371c0.25,0.247,0.375,0.56,0.375,0.938
-	 		c0,0.396-0.124,0.72-0.371,0.974c-0.247,0.253-0.563,0.379-0.947,0.379c-0.372,0-0.684-0.125-0.934-0.375
-	 		c-0.25-0.25-0.375-0.564-0.375-0.942c0-0.384,0.124-0.704,0.371-0.96C13.176,6.728,13.483,6.6,13.85,6.6z"/>
-	 </g>
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="15%" to="25%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 	</circle>
+ 	<circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="20%" to="40%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 	</circle>
+ 	<circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="30%" to="50%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 	</circle>
+ 	<g>
+ 			<path transform="translate(48,54)" fill="#FFFFFF" d="M11.914,5.962C11.897,6.321,12.237,6.5,12.934,6.5v0.984H8.697V6.5c0.68,0,1.02-0.18,1.02-0.539V2.887
+ 				c0-0.367-0.34-0.55-1.02-0.55v-0.96h3.216V5.962z M12.021-0.567c0,0.168-0.032,0.326-0.096,0.474
+ 				c-0.064,0.148-0.15,0.278-0.258,0.39c-0.108,0.112-0.236,0.2-0.384,0.264c-0.148,0.064-0.306,0.096-0.474,0.096
+ 				s-0.324-0.032-0.468-0.096s-0.272-0.152-0.384-0.264c-0.112-0.112-0.2-0.242-0.264-0.39C9.629-0.242,9.598-0.399,9.598-0.567
+ 				c0-0.168,0.032-0.324,0.096-0.468s0.152-0.27,0.264-0.378c0.112-0.108,0.24-0.194,0.384-0.258s0.3-0.096,0.468-0.096
+ 				s0.326,0.032,0.474,0.096c0.148,0.064,0.276,0.15,0.384,0.258s0.194,0.234,0.258,0.378S12.021-0.736,12.021-0.567z"/>
+ 	</g>
 </svg>
