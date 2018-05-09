@@ -333,7 +333,7 @@ function io_intro_explorer () {
 
   /// //////////////////
   // Create the Orpeus App
-  orpheusApp({ path: '/dist/static/assets/' }).then(app => {
+  orpheusApp({ path: '/static/assets/' }).then(app => {
     window.app = app
 
     window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
