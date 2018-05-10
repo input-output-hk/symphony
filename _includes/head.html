@@ -191,7 +191,7 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 
 </script>
 <link rel="icon" href="{{ '/images/favicon.ico' | prepend: urlprefix }}" type="image/x-icon">
-<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,700i" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
 
 <style>
 {% include css/jquery-ui.css %}
@@ -201,9 +201,9 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 {% include css/simple-line-icons.css %}
 {% include css/base.css %}
 {% include css/rd.css %}
-{% include css/symphony.css %}
 </style>
 
+<link rel="stylesheet"  href="{{ "/static/assets/css/symphony.css" | prepend: site.baseurl }}" type="text/css" media="all" />
 
 
 <!--[if IE]>
@@ -247,6 +247,7 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 {% include js/app/functions.js %}
 </script>
 
+<script type="text/javascript" src="{{ '/static/assets/js/logo.main.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 <script type="text/javascript" src="{{ '/dist/static/js/app.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 
 </head>
