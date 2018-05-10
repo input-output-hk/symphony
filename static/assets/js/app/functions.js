@@ -207,7 +207,7 @@ function io_ajaxload() {
 
 		$(active).removeClass('active');
 		e.preventDefault();
-		History.pushState(io_hist, "IOHK",url);
+		History.pushState(io_hist, "Symphony",url);
 		//io_load_page(url,obj,target,callback);
 		$(this).closest(active).addClass('active');
 	});
@@ -244,7 +244,7 @@ function io_load_page(url,obj,hash,callback){
 		$(obj).load(url+' '+hash,function(){
 			io_nav();
 			var bodyvar = chosen;
-			if(bodyvar == '' || bodyvar == 'symp.com' || bodyvar == 'symphony.iohk.io' || bodyvar == 'symphonydev.iohk.io'){
+			if(bodyvar == '' || bodyvar == 'symp.com' || bodyvar == 'sympdev.net' || bodyvar == 'symphony.iohk.io' || bodyvar == 'symphonydev.iohk.io'){
 				bodyvar = 'home';
 			}
 			$("#page").attr('class',bodyvar);
@@ -278,11 +278,10 @@ function io_load_page(url,obj,hash,callback){
 
 function io_navbar() {
 
-
-$(".navbar a").click(function(e){
+	$(".navbar a,.block.title a").click(function(e){
 
 		e.preventDefault();
-		if(homeloaded){
+		if(!$(this).hasClass('home')){
 			io_intro_kill();
 		}
 		io_zotero_setup = false;
@@ -292,8 +291,8 @@ $(".navbar a").click(function(e){
 		io_loadto[0] = '#middle';
 		io_loadto[1] = '#main';
 		if(!lowie){
-			//window.history.pushState(io_hist, "IOHK", urlchoice);
-			History.pushState(io_hist, "IOHK",urlchoice);
+			//window.history.pushState(io_hist, "Symphony", urlchoice);
+			History.pushState(io_hist, "Symphony",urlchoice);
 			//io_load_page(urlchoice);
 		}else{
 			document.location.href = urlchoice;
@@ -301,8 +300,14 @@ $(".navbar a").click(function(e){
 		if($("#navhider").hasClass('in')){
 		 	$("#navhider").removeClass('in');
 		}
+		if(!$(".navbar-toggle").hasClass('collapsed')){
+		 	$(".navbar-toggle").addClass('collapsed');
+		}
 
-});
+
+
+
+	});
 }
 
 function io_translate_update() {
@@ -336,7 +341,7 @@ function io_nav() {
 		io_loadto[0] = '#middle';
 		io_loadto[1] = '#main';
 		if(!lowie){
-			History.pushState(io_hist, "IOHK",urlchoice);
+			History.pushState(io_hist, "Symphony",urlchoice);
 			//alert(urlchoice);
 			if(document.location.hash){
 				//alert("hash");
@@ -361,7 +366,7 @@ function io_altnav() {
 		choice = urlchoice;
 		io_loadto = ['#middle','#main'];
 		if(!lowie){
-			History.pushState(io_hist, "IOHK",urlchoice);
+			History.pushState(io_hist, "Symphony",urlchoice);
 			io_goto_page(urlchoice);
 		}else{
 			document.location.href = urlchoice;
@@ -434,9 +439,9 @@ function io_alter_title(){
 function io_title_typing(){
 	var txt = $("h1").text();
 	//$("h1").typewriter();
-	if(txt.match('IOHK |')){
+	if(txt.match('Symphony |')){
 		setTimeout(function(){
-			txt = txt.replace('IOHK |','<span class="c_f00">IOHK |</span>');
+			txt = txt.replace('Symphony |','<span class="c_f00">Symphony |</span>');
 			$("h1").html(txt);
 		},3500);
 	}
@@ -475,7 +480,18 @@ function io_which_way_alter(){
 
 
 	if($("#symphony").hasClass('ready')){
+
+
+		if($("#symphony").hasClass('mask')){
+			if($("#page").hasClass('home')){
+				setTimeout(function () {
+					$("#symphony").removeClass('mask');
+			  }, 2000)
+			}
+		}
+
 		if(!$("#symphony").hasClass('loaded')){
+
 			$("#symphony").addClass('loaded');
 			$("#main").attr('class','container-fluid');
 			//$("#page").addClass('intropage home');
@@ -487,53 +503,225 @@ function io_which_way_alter(){
 		}
 	}
 
-	if($("#team-load").hasClass('ready')){
+	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
+	//console.log(chosen);
+		if(chosen != 'home'){
+			$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+				var config = {
+	          git: {
+							owner: 'input-output-hk',
+	            repo: 'symphony',
+	            commitHash: '', // hash of commit to load
+	            commitDate: '', // date to load (YYYY-MM-DD)
+	            loadLatest: true // load latest commit in db
+	          },
+	          display: {
+	            showUI: false,
+							customUI: false,
+							showSidebar: false
+	          },
+	          FDG: {
+	            nodeSpritePath: '/static/assets/textures/gource/dot.png', // path to node texture
+	            nodeUpdatedSpritePath: '/static/assets/textures/gource/dot-concentric.png', // path to node updated state texture
+	            fontTexturePath: '/static/assets/textures/gource/UbuntuMono.png', // path to font texture
+	 						nodeSpritePathBlur: '/static/assets/textures/gource/dot-blur.png', // path to blur node texture
+	            autoPlay: false,
+	            delayAmount: 1500, // time in between new commits being added to the graph
+	            sphereProject: 0, // project graph onto sphere? 1 == true, 0 == false
+	            sphereRadius: 700, // radius of sphere if in sphere projection mode
+	            showFilePaths: true, // display filepath overlay on nodes
+	            colorCooldownSpeed: 0.05, // speed at which node colors cycle
+	            cycleColors: false, // cycle colors based on file edit time from red to blue to white
+	            colorPalette: [ // colors to use if cycleColors is switched off (colors cannot contain)
+	              '#eb2256',
+	              '#f69ab3',
+	              '#1746a0',
+	              '#6f9cef',
+	              '#652b91',
+	              '#0e5c8d',
+	              '#1fc1c3'
+	            ]
+	          },
+						scene: {
+	            fullScreen: true,
+	            width: 800,
+	            height: 600,
+	            bgColor: 0x121327,
+	            antialias: false,
+	            canvasID: 'gource-stage', // ID of webgl canvas element
+	            autoRotate: false, // auto rotate camera around target
+	            autoRotateSpeed: 0.0 // speed of auto rotation
+	          },
+	          post: {
+	            vignette: true
+	          },
+	          camera: {
+	            fov: 45,
+	            initPos: {x: 0, y: 0, z: 600}
+	          }
+	        }
+					if (gource.canRun()) {
+            gource.init(config).on('ready', function() {
 
-		function team_member(nam){
-			var out = '';
-			for (var i=0;i<io_team_arr.length;i++){
-				if(io_slug(nam) == io_slug(io_team_arr[i]['tit'])){
-			    var role = (lang === 'en') ? io_team_arr[i]['role'] : io_team_arr[i]['roleJa'];
-					out = '\
-					<div class="profile team '+io_team_arr[i]['key']+' smaller">\
-					    <div class="img">\
-					      <a href="//iohk.io/team/'+io_team_arr[i]['key']+'" class="ajaxhref profile-link" rel="" title="'+io_team_arr[i]['tit']+'" target="_blank">\
-		              <img src="//iohk.io/'+io_team_arr[i]['pic']+'" alt="" class="img-circle fullwidth" style="">\
-		            </a>\
-		          </div>\
-					    <h2>\
-					      <a href="//iohk.io/team/'+io_team_arr[i]['key']+'" rel="30" class=" profile-link" title="IOHK profile of '+io_team_arr[i]['tit']+'" target="_blank">'+io_team_arr[i]['tit']+'</a>\
-		          </h2>\
-					    <h4>'+ role +'</h4>\
-					</div>\
-					';
-				}
-			}
-			return out;
+							function commitInfo(data){
+								return '\
+								<ul onclick="javascript:io_class_toggle(\'#gource-box\',\'infohidden\')">\
+								<li class="msg"><small>Msg: </small><b>'+data.msg+'</b></li>\
+								<li class="date"><small>Date: </small><b>'+data.date+'</b></li>\
+								<li class="author"><small>Author: </small><b>'+data.author+'</b></li>\
+								<li class="added"><small>Added: </small><b>'+data.added+'</b></li>\
+								<li class="changed"><small>Changed: </small><b>'+data.changed+'</b></li>\
+								<li class="removed"><small>Removed: </small><b>'+data.removed+'</b></li>\
+								<li class="hash"><small>Hash: </small><b><a href="https://github.com/'+config.git.owner+'/'+config.git.repo+'/commit/'+data.hash+'" target="_blank">'+data.hash+' <em class="icon-link"></em></a></b></li>\
+								</ul>\
+								';
+							}
+
+
+							$(".commit--switcher a.prev").click(function(){
+								gource.goToPrev()
+							})
+							$(".commit--switcher a.next").click(function(){
+								gource.goToNext()
+							})
+
+							$(".view--switcher a.normal").click(function(){
+								gource.setSphereView(false);
+							})
+							$(".view--switcher a.sphere").click(function(){
+								gource.setSphereView(true);
+							})
+							$(".play--switcher a.play").click(function(){
+								gource.setPlay(true);
+							})
+							$(".play--switcher a.stop").click(function(){
+								gource.setPlay(false);
+							})
+
+
+							var commitFirst = new Object();
+							var commitLast = new Object();
+
+							gource.getFirstCommit().then(data => {
+			            //console.log(data)
+									commitFirst = data;
+									gource.getlastCommit().then(data => {
+										commitLast = data;
+
+										$("#gource-box .opener").removeClass('opa0');
+
+										var min_val = commitFirst.date/1000;
+										var max_val = commitLast.date/1000;
+
+										function zeroPad(num, places) {
+										  var zero = places - num.toString().length + 1;
+										  return Array(+(zero > 0 && zero)).join("0") + num;
+										}
+										function formatNice(__dt) {
+										    var year = __dt.getFullYear();
+										    var month = zeroPad(__dt.getMonth()+1, 2);
+										    var date = zeroPad(__dt.getDate(), 2);
+										    return  date+'. '+month+'. '+year;
+										}
+										function formatBot(__dt) {
+										    var year = __dt.getFullYear();
+										    var month = zeroPad(__dt.getMonth()+1, 2);
+										    var date = zeroPad(__dt.getDate(), 2);
+										    return  year+'-'+month+'-'+date;
+										}
+										var manual = true;
+										$( ".date--slider.normal" ).slider({
+											min: min_val,
+											max: max_val,
+											value: min_val,
+											slide: function( event, ui ) {
+												manual = true;
+												var dt_cur_from = new Date(ui.value*1000);
+												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+											}
+											,
+											change: function( event, ui ) {
+												var dt_cur_from = new Date(ui.value*1000);
+												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+												if(manual){
+													gource.setDate(formatBot(dt_cur_from));
+												}
+											},
+											create: function( event, ui ) {
+												var dt_cur_from = new Date(min_val*1000);
+												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+											}
+										});
+										var end = new Date(commitLast.date);
+										console.log(formatBot(end))
+										//gource.setDate(formatBot(end));
+										$('.datepicker').datepicker({
+											dateFormat: 'yy-mm-dd',
+											maxDate: new Date(max_val*1000),
+											minDate: new Date(min_val*1000),
+											beforeShow: function () {
+												$(this).datepicker('widget').wrap('<div class="ll-skin-melon">')
+											},
+											onSelect: function (dateText, inst) {
+												gource.setDate(dateText);
+											},
+											onClose: function () {
+													// $(this).datepicker("widget").removeClass("ll-skin-melon");
+											}
+										})
+										$('.datepicker_icon').click(function (e) {
+							        e.preventDefault()
+							        $('#datepicker').datepicker('show')
+							      })
+
+										gource.on('commitChanged', (data) => {
+											manual = false;
+											//console.log(data)
+											var pos = Date.parse(data.date)/1000;
+											$( ".date--slider" ).slider( "value", pos );
+
+											if(data.index == 0){
+												$("#gource-box").addClass('commit-first');
+											}else{
+												if($("#gource-box").hasClass('commit-first')){
+													$("#gource-box").removeClass('commit-first');
+												}
+											}
+											if(data.index == commitLast.index){
+												$("#gource-box").addClass('commit-last');
+											}else{
+												if($("#gource-box").hasClass('commit-last')){
+													$("#gource-box").removeClass('commit-last');
+												}
+											}
+											if(commitLast.index == data.index){
+												$("#gource-box").removeClass('playing');
+											}
+											$("#gource-box .infopanel .inner").html(commitInfo(data));
+										})
+
+								})
+							})
+
+						}
+					});
+					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
+
+			});
+
 		}
 
-			var out = '';
-			out += team_member('Charles Hoskinson');
-			out += team_member('Mark Lundin');
-			out += team_member('Richard Wild');
-			out += team_member('Scott Darby');
-			out += team_member('Helen Broadbridge');
-			out += team_member('Rouska Lundin');
-			out += team_member('Tomas Vrana');
-			$('#team-load').html(out);
-
-			//Charles Hoskinson, Mark Lundin, Richard Wild, Scott Darby, Tomas Vrana, Helen Broadbridge, Rouska Lundin
 
 
-	} // #team-load
+
 
 	if($(".entry").data('type') == 'blog-post'){
 		io_fluid_videos();
 	}
 	if($("#page").hasClass('blog') || $("#page").hasClass('video')){
-		io_fluid_videos();
-	}
-	if($("#page").hasClass('papers')){
 		io_fluid_videos();
 	}
 
@@ -896,9 +1084,30 @@ function goBack() {
 }
 
 
-
 $(document).ready(function() {
 	io_navbar();
+	var config = {
+		scene: {
+			fullScreen: false,
+			width: 200,
+			height: 200,
+			antialias: window.devicePixelRatio === 1,
+			canvasID: 'logo-stage', // ID of wegbl canvas element
+			autoRotate: false, // auto rotate camera around target
+			autoRotateSpeed: 0.01 // speed of auto rotation
+		},
+		camera: {
+			fov: 60,
+			initPos: {x: 0, y: 0, z: 120}
+		},
+	}
+	if (logo.canRun()) {
+		logo.init(config)
+	}else {
+		console.log('no');
+	}
+
+
 	History.Adapter.bind(window, 'statechange', function() {
 		var State = History.getState();
 		//console.log(State.url);
