@@ -18,22 +18,117 @@ layout: page-about
           <div class="fader">
             <div class="block title text-center uppercase"><h1><a href="/"><span class="site">{{site.title}}</span><span class="dot"> • </span><b class="title">{{page.title}}</b></a></h1></div>
 
-
             <div class="{{page.defaultlink | slugify }}">
-
-
               <div class="container">
-
-                <div class="entry">
-
-                  {{content}}
-
-                </div>
+                <div class="entry centerline">
 
 
+                  <h2>The Blockchain art</h2>
+
+                  <blockquote>
+                    <p>Symphony of Blockchains is an interactive, visual and auditory exploration of Bitcoin, cryptocurrency and the blockchain. The project is an ongoing research initiative with the aim of bringing about greater understanding of blockchain technology. We hope to inspire a wide audience by representing blockchain data in new and innovative ways.</p>
+                  </blockquote>
+
+
+
+                  <h2>Audio</h2>
+
+
+
+                  <div class="item">
+                    <h3>Background audio</h3>
+
+                    <div class="gallery">
+                      <h5>Preview</h5>
+                      <div class="thumbnails">
+                        <div class="thumbnail">
+                          <img src="/static/assets/images/hashrate-low.jpg" alt="Hashrate low" />
+                          <caption>Hashrate low</caption>
+                        </div>
+                        <div class="thumbnail">
+                          <img src="/static/assets/images/hashrate-high.jpg" alt="Hashrate high" />
+                          <caption>Hashrate high</caption>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info">
+                      <p>Sound is a fundamental part of the experience and provides a detailed and dynamic insight into the data.</p>
+                      <p>The first thing you hear is a background hum. This sound represents the network hash rate for the day you are viewing. As you traverse down the tunnel of blocks, the number of frequencies present in sound changes. When the hashrate is low (relative to the highest historic hashrate), only a few low frequencies come through.</p>
+                      <p>At the front of the chain, where the hashrate is generally highest, the sound is most energetic and more high frequencies are played. This sound is a live representation of the energy within the Bitcoin network and gives the user a sense of the network as a living, power-hungry entity.</p>
+                    </div>
+                  </div>
+
+
+
+                  <div class="item">
+                    <h3>Block Audio</h3>
+
+                    <div class="gallery">
+                      <h5>Preview</h5>
+                      <div class="thumbnails">
+                        <div class="thumbnail">
+                          <img src="/static/assets/images/merkle-tree.jpg" alt="Merkle tree" />
+                          <caption>Merkle tree</caption>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="info">
+                      <p>Clicking on a block pulls it into view, displaying it’s underlying Merkle Tree (a cryptographic hash structure). It then proceeds to play a tone for each of the transactions in the block, relative to the time they were made. The generative audio follows these rules:</p>
+                      <ul>
+                        <li>The transaction notes are set to loop for 4 bars each and the notes are quantized to the nearest 16th note, to give a sense of musicality and rhythm.</li>
+                        <li>Each block is assigned a unique musical mode https://en.wikipedia.org/wiki/Mode_(music), which is determined by the block hash. The notes are selected from this mode based on the transaction value, larger values = lower frequency, smaller values = higher frequency.</li>
+                        <li>The size (number of bytes) of the transaction determines the note velocity (how loud).</li>
+                        <li>The ratio of the fee sent with the transaction to the total transaction value is used to control the distortion of the tones. This fee to value ratio is a rough indicator of the health of the network at the time the transaction was made as if the network is under strain, users tend to send higher fees with their transaction so that they are processed more quickly.</li>
+                      </ul>
+                      <p>Through each of these parameters, the listener can gain new insights into the data and  understand it in a different way.</p>
+                    </div>
+                  </div>
+
+
+                  <div class="item">
+                    <div class="info">
+                      <h3>MIDI Out Functionality</h3>
+                      <p>For web browsers that support WebMIDI (currently Google Chrome), you can send bitcoin transaction note data out to your external hardware or DAW (Digital Audio Workstation). This opens up new creative avenues for musicians and technologists to use the data to create innovative and exciting work, underpinned by blockchain data. If you hear a musical pattern in a block that you particularly like, route the MIDI to your DAW and record the sequence, or use Symphony as a live instrument on stage.</p>
+                    </div>
+                  </div>
+
+
+
+                  <h2>Visual</h2>
+
+
+
+                  <div class="item">
+                    <div class="info">
+                      <h3>Day View</h3>
+                      <p>Blocks are organised in separate spirals, with each spiral representing a day. A spiral is a spatially efficient structure to represent linear time which lends itself well to a web based interaction model.</p>
+                      <p>The size of each of the blocks is determined by its underlying Merkle Tree, which is in turn defined by the number of transactions in a block.</p>
+                      <p>From the day view, the user can gain an insight into how many transactions are flowing through the Bitcoin network at a given point in time.</p>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="info">
+                      <h3>Block View</h3>
+                      <p>When a block is brought into focus, it’s underlying Merkle Tree is revealed. The 3D Merkle Tree is determined by block data parameters which give each one a unique structure. From the block hash we derive a “signature angle” which is used by the algorithm which controls how the branches fan out and grow. This demonstrates the immutable nature of bitcoin blocks and reflects how hash functions always produce the same output from the same input.</p>
+                      <p>The average fee to value ratio for the entire block (which can be an indicator of network health) is used to add randomness to the angle at which the branches grow. The higher the fee to value, the more contorted the tree becomes.</p>
+                    </div>
+                  </div>
+
+
+
+
+
+
+
+
+
+
+
+                </div><!-- .entry -->
               </div>
-            </div><!-- .roadmap -->
-
+            </div>
           </div>
         </div>
 
