@@ -71,6 +71,7 @@ en:
     share_on_Reddit: Share on Reddit
     web_technologies: Web Technologies
     search: Search
+    supportedproject: IOHK supported project
 
 ja:
     name: 名
@@ -194,7 +195,7 @@ ru:
     chief_executive_officer: ГЛАВНЫЙ ИСПОЛНИТЕЛЬНЫЙ ДИРЕКТОР
     chief_strategy_officer: ГЛАВНЫЙ ДИРЕКТОР ПО СТРАТЕГИЯМ
     chief_operations_officer: ГЛАВНЫЙ ОПЕРАЦИОННЫЙ ДИРЕКТОР
-    chief_communications_officer: ГЛАВНЫЙ ДИРЕКТОР ПО КОММУНИКАЦИЯМ 
+    chief_communications_officer: ГЛАВНЫЙ ДИРЕКТОР ПО КОММУНИКАЦИЯМ
     chief_design_officer: ГЛАВНЫЙ ДИРЕКТОР ПО ДИЗАЙНУ
     full_stack_developer: FULL STACK РАЗРАБОТЧИК
     email_to_friend: Отправить ссылку на эту страницу
@@ -219,4 +220,3 @@ ru:
     share_on_Reddit: Выложить на Reddit
     web_technologies: веб-технологии
     search: Search
-
