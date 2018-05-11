@@ -482,10 +482,8 @@ function io_which_way_alter(){
 	var loadgource = false;
 
 	if($("#symphony").hasClass('ready')){
-		if(loadedgource){
 			gource.destroy()
-		}
-
+			loadedgource = false;
 		if($("#symphony").hasClass('mask')){
 			if($("#page").hasClass('home')){
 				setTimeout(function () {
@@ -510,11 +508,12 @@ function io_which_way_alter(){
 	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
 	//console.log(chosen);
 
-	if(current_chosen == '' || current_chosen == 'home'){
+	if(!loadedgource){
 
 		if(chosen != 'home'){
-			$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
-				loadedgource = true;
+			//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+			console.log("fdsfadf");
+			loadedgource = true;
 				var config = {
 	          git: {
 							owner: 'input-output-hk',
@@ -741,8 +740,7 @@ function io_which_way_alter(){
 						});
 					}
 					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
-
-			});
+				
 
 		}
 }
@@ -1131,7 +1129,7 @@ $(document).ready(function() {
 		},
 		camera: {
 			fov: 60,
-			initPos: {x: 0, y: 0, z: 120}
+			initPos: {x: 0, y: 0, z: 0}
 		},
 	}
 	if (logo.canRun()) {
