@@ -202,30 +202,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 
 
 
-.widget.twitter_fetcher .user {font-size:120%;line-height: 1.3}
-.widget.twitter_fetcher .user img{width:20px !important;height:20px !important;}
-.widget.twitter_fetcher .tweet{font-size:93%;margin:0 0 3px 0;line-height: 1.5}
-.widget.twitter_fetcher .user img,
-.widget.twitter_fetcher .interact{display:none}
-.widget.twitter_fetcher .timePosted{font-size:77%;margin:0 0 2px 0;text-transform:uppercase;}
-.widget.twitter_fetcher .timePosted a{color:#555;font-weight:500;}
-
-
-
-@media (min-width:768px){
-  .entry .widget.twitter_fetcher.none {width:220px;float:right;border-left:1px solid rgba(125,125,125,0.2);padding:0 0 0 20px;margin:0 0 0 20px}
-}
-.entry .widget.twitter_fetcher .user {font-size:108%;}
-.entry .widget.twitter_fetcher .fetch {font-size:72%;}
-.entry .widget.twitter_fetcher .fetch .tweet{color:#aaa}
-.entry .widget.twitter_fetcher .fetch .tweet a{color:#fff}
-.entry .widget.twitter_fetcher .fetch ul{list-style-type:none;padding:0;}
-.entry .widget.twitter_fetcher .fetch ul li{padding: 0 0 5px 0}
-.entry .widget.twitter_fetcher .fetch ul li+li{padding:5px 0;border-top:1px solid rgba(125,125,125,0.2);}
-
-
-
-
 
 
 
