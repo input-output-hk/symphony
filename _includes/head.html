@@ -203,7 +203,7 @@ rm_labels['kr']['readmorein'] = '{{site.data.i18n['kr'].readmorein}}';
 {% include css/rd.css %}
 </style>
 
-<link rel="stylesheet"  href="{{ "/static/assets/css/symphony.css" | prepend: site.baseurl }}" type="text/css" media="all" />
+<link rel="stylesheet"  href="{{ "/static/assets/css/symphony.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 
 
 <!--[if IE]>
