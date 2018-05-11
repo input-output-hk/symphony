@@ -1,46 +1,200 @@
+<div class="clear"></div>
+<div id="foot" class="foot noprint ">
+    <footer>
 
-                    <div class="container">
-                    <div class="sitemap_foot">
-                    <div class="row">
-                        <div class="col-md-8 col-sm-24 col-xs-24 logocol">
+        <div class="container">
 
-                            <a class="navbar-brand" href="{{ site.baseurl }}/{% if page.language != 'en' %}{{ page.language }}/{% endif %}"><img src="/static/assets/images/symphony-logo.svg" width="60" height="60" alt="" /></a>
-                            <br><br>
-
-
-                        </div>
-                        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="footer">
 
 
-                        </div>
-                        <div class="col-md-4 col-sm-6 col-xs-12">
-                            <div class="wrap">
-                                <ul>
-                                  <li class="home"><a href="/">Home</a></li>
-                                  <li class="roadmap"><a href="/roadmap/">Roadmap</a></li>
-                                	<li class="team"><a href="/team/">Team</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-6 col-xs-12">
-                          <div class="wrap">
-                              <ul>
-                                <li class="github"><a href="//github.com/input-output-hk/symphony" target="_blank">Github</a></li>
-                                <li class="documentation"><a href="//github.com/input-output-hk/symphony#api" target="_blank">Documentation</a></li>
-                                <li class="documentation"><a href="//github.com/input-output-hk/symphony/issues" target="_blank">Issues</a></li>
-                              </ul>
-                          </div>
+
+            <div class="row above">
+
+              <div class="col-sm-24 logo iohk">
 
 
-                        </div>
-                        <div class="col-md-4 col-sm-6 col-xs-12">
-                          <div class="wrap footer-social-networks">
-                          {% include ui-social-networks.html %}
-                          </div>
 
-                        </div>
-                        <div class="clear nodesktop"></div>
+
+                <div class="uppercase">
+                  <a href="//iohk.io/" target="_blank" class="iohk"><img src="/static/assets/images/iohk-symbol-on-black.svg" alt="IOHK"  /></a>
+                  <a href="//iohk.io/projects/cardano/" target="_blank" class="support">{{ site.data.i18n[page.language].supportedproject }}</a>
+
+
+                                          <div class="more inline-block">
+
+                                            <a href="//twitter.com/InputOutputHK" target="_blank"><em class="fa fa-twitter"></em></a>
+                                            <a href="javascript:io_send_mail(this)" class="" data-title="Symphony"><em class="fa fa-envelope"></em></a>
+                                            <a href="//github.com/input-output-hk/daedalus" target="_blank"><em class="fa fa-github"></em></a>
+
+                                          </div>
+                </div>
+
+
+
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row top">
+              <div class="col-sm-16">
+
+                {% if page.language == 'en' %}
+
+                <h5>Symphony is an
+                  <a href="https://opensource.org/licenses/MIT" target="_blank" class="highlight">
+                     open source
+                  </a> project.
+                </h5>
+
+                <p>
+                  Symphony is a software platform ONLY and does not conduct any independent diligence
+                  on or substantive review of any blockchain asset, digital currency, cryptocurrency
+                  or associated funds. You are fully and solely responsible for evaluating your
+                  investments, for determining whether you will exchange blockchain assets based
+                  on your own, and for all your decisions as to whether to exchange blockchain
+                  assets with Symphony. In many cases, blockchain assets you exchange on the basis
+                  of your research may not increase in value, and may decrease in value. Similarly,
+                  blockchain assets you exchange on the basis of your research may increase in value
+                  after your exchange.
+                </p>
+
+                <p>
+                  Past performance is not indicative of future results. Any investment in blockchain
+                  assets involves the risk of loss of part or all of your investment. The value of
+                  the blockchain assets you exchange is subject to market and other investment risks.
+                </p>
+                <br>
+                <p><a href="/tos/"><small>Terms of Service</small></a> &nbsp; | &nbsp; <a href="/release-notes/"><small>Release Notes</small></a></p>
+
+                {% endif %}
+
+
+                {% if page.language == 'ja' %}
+
+                <h5>
+                  <a href="https://opensource.org/licenses/MIT" target="_blank">
+                    ダイダロスはオープソースプロジェクトです。
+                  </a></h5>
+
+                <p>
+                  カルダノは、ソフトウェアプラットフォームのみであり、ブロックチェーン資産、デジタル通貨、暗号通貨またはそれに関連する各資金の精査や実質的なレビューは一切行いません。あなたは自身の投資評価、ブロックチェーン資産を交換するかどうかの決定、ブロックチェーン資産をカルダノと交換の如何に関して、完全かつ唯一の責任があります。多くの場合、あなたの調査に基づいて交換するブロックチェーン資産は価値が上がらず、下がる可能性があります。同様に、調査を基に交換するブロックチェーン資産は、交換後に価値が上がる可能性もあります。
+                </p>
+
+                <p>
+                  過去の業績は必ずしも将来の結果を 暗 示す るものではありません。ブロックチェーン資産への投資には、投資の一部または全てが失われるリスクが伴います。換金するブロックチェーン資産の価値は、市場リスクおよびその他の投資リスクの対象となります。
+                </p>
+
+                <p>
+                  <a href="/ja/tos/"><small>利用規約</small></a> &nbsp; | &nbsp; <a href="/ja/release-notes/"><small>リリースノート</small></a>
+                </p>
+
+
+                {% endif %}
+
+
+
+
+
+
+              </div>
+              <div class="col-sm-7 col-sm-offset-1">
+
+
+
+                <div class="links">
+
+                  <div class="row">
+
+                    {% if page.language == 'en' %}
+                    <div class="col-sm-11">
+
+                      <h5>Symphony</h5>
+
+                      <ul class="nolist pd0 margin0">
+
+                        <li class="home"><a href="/">Home</a></li>
+                        <li class="about"><a href="/about/">About</a></li>
+                      	<li class="roadmap"><a href="/roadmap/">Roadmap</a></li>
+                      	<li class="team"><a href="/team/">Team</a></li>
+                      	<li class="docs"><a href="/docs/">Documentation</a></li>
+                      	<li class="github"><a href="//github.com/input-output-hk/symphony" target="_blank">Github</a></li>
+
+
+                      </ul>
+                    </div>
+                    <div class="col-sm-13">
+
+                      <h5>IOHK</h5>
+
+                      <ul class="nolist pd0 margin0">
+
+
+                                              	<li class="" target="_blank"><a href="http://iohk.io">Input Output</a></li>
+
+                            		<li><a href="https://twitter.com/inputoutputHK" target="_blank"><span>Twitter</span><em class="hidden-icon fa fa-twitter"></em></a></li>
+                            		<li><a href="https://www.facebook.com/iohk.io/" target="_blank"><span>Facebook</span><em class="fa fa-facebook"></em></a></li>
+                            		<li><a href="https://www.github.com/input-output-hk" target="_blank"><span>Github</span><em class="fa fa-github"></em></a></li>
+                            		<li><a href="https://www.linkedin.com/company-beta/6385405/" target="_blank"><span>LinkedIn</span><em class="fa fa-linkedin"></em></a></li>
+                            		<li><a href="http://www.youtube.com/c/IohkIo" target="_blank"><span>YouTube</span><em class="fa fa-youtube"></em></a></li>
+
+
+                      </ul>
 
                     </div>
+
+                    {% elsif page.language == 'ja' %}
+
+                    <div class="col-sm-14">
+                      <ul class="nolist pd0 margin0">
+                        <li><a href="https://cardanoexplorer.com" title="An open source block explorer for the Symphony project" target="_blank">カルダノブロックチェーンエクスプローラー</a></li>
+                        <li><a href="https://cardanodocs.com" title="Full technical documentation of the project" target="_blank">カルダノドキュメンテーション</a></li>
+                        <li><a href="https://cardanoroadmap.com" title="Development path of the Symphony project" target="_blank">カルダノロードマップ</a></li>
+                        <li><a href="https://github.com/input-output-hk/cardano-sl" title="Symphony SL repository" target="_blank">カルダノSLソース</a></li>
+                        <li><a href="https://cardanofoundation.org" title="Supervisory and educational body for the Symphony Protocol" target="_blank">カルダノ財団</a></li>
+                        <li><a href="https://whycardano.com" target="_blank" title="Why we are building Symphony">なぜカルダノなのか</a></li>
+                        <li><a href="https://www.cardano.org/ja/home-2/" title="Symphony Hub" target="_blank">カルダノハブ</a></li>
+                        <li><a href="https://staking.cardano.org" title="Symphony Staking" target="_blank">カルダノステイキング</a></li>
+                        <li><a href="https://feedback.cardano.org" title="Symphony Feedback" target="_blank">カルダノ評価</a></li>
+                        <li><a href="https://www.youtube.com/channel/UCbQ9vGfezru1YRI1zDCtTGg" target="_blank">カルダノ財団 Youtube</a></li>
+                        <li><a href="https://twitter.com/SymphonyStiftung" title="Follow the Foundation" target="_blank">カルダノ財団 Twitter</a></li>
+                      </ul>
                     </div>
+
+                    <div class="col-sm-10">
+                      <ul class="nolist pd0 margin0">
+                        <li><a href="https://t.me/SymphonyAnnouncements" title="Join the conversation" target="_blank">チャット</a></li>
+                        <li><a href="https://forum.cardano.org/ja/home-2/" title="Join the conversation" target="_blank">フォーラム</a></li>
+                        <li><a href="https://www.reddit.com/r/cardano/" title="Join the conversation" target="_blank">カルダノ財団 Reddit </a></li>
+                        <li><a href="http://cardano.org" title="Community hub for the ecosystem" target="_blank">カルダノコミュニティー</a></li>
+                        <!--<li><a href="https://daedaluswallet.io" title="Open source platform" target="_blank">ダイダロスプラットフォーム</a></li>-->
+                        <li><a href="https://iohk.io" title="Development partner" target="_blank">IOHK</a></li>
+                        <li><a href="https://iohk.io/blog/" target="_blank">IOHKブログ</a></li>
+                        <li><a href="https://www.youtube.com/channel/UCBJ0p9aCW-W82TwNM-z3V2w" target="_blank">IOHK YouTube</a></li>
+                      </ul>
                     </div>
+                    {% endif %}
+
+                  </div>
+
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+        </div>
+    </footer>
+</div>
