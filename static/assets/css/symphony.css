@@ -19,7 +19,7 @@ small{font-weight: 400}
 
 h3,h4,h5,h6{font-weight: 400}
 h1,h2,h3,h4,h5,h6{text-transform: uppercase;font-size: 110%;margin:1.3em 0}
-h1,h2{text-align: center;font-size: 140%;margin:2em 0}
+h1,.about h2{text-align: center;font-size: 140%;margin:2em 0}
 h2{font-weight:500}
 
 pre.highlight{margin-bottom: 10px}
@@ -60,7 +60,8 @@ blockquote p{font-size: 100%;line-height:1.6;}
 #navbar .navbar-brand{position: absolute;margin:-250px 0 0 -100px;left:50%}
 #page.home #navbar .navbar-brand{position: absolute;margin:-57px 0 0 -57px;left:auto}
 #navbar .navbar-brand,.navbar-brand #logo-stage,.navbar-brand #logo-root{width:200px;height:200px;}
-
+    #navbar .navbar-brand{pointer-events: none}
+    #navbar .navbar-brand #logo-stage {pointer-events: auto}
 
 #navbar #menu-top li:before {line-height:93px;content:"•";font-size:290%;display:inline-block;float:left;color:rgba(255,255,255,0.5) }
 #navbar #menu-top li a{line-height:50px;padding-right:10px;padding-left:18px}
@@ -87,7 +88,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
 #page.home #navbar #menu-top li.hr .line{width:540px}
 }
 
-.block.title{padding:0px 0 0 20px;text-align: left;font-size: 100%;position:absolute;top:270px;left:0;width: 100%;z-index:9;-webkit-transition: top .5s;-moz-transition: top .5s; -o-transition: top .5s; transition: top .5s;}
+.block.title{pointer-events: none;padding:0px 0 0 20px;text-align: left;font-size: 100%;position:absolute;top:270px;left:0;width: 100%;z-index:9;-webkit-transition: top .5s;-moz-transition: top .5s; -o-transition: top .5s; transition: top .5s;}
 #page.home .block.title{top:40px;}
 .block.title h1{font-weight:300;font-size: 140%;letter-spacing: 0.2em;margin:0;text-shadow:#fff 0 0 3px}
 .block.title h1 a{color:rgba(255,255,255,0.8)}
@@ -690,7 +691,7 @@ h1,
 #gource-box .opener .on{display: inline-block}
 #gource-box.fullscreen .opener .on{display: none}
 
-#gource-box .opener {position: absolute;z-index:99;margin:12% 0 0 0px;right:0;width:120px;height:120px;background:url('/static/assets/images/mouseglow.svg') center no-repeat;color:#fff;line-height:120px;text-align: center;}
+#gource-box .opener {position: absolute;z-index:99;margin:12% 0 0 0px;right:0;width:120px;height:120px;background:url('/static/assets/images/mouseglow.svg') center no-repeat;color:#fff;line-height:120px;text-align: center;-webkit-transition: opacity 1.1s;-moz-transition: opacity 1.1s; -o-transition: opacity 1.1s; transition: opacity 1.1s;}
 #gource-box.fullscreen .opener {position: absolute;font-size: 200%;opacity: 0.8;z-index:9999;top:60px;right:100px;left:auto;background:transparent;width: 80px;height: 80px;margin:0;line-height:20px}
 #gource-box.fullscreen .opener:hover{opacity: 1}
 

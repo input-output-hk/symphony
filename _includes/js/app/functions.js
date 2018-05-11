@@ -478,9 +478,13 @@ function io_which_way_alter(){
 	}
 
 
+	var loadedgource = false;
+	var loadgource = false;
 
 	if($("#symphony").hasClass('ready')){
-
+		if(loadedgource){
+			gource.destroy()
+		}
 
 		if($("#symphony").hasClass('mask')){
 			if($("#page").hasClass('home')){
@@ -506,11 +510,11 @@ function io_which_way_alter(){
 	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
 	//console.log(chosen);
 
-	var loadgource = false;
 	if(current_chosen == '' || current_chosen == 'home'){
 
 		if(chosen != 'home'){
 			$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+				loadedgource = true;
 				var config = {
 	          git: {
 							owner: 'input-output-hk',
@@ -611,9 +615,30 @@ function io_which_way_alter(){
 									commitFirst = data;
 									gource.getlastCommit().then(data => {
 										commitLast = data;
-
 										$("#gource-box .opener").removeClass('opa0');
 										$("#gource-box .opener").removeClass('none');
+										$("#gource-box .opener").click(function(e){
+											io_class_toggle('#gource-box','fullscreen');
+											if($('#gource-box').hasClass('fullscreen')){
+												gource.setConfig({
+			                    camera: {
+			                      enableZoom: true
+			                    }
+			                  })
+											}else{
+												gource.setConfig({
+			                    camera: {
+			                      enableZoom: false
+			                    }
+			                  })
+											}
+										});
+										gource.setConfig({
+											camera: {
+												enableZoom: false
+											}
+										})
+
 
 										var min_val = commitFirst.date/1000;
 										var max_val = commitLast.date/1000;
