@@ -50,12 +50,12 @@ p{line-height: 1.5;}
 .roadmap .item .content .icon{margin: 0 0 0 18px;display: none}
 
 
-.roadmap .item .content{width:35%;display: inline-block;padding:12px 20px 20px 20px !important;;margin:0 0 0 6%;font-size: 90%;
+.roadmap .item .content{width:35%;display: inline-block;padding:12px 20px 20px 20px !important;;margin:0 0 0 6%;
   min-height:130px;background:rgba(23,28,48,0.9);border:0 solid rgba(255,255,255,0.3);padding:20px 20px;
   box-shadow: 0 0 3px rgba(255,255,255,0.4), 0 5px 10px rgba(18,23,38,0.6);
   -webkit-transition: opacity .5s;-moz-transition: opacity .5s; -o-transition: opacity .5s; transition: opacity .5s;}
 
-.roadmap .item .content .glow{position: absolute;margin: -26px 0 0 -10px}
+.roadmap .item .content .glow{position: absolute;margin: -24px 0 0 -10px}
 
 
 
@@ -112,7 +112,7 @@ p{line-height: 1.5;}
 .roadmap .item.milestone.notitle .content .desc{margin:-18px 0 0 0}
 
 
-.roadmap .item h2{padding:35px 0 1em 35px;font-size:100%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em}
+.roadmap .item h2{padding:35px 0 1em 35px;font-size:100%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em;text-align: right}
 
 
 @media (max-width:1199px){
