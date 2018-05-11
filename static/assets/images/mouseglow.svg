@@ -4,16 +4,16 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="120px" height="120px" viewBox="0 0 120 120" enable-background="new 0 0 120 120" xml:space="preserve">
 	 <circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
- 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="15%" to="25%"/>
- 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="2.5s" repeatCount="indefinite" from="15%" to="25%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="2.5s" repeatCount="indefinite" from="1" to="0"/>
  	</circle>
  	<circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
- 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="20%" to="40%"/>
- 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="2.5s" repeatCount="indefinite" from="20%" to="40%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="2.5s" repeatCount="indefinite" from="1" to="0"/>
  	</circle>
  	<circle class = "innerCircle" cx = "50%" cy = "50%" r = "25%" fill = "#1dd2d4">
- 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="30%" to="50%"/>
- 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+ 		<animate attributeType="SVG" attributeName="r" begin="0s" dur="2.5s" repeatCount="indefinite" from="30%" to="50%"/>
+ 		<animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="2.5s" repeatCount="indefinite" from="1" to="0"/>
  	</circle>
  	<g>
  			<path transform="translate(48,56)" fill="#FFFFFF" d="M11.914,5.962C11.897,6.321,12.237,6.5,12.934,6.5v0.984H8.697V6.5c0.68,0,1.02-0.18,1.02-0.539V2.887
