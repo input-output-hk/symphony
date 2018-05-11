@@ -655,7 +655,7 @@ export default class MainScene extends EventEmitter {
     /*
       Get the nearest day to the camera's target location
     */
-    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z + (DAY_OFFSET * 0.5) + CIRCLE_OFFSET)
+    const date = this.getNearestDateForPosition(this.stage.targetCameraPos.z)
 
     // const postionOfCurrentDate = this.getPositionForDate(this.date)
     date.setHours(0, 0, 0, 0)
