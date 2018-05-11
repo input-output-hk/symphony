@@ -174,7 +174,7 @@ box-shadow:0 0 0 transparent;
 
 
 .entry{font-size:80%;position: relative;}
-
+.entry.centerline h2{text-align: left}
 .entry.centerline .item{background:url('/static/assets/images/timeline.svg') repeat-y 0;padding:30px 0 30px 20px}
 .entry.centerline .item .gallery{margin:-3px 0 0 0}
 .entry.centerline .item .gallery .thumbnail{display: inline-block;vertical-align: top;padding:0;margin:0 10px 0 0;background: transparent;border: 0;}
@@ -190,17 +190,24 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item.final .github{font-size: 300%;padding:0 70px 0 10px;margin: -10px 0 0 0}
 .entry.centerline .item.final .hr:before{float:left;}
 
-@media (min-width:768px){
-.entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
-.entry.centerline .item.mirrored .info,.entry.centerline .item.mirrored .gallery{width: 50%;float: right;font-size: 90%}
+.entry.centerline .item .hr{border-top:1px solid #0bdcf9;width:20px;margin:0 0 0 -10px;opacity: 1;position:absolute;left:0;}
+.entry.centerline .item .hr:before,.entry.centerline .item .hr:after{line-height:0;content:"•";color:#0bdcf9;font-size:280%;display:inline-block;vertical-align:top;margin:-3px 0 0 -3px}
+.entry.centerline .item .hr:after{float:right;margin:-3px -3px 0 0}
 
-.entry.centerline .item{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:30px 0}
-.entry.centerline .item.mirrored{}
+@media (min-width:768px){
+.entry.centerline h2{text-align: center}
+
+    .entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
+.entry.centerline .item.mirrored .info,.entry.centerline .item.mirrored .gallery{width: 50%;float: right;font-size: 90%}
 
 .entry.centerline .item .hr{border-top:1px solid #0bdcf9;width:120px;margin:0 0 0 -60px;opacity: 1;position:absolute;left:50%;}
 .entry.centerline .item .hr:before,.entry.centerline .item .hr:after{line-height:0;content:"•";color:#0bdcf9;font-size:280%;display:inline-block;vertical-align:top;margin:-3px 0 0 -3px}
 .entry.centerline .item .hr:after{float:right;margin:-3px -3px 0 0}
-.entry.centerline .item .info{padding: 0 40px 0 0}
+
+.entry.centerline .item{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:30px 0}
+.entry.centerline .item.mirrored{}
+
+.entry.centerline .item .info{padding: 0 80px 0 0}
 .entry.centerline .item .gallery{padding: 0  0 0 90px}
 .entry.centerline .item.mirrored .info{padding:  0 0 0 90px}
 .entry.centerline .item.mirrored .gallery{padding: 0 90px 0 40px;text-align: right}
