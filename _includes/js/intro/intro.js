@@ -39,66 +39,7 @@ function io_intro_frame () {
 }
 
 function io_intro () {
-	// IOHP2();
-
-/*
-
-	setTimeout(function(){
-    io_intro_frame();
-    $("#symphony_hint_but").addClass('ready');
-    $("#app").click(function () {
-      $("#symphony_hint").addClass('go');
-      $("#symphony_hint_but").remove();
-    })
-    $("#app").on('swipe',function () {
-      $("#symphony_hint").addClass('go');
-      $("#symphony_hint_but").remove();
-    });
-    $("#app").on('touchstart',function () {
-      $("#symphony_hint").addClass('go');
-      $("#symphony_hint_but").remove();
-    });
-    $("#app").on('click',function () {
-      $("#symphony_hint").addClass('go');
-      $("#symphony_hint_but").remove();
-    });
-    $("#app").on('mousemove',function () {
-      $("#symphony_hint").addClass('go');
-      $("#symphony_hint_but").remove();
-    });
-
-    //$("#window1").removeAttr('style');
-    //$("#window1").height(wh-160);
-    //
-
-		$("#entry .desc").removeClass('none');
-		setTimeout(function(){
-			//jQuery("#symphony_ignit,#symphony_start").addClass('in');
-		},150);
-	},200);
-*/
-	// io_intro_init();
-
-  $('#symphony_ignit,#symphony_start-0').click(function () {
-	    io_intro_init()
-    $('#app').remove()
-  })
-  $('#symphony_start-1').click(function () {
-    	io_intro_num = 1
-    $('#app').remove()
-	    io_intro_init()
-  })
-  $('#symphony_start-2').click(function () {
-    	io_intro_num = 2
-    $('#app').remove()
-	    io_intro_explorer()
-  })
-
-  setTimeout(function () {
-    io_intro_num = 2
-    $('#app').remove()
-    io_intro_explorer()
-  }, 500)
+  io_intro_explorer()
 }
 
 function io_intro_pauseplay () {
