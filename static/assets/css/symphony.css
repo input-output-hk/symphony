@@ -218,6 +218,11 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item .hr img{margin:-22px 0 0 5px;width:11px;height:11px;}
 .entry.centerline .item .hr:before,
 .entry.centerline .item .hr:after{display: none}
+.entry.centerline blockquote{margin:0}
+.entry.centerline .item.final {background: transparent;text-align: center;padding:0;}
+.entry.centerline .item.final .tit{padding-left:0;}
+.entry.centerline .item.final .github{padding-left:0;padding-right:0;}
+.entry.centerline .item.final .hr{display: none;}
 }
 
 
@@ -890,6 +895,7 @@ footer #lang-select li a {opacity: 0.9}
 
 @media (max-width: 767px) {
 #foot footer, #foot footer p, #foot footer li {  text-align: center;}
+.foot .logo .support{margin:0 0px 0 0px}
 }
 
 @media (min-width: 767px) {
