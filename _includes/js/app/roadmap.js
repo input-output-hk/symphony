@@ -49,6 +49,14 @@ var countdown_clock = '<br>\
 </div>\
 ';
 
+var rm_icons = new Object();
+rm_icons['press'] = '<em class="icon-book-open"></em>';
+rm_icons['research'] = '<em class="icon-eyeglasses"></em>';
+rm_icons['launch'] = '<em class="icon-rocket"></em>';
+rm_icons['github'] = '<em class="fa fa-github"></em>';
+rm_icons['presentation'] = '<em class="icon-eye"></em>';
+
+
 
 
 var rm_month = new Array(' ','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
@@ -407,7 +415,7 @@ function rm_item(item){
         <div class="link nodesktop"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>\
         <div class="attributes">\
           <div class="link nomobile"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>\
-          <h2 class=""><span class="dot left"></span> '+title+' <span class="dot right"></span></h2>\
+          <h2 class="">'+title+' <span class="icon">'+rm_icons[rm_slug(item.gsx$category.$t)]+'</span></h2>\
           <div class="links"> \
             '+owner+'\
             '+links+'\
@@ -417,8 +425,6 @@ function rm_item(item){
         </div><!-- .attributes -->\
         <div class="content">\
         <span class="glow"><img src="/static/assets/images/glow.png" alt="" /></span>\
-         '+icon+'\
-         <!--<h2><span class="dot left"></span> '+title+' <span class="dot right"></span></h2>-->\
           <div class="desc">\
             <div class="inner">\
             '+time+' \

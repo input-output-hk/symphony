@@ -14,6 +14,14 @@ rm_lang['cn']['progress'] = '进展';
 rm_lang['kr'] = new Object();
 rm_lang['kr']['progress'] = '진행';
 
+var rm_icons = new Object();
+rm_icons['press'] = '<em class="icon-book-open"></em>';
+rm_icons['research'] = '<em class="icon-eyeglasses"></em>';
+rm_icons['launch'] = '<em class="icon-rocket"></em>';
+rm_icons['github'] = '<em class="fa fa-github"></em>';
+rm_icons['presentation'] = '<em class="icon-eye"></em>';
+
+
 var milestone_header = '';
 var lang = $("#lang_meta").attr('content');
 var countdown_clock = '<br>\

@@ -196,8 +196,7 @@ box-shadow:0 0 0 transparent;
 
 @media (min-width:768px){
 .entry.centerline h2{text-align: center}
-
-    .entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
+.entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
 .entry.centerline .item.mirrored .info,.entry.centerline .item.mirrored .gallery{width: 50%;float: right;font-size: 90%}
 
 .entry.centerline .item .hr{border-top:1px solid #0bdcf9;width:120px;margin:0 0 0 -60px;opacity: 1;position:absolute;left:50%;}
@@ -211,8 +210,14 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item .gallery{padding: 0  0 0 90px}
 .entry.centerline .item.mirrored .info{padding:  0 0 0 90px}
 .entry.centerline .item.mirrored .gallery{padding: 0 90px 0 40px;text-align: right}
-.entry.centerline .item .gallery .thumbnail{margin:0 0 0 10px }
+.entry.centerline .item.mirrored .gallery .thumbnail{margin:0 0 0 10px }
 .entry.centerline .item .hr img{position: absolute;left:50%;margin:-8px 0 0 -8px}
+}
+
+@media (max-width:767px){
+.entry.centerline .item .hr img{margin:-22px 0 0 5px;width:11px;height:11px;}
+.entry.centerline .item .hr:before,
+.entry.centerline .item .hr:after{display: none}
 }
 
 
@@ -767,11 +772,12 @@ h1,
 #gource-box .date--slider--end{margin:29px 0 0 -20px}
 #gource-box .date--slider--end.pull-right{margin:29px -10px 0 0}
 
+#gource-root .App{position:absolute;left:0;top:-425px;width:100%;height:auto;}
 
-#gource-box #gource-root{top:300px;right:0;width:auto;height:100%;}
-#gource-box .opener {margin:55% 0 0 0px;background-size:70% 70%;}
+#gource-box #gource-root{top:0px;right:0;width:100%;height:100%;}
+#gource-box .opener {margin:-40px 0 0 0px;background-size:70% 70%;}
 
-#gource-box.fullscreen .opener{top:17px;right:18px;}
+#gource-box.fullscreen .opener{top:17px;right:18px;width:20px}
 #gource-box.fullscreen.infohidden .infopanel .inner{display:none;}
 #gource-box.fullscreen .infopanel .opener{font-size:100%;}
 #gource-box.fullscreen .infopanel{display:block;padding:0;font-size:80%;letter-spacing:0.03em;}
