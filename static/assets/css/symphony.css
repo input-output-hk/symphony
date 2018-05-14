@@ -64,7 +64,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
     #navbar .navbar-brand #logo-stage {pointer-events: auto}
 
 #navbar #menu-top li:before {line-height:93px;content:"•";font-size:290%;display:inline-block;float:left;color:rgba(255,255,255,0.5) }
-#navbar #menu-top li a{line-height:50px;padding-right:10px;padding-left:18px}
+#navbar #menu-top li a{line-height:50px;padding-right:5px;padding-left:18px}
 #navbar #menu-top li.hr .line{vertical-align: bottom;border-bottom:1px solid rgba(255,255,255,0.5);opacity: 1;line-height:auto;width:160px;height:50px;display: inline-block;margin:0 -2px}
 #page.home #navbar #menu-top li.hr .line{width:120px}
 
