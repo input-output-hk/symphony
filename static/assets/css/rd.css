@@ -3,6 +3,7 @@
 
 p{line-height: 1.5;}
 
+#roadmap-load{position: relative;z-index: 9}
 
 
 .roadmap .introduction-full {display:none}
