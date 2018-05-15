@@ -782,7 +782,7 @@ h1,
 #gource-box #gource-root{top:0px;right:0;width:100%;height:100%;}
 #gource-box .opener {margin:-40px 0 0 0px;background-size:70% 70%;}
 
-#gource-box.fullscreen .opener{top:17px;right:18px;width:20px}
+#gource-box.fullscreen .opener{top:17px;right:18px;width:20px;height:20px}
 #gource-box.fullscreen.infohidden .infopanel .inner{display:none;}
 #gource-box.fullscreen .infopanel .opener{font-size:100%;}
 #gource-box.fullscreen .infopanel{display:block;padding:0;font-size:80%;letter-spacing:0.03em;}
@@ -812,7 +812,7 @@ h1,
 #gource-box.sphereview .view--switcher .sphere{display:none}
 #gource-box .view--switcher a+a{border-top:0}
 
-
+#gource-box .daterange .date--slider.ui-slider .ui-slider-handle{width:30px}
 }
 
 
