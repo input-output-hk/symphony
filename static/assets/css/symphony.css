@@ -585,8 +585,8 @@ h1,
 #symphony_hud .controls.top{position: fixed;width:100%;z-index:9;bottom:30px}
 #symphony_hud.search_box_on .controls.top{bottom:90px}
 #symphony_hud .controls.top .inner{text-align: center}
-#symphony_hud .controls.top .inline-block{background:rgba(18,23,38,0.6);padding:15px 20px;border-radius: 50px;margin:0 10px;min-width: 55px}
-#symphony_hud .controls.top .inline-block.search,#symphony_hud .controls.top .inline-block.sound{padding:15px 15px;width:50px;min-width:45px}
+#symphony_hud .controls.top .inline-block{background:rgba(18,23,38,0.6);padding:12px 20px;border-radius: 50px;margin:0 10px;min-width: 55px}
+#symphony_hud .controls.top .inline-block.search,#symphony_hud .controls.top .inline-block.sound{padding:12px 15px;width:46px;min-width:45px}
 #symphony_hud .controls.top .day_prev{font-size:150%;line-height:1;margin:0 10px 0 0}
 #symphony_hud .controls.top .day_next{font-size:150%;line-height:1;margin:0 0 0 15px}
 #symphony_hud .controls.top .date {margin:0 5px}
@@ -780,7 +780,7 @@ h1,
 #gource-root .App{position:absolute;left:0;top:-425px;width:100%;height:auto;}
 
 #gource-box #gource-root{top:0px;right:0;width:100%;height:100%;}
-#gource-box .opener {margin:-40px 0 0 0px;background-size:70% 70%;}
+#gource-box .opener {margin:-40px 0 0 0px;background-size:70% 70%;z-index:9}
 
 #gource-box.fullscreen .opener{top:17px;right:18px;width:20px;height:20px}
 #gource-box.fullscreen.infohidden .infopanel .inner{display:none;}
