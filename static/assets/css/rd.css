@@ -112,7 +112,7 @@ p{line-height: 1.5;}
 .roadmap .item.milestone.notitle .content .desc{margin:-18px 0 0 0}
 
 
-.roadmap .item h2{padding:35px 0 0 35px;font-size:116%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em;text-align: right}
+.roadmap .item h2{padding:35px 0 0 35px;line-height:1.35;font-size:116%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em;text-align: right}
 .roadmap .item h2 .icon{font-size:150%;vertical-align:middle;margin:0 0 0 9px}
 
 .roadmap .item h2 .icon .icon-rocket{color:#bc3674}
