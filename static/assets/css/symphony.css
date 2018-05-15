@@ -552,8 +552,8 @@ h1,
 #symphony_hud .pane.top{top:265px;}
 
 
-#symphony_hud .pane .link{display: inline-block;position: absolute;width:26px;border-top:1px solid rgba(29,210,212,0.5);margin:10px 0 0 -50px}
-#symphony_hud .pane .link:after{content:"•";font-size:250%;display:inline-block;float:right;margin:-4px -8px 0 0;line-height:1px;color:rgba(29,210,212,0.5)}
+#symphony_hud .pane .link{display: inline-block;position: absolute;width:27px;border-top:1px solid rgba(29,210,212,0.5);margin:10px 0 0 -50px}
+#symphony_hud .pane .link:after{content:"•";font-size:350%;display:inline-block;float:right;margin:-5px -8px 0 0;line-height:1px;color:rgba(29,210,212,0.5)}
 #symphony_hud .pane.off .link{margin:11px 0 0 -60px;width:29px;}
 #symphony_hud .pane.off .link:after{display: none}
 
@@ -586,13 +586,13 @@ h1,
 #symphony_hud.search_box_on .controls.top{bottom:90px}
 #symphony_hud .controls.top .inner{text-align: center}
 #symphony_hud .controls.top .inline-block{background:rgba(18,23,38,0.6);padding:15px 20px;border-radius: 50px;margin:0 10px;min-width: 55px}
-
+#symphony_hud .controls.top .inline-block.search,#symphony_hud .controls.top .inline-block.sound{padding:15px 15px;width:50px;min-width:45px}
 #symphony_hud .controls.top .day_prev{font-size:150%;line-height:1;margin:0 10px 0 0}
 #symphony_hud .controls.top .day_next{font-size:150%;line-height:1;margin:0 0 0 15px}
 #symphony_hud .controls.top .date {margin:0 5px}
 
 @media (min-width:768px){
-  #symphony_hud .pane .glow{top:-13px;left:0;position: absolute;}
+  #symphony_hud .pane .glow{top:-11.5px;left:0;position: absolute;}
   #symphony_hud .pane.off .glow{display: none}
 }
 

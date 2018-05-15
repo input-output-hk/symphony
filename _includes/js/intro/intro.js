@@ -199,10 +199,10 @@ function io_intro_explorer () {
           <a href="javascript:io_class_toggle(\'.sound_control\',\'off\')" id="mute"><em class="icon-volume-off"></em></a><a href="javascript:io_class_toggle(\'.sound_control\',\'off\')" id="unmute"><em class="icon-volume-2 "></em></a>\
         </div>\
         <div class="inline-block pane date">\
-          <a href="" class="day_prev"><em class="fa fa-angle-left"></em></a>\
+          <a href="" class="day_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
           <span class="date"></span> &nbsp; \
           <input type="text" value="000000" id="datepicker" class="datepicker ll-skin-melon none" style="position:fixed;top:0left:0" /> <a href="#" class="datepicker_icon"><em class="fa fa-calendar"></em></a>\
-          <a href="" class="day_next"><em class="fa fa-angle-right"></em></a>\
+          <a href="" class="day_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
         </div>\
         <div class="inline-block pane search">\
           <div class="search_control"><a href="javascript:io_class_toggle(\'#symphony_hud\',\'search_box_on\')"><em class="icon-magnifier"></em></a></div>\
@@ -227,14 +227,14 @@ function io_intro_explorer () {
           <a href="javascript:io_class_toggle(\'.sound_control\',\'off\')" id="mute2"><em class="icon-volume-off"></em></a><a href="javascript:io_class_toggle(\'.sound_control\',\'off\')" id="unmute2"><em class="icon-volume-2 "></em></a>\
         </div>\
         <div class="inline-block pane date">\
-          <a href="" class="day_prev"><em class="fa fa-angle-left"></em></a>\
+          <a href="" class="day_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
           <span class="date"></span> &nbsp; \
           <input type="text" value="000000" id="datepicker2" class="datepicker ll-skin-melon none" /> <a href="#" class="datepicker_icon"><em class="fa fa-calendar"></em></a>\
-          <a href="" class="day_next"><em class="fa fa-angle-right"></em></a>\
+          <a href="" class="day_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
         </div>\
         <div class="inline-block block-controls text-center">\
-          <a href="#" title="Previous block" class="block_prev"><em class="fa fa-angle-left"></em></a>\
-          <a href="#" title="Next block" class="block_next"><em class="fa fa-angle-right"></em></a>\
+          <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
+          <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
           <a href="#" title="Close block" class="block_close"><em class="fa fa-times"></em></a>\
         </div>\
         <div class="inline-block pane search">\
@@ -526,8 +526,8 @@ function io_intro_explorer () {
           <div class="li"><small>Number of Transactions</small> ' + n_tx + '</div>\
           </div>\
           <div class="controls text-center nomobile">\
-            <a href="#" title="Previous block" class="block_prev"><em class="fa fa-angle-left"></em></a>\
-            <a href="#" title="Next block" class="block_next"><em class="fa fa-angle-right"></em></a>\
+            <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
+            <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
             <a href="#" title="Close block" class="block_close"><em class="fa fa-times"></em></a>\
           </div>\
         </div>\
