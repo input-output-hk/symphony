@@ -9,7 +9,7 @@
 
 .ll-skin-melon .ui-widget {
 	font-family: "Roboto","Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
-	background: rgba(75,30,110,1);
+	background: rgb(60, 97, 185);
 	border: none;
 	border-radius: 0;
 	-webkit-border-radius: 0;
@@ -85,7 +85,7 @@
 }
 
 .ll-skin-melon .ui-datepicker td {
-	background: rgba(100,45,145,0.95);
+	background: rgb(74, 114, 210);
 	border: none;
 	padding: 0;
 }
@@ -111,5 +111,5 @@
 
 .ll-skin-melon td .ui-state-active,
 .ll-skin-melon td .ui-state-hover {
-	background: #652d90;
+	background: #3e51a4;
 }
