@@ -512,7 +512,7 @@ function io_which_way_alter(){
 
 		if(chosen != 'home'){
 			//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
-			console.log("fdsfadf");
+			console.log("gource");
 			loadedgource = true;
 				var config = {
 	          git: {
@@ -703,9 +703,13 @@ function io_which_way_alter(){
 													// $(this).datepicker("widget").removeClass("ll-skin-melon");
 											}
 										})
-										$('.datepicker_icon').click(function (e) {
+										$('#gource-box .daterange.nomobile .datepicker_icon').click(function (e) {
 							        e.preventDefault()
-							        $('#datepicker').datepicker('show')
+							        $('#gource-datepicker').datepicker('show')
+							      })
+										$('#gource-box .controls.nodesktop .datepicker_icon').click(function (e) {
+							        e.preventDefault()
+							        $('#gource-datepicker2').datepicker('show')
 							      })
 
 										gource.on('commitChanged', (data) => {
@@ -740,7 +744,7 @@ function io_which_way_alter(){
 						});
 					}
 					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
-				
+
 
 		}
 }

@@ -201,7 +201,7 @@ function io_intro_explorer () {
         <div class="inline-block pane date">\
           <a href="" class="day_prev"><em class="fa fa-angle-left"></em></a>\
           <span class="date"></span> &nbsp; \
-          <input type="text" value="000000" id="datepicker" class="datepicker ll-skin-melon none" /> <a href="#" class="datepicker_icon"><em class="fa fa-calendar"></em></a>\
+          <input type="text" value="000000" id="datepicker" class="datepicker ll-skin-melon none" style="position:fixed;top:0left:0" /> <a href="#" class="datepicker_icon"><em class="fa fa-calendar"></em></a>\
           <a href="" class="day_next"><em class="fa fa-angle-right"></em></a>\
         </div>\
         <div class="inline-block pane search">\
