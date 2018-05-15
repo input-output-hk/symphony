@@ -510,6 +510,7 @@ function io_which_way_alter(){
 
 	if(!loadedgource){
 
+
 		if(chosen != 'home'){
 			//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
 			console.log("gource");
@@ -585,27 +586,8 @@ function io_which_way_alter(){
 							}
 
 
-							$(".commit--switcher a.prev").click(function(){
-								gource.goToPrev()
-							})
-							$(".commit--switcher a.next").click(function(){
-								gource.goToNext()
-							})
 
-							$(".view--switcher a.normal").click(function(){
-								gource.setSphereView(false);
-							})
-							$(".view--switcher a.sphere").click(function(){
-								gource.setSphereView(true);
-							})
-							$(".play--switcher a.play").click(function(){
-								gource.setPlay(true);
-							})
-							$(".play--switcher a.stop").click(function(){
-								gource.setPlay(false);
-							})
-
-
+							var commitCurrent = new Object();
 							var commitFirst = new Object();
 							var commitLast = new Object();
 
@@ -614,6 +596,7 @@ function io_which_way_alter(){
 									commitFirst = data;
 									gource.getlastCommit().then(data => {
 										commitLast = data;
+										commitCurrent = data;
 										$("#gource-box .opener").removeClass('opa0');
 										$("#gource-box .opener").removeClass('none');
 										$("#gource-box .opener").click(function(e){
@@ -714,7 +697,7 @@ function io_which_way_alter(){
 
 										gource.on('commitChanged', (data) => {
 											manual = false;
-											//console.log(data)
+											commitCurrent = data;
 											var pos = Date.parse(data.date)/1000;
 											$( ".date--slider" ).slider( "value", pos );
 
@@ -726,6 +709,7 @@ function io_which_way_alter(){
 												}
 											}
 											if(data.index == commitLast.index){
+												$("#gource-box").removeClass('playing');
 												$("#gource-box").addClass('commit-last');
 											}else{
 												if($("#gource-box").hasClass('commit-last')){
@@ -737,6 +721,33 @@ function io_which_way_alter(){
 											}
 											$("#gource-box .infopanel .inner").html(commitInfo(data));
 										})
+
+
+
+										$(".commit--switcher a.prev").click(function(){
+											gource.goToPrev()
+										})
+										$(".commit--switcher a.next").click(function(){
+											gource.goToNext()
+										})
+
+										$(".view--switcher a.normal").click(function(){
+											gource.setSphereView(false);
+										})
+										$(".view--switcher a.sphere").click(function(){
+											gource.setSphereView(true);
+										})
+										$(".play--switcher a.play").click(function(){
+											if(commitCurrent.index == commitLast.index){
+												var start = new Date(commitFirst.date);
+												gource.setDate(formatBot(start));
+											}
+											gource.setPlay(true);
+										})
+										$(".play--switcher a.stop").click(function(){
+											gource.setPlay(false);
+										})
+
 
 								})
 							})
