@@ -224,7 +224,7 @@
 #symphony_hud .controls.top .block-controls .block_next{display: inline-block;width: 33%;font-size:150%;line-height: 1}
 #symphony_hud .controls.top .block-controls .block_prev{float:left;}
 #symphony_hud .controls.top .block-controls .block_next{float:right;}
-#symphony_hud .controls.top .block-controls .block_close{line-height:1.85;font-size:120%;margin:-8px}
+#symphony_hud .controls.top .block-controls .block_close{line-height:1.85;font-size:120%;margin:-12px 0;background:transparent !important}
 
 }
 
