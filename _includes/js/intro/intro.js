@@ -235,7 +235,7 @@ function io_intro_explorer () {
         <div class="inline-block block-controls text-center">\
           <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
           <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
-          <a href="#" title="Close block" class="block_close"><em class="fa fa-times"></em></a>\
+          <a href="#" title="Close block" class="block_close"><img src="/static/assets/images/close-block.svg" alt="Cancel" /></a>\
         </div>\
         <div class="inline-block pane search">\
           <div class="search_control"><a href="javascript:io_class_toggle(\'#symphony_hud\',\'search_box_on\')"><em class="icon-magnifier"></em></a></div>\
@@ -528,7 +528,7 @@ function io_intro_explorer () {
           <div class="controls text-center nomobile">\
             <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
             <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
-            <a href="#" title="Close block" class="block_close"><em class="fa fa-times"></em></a>\
+            <a href="#" title="Close block" class="block_close"><img src="/static/assets/images/close-block.svg" alt="Cancel" /></a>\
           </div>\
         </div>\
         '
