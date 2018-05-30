@@ -211,7 +211,7 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item.mirrored .info{padding:  0 0 0 90px}
 .entry.centerline .item.mirrored .gallery{padding: 0 90px 0 40px;text-align: right}
 .entry.centerline .item.mirrored .gallery .thumbnail{margin:0 0 0 10px }
-.entry.centerline .item .hr img{position: absolute;left:50%;margin:-8px 0 0 -8px}
+.entry.centerline .item .hr img{position: absolute;left:50%;margin:-8px 0 0 -7.5px}
 }
 
 @media (max-width:767px){
