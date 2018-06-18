@@ -1,222 +1,507 @@
 en:
-    name: Name
-    phone: Phone
-    email: Email
-    subject: Subject
+  name: Name
+  phone: Phone
+  email: Email
+  subject: Subject
+  message: Message
+  cardano_core: Cardano Core
+  network: Network
+  ouroboros: Ouroboros
+  research: Research
+  progress: Progress
+  total: Total
+  days: Days
+  hours: Hours
+  minutes: Minutes
+  seconds: Seconds
+  readmorein: Next Update in
+  byron: Byron
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  supportedproject: IOHK supported project
+  completed: Completed
+  active: Active
+  latestcommits: Latest commits
+  latesttweets: Latest tweets
+  pressreleases: Press releases
+  noitemscompletedyet: No items completed
+  noactiveitemsyet: No active items
+  noresourcesyet: No resources
+  showmore: Show more
+  showless: Show less
+  nextrelease: Next release
+  weeklytechnicalreport: Weekly technical report
+  community: Community
+  loadingrepository: Loading repository ...
+  introduction: Introduction
+  showall: Show All
+  showupdated: Show updated
+  shownew: Show new
+  showprogress: Show progress
+  cardano: Cardano
+  cardanoSL: Cardano SL
+  cardanoCL: Cardano CL
+  daedalus: Daedalus
+  cardanofoundation: Cardano Foundation
+  emurgo: Emurgo
+  byron: Byron
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  resource: Resource
+  stackexchange: Stack Exchange
+  adamarket: ADA market
+  repository: Repository
+  viewongithub: View on GitHub
+  stage: Stage
+  price: price
+  gource:
+    desc: Gource is a real-time visualisation of the Symphony project. It acts like “living artwork” where you can view the entire project history. Explore the enormous engineering work going on behind the scenes along with the active involvement of the community.
+    viewtherepositoryinGourceexplorer: View the repository in Gource explorer
+    gourceprojectexplorer: Gource project explorer
+    githubprojectactivitylive : Github project activity live
+    filesadded: Files added
+    fileschanged: Files changed
+    filesdeleted: Files deleted
     message: Message
-    head_office: Office
-    newsletter: Newsletter
-    submit: Submit
-    submit_application: Submit Application
-    apply_now: Apply Now!
-    your_cv: Your CV
-    cv_url: Your CV file URL address
-    subscribe: Subscribe
-    subscribe_to_nl: Subscribe to IOHK Newsletter
-    rights: All Rights Reserved
-    home: Home
-    about: About
-    careers: Careers
-    contact: Contact
-    projects: Projects
-    library: Library
-    development: Development
-    research: Research
-    researchers: Researchers
-    blog: Blog
-    news: Blog
-    team: Team
-    founder: Founder
-    founders: Founders
-    executives: Executives
-    research_and_development: Research &amp; Development
-    cardano_and_serokell: Cardano &amp; Serokell
-    operations_and_creative: Operations &amp; Creative
-    operations: Operations
-    creative: Creative
-    coreteam: Core team
-    veritas: Veritas
-    scorex: Scorex
-    seeking: Seeking
-    back: Back
-    article: Blog post
-    articles: Blog posts
-    active_members: Active members
-    latest_commits: Latest commits
-    chief_executive_officer: Chief Executive Officer
-    chief_strategy_officer: Chief Strategy Officer
-    chief_operations_officer: Chief Operations Officer
-    chief_communications_officer: Chief Communications Officer
-    chief_design_officer: Chief Design Officer
-    full_stack_developer: Full Stack Developer
-    email_to_friend: Email link to this page
-    comments: Comments
-    submit_paper: Submit paper
-    document_title: Document title
-    description: Description
-    tags: Tags
-    URL: URL
-    full_name: Full name
-    your_email: Your E-mail
-    cancel: Cancel
-    type_to_search: Type to search ...
-    read_more: Read more
-    link: Link
-    close: Close
-    open: Open
-    share_on_Twitter: Share on Twitter
-    share_on_Facebook: Share on Facebook
-    share_on_LinkedIn: Share on LinkedIn
-    share_on_Google_Plus: Share on Google Plus
-    share_on_Reddit: Share on Reddit
-    web_technologies: Web Technologies
-    search: Search
-    supportedproject: IOHK supported project
+    date: Date
+    author: Author
+    directory: Directory
+    rootdirectory: Root directory
+    message: Message
+    commitedfile: Committed file
+    updatedfile: Updated file
+    coldfile: Cold file
+    newfile: New file
+    allcommits: All commits
+    nextcommit: Next commit
+    previouscommit: Previous commit
+    searchcommit: Search commit
+    autoplay: Autoplay
+    displaymode: Display mode
+    realtime: Real time
+    hash: Hash
+  cardanomenu:
+    chat: Cardano Chat
+    forum: Cardano Forum
+    reddit: Cardano Reddit 
+    community: Cardano Community
+    foundation: Cardano Foundation
+    foundationyoutube: Cardano Foundation YouTube
+    foundationtwitter: Cardano Foundation Twitter
+  languages:
+    en: English
+    jp: Japanese
+    ko: Korean
+    zh: Chinese
+  site:
+    title: Cardano Launch
+  launch:
+    title: Cardano Mainnet Countdown
+    description: Follow the launch schedule!
+    counter:
+      days: Days
+      hours: Hours
+      minutes: Minutes
+      seconds: Seconds
+    is_live: Cardano mainnet is live
+  mode:
+    overview: Overview
+    snapshot: Snapshot
+  learn_more:
+    cardano_project: Cardano Project
+    cardano_sl: Cardano SL
+    ouroboros: Ouroboros Algorithm
+    iohk: Input Output
+  footer:
+    daedalus: Daedalus Wallet
+    why_cardano: Why Cardano
+    cardano_roadmap: Cardano Roadmap
+    cardano_ada_faucet: Cardano ADA Faucet
+    cardano_docs: Cardano Documentation
+    cardano_explorer: Cardano Explorer
+    github: Github
+    linked_in: LinkedIn
+    twitter: Twitter
+    iohk_supported_project: IOHK supported project
 
-ja:
-    name: 名
-    phone: 電話
-    email: Eメール
-    subject: テーマ
-    message: メッセージ
-    head_office: 本社
-    newsletter: ニュースレター
-    submit: 提出します
-    submit_application: 申請書を提出
-    apply_now: 今すぐ申し込みます！
-    your_cv: あなたの履歴書
-    cv_url: あなたの履歴書ファイルのURLアドレス
-    subscribe: 申し込む
-    subscribe_to_nl: IOHKニュースレターの購読
-    rights: 全著作権所有
-    home: ホーム
-    about: IOHKについて
-    careers: 求人
-    contact: 連絡先
-    projects: プロジェクト
-    library: ライブラリ
-    development: Development
-    research: 研究
-    researchers: 研究者
-    blog: ブログ
-    news: ニュース
-    team: チーム
-    founder: 創業者
-    founders: ファウンダーズ
-    executives: エグゼクティブ
-    research_and_development: 研究開発
-    cardano_and_serokell: Cardano &amp; Serokell
-    operations_and_creative: Operations &amp; Creative
-    operations: オペレーション
-    creative: クリエイティブ
-    coreteam: コアチーム
-    veritas: Veritas
-    scorex: Scorex
-    seeking: Seeking
-    back: バック
-    article: 記事
-    articles: 物品
-    active_members: アクティブメンバー
-    latest_commits: 最新のコミット
-    chief_executive_officer: 最高経営責任者
-    chief_strategy_officer: 最高戦略責任者
-    chief_operations_officer: 最高執行責任者
-    chief_communications_officer: チーフ・コミュニケーション・オフィサー
-    chief_design_officer: チーフデザインオフィサー
-    full_stack_developer: フルスタックの開発
-    email_to_friend: このページをメールで送信リンク
-    comments: 注釈
-    submit_paper: 論文を提出
-    document_title: ドキュメントのタイトル
-    description: 説明
-    tags: タグ
-    URL: URL
-    full_name: フルネーム
-    your_email: あなたのEメール
-    cancel: キャンセル
-    type_to_search: 検索すると入力...
-    read_more: 続きを読む
-    link: リンク
-    close: 閉じる
-    open: 開いた
-    share_on_Twitter: Twitterでシェア
-    share_on_Facebook: Facebookでシェア
-    share_on_LinkedIn: LinkedInでシェア
-    share_on_Google_Plus: Google Plusでシェア
-    share_on_Reddit: Redditでシェア
-    web_technologies: ウェブテクノロジ
-    search: Search
+jp:
+  name: 名
+  phone: 電話
+  email: Eメール
+  subject: 件名
+  message: メッセージ
+  cardano_core: カルダノコア
+  network: ネットワーク
+  ouroboros: Ouroboros
+  research: 研究
+  progress: 進捗
+  total: Total
+  days: 日
+  hours: 時間
+  minutes: 分
+  seconds: 秒
+  readmorein: 次のアップデートまで
+  byron: Byron
+  supportedproject: IOHK supported project
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  completed: 完了しました
+  active: アクティブ
+  latestcommits: Latest commits
+  latesttweets: Latest tweets
+  pressreleases: Press releases
+  noitemscompletedyet: No items completed yet
+  noactiveitemsyet: No active items yet
+  noresourcesyet: No resources yet
+  showmore: Show more
+  showless: Show less
+  nextrelease: Next release
+  weeklytechnicalreport: 週刊技術レポート
+  community: コミュニティ
+  loadingrepository: Loading repository ...
+  introduction: Introduction
+  showall: すべて表示する
+  showupdated: Show updated
+  shownew: Show new
+  showprogress: Show progress
+  cardano: Cardano
+  cardanoSL: Cardano SL
+  cardanoCL: Cardano CL
+  daedalus: Daedalus
+  cardanofoundation: カルダノ財団
+  emurgo: Emurgo
+  byron: Byron
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  resource: Resource
+  stackexchange: Stack Exchange
+  adamarket: ADA market
+  repository: on
+  viewongithub: View on GitHub
+  stage: 段階
+  price: price
+  gource:
+    desc: Gource is a real-time visualisation of the Cardano project. It acts like “living artwork” where you can view the entire project history. Explore the enormous engineering work going on behind the scenes along with the active involvement of the community.
+    viewtherepositoryinGourceexplorer: View the repository in Gource explorer
+    gourceprojectexplorer: Gource project explorer
+    githubprojectactivitylive : Github project activity live
+    filesadded: Files added
+    fileschanged: Files changed
+    filesdeleted: Files deleted
+    message: Message
+    date: Date
+    author: Author
+    directory: Directory
+    rootdirectory: Root directory
+    commitedfile: Committed file
+    message: Root directory
+    updatedfile: Updated file
+    coldfile: Cold file
+    newfile: New file
+    allcommits: All commits
+    nextcommit: Next commit
+    previouscommit: Previous commit
+    searchcommit: Search commit
+    autoplay: Autoplay
+    displaymode: Display mode
+    realtime: Real time
+    hash: Hash
+  cardanomenu:
+    chat: Cardano Chat
+    forum: Cardano Forum
+    reddit: Cardano Reddit 
+    community: Cardano Community
+    foundation: Cardano Foundation
+    foundationyoutube: Cardano Foundation YouTube
+    foundationtwitter: Cardano Foundation Twitter
+  languages:
+    en: 英語
+    ja: 日本語
+    ko: Korean
+    zh: Chinese
+  site:
+    title: Cardano Launch
+  launch:
+    title: メインネット公開へのカウントダウン
+    description: 公開までのスケジュールを確認しましょう！
+    counter:
+      days: 日
+      hours: 時
+      minutes: 分
+      seconds: 秒
+    is_live: カルダノメインネットが公開されました
+  mode:
+    overview: 概要
+    snapshot: Snapshot
+  learn_more:
+    cardano_project: カルダノプロジェクト
+    cardano_sl: Cardano SL
+    ouroboros: Ouroborosアルゴリズム
+    iohk: Input Output
+  footer:
+    daedalus: Daedalus Wallet
+    why_cardano: Why Cardano
+    cardano_roadmap: Cardano Roadmap
+    cardano_ada_faucet: Cardano ADA Faucet
+    cardano_docs: Cardano Documentation
+    cardano_explorer: Cardano Explorer
+    github: Github
+    linked_in: LinkedIn
+    twitter: Twitter
+    iohk_supported_project: IOHKに支援されているプロジェクト
 
-ru:
-    name: имя
-    phone: Телефон
-    email: Эл. адрес
-    subject: Тема
-    message: Сообщение
-    head_office: Главный офис
-    newsletter: ПОЧТОВАЯ РАССЫЛКА
-    submit: Подтвердить
-    submit_application: Подать заявку
-    apply_now: Применить сейчас!
-    your_cv: Ваше резюме
-    cv_url: Ваш адрес URL CV файл
-    subscribe: Подписывайся
-    subscribe_to_nl: Подпишитесь на рассылку от IOHK
-    rights: ВСЕ АВТОРСКИЕ ПРАВА ЗАЩИЩЕНЫ
-    home: Главная
-    about: О нас
-    careers: Карьера
-    contact: контакт
-    projects: проектов
-    library: Библиотека
-    development: Development
-    research: Исследование
-    researchers: Исследователи
-    blog: блог
-    news: Новости
-    team: команда
-    founder: основатель
-    founders: Создатели
-    executives: руководство
-    research_and_development: Исследования и разработки
-    cardano_and_serokell: Cardano &amp; Serokell
-    operations_and_creative: Операции и творчество
-    operations: Операции
-    creative: творчество
-    coreteam: Основная команда
-    veritas: Veritas
-    scorex: Scorex
-    seeking: ищет
-    back: назад
-    article: Статья
-    articles: Статьи
-    active_members: Активные участники
-    latest_commits: Последние фиксаций
-    chief_executive_officer: ГЛАВНЫЙ ИСПОЛНИТЕЛЬНЫЙ ДИРЕКТОР
-    chief_strategy_officer: ГЛАВНЫЙ ДИРЕКТОР ПО СТРАТЕГИЯМ
-    chief_operations_officer: ГЛАВНЫЙ ОПЕРАЦИОННЫЙ ДИРЕКТОР
-    chief_communications_officer: ГЛАВНЫЙ ДИРЕКТОР ПО КОММУНИКАЦИЯМ
-    chief_design_officer: ГЛАВНЫЙ ДИРЕКТОР ПО ДИЗАЙНУ
-    full_stack_developer: FULL STACK РАЗРАБОТЧИК
-    email_to_friend: Отправить ссылку на эту страницу
-    comments: Комментарии
-    submit_paper: Отправить документ
-    document_title: Заголовок документа
-    description: Описание
-    tags: Теги
-    URL: URL
-    full_name: Полное имя
-    your_email: Ваш эл. адрес
-    cancel: Отмена
-    type_to_search: Введите поисковый запрос ...
-    read_more: Прочитайте больше
-    link: Ссылка
-    close: Закрыть
-    open: открыто
-    share_on_Twitter: Поделиться ссылкой на Twitter
-    share_on_Facebook: Поделиться через фейсбук
-    share_on_LinkedIn: Выложить на LinkedIn
-    share_on_Google_Plus: Выложить на Google Plus
-    share_on_Reddit: Выложить на Reddit
-    web_technologies: веб-технологии
-    search: Search
+cn:
+  name: 名称
+  phone: 电话
+  email: 电邮
+  subject: 主题
+  message: 消息
+  cardano_core: 卡尔达诺核心
+  network: 网络
+  ouroboros: 乌洛波洛斯
+  research: 研究
+  progress: 进度
+  days: 天
+  hours: 小时
+  minutes: 分钟
+  seconds: 秒
+  readmorein: 下一次更新
+  total: 总计
+  completed: 已完成
+  active: 活跃的
+  latestcommits: 最新提交
+  latesttweets: 最新推文
+  pressreleases: 新闻发布
+  noitemscompletedyet: 暂时没有完成项
+  noactiveitemsyet: 暂时没有活跃项
+  noresourcesyet: 暂时没有资源
+  showmore: 显示更多
+  showless: 显示更少
+  nextrelease: 下次发版
+  weeklytechnicalreport: 卡尔达诺每周技术报告
+  community: 社区
+  loadingrepository: 载入仓库 ...
+  introduction: 介绍
+  showall: 显示所有
+  showupdated: 显示更新
+  shownew: 显示新项
+  showprogress: 显示进度
+  cardano: 卡尔达诺
+  cardanoSL: 卡尔达诺结算层
+  cardanoCL: 卡尔达诺计算层
+  daedalus: 代达罗斯钱包
+  cardanofoundation: 卡尔达诺基金会
+  emurgo: Emurgo
+  byron: Byron
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  resource: 资源
+  stackexchange: Stack Exchange
+  adamarket: ADA市场
+  repository: 知识库
+  viewongithub: 在 GitHub 上查看
+  stage: 期
+  price: 价钱
+  gource:
+    desc: Gource 是卡尔达诺实时可视化项目。它就像“活着的艺术品”，在其中可以查看整个项目历史。探索随着社区的积极参与在幕后进行的大量工程工作。
+    viewtherepositoryinGourceexplorer: 查看 Gource 浏览器仓库
+    gourceprojectexplorer: Gource 项目浏览器
+    githubprojectactivitylive: Github 项目活动状态
+    filesadded: 增加的文件
+    fileschanged: 修改的文件
+    filesdeleted: 删除的文件
+    message: 信息
+    date: 日期
+    author: 作者
+    directory: 目录
+    rootdirectory: Root directory
+    commitedfile: Committed file
+    message: 根目录
+    updatedfile: 更新的文件
+    coldfile: 冷文件
+    newfile: New file
+    allcommits: 所有提交
+    nextcommit: 下次提交
+    previouscommit: 上次提交
+    searchcommit: 搜索提交
+    autoplay: 自动播放
+    displaymode: 播放模式
+    realtime: 实时
+    hash: 哈希
+  cardanomenu:
+    chat: 卡尔达罗 Chat
+    forum: 卡尔达诺论坛
+    reddit: 卡尔达诺 Reddit
+    community: 卡尔达诺社区
+    foundation: 卡尔达诺基金会
+    foundationyoutube: 卡尔达诺基金会 YouTube
+    foundationtwitter: 卡尔达诺基金会推特
+  languages:
+    en: 英文
+    ja: 日语
+    ko: 韩语
+    zh: 中文
+  site:
+    title: 卡尔达诺发布
+  launch:
+    title: 欢迎来到启动清单！
+    description: 跟踪卡爾達諾主网络发布里程碑的进展情况
+    counter:
+      days: 天数
+      hours: 小时
+      minutes: 分钟
+      seconds: 秒数
+    is_live: 卡尔达诺正式启动
+  mode:
+    overview: 概述
+    snapshot: 快照
+  learn_more:
+    cardano_project: 卡尔达诺项目
+    cardano_sl: 卡尔达诺结算层
+    ouroboros:  乌洛波洛斯计算法
+    iohk: Input Output
+  footer:
+    daedalus: 代达罗斯钱包
+    why_cardano: 何谓卡尔达诺
+    cardano_roadmap: 卡尔达诺路线图
+    cardano_ada_faucet: 卡尔达诺艾达币水龙头
+    cardano_docs: 卡尔达诺文档
+    cardano_explorer: 卡尔达诺浏览器
+    github: Github
+    linked_in: 领英
+    twitter: 推特
+    iohk_supported_project: IOHK支持项目
+
+kr:
+  name: 이름
+  phone: 전화번호
+  email: 이메일
+  subject: 제목
+  message: 메시지
+  cardano_core: 카르다노 코어
+  network: 네트워크
+  ouroboros: 우로보로스
+  research: 연구
+  progress: 진척도
+  days: 일
+  hours: 시간
+  minutes: 의사록
+  seconds: 초
+  readmorein: 더 자세히 읽기
+  total: 합계
+  completed: 완료됨
+  active: 활성화
+  latestcommits: 최신 커밋
+  latesttweets: 최신 트윗
+  pressreleases: 보도 자료
+  noitemscompletedyet: 아직 완료된 항목 없음
+  noactiveitemsyet: 아직 활성화된 항목 없음
+  noresourcesyet: 아직 리소스 없음
+  showmore: 자세히 보기
+  showless: 간단히 보기
+  nextrelease: 출시 계획
+  weeklytechnicalreport: 주간 기술 보고서
+  community: 커뮤니티
+  loadingrepository: 저장소 로드 중...
+  introduction: 소개
+  showall: 모두 보기
+  showupdated: 업데이트된 항목 보기
+  shownew: 새 항목 보기
+  showprogress: 진행 상황 보기
+  cardano: Cardano
+  cardanoSL: Cardano SL
+  cardanoCL: Cardano CL
+  daedalus: Daedalus
+  cardanofoundation: Cardano 재단
+  emurgo: Emurgo
+  byron: Byron
+  shelley: Shelley
+  goguen: Goguen
+  basho: Basho
+  voltaire: Voltaire
+  resource: 자원
+  stackexchange: Stack Exchange
+  adamarket: ADA 시장
+  repository: 저장소
+  viewongithub: GitHub에서 보기
+  stage: 단계
+  price: 가격
+  gource:
+    desc: Gource는 Cardano 프로젝트의 실시간 시각화 구현입니다. 전체 프로젝트 기록을 볼 수 있는 "살아있는 삽화"처럼 작동합니다. 커뮤니티의 적극적인 참여와 함께 이면에서 진행되는 엄청난 엔지니어링 작업을 탐색하십시오.
+    viewtherepositoryinGourceexplorer: Gource 탐색기에서 저장소 보기
+    gourceprojectexplorer: Gource 프로젝트 탐색기
+    githubprojectactivitylive: Github 프로젝트 활동 라이브
+    filesadded: 파일 추가됨
+    fileschanged: 파일 변경됨
+    filesdeleted: 파일 삭제됨
+    message: 메시지
+    date: 날짜
+    author: 저자
+    directory: 디렉토리
+    rootdirectory: 루트 디렉토리
+    message: 메시지
+    commitedfile: 커밋된 파일
+    updatedfile: 업데이트된 파일
+    coldfile: 콜드 파일
+    newfile: New file
+    allcommits: 모든 커밋
+    nextcommit: 다음 커밋
+    previouscommit: 이전 커밋
+    searchcommit: 커밋 검색
+    autoplay: 자동 재생
+    displaymode: 디스플레이 모드
+    realtime: 실시간
+    hash: Hash
+  cardanomenu:
+    chat: Cardano 채팅
+    forum: Cardano 포럼
+    reddit: Cardano 레딧 
+    community: Cardano 커뮤니티
+    foundation: Cardano 재단
+    foundationyoutube: Cardano 재단 YouTube
+    foundationtwitter: Cardano 재단 트위터
+  languages:
+   en: 영어
+   ja: 일본어
+   ko: 한국어
+   ch: 중국어
+  site:
+   title: 카르다노 출시
+  launch:
+   title: 출시 체크리스트에 오신 것을 환영합니다!
+   description: 카르다노 메인넷 출시를 위한 마일스톤들의 진척 상황 확인
+   counter:
+     days: 일
+     hours: 시간
+     minutes: 분
+     seconds: 초
+   is_live: 카르다노 메인넷 개시
+  mode:
+   overview: 개요
+   snapshot: 스냅샷
+  learn_more:
+   cardano_project: 카르다노 프로젝트
+   cardano_sl: 카르다노 SL
+   ouroboros: 우로보로스 알고리즘
+   iohk: Input Output
+  footer:
+   daedalus: 다이달로스 전자지갑
+   why_cardano: 왜 카르다노인가
+   cardano_roadmap: 카르다노 로드맵
+   cardano_ada_faucet: 카르다노 ADA 생성기
+   cardano_docs: 카르다노 문서
+   cardano_explorer: 카르다노 익스플로러
+   github: 깃허브
+   linked_in: 링크드인
+   twitter: 트위터
+   iohk_supported_project: IOHK supported project
