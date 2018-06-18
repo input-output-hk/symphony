@@ -150,6 +150,35 @@
 #symphony_hud .controls.top .day_next{font-size:150%;line-height:1;margin:0 0 0 15px}
 #symphony_hud .controls.top .date {margin:0 5px}
 
+@media (min-width:768px) and (max-height:850px){
+#symphony_hud .pane.top{top:180px;}
+#symphony_hud .pane.middle{top:330px;}
+#symphony_hud .pane.bottom{bottom:30px;}
+}
+@media (min-width:768px) and (max-height:680px){
+#symphony_hud.viewing-block .pane.bottom{display:none}
+}
+
+@media (min-width:768px){
+
+@media (max-width:1255px){
+
+#symphony_hud .controls.top .container {max-width: 100%;width: 100%;padding-right:30px;}
+#symphony_hud .controls.top .inner {text-align:right;}
+
+}
+@media (max-width:885px){
+
+#symphony_hud .controls.top .inner .date .date{display: none}
+
+}
+
+
+}
+
+
+
+
 @media (min-width:768px){
   #symphony_hud .pane .glow{top:-11.5px;left:0;position: absolute;}
   #symphony_hud .pane.off .glow{display: none}
