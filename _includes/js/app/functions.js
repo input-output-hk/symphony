@@ -278,6 +278,10 @@ function io_load_page(url,obj,hash,callback){
 
 function io_navbar() {
 
+	if($("#page").hasClass('page-404')){
+		return false;
+	}
+
 	$(".navbar a,.block.title a").click(function(e){
 
 		e.preventDefault();
@@ -484,14 +488,15 @@ function io_which_way_alter(){
 	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
 	//console.log(chosen);
 
-	if(!loadedgource){
 
+		if($("#gource-box").hasClass('ready')){
 
-		if(chosen != 'home'){
-			//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
-			console.log("gource");
-			loadedgource = true;
-				var config = {
+			if(!loadedgource){
+
+				//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+
+				loadedgource = true;
+					var config = {
 	          git: {
 							owner: 'input-output-hk',
 	            repo: 'symphony',
@@ -500,9 +505,8 @@ function io_which_way_alter(){
 	            loadLatest: true // load latest commit in db
 	          },
 	          display: {
-	            showUI: false,
-							customUI: false,
-							showSidebar: false
+	            showUI: true,
+							showSidebar: true
 	          },
 	          FDG: {
 	            nodeSpritePath: '/static/assets/textures/gource/dot.png', // path to node texture
@@ -513,7 +517,7 @@ function io_which_way_alter(){
 	            delayAmount: 1500, // time in between new commits being added to the graph
 	            sphereProject: 0, // project graph onto sphere? 1 == true, 0 == false
 	            sphereRadius: 700, // radius of sphere if in sphere projection mode
-	            showFilePaths: true, // display filepath overlay on nodes
+	            showFilePaths: false, // display filepath overlay on nodes
 	            colorCooldownSpeed: 0.05, // speed at which node colors cycle
 	            cycleColors: false, // cycle colors based on file edit time from red to blue to white
 	            colorPalette: [ // colors to use if cycleColors is switched off (colors cannot contain)
@@ -545,18 +549,18 @@ function io_which_way_alter(){
 	          }
 	        }
 					if (gource.canRun()) {
-            gource.init(config).on('ready', function() {
+	          gource.init(config).on('ready', function() {
 
 							function commitInfo(data){
 								return '\
 								<ul onclick="javascript:io_class_toggle(\'#gource-box\',\'infohidden\')">\
-								<li class="msg"><small>Msg: </small><b>'+data.msg+'</b></li>\
-								<li class="date"><small>Date: </small><b>'+data.date+'</b></li>\
-								<li class="author"><small>Author: </small><b>'+data.author+'</b></li>\
-								<li class="added"><small>Added: </small><b>'+data.added+'</b></li>\
-								<li class="changed"><small>Changed: </small><b>'+data.changed+'</b></li>\
-								<li class="removed"><small>Removed: </small><b>'+data.removed+'</b></li>\
-								<li class="hash"><small>Hash: </small><b><a href="https://github.com/'+config.git.owner+'/'+config.git.repo+'/commit/'+data.hash+'" target="_blank">'+data.hash+' <em class="icon-link"></em></a></b></li>\
+								<li class="msg"><small>'+grc_label[lang]['message']+' </small><b>'+data.msg+'</b></li>\
+								<li class="date"><small>'+grc_label[lang]['date']+' </small><b>'+data.date+'</b></li>\
+								<li class="author"><small>'+grc_label[lang]['author']+' </small><b>'+data.author+'</b></li>\
+								<li class="added"><small>'+grc_label[lang]['filesadded']+' </small><b>'+data.added+'</b></li>\
+								<li class="changed"><small>'+grc_label[lang]['fileschanged']+' </small><b>'+data.changed+'</b></li>\
+								<li class="removed"><small>'+grc_label[lang]['filesdeleted']+' </small><b>'+data.removed+'</b></li>\
+								<li class="hash"><small>'+grc_label[lang]['hash']+' </small><b><a href="https://github.com/'+config.git.owner+'/'+config.git.repo+'/commit/'+data.hash+'" target="_blank">'+data.hash+' <em class="icon-link"></em></a></b></li>\
 								</ul>\
 								';
 							}
@@ -575,19 +579,41 @@ function io_which_way_alter(){
 										commitCurrent = data;
 										$("#gource-box .opener").removeClass('opa0');
 										$("#gource-box .opener").removeClass('none');
+
+										var nav = '<div class="commit--switcher">\
+				              <b>'+grc_label[lang]['allcommits']+'</b>\
+				              <a href="javascript:;" class="prev" title="'+grc_label[lang]['previouscommit']+'"><em class="icon-arrow-down"></em></a><a href="javascript:;" class="next" title="'+grc_label[lang]['nextcommit']+'"><em class="icon-arrow-up"></em></a>\
+				            </div>';
+										$(".gource-sidebar").wrap('<div class="gource-wrap" />');
+										$(".gource-wrap").prepend(nav);
+
+										setTimeout(function(){
+											$(".sidebar-github-view").text(grc_label[lang]['viewongithub']);
+												$(".sidebar-github-view").attr('title',grc_label[lang]['viewongithub']);
+										},2000);
+
+
+
+
 										$("#gource-box .opener").click(function(e){
 											io_class_toggle('#gource-box','fullscreen');
 											if($('#gource-box').hasClass('fullscreen')){
 												gource.setConfig({
 			                    camera: {
-			                      enableZoom: true
-			                    }
+			                      enableZoom: true,
+			                    },
+													FDG: {
+														showFilePaths: true
+													}
 			                  })
 											}else{
 												gource.setConfig({
 			                    camera: {
 			                      enableZoom: false
-			                    }
+			                    },
+													FDG: {
+														showFilePaths: false
+													}
 			                  })
 											}
 										});
@@ -602,8 +628,10 @@ function io_which_way_alter(){
 										var max_val = commitLast.date/1000;
 
 										var end = new Date(commitLast.date);
-										console.log(formatBot(end))
+
 										gource.setDate(formatBot(end));
+
+										$(".welcome .timestamp").html('<a href="https://github.com/input-output-hk/cardano-sl/" target="_blank">Cardano SL</a> '+grc_label[lang]['repository']+' '+formatNice(end)+', '+zeroPad(end.getHours(),2)+':'+zeroPad(end.getMinutes(),2)+':'+zeroPad(end.getSeconds(),2));
 
 										function zeroPad(num, places) {
 										  var zero = places - num.toString().length + 1;
@@ -638,6 +666,7 @@ function io_which_way_alter(){
 												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
 												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
 												if(manual){
+													console.log('setting slider '+formatBot(dt_cur_from));
 													gource.setDate(formatBot(dt_cur_from));
 												}
 											},
@@ -656,6 +685,7 @@ function io_which_way_alter(){
 												$(this).datepicker('widget').wrap('<div class="ll-skin-melon">')
 											},
 											onSelect: function (dateText, inst) {
+												console.log('picking '+dateText);
 												gource.setDate(dateText);
 											},
 											onClose: function () {
@@ -675,6 +705,7 @@ function io_which_way_alter(){
 											manual = false;
 											commitCurrent = data;
 											var pos = Date.parse(data.date)/1000;
+											console.log('getting '+data.date);
 											$( ".date--slider" ).slider( "value", pos );
 
 											if(data.index == 0){
@@ -729,12 +760,15 @@ function io_which_way_alter(){
 							})
 
 						});
+					}else{
+						$("#gource-box").addClass('notsupported');
+						$(".welcome .timestamp").html('<p class="comingsoon">Gource coming soon to this device</p>');
 					}
 					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
 
 
+			}
 		}
-}
 
 
 	if($("#symphony").hasClass('ready')){
