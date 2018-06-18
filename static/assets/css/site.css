@@ -5,7 +5,7 @@ body{background:#121327;color:#eee;  font-family: 'Montserrat', sans-serif;;font
     font-family: 'Montserrat',Arial,Helvetica,sans-serif;
 }
 
-a{color:#1dd2d4}
+a{color:#1dd2d4;}
 
 small{font-weight: 400}
 .roboto{font-family: 'Roboto';text-transform: none}
@@ -53,7 +53,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
 @media (min-width:768px){
 
 #page{padding:300px 0 0 0}
-#page.home,#page.home-page{padding:0 0 0 0}
+#page.home,#page.home-page,#page.home-page{padding:0 0 0 0}
 
 #navbar {min-height:100px;margin-top:0px}
 #page.home #navbar {min-height:100px;margin-top:70px}
@@ -531,6 +531,38 @@ footer #lang-select li a {opacity: 0.9}
 @media (min-width: 767px) {
   .logo.iohk{text-align: center}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.page-404 {background:url(/static/assets/images/404-bg.jpg) no-repeat center top}
+
+.page-404 .navbar-brand{pointer-events: auto}
+.page-404 #main-body .block.title{text-align: center;position:relative;top:0;margin:50px 0 0 0}
+.page-404 #main-body h1 .title{display: block;font-size: 500%;line-height:1.5;text-align: center;color:#1dd2d4;text-shadow:#1dd2d4 0 0 2px, #1dd2d4 0 0 5px}
+.page-404 #main-body h1 .title,.page-404 #main-body h1 .site{width:auto;}
+
+@media (max-width: 767px) {
+.page-404 {background-size:contain}
+}
+
+@media (min-width: 768px) {
+
+ .page-404  #navbar {    min-height: 50px;    margin: 0px;    padding-top:100px;}
+.page-404 #main-body{padding: 0px 0 10px 0}
+}
+
+
+
+
 
 
 
