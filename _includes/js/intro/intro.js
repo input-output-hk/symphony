@@ -272,6 +272,8 @@ function io_intro_explorer () {
   $('#symphony_hud').addClass('block-top-off block-middle-off block-bottom-off');
   $('#loading_text').html(svgloader_b)
 
+  var loaded_block = false;
+
   /// //////////////////
   // Create the Orpeus App
   orpheusApp({ path: '/static/assets/' }).then(app => {
@@ -434,19 +436,27 @@ function io_intro_explorer () {
       $('.controls.top .date .date').html(date_nice(date));
 
 
-      if($('#symphony').hasClass('view-block')){
-        $('#symphony').removeClass('view-block');
-      }
-      if(!$('#symphony').hasClass('view-day')){
-        $('#symphony').addClass('view-day');
-      }
 
-      if(!$('#symphony_hud').hasClass('viewing-day')){
-        $('#symphony_hud').addClass('viewing-day')
-      }
-      if($('#symphony_hud').hasClass('viewing-block')){
-        $('#symphony_hud').removeClass('viewing-block')
-      }
+
+            if(!loaded_block){
+
+                    if($('#symphony').hasClass('view-block')){
+                      $('#symphony').removeClass('view-block');
+                    }
+                    if(!$('#symphony').hasClass('view-day')){
+                      $('#symphony').addClass('view-day');
+                    }
+
+                    if(!$('#symphony_hud').hasClass('viewing-day')){
+                      $('#symphony_hud').addClass('viewing-day')
+                    }
+                    if($('#symphony_hud').hasClass('viewing-block')){
+                      $('#symphony_hud').removeClass('viewing-block')
+                    }
+
+
+            }
+
 
       $('.datepicker').val(num_pad(date.getDate()) + '/' + num_pad(date.getMonth() + 1) + '/' + date.getFullYear())
       datepicker_init()
@@ -492,6 +502,9 @@ function io_intro_explorer () {
   	app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
     $('#intro_text').empty()
     console.log('search opened')
+
+    loaded_block = true;
+
     //$('#welcome_text').addClass('off')
     //$('.pane.left.bottom').addClass('off')
     setTimeout(function () {
@@ -551,6 +564,7 @@ function io_intro_explorer () {
 
       }
 
+
       if($('#symphony').hasClass('view-day')){
         $('#symphony').removeClass('view-day');
       }
@@ -564,6 +578,7 @@ function io_intro_explorer () {
       if($('#symphony_hud').hasClass('viewing-day')){
         $('#symphony_hud').removeClass('viewing-day')
       }
+
 
       $('.block_prev').click(function (e) {
         e.preventDefault()
@@ -687,6 +702,7 @@ function io_intro_explorer () {
     //$('#intro_text').addClass('empty').html('')
     //$('#details').html(latest_block_date)
     //$('.pane.top').html(latest_block_date)
+    loaded_block = false;
     $('.pane.middle').addClass('none');
     $('.datepicker').val(num_pad(date_selected.getDate()) + '/' + num_pad(date_selected.getMonth() + 1) + '/' + date_selected.getFullYear())
     datepicker_init()
