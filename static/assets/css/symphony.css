@@ -167,7 +167,7 @@
 #symphony_hud .pane.middle{font-size:70%;padding:15px;width:260px}
 #symphony_hud .pane.middle{top:180px;}
 #symphony_hud .pane.bottom{display:none}
-#symphony_hud.viewing-about.viewing-block .pane.top{display:none}
+#symphony_hud.viewing-block .pane.top{display:none}
 
   #symphony_hud .pane .link:after{margin:-4.5px -6.5px 0 0;}
 #symphony_hud .pane .link{width:32px;border-top:1px solid rgba(29,210,212,0.5);margin:10px 0 0 -50px}
@@ -181,7 +181,7 @@
 }
 
 @media (min-width:768px) and (max-height:400px){
-#symphony_hud.viewing-about.viewing-block .pane.middle .ul{display:none}
+#symphony_hud.viewing-block .pane.middle .ul{display:none}
 }
 
 
