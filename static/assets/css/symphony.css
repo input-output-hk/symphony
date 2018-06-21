@@ -8,6 +8,15 @@
 
 }
 
+#symphony_hud .symphony-MIDI-form{position: fixed;right:30px;bottom:20px;z-index: 999;width:170px;}
+#symphony_hud.search_box_on .symphony-MIDI-form{bottom:80px}
+#symphony_hud .symphony-MIDI-form select.form-control{width:170px;background:transparent;color:#fff;border-radius: 2px;height:25px;padding:2px 4px;margin:0 0 10px 0 }
+#symphony_hud .symphony-MIDI-form select.form-control {}
+
+@media (max-width:767px){
+#symphony_hud .symphony-MIDI-form {display: none}
+}
+
 
 #symphony,#symphony_hud{font-size: 120%}
 #stage,#symphony{overflow: hidden !important}
@@ -197,6 +206,10 @@
 
 #symphony_hud .controls.top .container {max-width: 100%;width: 100%;padding-right:30px;}
 #symphony_hud .controls.top .inner {text-align:right;}
+
+#symphony_hud .symphony-MIDI-form{bottom:100px}
+#symphony_hud.search_box_on .symphony-MIDI-form{bottom:160px}
+
 
 }
 @media (max-width:885px){

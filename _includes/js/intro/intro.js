@@ -131,6 +131,19 @@ function io_intro_explorer () {
   <p>Select a block to find out more.</p>\
   </div>'
 
+  var midi_select = '\
+  <form id="symphony-MIDI-form" class="symphony-MIDI-form">\
+    <select id="midiOut" disabled="disabled" class="hide form-control midiOut">\
+        <option value=0>No MIDI Output</option>\
+    </select> \
+    <select id="midiChannel" disabled="disabled" class="hide form-control midiChannel"><option value="">MIDI Channel</option>\
+        <option value=0>1</option> <option value=1>2</option> <option value=2>3</option> <option value=3>4</option> <option value=4>5</option> <option value=5>6</option> <option value=6>7</option> <option value=7>8</option> <option value=8>9</option>\
+        <option value=9>10</option> <option value=A>11</option> <option value=B>12</option> <option value=C>13</option> <option value=D>14</option> <option value=E>15</option>  <option value=F>16</option>\
+    </select>\
+  </form>\
+  ';
+
+
   function datetime_nice (date) {
     return '' + io_weekdays[date.getDay()] + ', ' + io_months[date.getMonth()] + ' ' + ordinal_suffix_of(date.getDate()) + ' ' + date.getFullYear() + ', ' + date.getHours() + ':' + num_pad(date.getMinutes()) + ':' + num_pad(date.getSeconds()) + ' GMT'
   }
@@ -192,6 +205,7 @@ function io_intro_explorer () {
   $('#symphony').html('<canvas id="stage" style=""></canvas>')
   $('#symphony_hud').html('\
   <div id="mousemove_note" class="none"></div>\
+  '+midi_select+'\
   <div class="controls top none nomobile">\
     <div class="container">\
       <div class="inner">\
