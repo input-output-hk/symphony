@@ -52,8 +52,17 @@ export const getHashRateforDay = async startTimestamp => axios.get(`https://api.
  */
 export const getBlock = async hash => blocks.where('hash', '==', hash)
   .get()
-  .then(({docs}) => docs[0].data())
+  .then(({docs}) => {
+    if (typeof docs[0] === 'undefined') {
+      throw new Error('Block does not exist for hash: ' + hash)
+    } else {
+      return docs[0].data()
+    }
+  })
   .then(Block)
+  .catch((error) => {
+    throw new Error(error)
+  })
 
 /**
  * Returns all the blocks that occured on the current date froim 00:00 - 23:59

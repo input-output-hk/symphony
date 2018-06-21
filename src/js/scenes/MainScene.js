@@ -142,6 +142,21 @@ export default class MainScene extends EventEmitter {
     this.stage.cameraPos.z = this.stage.camera.position.z
     this.stage.targetCameraPos.z = this.stage.cameraPos.z
     this.setDate(threeHoursBeforeLastBlock)
+
+    this.goToHash()
+  }
+
+  goToHash () {
+    const regex = new RegExp('[?&]hash=([^&#]*)', 'i')
+    let regexResult = regex.exec(window.location.href)
+
+    if (regexResult !== null && typeof regexResult[1] !== 'undefined') {
+      try {
+        this.goToBlock(regexResult[1])
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }
 
   /*
@@ -691,7 +706,12 @@ export default class MainScene extends EventEmitter {
       noBlockInMemory = false
       block = obj3d.block
     } else {
-      block = await getBlock(blockhash)
+      try {
+        block = await getBlock(blockhash)
+      } catch (error) {
+        console.log(error)
+        return
+      }
     }
 
     // blocks with a large number of transactions are stored as a JSON string
