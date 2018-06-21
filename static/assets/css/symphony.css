@@ -104,12 +104,17 @@
 #symphony_hud .pane.block{width:360px;font-size:85%}
 #symphony_hud .pane.block.none{display:none}
 #symphony_hud .pane.left{position: fixed;left:30px;z-index:99}
-#symphony_hud .pane.middle{top:415px;}
+#symphony_hud .pane.middle{top:415px;display:none}
 #symphony_hud .pane.bottom{bottom:110px;}
 #symphony_hud.search_box_on .pane.bottom{bottom:170px;}
 #symphony_hud .pane.bottom p{margin:0px 10px 5px 0;}
 #symphony_hud .pane.bottom hr{margin:12px 100px 12px 0;border-top:1px dashed rgba(255,255,255,0.8)}
 #symphony_hud .pane.top{top:265px;}
+
+
+#symphony_hud.viewing-block .pane.middle{display:inherit}
+
+
 
 
 #symphony_hud .pane .link{display: inline-block;position: absolute;width:27px;border-top:1px solid rgba(29,210,212,0.5);margin:10px 0 0 -50px}
