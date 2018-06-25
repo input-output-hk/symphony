@@ -545,6 +545,7 @@ function io_which_way_alter(){
 	          },
 	          camera: {
 	            fov: 45,
+							enableZoom: false,
 	            initPos: {x: 0, y: 0, z: 600}
 	          }
 	        }
