@@ -4,7 +4,6 @@ import Config from '../Config'
 import Tone from 'tone'
 import { map } from '../../utils/math'
 import EventEmitter from 'eventemitter3'
-import WebMidi from 'WebMidi'
 
 const MAX_HASH_RATE = 35000000 // maximum hash rate
 
@@ -231,7 +230,7 @@ export default class Audio extends EventEmitter {
     let outputs = []
     for (let output = MIDIOutputs.next(); output && !output.done; output = MIDIOutputs.next()) {
       outputs.push(output.value)
-      selectMIDIOut.appendChild(new Option(output.value.name, output.value.id, false, false))
+      selectMIDIOut.appendChild(new window.Option(output.value.name, output.value.id, false, false))
     }
   }
 
@@ -278,8 +277,8 @@ export default class Audio extends EventEmitter {
   }
 
   onMIDIFailure (error) {
-    alert('No MIDI support in your browser.')
-    document.getElementById('midiOut').appendChild(new Option('No Device Available', 0, false, false))
+    window.alert('No MIDI support in your browser.')
+    document.getElementById('midiOut').appendChild(new window.Option('No Device Available', 0, false, false))
     console.log('No midi ' + error)
   }
 
@@ -401,18 +400,7 @@ export default class Audio extends EventEmitter {
         this.MIDIClockStarted = true
       }
 
-      // adding a timestamp to output.send() doesn't work on windows :'(
-      if (
-        Config.detector.isMac ||
-          Config.detector.isChrome67 || // remove this when chrome 67 reaches stable channel
-          Config.detector.isChrome68 ||
-          Config.detector.isChrome69
-      ) {
-        console.log('asdfas6d54')
-        this.MIDIDevice.send([0xF8], (loopTime * 1000))
-      } else {
-        this.MIDIDevice.send([0xF8])
-      }
+      this.MIDIDevice.send([0xF8], (loopTime * 1000))
     },
     '96n'
     ).start()
@@ -657,17 +645,7 @@ export default class Audio extends EventEmitter {
                     let MIDINote = Tone.Frequency(note).toMidi()
 
                     // send MIDI note on
-                    // adding a timestamp to output.send() doesn't work on windows :'(
-                    if (
-                      Config.detector.isMac ||
-                      Config.detector.isChrome67 || // remove this when chrome 67 reaches stable channel
-                      Config.detector.isChrome68 ||
-                      Config.detector.isChrome69
-                    ) {
-                      this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity], (time * 1000))
-                    } else {
-                      this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity])
-                    }
+                    this.MIDIDevice.send(['0x9' + this.MIDIChannel, MIDINote, '0x' + velocity], (time * 1000))
 
                     // send MIDI note off
                     setTimeout(() => {

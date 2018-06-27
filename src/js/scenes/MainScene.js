@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
-import AddText, { CIRCLE_OFFSET } from '../geometry/circleGeometry'
+import AddText from '../geometry/circleGeometry'
 import Config from '../Config'
 import Audio from '../audio/audio'
 import { getBlocksOnDay, getTransactionsForBlock, getBlock, getHashRateforDay } from '../api/btc'
@@ -269,7 +269,7 @@ export default class MainScene extends EventEmitter {
 
   destroy () {
     document.removeEventListener('preUpdate', this.onUpdateBound, false)
-    cancelAnimationFrame(this.stage.reqID)
+    window.cancelAnimationFrame(this.stage.reqID)
 
     const dispose = function (object) {
       if (object.geometry) {
