@@ -499,7 +499,7 @@ function io_which_way_alter(){
 					var config = {
 	          git: {
 							owner: 'input-output-hk',
-							repo: 'cardano-sl',
+							repo: 'symphony',
 	            commitHash: '', // hash of commit to load
 	            commitDate: '', // date to load (YYYY-MM-DD)
 	            loadLatest: true // load latest commit in db
