@@ -572,10 +572,15 @@ function io_which_way_alter(){
 							var commitFirst = new Object();
 							var commitLast = new Object();
 
+							setTimeout(function(){
+
+
 							gource.getFirstCommit().then(data => {
 			            //console.log(data)
 									commitFirst = data;
 									gource.getlastCommit().then(data => {
+
+										
 										commitLast = data;
 										commitCurrent = data;
 										$("#gource-box .opener").removeClass('opa0');
@@ -760,7 +765,12 @@ function io_which_way_alter(){
 								})
 							})
 
+							},500);
+
+
 						});
+
+
 					}else{
 						$("#gource-box").addClass('notsupported');
 						$(".welcome .timestamp").html('<p class="comingsoon">Gource coming soon to this device</p>');
@@ -1021,103 +1031,9 @@ $(window).resize(function(){
 var moreloaded = 0;
 
 
-$(window).load(function(){
+window.onload = function() {
 	io_which_way();
-});
-
-
-
-
-$(window).on('hashchange', function() {
-
-var bLazy = new Blazy({
-	    breakpoints: [{
-	     width: 420 // Max-width
-	    , src: 'data-src'
-	     }]
-	    , success: function(element){
-	    setTimeout(function(){
-	    var parent = element.parentNode;
-	    parent.className = parent.className.replace(/\bloading\b/,'');
-	    }, 200);
-	    }
-    });
-
-	//io_zotero();
-if (location.hash === "#iohk") {
-		$(".founder").addClass("col-md-10 col-md-offset-2");
-		$(".founders").addClass("col-md-10").removeClass("col-md-4");
-		io_team_filter('all','show-all');
-	}
-
-	else if	(location.hash === "#founders") {
-		$(".founder").removeClass("col-md-10 col-md-offset-2");
-        $(".founders").removeClass("col-md-10").addClass("col-md-4");
-        io_team_filter('founder','show-founder');
-    }
-
-    else if (location.hash === "#executives") {
-    	$(".founder").addClass("col-md-10 col-md-offset-2");
-        $(".founders").addClass("col-md-10").removeClass("col-md-4");
-        io_team_filter('executive','show-executive');
-    }
-
-    else if (location.hash === "#research") {
-    	io_team_filter('research','show-research');
-    }
-
-    else if (location.hash === "#cardano") {
-    	io_team_filter('cardano','show-cardano');
-    }
-
-     else if (location.hash === "#bourbaki") {
-    	io_team_filter('bourbaki','show-bourbaki');
-    }
-
-    else if (location.hash === "#ethereum-classic") {
-    	io_team_filter('ethereum-classic','show-ethereum-classic');
-    }
-
-    else if (location.hash === "#scorex") {
-    	io_team_filter('scorex','show-scorex');
-    }
-
-    else if (location.hash === "#daedalus") {
-    	io_team_filter('daedalus','show-daedalus');
-    }
-
-    else if (location.hash === "#devops") {
-    	io_team_filter('devops','show-devops');
-    }
-
-    else if (location.hash === "#web") {
-    	io_team_filter('web','show-web');
-    }
-
-    else if (location.hash === "#pmo") {
-    	io_team_filter('pmo','show-pmo');
-    }
-
-    else if (location.hash === "#cryptocurrency-diligence") {
-    	io_team_filter('cryptocurrency-diligence','show-cryptocurrency-diligence');
-    }
-
-    else if (location.hash === "#creative") {
-    	io_team_filter('creative','show-creative');
-    }
-
-    else if (location.hash === "#communications") {
-    	io_team_filter('communications','show-communications');
-    }
-
-    else if (location.hash === "#operations") {
-    	io_team_filter('operations','show-operations');
-    }
-
-
-
-    setTimeout(function() { bLazy.revalidate(); }, 500);
-});
+}
 
 
 
