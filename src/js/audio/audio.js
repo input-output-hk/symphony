@@ -220,6 +220,9 @@ export default class Audio extends EventEmitter {
     if (selectMIDIOut === null) {
       return
     }
+
+    selectMIDIOut.classList.remove('hide')
+
     selectMIDIOut.onchange = this.changeMIDIOut.bind(this)
     selectMIDIOut.disabled = false
 
