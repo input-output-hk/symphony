@@ -450,9 +450,6 @@ function rm_item(item){
           </div>\
         </div>\
         <br><br>\
-        <div class="text-center">\
-          <img src="/static/assets/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
-        </div>\
         ';
       }
 
