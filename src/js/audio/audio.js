@@ -327,7 +327,9 @@ export default class Audio extends EventEmitter {
 
     this.resetMIDI()
 
-    this.ambiencePlayer.start()
+    if (this.ambiencePlayer) {
+      this.ambiencePlayer.start()
+    }
     this.ambienceBus.volume.linearRampToValueAtTime(this.ambienceVol, Tone.now())
 
     this.pointColors = []
@@ -380,7 +382,7 @@ export default class Audio extends EventEmitter {
 
       Tone.Transport.bpm.value = this.bpm
 
-      this.loadSampler()
+      // this.loadSampler()
 
       this.loadAmbience().then(() => {
         this.ambiencePlayer.start()
@@ -499,7 +501,9 @@ export default class Audio extends EventEmitter {
 
     this.ambienceBus.volume.linearRampToValueAtTime(-96, Tone.now() + 2)
     setTimeout(() => {
-      this.ambiencePlayer.stop()
+      if (this.ambiencePlayer) {
+        this.ambiencePlayer.stop()
+      }
     }, 2000)
 
     this.loopMap = []
