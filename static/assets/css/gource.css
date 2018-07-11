@@ -171,6 +171,9 @@
 
 
 @media (max-width:767px){
+
+
+#ui-datepicker-div{z-index: 999999 !important}
 #gource-box.fullscreen a.github {font-size: 250%;position: absolute;display: inline-block;margin:3px 0 0 15px}
 #gource-box.showing-sidebar .sidebar-opener,
 #gource-root .gource-wrap .commit--switcher,
