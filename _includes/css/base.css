@@ -209,7 +209,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 
 
 
-
 @media (orientation: landscape){
 .nolandscape{display: none}
 }
@@ -225,6 +224,19 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 @media (max-width:600px){
 .no600{display:none}
 }
+
+@media (min-width:768px){
+  .desktop-left{text-align: left;}
+  .desktop-right{text-align: right;}
+  .desktop-center{text-align: center;}
+}
+@media (max-width:767px){
+  .mobile-left{text-align: left;}
+  .mobile-right{text-align: right;}
+  .mobile-center{text-align: center;}
+}
+
+
 
 
 
