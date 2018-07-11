@@ -488,12 +488,11 @@ function io_which_way_alter(){
 	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
 	//console.log(chosen);
 
-
 		if($("#gource-box").hasClass('ready')){
 
 			if(!loadedgource){
 
-				//$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+				$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js?bust="+buster, function( data, textStatus, jqxhr ) {
 
 				loadedgource = true;
 					var config = {
@@ -580,7 +579,7 @@ function io_which_way_alter(){
 									commitFirst = data;
 									gource.getlastCommit().then(data => {
 
-										
+
 										commitLast = data;
 										commitCurrent = data;
 										$("#gource-box .opener").removeClass('opa0');
@@ -775,16 +774,20 @@ function io_which_way_alter(){
 						$("#gource-box").addClass('notsupported');
 						$(".welcome .timestamp").html('<p class="comingsoon">Gource coming soon to this device</p>');
 					}
-					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
 
+
+				});
 
 			}
 		}
 
 
 	if($("#symphony").hasClass('ready')){
-			gource.destroy()
+		if(loadedgource){
 			loadedgource = false;
+			gource.destroy()
+		}
+
 		if($("#symphony").hasClass('mask')){
 			if($("#page").hasClass('home')){
 				setTimeout(function () {

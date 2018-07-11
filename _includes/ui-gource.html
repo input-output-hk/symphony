@@ -1,0 +1,88 @@
+
+
+            <div id="gource-box" class="ready showing-sidebar showing-legend">
+              <p class="nosupport none"></p>
+              <a href="https://github.com/input-output-hk/cardano-sl/" class="github nodesktop" title=""><em class="fa fa-github"></em></a>
+              <a href="javascript:;" class="opener opa0 none" title="{{site.data.i18n[page.language].gource.viewtherepositoryinGourceexplorer}}"><em class="on"></em><span class="off"><img src="/static/assets/images/gource-close-mobile.svg" alt="&times;" class="" /></span></a>
+              <div class="nodesktop date--mobile"></div>
+
+              <div class="sidebar">
+
+                <div class="inner">
+
+                  <div class="pane main">
+
+                    <div class="head">
+                      <a href="" target="_blank"><em class="fa fa-github"></em></a>
+                      <h3>{{site.data.i18n[page.language].gource.gourceprojectexplorer}}</h3>
+                      <small>{{site.data.i18n[page.language].gource.githubprojectactivitylive}}</small>
+                    </div>
+
+                    <div class="info">
+                      <div class="inner">
+                        <p>{{site.data.i18n[page.language].gource.desc}}</p>
+
+                        <div class="switcher play--switcher">
+                          <b>{{site.data.i18n[page.language].gource.autoplay}}</b> <a href="javascript:io_class_toggle('#gource-box','playing')" class="play"><em class="icon-control-play"></em></a><a href="javascript:io_class_toggle('#gource-box','playing')" class="stop"><em class="icon-control-pause"></em></a>
+                        </div>
+
+                        <div class="switcher view--switcher">
+                          <b>{{site.data.i18n[page.language].gource.displaymode}}</b> <div class="inner"><a href="javascript:io_class_toggle('#gource-box','sphereview')" class="sphere"><em class="icon-globe"></em></a><a href="javascript:io_class_toggle('#gource-box','sphereview')" class="normal"><em class="icon-graph"></em></a></div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="legend">
+                <!--a href="javascript:io_class_toggle('#gource-box','showing-legend')" class="legend-opener"><em class="icon-arrow-down"></em></a-->
+                  <div class="inner">
+                  <ul class="nolist">
+                    <!--li><img src="/static/assets/images/leg-dir.svg" alt="" /> {{site.data.i18n[page.language].directory}}</li>
+                    <li><img src="/static/assets/images/leg-root.svg" alt="" /> Root directory</li-->
+                    <li><img src="/static/assets/images/leg-commited.svg" alt="" /> {{site.data.i18n[page.language].gource.commitedfile}}</li>
+                    <li><img src="/static/assets/images/leg-new.svg" alt="" /> {{site.data.i18n[page.language].gource.updatedfile}}</li>
+                    <li><img src="/static/assets/images/leg-cold.svg" alt="" /> {{site.data.i18n[page.language].gource.coldfile}}</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="daterange nomobile">
+                <input type="text" value="000000" id="gource-datepicker" class="datepicker ll-skin-melon none" />
+                <a href="#" class="icon--calendar datepicker_icon"><span></span><em class="icon-calendar"></em></a>
+                <div class="date--slider--end pull-left"></div>
+                <div class="date--slider--end pull-right"></div>
+                <div class="date--slider normal"></div>
+              </div>
+              <!--div class="nomobile">
+                <div class="commit--switcher">
+                  <b>All commits</b>
+                  <a href="javascript:;" class="prev" title="Previous commit"><em class="icon-arrow-down"></em></a><a href="javascript:;" class="next" title="Next commit"><em class="icon-arrow-up"></em></a>
+                </div>
+              </div-->
+              <div class="infopanel">
+                <a href="javascript:io_class_toggle('#gource-box','showing-sidebar')" class="sidebar-opener"><em class="icon-arrow-left"></em><em class="icon-arrow-right"></em></a>
+
+
+                <span class="line"></span>
+                <div class="commit--switcher nodesktop">
+                  <a href="javascript:;" class="prev" title="Previous commit"><em class="icon-arrow-left"></em></a><a href="javascript:;" class="next" title="Next commit"><em class="icon-arrow-right"></em></a>
+                </div>
+
+                <div class="inner"></div>
+                <div class="controls nodesktop">
+                  <input type="text" value="000000" id="gource-datepicker2" class="datepicker ll-skin-melon none" />
+                  <a href="#" class="icon--calendar datepicker_icon pull-left"><em class="icon-calendar"></em></a>
+
+                  <a href="javascript:io_class_toggle('#gource-box','infohidden')" class="info--switcher pull-right"><em class="icon-info"></em></a>
+
+                  <div class="play--switcher">
+                    <a href="javascript:io_class_toggle('#gource-box','playing')" class="play"><em class="icon-control-play"></em></a><a href="javascript:io_class_toggle('#gource-box','playing')" class="stop"><em class="icon-control-pause"></em></a>
+                  </div>
+                </div>
+              </div>
+              <div id="gource-root" class="ready"></div>
+            </div>
