@@ -126,6 +126,13 @@
 <meta name="robots" content="noindex,nofollow" />
 {% endif %}
 
+
+
+
+
+
+
+
 <script>(function(){document.documentElement.className='js'})();</script>
 <script>
 var buster = {{ site.time | date: '%s' }};
@@ -263,7 +270,6 @@ grc_label['kr']['repository'] = '{{site.data.i18n['kr'].repository}}';
 {% include css/base.css %}
 </style>
 
-
 <link rel="stylesheet"  href="{{ "/static/assets/css/rd.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 
 <link rel="stylesheet"  href="{{ "/static/assets/css/site.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
@@ -312,7 +318,7 @@ grc_label['kr']['repository'] = '{{site.data.i18n['kr'].repository}}';
 {% include js/app/functions.js %}
 </script>
 
-<script type="text/javascript" src="//gource.iohk.io/client/build/static/js/gource.main.js?bust={{ site.time | date: '%s' }}"></script>
+<!--<script type="text/javascript" src="//gource.iohk.io/client/build/static/js/gource.main.js?bust={{ site.time | date: '%s' }}"></script>-->
 <script type="text/javascript" src="{{ '/static/assets/js/logo.main.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 <script type="text/javascript" src="{{ '/dist/static/js/app.js' | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}"></script>
 
