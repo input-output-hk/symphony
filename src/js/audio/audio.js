@@ -305,12 +305,14 @@ export default class Audio extends EventEmitter {
   }
 
   setAmbienceFilterCutoff (hashRate) {
-    let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 15000.0)
-    if (audioFreqCutoff > 15000) {
-      audioFreqCutoff = 15000
+    if (this.ambienceFilter) {
+      let audioFreqCutoff = map(hashRate, 0.0, MAX_HASH_RATE, 50.0, 15000.0)
+      if (audioFreqCutoff > 15000) {
+        audioFreqCutoff = 15000
+      }
+      console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
+      this.ambienceFilter.set('frequency', audioFreqCutoff)
     }
-    console.log('Hash Rate Freq Cutoff: ' + audioFreqCutoff)
-    this.ambienceFilter.set('frequency', audioFreqCutoff)
   }
 
   unloadSound () {
