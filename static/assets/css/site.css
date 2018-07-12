@@ -338,7 +338,7 @@ background:#00aeff;position:absolute;display: block;font-size: 93%;margin:0 0 0 
 @media (max-width:768px){
 
 
-#main .profile hr{display:none}
+#main .profile hr{margin:0 auto}
 #main .profile #io_data_globe-box{top:150px;right:100px}
 #main .profile #io_data_globe-marker{top:234px;left:142px;margin:-12px 0 0 -11px}
 }
