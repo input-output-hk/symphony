@@ -113,7 +113,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
 @media (max-width:767px){
 #page{background-size:140%;background-position-y:-150px }
 .navbar-brand{margin-left: -10px}
-
+.block.title{padding:0px 0 0 5px;}
 #page.home .block.title,
 .block.title{position: absolute;top:27px;}
 .block.title{font-size: 80%}
@@ -338,7 +338,7 @@ background:#00aeff;position:absolute;display: block;font-size: 93%;margin:0 0 0 
 @media (max-width:768px){
 
 
-#main .profile hr{display:none}
+  #main .profile hr{margin: 15px auto;width: 100px;}
 #main .profile #io_data_globe-box{top:150px;right:100px}
 #main .profile #io_data_globe-marker{top:234px;left:142px;margin:-12px 0 0 -11px}
 }
