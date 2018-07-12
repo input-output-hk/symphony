@@ -496,13 +496,6 @@ function rm_load(){
 
 
   }
-  out += '\
-  <br>\
-  <div class="text-center">\
-    <img src="/static/assets/images/issue/symphony.svg" alt="" width="48" height="48" class="top icon" />\
-  </div>\
-  ';
-
 
   $("#roadmap-load").html(out);
 	$(".nav--lines .dot").removeClass('active');
