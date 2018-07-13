@@ -692,6 +692,7 @@ function io_which_way_alter(){
 											onSelect: function (dateText, inst) {
 												console.log('picking '+dateText);
 												gource.setDate(dateText);
+												$(".ll-skin-melon").remove();
 											},
 											onClose: function () {
 													// $(this).datepicker("widget").removeClass("ll-skin-melon");
@@ -817,6 +818,7 @@ function io_which_way_alter(){
 	if($("#page").hasClass('blog') || $("#page").hasClass('video')){
 		io_fluid_videos();
 	}
+	iohk_video_modal_update();
 
 	if($("#nav-tabs").hasClass('nav-tabs')){
 		io_hash_tabs();
