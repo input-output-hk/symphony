@@ -3,6 +3,7 @@
 
 p{line-height: 1.5;}
 
+#roadmap-load{position: relative;z-index: 9}
 
 
 .roadmap .introduction-full {display:none}
@@ -112,8 +113,14 @@ p{line-height: 1.5;}
 .roadmap .item.milestone.notitle .content .desc{margin:-18px 0 0 0}
 
 
-.roadmap .item h2{padding:35px 0 1em 35px;font-size:100%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em;text-align: right}
+.roadmap .item h2{padding:35px 0 0 35px;line-height:1.35;font-size:116%;text-transform:uppercase;font-weight:400;letter-spacing:0.1em;text-align: right}
+.roadmap .item h2 .icon{font-size:150%;vertical-align:middle;margin:0 0 0 9px}
 
+.roadmap .item h2 .icon .icon-rocket{color:#bc3674}
+.roadmap .item h2 .icon .icon-book-open{color:#80c119}
+.roadmap .item h2 .icon .icon-eyeglasses{color:#19c1bf}
+.roadmap .item h2 .icon .icon-rocket{color:#bc3674}
+.roadmap .item h2 .icon .fa-github{color:#c8ba23;font-size:140%}
 
 @media (max-width:1199px){
   .roadmap .item .link img{margin:-8px 0 0 -13px}
@@ -125,7 +132,7 @@ p{line-height: 1.5;}
 
 
 @media (max-width:767px){
-  .roadmap .item h2{padding:0px 0 1em 3px;margin:0}
+  .roadmap .item h2{padding:0px 0 1em 3px;margin:0;text-align:left;}
   .roadmap .item .link img{margin:-8px 0 0 -17px}
 }
 

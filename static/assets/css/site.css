@@ -113,7 +113,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
 @media (max-width:767px){
 #page{background-size:140%;background-position-y:-150px }
 .navbar-brand{margin-left: -10px}
-
+.block.title{padding:0px 0 0 5px;}
 #page.home .block.title,
 .block.title{position: absolute;top:27px;}
 .block.title{font-size: 80%}
@@ -183,6 +183,10 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item h5{font-style: italic;text-transform: none;}
 .entry.centerline .item h3,.entry.centerline .item h5{margin-top:0;}
 
+.entry.centerline .item.text-center .gallery .thumbnail{margin:0}
+
+
+
 .entry.centerline .item.final{text-align: center;margin:4em 0 0 0;text-transform: uppercase}
 .entry.centerline .item.final .hr{position: relative;vertical-align: bottom;top:-25px;display: inline-block;border-color:rgba(255,255,255,0.5);margin:0;left:0;opacity: 0.3;width:300px}
 .entry.centerline .item.final .hr:before,.entry.centerline .item.final .hr:after{color:rgba(255,255,255,0.5);}
@@ -197,6 +201,7 @@ box-shadow:0 0 0 transparent;
 @media (min-width:768px){
 .entry.centerline h2{text-align: center}
 .entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
+.entry.centerline .item.text-center .gallery{width:auto;float:none;}
 .entry.centerline .item.mirrored .info,.entry.centerline .item.mirrored .gallery{width: 50%;float: right;font-size: 90%}
 
 .entry.centerline .item .hr{border-top:1px solid #0bdcf9;width:120px;margin:0 0 0 -60px;opacity: 1;position:absolute;left:50%;}
@@ -204,10 +209,12 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item .hr:after{float:right;margin:-3px -3px 0 0}
 
 .entry.centerline .item{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:30px 0}
+.entry.centerline .item.text-center{background:transparent}
 .entry.centerline .item.mirrored{}
 
 .entry.centerline .item .info{padding: 0 80px 0 0}
 .entry.centerline .item .gallery{padding: 0  0 0 90px}
+.entry.centerline .item.text-center .gallery{padding:0}
 .entry.centerline .item.mirrored .info{padding:  0 0 0 90px}
 .entry.centerline .item.mirrored .gallery{padding: 0 90px 0 40px;text-align: right}
 .entry.centerline .item.mirrored .gallery .thumbnail{margin:0 0 0 10px }
@@ -289,7 +296,7 @@ box-shadow:0 0 0 transparent;
 
 
 #main .profile h4,
-#main .profile h2{letter-spacing:0;font-size:110%;text-align:left}
+#main .profile h2{letter-spacing:0;font-size:110%}
 #main .profile h2{margin:00 0 4px 0;font-weight:500;text-transform: uppercase;letter-spacing: 0.15em}
 #main .profile h4{letter-spacing:1px;font-size:100%; margin:0 0 5px 0;font-weight:400; line-height: 1.3;min-height:2.6em;text-transform: uppercase;}
 #main .profile h4 span{opacity:.4}
@@ -338,7 +345,7 @@ background:#00aeff;position:absolute;display: block;font-size: 93%;margin:0 0 0 
 @media (max-width:768px){
 
 
-#main .profile hr{margin:0 auto}
+  #main .profile hr{margin: 15px auto;width: 100px;}
 #main .profile #io_data_globe-box{top:150px;right:100px}
 #main .profile #io_data_globe-marker{top:234px;left:142px;margin:-12px 0 0 -11px}
 }
@@ -537,6 +544,9 @@ footer #lang-select li a {opacity: 0.9}
 
 
 
+.vertical-alignment-helper {display:table;height:100%;width: 100%;pointer-events:none;}
+.vertical-align-center {display: table-cell;vertical-align: middle;pointer-events:none;padding:10px}
+.modal-content {width:inherit;height:inherit;margin: 0 auto;pointer-events: all;}
 
 
 

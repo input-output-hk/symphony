@@ -183,6 +183,10 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item h5{font-style: italic;text-transform: none;}
 .entry.centerline .item h3,.entry.centerline .item h5{margin-top:0;}
 
+.entry.centerline .item.text-center .gallery .thumbnail{margin:0}
+
+
+
 .entry.centerline .item.final{text-align: center;margin:4em 0 0 0;text-transform: uppercase}
 .entry.centerline .item.final .hr{position: relative;vertical-align: bottom;top:-25px;display: inline-block;border-color:rgba(255,255,255,0.5);margin:0;left:0;opacity: 0.3;width:300px}
 .entry.centerline .item.final .hr:before,.entry.centerline .item.final .hr:after{color:rgba(255,255,255,0.5);}
@@ -197,6 +201,7 @@ box-shadow:0 0 0 transparent;
 @media (min-width:768px){
 .entry.centerline h2{text-align: center}
 .entry.centerline .item .info,.entry.centerline .item .gallery{width: 50%;float: left;}
+.entry.centerline .item.text-center .gallery{width:auto;float:none;}
 .entry.centerline .item.mirrored .info,.entry.centerline .item.mirrored .gallery{width: 50%;float: right;font-size: 90%}
 
 .entry.centerline .item .hr{border-top:1px solid #0bdcf9;width:120px;margin:0 0 0 -60px;opacity: 1;position:absolute;left:50%;}
@@ -204,10 +209,12 @@ box-shadow:0 0 0 transparent;
 .entry.centerline .item .hr:after{float:right;margin:-3px -3px 0 0}
 
 .entry.centerline .item{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:30px 0}
+.entry.centerline .item.text-center{background:transparent}
 .entry.centerline .item.mirrored{}
 
 .entry.centerline .item .info{padding: 0 80px 0 0}
 .entry.centerline .item .gallery{padding: 0  0 0 90px}
+.entry.centerline .item.text-center .gallery{padding:0}
 .entry.centerline .item.mirrored .info{padding:  0 0 0 90px}
 .entry.centerline .item.mirrored .gallery{padding: 0 90px 0 40px;text-align: right}
 .entry.centerline .item.mirrored .gallery .thumbnail{margin:0 0 0 10px }
@@ -537,6 +544,9 @@ footer #lang-select li a {opacity: 0.9}
 
 
 
+.vertical-alignment-helper {display:table;height:100%;width: 100%;pointer-events:none;}
+.vertical-align-center {display: table-cell;vertical-align: middle;pointer-events:none;padding:10px}
+.modal-content {width:inherit;height:inherit;margin: 0 auto;pointer-events: all;}
 
 
 
