@@ -13,6 +13,97 @@ var desc_hider_href = "javascript:io_class_toggle('#symphony_nav','hidedesc')"
 var io_intro_rule_desc_hider = '<a href="' + desc_hider_href + '" class=""><span class="hider"><em class="fa fa-minus-square-o"></em></span><span class="shower"><em class="fa fa-info"></em></span></a>'
 
 
+var featured_blocks = new Array()
+
+featured_blocks[0] = new Object()
+featured_blocks[0]['id'] = '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048';
+featured_blocks[0]['date'] = '9th January 2009';
+featured_blocks[0]['desc'] = 'Genesis Block';
+featured_blocks[0]['tag'] = 'Key Events';
+
+featured_blocks[1] = new Object()
+featured_blocks[1]['id'] = '0000000000000008e104b4dc035b8593d6d93c6b11e99cdd94bd316abf2a286d';
+featured_blocks[1]['date'] = '2nd October 2013';
+featured_blocks[1]['desc'] = 'FBI shuts down online drug marketplace Silk Road, seizing 3.6 million dollars worth of bitcoins';
+featured_blocks[1]['tag'] = 'Key Events';
+
+featured_blocks[2] = new Object()
+featured_blocks[2]['id'] = '0000000000000000021283ad13cd1301ffa24e11e752d6f6b51a20dc6a42abe3';
+featured_blocks[2]['date'] = '2nd March 2017';
+featured_blocks[2]['desc'] = 'The day one bitcoin overtook the price of an ounce of gold';
+featured_blocks[2]['tag'] = 'Key Events';
+
+featured_blocks[3] = new Object()
+featured_blocks[3]['id'] = '00000000000000000041a56131da7150f2a546e15aff0e6eb8acae90753ac7af';
+featured_blocks[3]['date'] = '1st August 2017';
+featured_blocks[3]['desc'] = 'bcash fork';
+featured_blocks[3]['tag'] = 'Key Events';
+
+featured_blocks[4] = new Object()
+featured_blocks[4]['id'] = '000000000000000000044f8d1a241db0b77d7e5eb252b1c3bad7cfa81d6f2f79';
+featured_blocks[4]['date'] = '20th June 2018';
+featured_blocks[4]['desc'] = 'bithumb hack';
+featured_blocks[4]['tag'] = 'Key Events';
+
+featured_blocks[5] = new Object()
+featured_blocks[5]['id'] = '000000000000000000192f4e211a617bf97e6d1b559a5b0bf45a893c7a3e495b';
+featured_blocks[5]['date'] = '12th July 2018';
+featured_blocks[5]['desc'] = '';
+featured_blocks[5]['tag'] = 'Interesting melodies';
+
+featured_blocks[6] = new Object()
+featured_blocks[6]['id'] = '0000000000000000002d89990a955397ac4720a0fe887bb013df6a80733c86af';
+featured_blocks[6]['date'] = '19th February 2018';
+featured_blocks[6]['desc'] = '';
+featured_blocks[6]['tag'] = 'Interesting melodies';
+
+featured_blocks[7] = new Object()
+featured_blocks[7]['id'] = '000000000000000000016c48cd172e7cc6e057bee149d7226d72cba66657747e';
+featured_blocks[7]['date'] = '3rd February 2018';
+featured_blocks[7]['desc'] = '';
+featured_blocks[7]['tag'] = 'Interesting melodies';
+
+featured_blocks[8] = new Object()
+featured_blocks[8]['id'] = '0000000000000000003a58a53ffce21f9aa10b47baf5fd6adc5b4a868a2ced4b';
+featured_blocks[8]['date'] = '18th April 2018';
+featured_blocks[8]['desc'] = 'Unhealthy block';
+featured_blocks[8]['tag'] = 'Interesting melodies';
+
+featured_blocks[9] = new Object()
+featured_blocks[9]['id'] = '00000000000000000035a08d4d66da659db449f75e074c6b59dd4ba2afe863a9';
+featured_blocks[9]['date'] = '9th February 2018';
+featured_blocks[9]['desc'] = 'Very unhealthy block';
+featured_blocks[9]['tag'] = 'Interesting melodies';
+
+featured_blocks[10] = new Object()
+featured_blocks[10]['id'] = '000000000000000000338d60da498ce8544000bf61d60962c934762ad50a33fc';
+featured_blocks[10]['date'] = '3rd May 2018';
+featured_blocks[10]['desc'] = '';
+featured_blocks[10]['tag'] = 'Interesting melodies';
+
+featured_blocks[11] = new Object()
+featured_blocks[11]['id'] = '000000000000000000312ef010e5e5fbe40de748bb5641d18589f7ccaad8c67a';
+featured_blocks[11]['date'] = '3rd February 2018';
+featured_blocks[11]['desc'] = '';
+featured_blocks[11]['tag'] = 'Interesting melodies';
+
+featured_blocks[12] = new Object()
+featured_blocks[12]['id'] = '000000000000000000439589cc6a09907b8c0014882c0b7345336d8ac8efb684';
+featured_blocks[12]['date'] = '1st May 2018';
+featured_blocks[12]['desc'] = '';
+featured_blocks[12]['tag'] = 'Interesting melodies';
+
+featured_blocks[13] = new Object()
+featured_blocks[13]['id'] = '0000000000000000003c7278026075ba98cf9ee9422cf0a13621bde05f696975';
+featured_blocks[13]['date'] = '10th May 2018';
+featured_blocks[13]['desc'] = '';
+featured_blocks[13]['tag'] = 'Interesting melodies';
+
+featured_blocks[14] = new Object()
+featured_blocks[14]['id'] = '00000000000000011262d9dbc4dfec82a8d07da251d269028f51b03ec982dcc8';
+featured_blocks[14]['date'] = '2nd October 2013';
+featured_blocks[14]['desc'] = '';
+featured_blocks[14]['tag'] = 'Interesting melodies';
 
 
 
@@ -144,6 +235,35 @@ function io_intro_explorer () {
   ';
 
 
+  function featured_blocks_list () {
+    var tit = '';
+    var out = '';
+    for(i=0;i<featured_blocks.length;i++){
+      if(tit != featured_blocks[i]['tag']){
+        out += '<h4>'+featured_blocks[i]['tag']+'</h4>';
+        tit = featured_blocks[i]['tag'];
+      }
+      out += '<div id="item-'+featured_blocks[i]['id']+'" class="block item">\
+      <a href="//symphony.iohk.io/?hash='+featured_blocks[i]['id']+'" rel="'+featured_blocks[i]['id']+'" class="block_link tit" title="'+featured_blocks[i]['date']+': '+featured_blocks[i]['desc']+'">'+featured_blocks[i]['id'].substr(-16)+'</a>\
+      <div class="more">\
+      <small class="block"><a href="//symphony.iohk.io/?hash='+featured_blocks[i]['id']+'" class="block_link" title="'+featured_blocks[i]['date']+': '+featured_blocks[i]['desc']+'">'+featured_blocks[i]['date']+'</a></small>\
+      <hr />\
+      <p>'+featured_blocks[i]['desc']+'</p>\
+      </div>\
+      </div>';
+    }
+    $("#featured .cont").html(out);
+    $("#featured .item .block_link").click(function(e){
+      e.preventDefault();
+      var id = $(this).attr('rel');
+      $("#featured .block.item").removeClass('open');
+      $(this).parent().addClass('open');
+      app.goToBlock(id);
+    });
+
+
+  }
+
   function datetime_nice (date) {
     return '' + io_weekdays[date.getDay()] + ', ' + io_months[date.getMonth()] + ' ' + ordinal_suffix_of(date.getDate()) + ' ' + date.getFullYear() + ', ' + date.getHours() + ':' + num_pad(date.getMinutes()) + ':' + num_pad(date.getSeconds()) + ' GMT'
   }
@@ -230,6 +350,15 @@ function io_intro_explorer () {
     <a href="javascript:io_class_toggle(\'.pane.bottom\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><em class="fa fa-info on"></em><span class="lab">About Symphony</span></a>\
     <div class="inner">\
       <div class="top">'+symphony_label['en']['desc']+'</div> <div class="update"></div>\
+    </div>\
+  </div>\
+  <div id="featured" class="block pane right top off none">\
+    <span class="glow nomobile"><img src="/static/assets/images/glow.png" alt="" /></span>\
+    <span class="link"></span>\
+    <a href="javascript:io_class_toggle(\'#featured\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><em class="fa fa-info on"></em><span class="lab">Featured blocks</span></a>\
+    <div class="inner">\
+      <h3>Featured blocks</h3>\
+      <div class="cont"></div>\
     </div>\
   </div>\
   <div class="block pane left top off"></div>\
@@ -358,8 +487,7 @@ function io_intro_explorer () {
     });
 
 
-
-
+    var featured_blocks_loaded = false;
 
 
 
@@ -449,7 +577,12 @@ function io_intro_explorer () {
       $('.controls.top').removeClass('none');
       $('.controls.top .date .date').html(date_nice(date));
 
+      if(!featured_blocks_loaded){
+        featured_blocks_loaded = true;
+        $('#featured').removeClass('none')
 
+        featured_blocks_list();
+      }
 
 
             if(!loaded_block){
@@ -507,7 +640,7 @@ function io_intro_explorer () {
       $('#loading_text').html('')
       setTimeout(function () {
         $('#loading_text').html('')
-      }, 1000)
+      }, 5000)
     })
 
     /*
