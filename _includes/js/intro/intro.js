@@ -244,7 +244,7 @@ function io_intro_explorer () {
         tit = featured_blocks[i]['tag'];
       }
       out += '<div id="item-'+featured_blocks[i]['id']+'" class="block item">\
-      <a href="//symphony.iohk.io/?hash='+featured_blocks[i]['id']+'" rel="'+featured_blocks[i]['id']+'" class="block_link tit" title="'+featured_blocks[i]['date']+': '+featured_blocks[i]['desc']+'">'+featured_blocks[i]['id'].substr(-16)+'</a>\
+      BLOCK &nbsp;<a href="//symphony.iohk.io/?hash='+featured_blocks[i]['id']+'" rel="'+featured_blocks[i]['id']+'" class="block_link tit uppercase" title="'+featured_blocks[i]['date']+': '+featured_blocks[i]['desc']+'">'+featured_blocks[i]['id'].substr(-16)+'</a>\
       <div class="more">\
       <small class="block"><a href="//symphony.iohk.io/?hash='+featured_blocks[i]['id']+'" class="block_link" title="'+featured_blocks[i]['date']+': '+featured_blocks[i]['desc']+'">'+featured_blocks[i]['date']+'</a></small>\
       <hr />\
