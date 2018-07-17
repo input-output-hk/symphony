@@ -121,16 +121,17 @@
 #symphony_hud .pane.top{top:265px;}
 
 
-#symphony_hud .pane.right{right:30px;left:auto;top:205px;position: fixed;width:240px;padding:15px 0 0 0;}
-#symphony_hud .pane.right .cont{height:428px;overflow-y:auto}
+#symphony_hud .pane.right{right:30px;left:auto;top:205px;position: fixed;width:270px;padding:15px 0 0 0;}
+#symphony_hud .pane.right .cont{height:340px;overflow-y:auto}
 #symphony_hud .pane.right .cont a{text-decoration: none}
-#symphony_hud .pane.right .item {border-top:1px solid rgba(255,255,255,0.2);padding:8px 20px}
+#symphony_hud .pane.right .item {border-top:1px solid rgba(255,255,255,0.15);padding:8px 20px}
 #symphony_hud .pane.right .item .more{display: none;padding:5px 0 0 0}
 #symphony_hud .pane.right .item.open {background:rgba(255,255,255,0.08)}
 #symphony_hud .pane.right .item.open .more{display: block;}
 #symphony_hud .pane.right .item.open .tit{font-weight: 500;color:#fff}
-#symphony_hud .pane.right h3{margin:0 20px 10px 20px}
-#symphony_hud .pane.right h4{margin:10px 20px 10px 20px;font-size:85%}
+#symphony_hud .pane.right h3{margin:0 0 -5px 0;padding:0 20px 10px 20px}
+#symphony_hud .pane.right h4{margin:0;padding:18px 20px 10px 20px;font-size:85%}
+#symphony_hud .pane.right .item+h4{border-top:2px solid rgba(255,255,255,0.2);}
 
 #symphony_hud .pane.right hr{margin:5px 0;width:100px;border-top:1px dashed rgba(255,255,255,0.2);opacity:1}
 
