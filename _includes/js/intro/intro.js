@@ -846,85 +846,110 @@ function io_intro_explorer () {
     })
 
   	app.on('blockUnselected', _ => {
-    //$('#intro_text').addClass('empty').html('')
-    //$('#details').html(latest_block_date)
-    //$('.pane.top').html(latest_block_date)
-    loaded_block = false;
-    $('.pane.middle').addClass('none');
-    $('.datepicker').val(num_pad(date_selected.getDate()) + '/' + num_pad(date_selected.getMonth() + 1) + '/' + date_selected.getFullYear())
-    datepicker_init()
+      //$('#intro_text').addClass('empty').html('')
+      //$('#details').html(latest_block_date)
+      //$('.pane.top').html(latest_block_date)
+      loaded_block = false;
+      $('.pane.middle').addClass('none');
+      $('.datepicker').val(num_pad(date_selected.getDate()) + '/' + num_pad(date_selected.getMonth() + 1) + '/' + date_selected.getFullYear())
+      datepicker_init()
 
-    if(!$('#symphony').hasClass('view-day')){
-      $('#symphony').addClass('view-day');
-    }
-    if($('#symphony').hasClass('view-block')){
-      $('#symphony').removeClass('view-block');
-    }
-    if(!$('#symphony_hud').hasClass('viewing-day')){
-      $('#symphony_hud').addClass('viewing-day')
-    }
-    if($('#symphony_hud').hasClass('viewing-block')){
-      $('#symphony_hud').removeClass('viewing-block')
-    }
-
-    if($(document).width() < 768){
-      if ($('.pane.left.top').hasClass('off')) {
-        $('.pane.left.top').removeClass('off');
+      if(!$('#symphony').hasClass('view-day')){
+        $('#symphony').addClass('view-day');
       }
-    }
+      if($('#symphony').hasClass('view-block')){
+        $('#symphony').removeClass('view-block');
+      }
+      if(!$('#symphony_hud').hasClass('viewing-day')){
+        $('#symphony_hud').addClass('viewing-day')
+      }
+      if($('#symphony_hud').hasClass('viewing-block')){
+        $('#symphony_hud').removeClass('viewing-block')
+      }
+
+      if($(document).width() < 768){
+        if ($('.pane.left.top').hasClass('off')) {
+          $('.pane.left.top').removeClass('off');
+        }
+      }
 
 
-    $('.nomobile .datepicker_icon').click(function (e) {
-      e.preventDefault()
-      $('#datepicker').datepicker('show')
-    })
-    $('.nodesktop .datepicker_icon').click(function (e) {
-      e.preventDefault()
-      $('#datepicker2').datepicker('show')
-    })
+      $('.nomobile .datepicker_icon').click(function (e) {
+        e.preventDefault()
+        $('#datepicker').datepicker('show')
+      })
+      $('.nodesktop .datepicker_icon').click(function (e) {
+        e.preventDefault()
+        $('#datepicker2').datepicker('show')
+      })
 
-    $('.day_prev').click(function (e) {
-      e.preventDefault()
-      var rel = $(this).attr('rel')
-      var date_arr = rel.split('/')
-      app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+      $('.day_prev').click(function (e) {
+        e.preventDefault()
+        var rel = $(this).attr('rel')
+        var date_arr = rel.split('/')
+        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+      })
+      $('.day_next').click(function (e) {
+        e.preventDefault()
+        var rel = $(this).attr('rel')
+        var date_arr = rel.split('/')
+        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+      })
     })
-    $('.day_next').click(function (e) {
-      e.preventDefault()
-      var rel = $(this).attr('rel')
-      var date_arr = rel.split('/')
-      app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-    })
-  })
 
     var scrolled_once = 0
-  // move camera on z axis with mouse wheel
-  $("#symphony_hud").removeClass('block-bottom-off');
+    // move camera on z axis with mouse wheel
+    $("#symphony_hud").removeClass('block-bottom-off');
 
-  // move camera on z axis with mouse wheel
-    const onDocumentMouseWheel = function (event) {
-      if (event.deltaY > 0) {
-        cameraMove('negative')
-      } else {
-        cameraMove('positive')
+    var symphony_scroll = true;
+
+    $("body").mousemove(function( e ) {
+      var featured = $('#featured');
+      var offset = featured.offset();
+      var offsetWidth = offset.left + featured.width();
+      var offsetHeight = offset.top + featured.height();
+
+      //var pageCoords = "( " + event.pageX + ", " + event.pageY + " )";
+      //var clientCoords = "( " + event.clientX + ", " + event.clientY + " )";
+
+      if(e.pageX >= offset.left && e.pageY >= offset.top &&
+        e.pageX <= offsetWidth && e.pageY <= offsetHeight) {
+
+        symphony_scroll = false;
+      }else {
+        symphony_scroll = true;
       }
-      intro_scrolled += event.deltaY
-      if (blocks_selected == 0) {
-        scrolled_once++
-        if (scrolled_once == 1) {
-          //$('#welcome_text').addClass('off')
-          //$('.pane.left.bottom').addClass('off')
-          setTimeout(function () {
-            //$('#welcome_text').html(intro_onscroll)
-            //$('#welcome_text').removeClass('off')
-            $('.pane.left.bottom .update').html(intro_onscroll)
-            //$('.pane.left.bottom').removeClass('off')
-          }, 1500)
+      //$( "span:first" ).text( "( event.pageX, event.pageY ) : " + pageCoords );
+      //$( "span:last" ).text( "( event.clientX, event.clientY ) : " + clientCoords );
+
+    });
+
+    // move camera on z axis with mouse wheel
+    const onDocumentMouseWheel = function (event) {
+      if(symphony_scroll){
+        if (event.deltaY > 0) {
+          cameraMove('negative')
+        } else {
+          cameraMove('positive')
         }
-      } else {
-        //$('#welcome_text').addClass('none').html('')
-        //$('.pane.left.bottom').addClass('off')
-        //$('.pane.left.bottom .update').html('')
+        intro_scrolled += event.deltaY
+        if (blocks_selected == 0) {
+          scrolled_once++
+          if (scrolled_once == 1) {
+            //$('#welcome_text').addClass('off')
+            //$('.pane.left.bottom').addClass('off')
+            setTimeout(function () {
+              //$('#welcome_text').html(intro_onscroll)
+              //$('#welcome_text').removeClass('off')
+              $('.pane.left.bottom .update').html(intro_onscroll)
+              //$('.pane.left.bottom').removeClass('off')
+            }, 1500)
+          }
+        } else {
+          //$('#welcome_text').addClass('none').html('')
+          //$('.pane.left.bottom').addClass('off')
+          //$('.pane.left.bottom .update').html('')
+        }
       }
     }
 
