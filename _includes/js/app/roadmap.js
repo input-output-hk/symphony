@@ -524,7 +524,7 @@ function rm_reload(){
     var url = '/js/content-jan.json';
     url = 'https://spreadsheets.google.com/feeds/list/1d_i5iMBZlFLhKRe4JJv47GDAmMDWrgWPF0nxF0k60to/od6/public/values?alt=json';
     //url = 'https://spreadsheets.google.com/feeds/list/14uD0DMi_HYpJkf4cSSGWDiGyMHoOPeoUArUW1uMmRuo/od6/public/values?alt=json';
-    url = '/static/assets/js/roadmap/values.json';
+    url = '/static/assets/js/roadmap/values1.json';
 
     $.getJSON(url, function(data) {
         var entry = data.feed.entry;
