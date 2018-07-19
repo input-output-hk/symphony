@@ -205,9 +205,9 @@ p{line-height: 1.5;}
 .roadmap .item .attributes .slack {font-size: 150%}
 .roadmap .item .attributes .slack .fa {line-height: 30px;width:31px;}
 
+.roadmap .item .attributes .links a img{vertical-align: top;}
 
 .roadmap .item.owners-toomany .attributes .links a{line-height: 1.5}
-.roadmap .item.owners-toomany .attributes .links a img{vertical-align: top;}
 .roadmap .item.owners-toomany .attributes .author{width:100%;padding:0 0 15px 0}
 .roadmap .item.owners-toomany .attributes .author__dash{display:none !important}
 
