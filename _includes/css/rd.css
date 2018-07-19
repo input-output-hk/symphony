@@ -59,6 +59,7 @@ p{line-height: 1.5;}
 .roadmap .item .content .glow{position: absolute;margin: -24px 0 0 -10px}
 
 
+.roadmap .item a.github{font-size:24px}
 
 
 
@@ -186,7 +187,7 @@ p{line-height: 1.5;}
 
 
 .roadmap .item .attributes{text-align:right;float:left;width:40%;margin:0 6% 0 4%;padding:0 0 0 20px;vertical-align: middle}
-.roadmap .item .attributes .links{display: inline-block;color:rgba(65,155,155,0.5)}
+.roadmap .item .attributes .links{display: inline-block;color:rgba(65,155,155,0.5);padding:0 30px 0 0}
 .roadmap .item .attributes a{background:#fff;color:#333;font-size:130%;vertical-align: middle;border-radius:50px;display: inline-block;width:30px;height:30px;line-height:30px;text-align: center;display: inline-block;margin: 5px}
 .roadmap .item .attributes .author a{background:transparent;padding:0px;width:44px;height:44px;line-height:40px;border:1px solid rgba(65,155,155,1)}
 .roadmap .item .attributes .author a img{}
@@ -366,10 +367,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#007486', end
   margin-right:5px;
   float:left;
   width:auto;
-  height:75px;
-  border-radius:4px;
+  height:55px;
+  border-radius:2px;
   opacity: 0.8;
-  border:2px solid #59999a;
+  border:1px solid #59999a;
 }
 .gallery-thumbnail:hover {
   cursor:pointer;

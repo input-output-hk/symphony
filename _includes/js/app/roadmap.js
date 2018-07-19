@@ -171,23 +171,41 @@ function rm_item(item){
   if(item.gsx$reddit != undefined){    reddit = item.gsx$reddit.$t;  }
   var slack = '';
   if(item.gsx$slack != undefined){    slack = item.gsx$slack.$t;  }
+
   var image1 = '';
   if(item.gsx$image1 != undefined){    image1 = item.gsx$image1.$t;  }
   var image1caption = '';
   if(item.gsx$image1caption != undefined){    image1caption = item.gsx$image1caption.$t;  }
+  var image1link = '';
+  if(item.gsx$image1link != undefined){    image1link = item.gsx$image1link.$t;  }
+
   var image2 = '';
   if(item.gsx$image2 != undefined){    image2 = item.gsx$image2.$t;  }
   var image2caption = '';
   if(item.gsx$image2caption != undefined){    image2caption = item.gsx$image2caption.$t;  }
+  var image2link = '';
+  if(item.gsx$image2link != undefined){    image2link = item.gsx$image2link.$t;  }
+
   var image3 = '';
   if(item.gsx$image3 != undefined){    image3 = item.gsx$image3.$t;  }
   var image3caption = '';
   if(item.gsx$image3caption != undefined){    image3caption = item.gsx$image3caption.$t;  }
+  var image3link = '';
+  if(item.gsx$image3link != undefined){    image3link = item.gsx$image3link.$t;  }
+
   var image4 = '';
   if(item.gsx$image4 != undefined){    image4 = item.gsx$image4.$t;  }
   var image4caption = '';
   if(item.gsx$image4caption != undefined){    image4caption = item.gsx$image4caption.$t;  }
+  var image4link = '';
+  if(item.gsx$image4link != undefined){    image4link = item.gsx$image4link.$t;  }
 
+  var image5 = '';
+  if(item.gsx$image5 != undefined){    image5 = item.gsx$image5.$t;  }
+  var image5caption = '';
+  if(item.gsx$image5caption != undefined){    image5caption = item.gsx$image5caption.$t;  }
+  var image5link = '';
+  if(item.gsx$image5link != undefined){    image5link = item.gsx$image5link.$t;  }
 
   var video = item.gsx$video.$t;
   var contact = item.gsx$contact.$t;
@@ -237,25 +255,22 @@ function rm_item(item){
   }
   links = links_arr.join('<span class="dash">—</span>');
 
-  if(image1 != '' && image2 == '' && image3 == '' && image4 == '' || permalink == '/dev'){
-   links_arr.push('<br><br><img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1+'" src="'+image1+'"/>');
-   links = links_arr.join('<span class="dash nolastjoin">—</span>');
+
+  var img_arr = new Array();
+
+
+
+  if(image1 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1link+'" src="'+image1+'"/>');  }else{    image2 = '';  }
+  if(image2 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image2caption+'" href="'+image2link+'" src="'+image2+'"/>');  }else{    image2 = '';  }
+  if(image3 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image3caption+'" href="'+image3link+'" src="'+image3+'"/>');  }else{    image3 = '';  }
+  if(image4 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image4caption+'" href="'+image4link+'" src="'+image4+'"/>');  }else{    image4 = '';  }
+  if(image5 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image5caption+'" href="'+image5link+'" src="'+image5+'"/>');  }else{    image5 = '';  }
+
+  if(img_arr.length > 0){
+    links_arr.push('<div class="gallery">'+img_arr.join('')+'</div>');
+    links = links_arr.join(' ');
   }
 
-     if(image1 != '' && image2 != '' && image3 == '' && image4 == '' || permalink == '/dev'){
-   links_arr.push('<br><br><img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1+'" src="'+image1+'"/>&nbsp;<img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image2caption+'" href="'+image2+'" src="'+image2+'"/>');
-   links = links_arr.join('<span class="dash nolastjoin">—</span>');
-  }
-
-   if(image1 != '' && image2 != '' && image3 != '' && image4 == '' || permalink == '/dev'){
-   links_arr.push('<br><br><img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1+'" src="'+image1+'"/>&nbsp;<img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image2caption+'" href="'+image2+'" src="'+image2+'"/>&nbsp;<img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image3caption+'" href="'+image3+'" src="'+image3+'"/>');
-   links = links_arr.join('<span class="dash nolastjoin">—</span>');
-  }
-
-  if(image1 != '' && image2 != '' && image3 != '' && image4 != '' || permalink == '/dev'){
-   links_arr.push('<br><br><img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1+'" src="'+image1+'"/>&nbsp;<img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image2caption+'" href="'+image2+'" src="'+image2+'"/>&nbsp;<img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image3caption+'" href="'+image3+'" src="'+image3+'"/><img class="gallery-thumbnail" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image4caption+'" href="'+image4+'" src="'+image4+'"/>');
-   links = links_arr.join('<span class="dash nolastjoin">—</span>');
-  }
 
   if(state != ''){
      state = '\
@@ -295,9 +310,7 @@ function rm_item(item){
           owner += '<img src="/static/assets/images/team/member.png" width="40" height="40" alt="" class="img-circle blank-member" />';
         }
 	    }
-	    if(links_arr.length != 0){
-	      owner += '<span class="author__dash right">—</span>';
-	    }
+
 	    owner += '</span>';
       if(owner_arr.length > 4){
 				owner_cls = 'owners-toomany';
@@ -369,42 +382,6 @@ function rm_item(item){
   var milestone_img = '';
   var milestone_cat = item.gsx$category.$t;
 
-/*
-  if(milestone_header != milestone_cat){
-    milestone_header = item.gsx$category.$t;
-    milestone_desc = html_converter.makeHtml(item.gsx$eradesc.$t);
-    milestone_link = item.gsx$eralink.$t;
-    milestone_img = item.gsx$erapic.$t;
-
-    if(milestone_img){
-      milestone_img = '<div id="'+io_slug(milestone_header)+'" class="img milestone"><span class="author"><a href="'+milestone_link+'" target="_blank"><img src="/static/assets/images/eras/'+milestone_img+'" alt="" width="70" height="70" class="img-circle" /></a></span></div>';
-    }
-
-    milestone_heading = '<h1 class="text-center milestone heading"><span>'+milestone_header+'</span></h1>';
-    if(milestone_link){
-      milestone_heading = milestone_img+'<h1 class="text-center milestone heading"><span><a href="'+milestone_link+'" target="_blank" title="'+io_nohttp(milestone_link)+'">'+milestone_header+'</a></span></h1>';
-    }
-    milestone_heading += '<div class="milestone desc"><span>'+milestone_desc+'</span></div>';
-
-
-    if($('#roadmap-load').hasClass('show-version-3')){
-      if(item.gsx$category.$t == 'Basho (Performance improvement)'){
-        milestone_heading = countdown_clock+milestone_heading;
-      }
-    }else{
-      if(item.gsx$category.$t == 'Goguen'){
-        milestone_heading = countdown_clock+milestone_heading;
-      }
-    }
-
-  }
-*/
-  /*var new_label = '';
-  if(new_item == 'yes'){
-    new_label = '<div class="new_label text-center"><img src="/static/assets/images/issue/new-label.svg" alt="" /></div><div class="timeline"></div>';
-  }*/
-
-
 
   if(item != undefined){
     if(content != '' || summary != ''){
@@ -418,7 +395,6 @@ function rm_item(item){
           <h2 class="">'+title+' <span class="icon">'+rm_icons[rm_slug(item.gsx$category.$t)]+'</span></h2>\
           <div class="links"> \
             '+owner+'\
-            '+links+'\
           </div>\
           <div class="clear"></div>\
           '+state+'\
@@ -429,6 +405,7 @@ function rm_item(item){
             <div class="inner">\
             '+time+' \
             '+expanded+'\
+            '+links+'\
             </div>\
    				 '+expand+'\
           </div>\
@@ -512,7 +489,7 @@ function rm_load(){
   rm_item_after();
 
 
-$('[data-fancybox="images"]').fancybox({
+$('.gallery-thumbnail.fancybox').fancybox({
     // Options will go here
     selector : '[data-fancybox]',
     loop     : true,
@@ -546,7 +523,8 @@ function rm_reload(){
   roadmap_arr = [];
     var url = '/js/content-jan.json';
     url = 'https://spreadsheets.google.com/feeds/list/1d_i5iMBZlFLhKRe4JJv47GDAmMDWrgWPF0nxF0k60to/od6/public/values?alt=json';
-
+    //url = 'https://spreadsheets.google.com/feeds/list/14uD0DMi_HYpJkf4cSSGWDiGyMHoOPeoUArUW1uMmRuo/od6/public/values?alt=json';
+    url = '/static/assets/js/roadmap/values.json';
 
     $.getJSON(url, function(data) {
         var entry = data.feed.entry;

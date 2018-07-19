@@ -271,6 +271,7 @@ grc_label['kr']['repository'] = '{{site.data.i18n['kr'].repository}}';
 {% include css/rd.css %}
 {% include css/site.css %}
 </style>
+<link href="/static/assets/css/jquery.fancybox.css" rel="stylesheet" media="screen">
 
 <link rel="stylesheet"  href="{{ "/static/assets/css/symphony.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 <link rel="stylesheet"  href="{{ "/static/assets/css/gource.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
@@ -302,7 +303,6 @@ grc_label['kr']['repository'] = '{{site.data.i18n['kr'].repository}}';
 {% include js/app/jquery.js %}
 {% include js/app/jquery-ui.js %}
 {% include js/app/app.js %}
-{% include js/blazy.js %}
 {% include js/intro/hammer.min.js %}
 {% include js/intro/StartAudioContext.min.js %}
 {% include js/showdown.min.js %}
