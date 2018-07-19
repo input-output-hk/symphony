@@ -79,8 +79,8 @@ p{line-height: 1.5;}
 .roadmap .item .link {width: 120px;border-top:1px solid #1dd2d4;margin:62px 0 -60px 453px;position:absolute;text-align:center;}
 .roadmap .item .link img{position: absolute;margin:-8px 0 0 -16px}
 .roadmap .item .link:before,
-.roadmap .item .link:after{content:"•";float:right;display:inline-block;line-height:1px;color:#1dd2d4;margin:-2px -2px 0 0;font-size:140%}
-.roadmap .item .link:before{float:left;margin:-2px 0 0 -2px}
+.roadmap .item .link:after{content:"•";float:right;display:inline-block;line-height:1px;color:#1dd2d4;margin:-4px -2px 0 0;font-size:260%}
+.roadmap .item .link:before{float:left;margin:-4px 0 0 -2px}
 
 @media (max-width:1199px){
 .roadmap .item .link {width: 106px;margin:62px 0 -60px 365px;}
