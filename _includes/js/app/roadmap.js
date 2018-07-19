@@ -253,11 +253,11 @@ function rm_item(item){
   if(new_item != ''){
     links_arr.push('<span class="new_label text-center"><img src="/static/assets/images/issue/new-label.svg" alt="" /></span>');
   }
-  links = links_arr.join('<span class="dash">—</span>');
+  links = '<div class="links">'+links_arr.join(' ')+'</div>';
 
 
   var img_arr = new Array();
-
+  var images = '';
 
 
   if(image1 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image1caption+'" href="'+image1link+'" src="'+image1+'"/>');  }else{    image2 = '';  }
@@ -267,8 +267,8 @@ function rm_item(item){
   if(image5 != ''){    img_arr.push('<img class="gallery-thumbnail fancybox" data-fancybox="'+io_nohttp(title)+'" data-caption="'+image5caption+'" href="'+image5link+'" src="'+image5+'"/>');  }else{    image5 = '';  }
 
   if(img_arr.length > 0){
-    links_arr.push('<div class="gallery">'+img_arr.join('')+'</div>');
-    links = links_arr.join(' ');
+    images = '<div class="gallery">'+img_arr.join('')+'</div>';
+    //links = links_arr.join(' ');
   }
 
 
@@ -287,18 +287,12 @@ function rm_item(item){
 	  if(owner_arr.length > 0){
       owner_cls = '';
 	    var owner = '<span class="author">';
-	    if(links_arr.length != 0){
-	      owner += '<span class="author__dash left">—</span>';
-	    }
+
 	    for(var i = 0;i < owner_arr.length;i++){
 	      var auth_id = rm_get_member(owner_arr[i].trim());
 				//console.log(auth_id);
 				if(auth_id){
-					if(i < 0){
-		        if(links_arr.length != 0){
-		          owner += '<span class="author__dash">—</span>';
-		        }
-		      }
+
           var owner_link = 'https://iohk.io/team/'+io_team_arr[auth_id]['key'];
           if(io_team_arr[auth_id]['redirect'] != undefined){
             if(io_team_arr[auth_id]['redirect'] != ''){
@@ -403,9 +397,10 @@ function rm_item(item){
         <span class="glow"><img src="/static/assets/images/glow.png" alt="" /></span>\
           <div class="desc">\
             <div class="inner">\
+            '+links+'\
             '+time+' \
             '+expanded+'\
-            '+links+'\
+            '+images+'\
             </div>\
    				 '+expand+'\
           </div>\
@@ -524,7 +519,7 @@ function rm_reload(){
     var url = '/js/content-jan.json';
     url = 'https://spreadsheets.google.com/feeds/list/1d_i5iMBZlFLhKRe4JJv47GDAmMDWrgWPF0nxF0k60to/od6/public/values?alt=json';
     //url = 'https://spreadsheets.google.com/feeds/list/14uD0DMi_HYpJkf4cSSGWDiGyMHoOPeoUArUW1uMmRuo/od6/public/values?alt=json';
-    url = '/static/assets/js/roadmap/values1.json';
+    //url = '/static/assets/js/roadmap/values1.json';
 
     $.getJSON(url, function(data) {
         var entry = data.feed.entry;

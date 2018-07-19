@@ -59,7 +59,7 @@ p{line-height: 1.5;}
 .roadmap .item .content .glow{position: absolute;margin: -24px 0 0 -10px}
 
 
-.roadmap .item a.github{font-size:24px}
+.roadmap .item .links{font-size:24px;float:right}
 
 
 
@@ -207,6 +207,7 @@ p{line-height: 1.5;}
 
 
 .roadmap .item.owners-toomany .attributes .links a{line-height: 1.5}
+.roadmap .item.owners-toomany .attributes .links a img{vertical-align: top;}
 .roadmap .item.owners-toomany .attributes .author{width:100%;padding:0 0 15px 0}
 .roadmap .item.owners-toomany .attributes .author__dash{display:none !important}
 
