@@ -229,6 +229,23 @@
 
 
 
+#gource-root .gource-file-info-widget {position: absolute;  background: rgba(33, 34, 62, 0.9);  border: 1px solid #832dc4;  border-radius: 44px;  padding: 0.5em 0.5em 0.3em 0.5em;  min-width: 321px;  min-height: 86px;}
+#gource-root .gource-file-info-widget:hover {cursor: default;}
+#gource-root .gource-file-info-widget p {margin: 0 0 0.8em;}
+#gource-root .file-info-gravatar {display: inline-block;  vertical-align: top;}
+#gource-root .file-info-details {display: inline-block;  vertical-align: top;}
+#gource-root .file-info-message {display: block;  width: 270px;  max-height: 50px;  overflow: hidden;  margin: 0 0 1em; }
+#gource-root .file-info-gravatar {margin: 1.2em 0.7em 0 0;}
+#gource-root .file-info-gravatar img {border-radius: 50%;}
+#gource-root .file-info-details {color: #fff;  font-size: 0.7em;  text-align: left;}
+#gource-root .file-info-author-name a {text-decoration: none;  font-weight: bold;  color: #fff;}
+#gource-root .file-info-author-name a:hover {text-decoration: underline;}
+#gource-root .file-info-links a {text-decoration: none;  font-weight: bold;  color: #fff;}
+#gource-root .file-info-links a:hover {text-decoration: underline;}
+
+
+
+
 
 
 

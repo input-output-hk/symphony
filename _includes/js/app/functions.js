@@ -513,6 +513,7 @@ function io_which_way_alter(){
 	            fontTexturePath: '/static/assets/textures/gource/UbuntuMono.png', // path to font texture
 	 						nodeSpritePathBlur: '/static/assets/textures/gource/dot-blur.png', // path to blur node texture
 	            autoPlay: false,
+							usePicker: false, // show file commit details on click
 	            delayAmount: 1500, // time in between new commits being added to the graph
 	            sphereProject: 0, // project graph onto sphere? 1 == true, 0 == false
 	            sphereRadius: 700, // radius of sphere if in sphere projection mode
@@ -608,6 +609,7 @@ function io_which_way_alter(){
 			                      enableZoom: true,
 			                    },
 													FDG: {
+														usePicker: true,
 														showFilePaths: true
 													}
 			                  })
@@ -617,6 +619,7 @@ function io_which_way_alter(){
 			                      enableZoom: false
 			                    },
 													FDG: {
+														usePicker: false,
 														showFilePaths: false
 													}
 			                  })
