@@ -282,7 +282,6 @@ function rm_item(item){
        <div class="bar"><div class="done" style="width:'+state+'%"></div></div>\
        <div class="prc">'+state+'%</div>\
        '+increment+'\
-       <div class="lab">Stage: <b>'+rm_progress_label(state)+'</b></div>\
      </div>\
      ';
   }

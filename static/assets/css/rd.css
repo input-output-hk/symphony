@@ -239,7 +239,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#007486', end
 }
 
 
-.roadmap .item .state .prc{display:inline-block;margin:0 10px}
+.roadmap .item .state .prc{display:inline-block;margin:0 5px 0 10px}
 .roadmap .item .state .lab{display:inline-block;margin:0 5px;color:#91a5b0;}
 
 .roadmap .item .state .increment{color:#31C94A;display: inline-block;}
