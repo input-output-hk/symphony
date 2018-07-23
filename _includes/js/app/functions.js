@@ -499,6 +499,7 @@ function io_which_way_alter(){
 	          git: {
 							owner: 'input-output-hk',
 							repo: 'symphony',
+							branch: 'develop',
 	            commitHash: '', // hash of commit to load
 	            commitDate: '', // date to load (YYYY-MM-DD)
 	            loadLatest: true // load latest commit in db
