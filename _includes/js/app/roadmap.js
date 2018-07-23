@@ -273,14 +273,20 @@ function rm_item(item){
 
 
   if(state != ''){
+    var increment = item.gsx$increment.$t;
+    if(increment != ''){
+      increment = '<div class="increment"><span class="icon"><em class="fa fa-caret-up"></em> </span>'+increment+' %</div>';
+    }
      state = '\
      <div class="state">\
-       <h5>'+rm_lang[lang]['progress']+' <span class="val">'+state+'%</span></h5>\
        <div class="bar"><div class="done" style="width:'+state+'%"></div></div>\
-       <h5>'+rm_progress_label(state)+'</h5>\
+       <div class="prc">'+state+'%</div>\
+       '+increment+'\
+       <div class="lab">Stage: <b>'+rm_progress_label(state)+'</b></div>\
      </div>\
      ';
   }
+
 
   var owner_cls = 'noowner';
 	if(owner != ''){
@@ -387,11 +393,10 @@ function rm_item(item){
         <div class="attributes">\
           <div class="link nomobile"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>\
           <h2 class="">'+title+' <span class="icon">'+rm_icons[rm_slug(item.gsx$category.$t)]+'</span></h2>\
-          <div class="links"> \
-            '+owner+'\
-          </div>\
-          <div class="clear"></div>\
           '+state+'\
+          <div class="clear"></div>\
+          <div class="links">'+owner+'</div>\
+          <div class="clear"></div>\
         </div><!-- .attributes -->\
         <div class="content">\
         <span class="glow"><img src="/static/assets/images/glow.png" alt="" /></span>\
@@ -519,7 +524,7 @@ function rm_reload(){
     var url = '/js/content-jan.json';
     url = 'https://spreadsheets.google.com/feeds/list/1d_i5iMBZlFLhKRe4JJv47GDAmMDWrgWPF0nxF0k60to/od6/public/values?alt=json';
     //url = 'https://spreadsheets.google.com/feeds/list/14uD0DMi_HYpJkf4cSSGWDiGyMHoOPeoUArUW1uMmRuo/od6/public/values?alt=json';
-    url = '/static/assets/js/roadmap/values2.json';
+    url = '/static/assets/js/roadmap/values3.json';
 
     $.getJSON(url, function(data) {
         var entry = data.feed.entry;

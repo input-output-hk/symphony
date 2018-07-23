@@ -96,6 +96,7 @@
 
 {% endif %}
 
+
 <title>{{ title }} - {{ site.title }}</title>
 <meta charset="utf-8">
 
@@ -268,11 +269,11 @@ grc_label['kr']['repository'] = '{{site.data.i18n['kr'].repository}}';
 {% include css/fa.css %}
 {% include css/simple-line-icons.css %}
 {% include css/base.css %}
-{% include css/rd.css %}
 {% include css/site.css %}
 </style>
 <link href="/static/assets/css/jquery.fancybox.css" rel="stylesheet" media="screen">
 
+<link rel="stylesheet"  href="{{ "/static/assets/css/rd.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 <link rel="stylesheet"  href="{{ "/static/assets/css/symphony.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 <link rel="stylesheet"  href="{{ "/static/assets/css/gource.css" | prepend: site.baseurl }}?bust={{ site.time | date: '%s' }}" type="text/css" media="all" />
 
