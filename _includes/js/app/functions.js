@@ -596,7 +596,8 @@ function io_which_way_alter(){
 
 										setTimeout(function(){
 											$(".sidebar-github-view").text(grc_label[lang]['viewongithub']);
-												$(".sidebar-github-view").attr('title',grc_label[lang]['viewongithub']);
+											$(".gource-file-info-widget").prepend('<hr />');
+											$(".sidebar-github-view").attr('title',grc_label[lang]['viewongithub']);
 										},2000);
 
 

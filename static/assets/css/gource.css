@@ -231,7 +231,7 @@
 
 #gource-root .gource-file-info-widget {visibility: hidden;position: absolute;  background: rgba(33, 34, 62, 0.9);  border: 1px solid #832dc4;  border-radius:39px;  padding:12px 25px 12px 12px;  min-width: 321px;  min-height: 86px;}
 #gource-box.fullscreen #gource-root .gource-file-info-widget {visibility: visible;}
-#gource-root .gource-file-info-widget:before {display:block;width:30px;height:2px;position:absolute;z-index: 9999999;margin:0 0 0 -50px;border-top:1px solid  #f0f;}
+#gource-root .gource-file-info-widget hr{display:block;width:35px;position:absolute;z-index: 9999999;margin:22px 0 0 -47px;opacity: 1;border-top:1px solid #832dc4;}
 #gource-root .gource-file-info-widget:hover {cursor: default;}
 #gource-root .gource-file-info-widget p {margin: 0 0 0.1em;font-size:130%;}
 #gource-root .file-info-gravatar {display: inline-block;  vertical-align: top;}
