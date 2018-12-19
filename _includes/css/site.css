@@ -66,7 +66,7 @@ blockquote p{font-size: 100%;line-height:1.6;}
 #navbar #menu-top li:before {line-height:93px;content:"•";font-size:290%;display:inline-block;float:left;color:rgba(255,255,255,0.5) }
 #navbar #menu-top li a{line-height:50px;padding-right:5px;padding-left:18px}
 #navbar #menu-top li.hr .line{vertical-align: bottom;border-bottom:1px solid rgba(255,255,255,0.5);opacity: 1;line-height:auto;width:160px;height:50px;display: inline-block;margin:0 -2px}
-#page.home #navbar #menu-top li.hr .line{width:120px}
+#page.home #navbar #menu-top li.hr .line{width:30px}
 
 #navbar  #menu-top li.home a{background:rgba(18,23,38,0.7);
     box-shadow: 1px -1px 1px rgba(109,210,212,0.6), 1px -1px 2px rgba(109,210,212,0.8), -1px 1px 3px rgba(209,210,212,0.8), -1px 1px 1px rgba(125,210,212,0.8);
@@ -80,12 +80,12 @@ blockquote p{font-size: 100%;line-height:1.6;}
 
 @media (min-width:992px){
 #navbar #menu-top li.hr .line{width:380px}
-#page.home #navbar #menu-top li.hr .line{width:340px}
+#page.home #navbar #menu-top li.hr .line{width:240px}
 }
 
 @media (min-width:1200px){
 #navbar #menu-top li.hr .line{width:580px}
-#page.home #navbar #menu-top li.hr .line{width:540px}
+#page.home #navbar #menu-top li.hr .line{width:440px}
 }
 
 .block.title{pointer-events: none;padding:0px 0 0 20px;text-align: left;font-size: 100%;position:absolute;top:270px;left:0;width: 100%;z-index:9;-webkit-transition: top .5s;-moz-transition: top .5s; -o-transition: top .5s; transition: top .5s;}
