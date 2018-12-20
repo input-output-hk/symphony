@@ -171,7 +171,7 @@ export default class MainScene extends EventEmitter {
       .filter(block => block) // Remove null blocks
     const day = blocks[0].day
     const group = this.getGroupForDay(day)
-    group.hashRate = await getHashRateforDay(day)
+    group.hashRate = 0
     group.position.z = this.getPositionForDate(day)
     group.add(...obj3ds)
 
