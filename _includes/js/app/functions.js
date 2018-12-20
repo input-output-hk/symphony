@@ -283,6 +283,7 @@ function io_navbar() {
 	}
 
 	$(".navbar a,.block.title a").click(function(e){
+		if(!$(this).hasClass('noajax')){
 
 		e.preventDefault();
 		if(!$(this).hasClass('home')){
@@ -310,7 +311,7 @@ function io_navbar() {
 
 
 
-
+}
 	});
 }
 
