@@ -311,14 +311,14 @@ function io_intro_explorer () {
   $('#symphony_hud').html('<div id="welcome_text" class=""></div>')
 
 	// check that browser supports webgl
-  if (!orpheusApp.canRun) {
-    $('#welcome_text').html('<p>WebGL Error</p>')
-    $('.pane.left.bottom .update').html('<p>WebGL Error</p>')
-    setTimeout(function () {
-      $('#welcome_text').remove(); IOHP2()
-      $('.pane.left.bottom .update').remove(); IOHP2()
-    }, 1500)
-  }
+  // if (!orpheusApp.canRun) {
+  //   $('#welcome_text').html('<p>WebGL Error</p>')
+  //   $('.pane.left.bottom .update').html('<p>WebGL Error</p>')
+  //   setTimeout(function () {
+  //     $('#welcome_text').remove(); IOHP2()
+  //     $('.pane.left.bottom .update').remove(); IOHP2()
+  //   }, 1500)
+  // }
 
   //			<form id=symphony-search-form><input id=symphony-search-field type=text placeholder="Enter Block Hash..."> <button id=symphony-search-button>Go</button></form>
 
@@ -419,559 +419,559 @@ function io_intro_explorer () {
 
   /// //////////////////
   // Create the Orpeus App
-  orpheusApp({ path: '/static/assets/' }).then(app => {
-    window.app = app
-
-    window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
-    app.setSize(window.innerWidth, window.innerHeight)
-
-  /*
-    Destroys the Orpheus instance and unloads all data.
-    The application instance cannot be used after this is called
-  */
-  // app.destroy()
-    const goToNextBlock = app.goToBlock
-    const goToPrevBlock = app.goToBlock
-    window.goToNextBlock = goToNextBlock
-    window.goToPrevBlock = goToPrevBlock
-
-  	/*
-  		Event called when the first day loads
-  	*/
-    var days_loaded = 0
-    /*
-  	app.on('firstDayLoaded', data => {
-      console.log('first day of blocks loaded');
-
-      $("#intro_text").addClass('empty');
-      $("#welcome_text").addClass('off');
-      setTimeout(function(){
-        $("#welcome_text").html(intro_text);
-        $("#welcome_text").removeClass('off');
-      },1500);
-
-      //$("#intro_text").html(intro_text_pref+intro_text);
-      $(".io_timeline_day").click(function(e){
-        e.preventDefault();
-        var rel = $(this).attr('rel');
-        io_timeline_day(rel);
-      });
-      $(".datepicker").val('01/01/2018');
-      datepicker_init();
-    })
-    */
-    $('#symphony_hud').addClass('viewing-about')
-
-    $(".pane.bottom .opener").click(function(e){
-      if($(".pane.bottom").hasClass('off')){
-        if(!$(".pane.middle").hasClass('off')){
-          //app.resetDayView();
-          $(".pane.middle").addClass('off');
-        }
-      }
-      if($("#symphony_hud").hasClass('block-bottom-off')){
-        $("#symphony_hud").removeClass('block-bottom-off');
-      }else{
-        $("#symphony_hud").addClass('block-bottom-off');
-      }
-      if(!$('#symphony_hud').hasClass('viewing-about')){
-        $('#symphony_hud').addClass('viewing-about')
-      }else{
-        $('#symphony_hud').removeClass('viewing-about')
-      }
-    });
-
-    $("#navbar ul a").click(function(e){
-      app.audio.muteAudio()
-      app.destroy()
-    });
-
-
-    var featured_blocks_loaded = false;
-
-
-
-    function io_timeline_day (date) {
-      var date_arr = date.split('-')
-      app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-    }
-
-    function io_get_date_index (date) {
-      out = ''
-      for (var i = 0; i < daysOfYear.length; i++) {
-        if (date === daysOfYear[i]) {
-          out = i
-        }
-      }
-      return out
-    }
-
-  	/*
-  		Event called as a user scrolls through time and the current day changes
-  	*/
-
-    /*
-    $("#search-input-button").click(function(e){
-      e.preventDefault();
-      alert($("#search-field").val());
-      app.goToBlock($("#search-field").val());
-      //alert("fa");
-    });
-    */
-    $('.pane.left.middle').addClass('none');
-
-    app.on('dayChanged', ({ date, input, output, fee }) => {
-      days_loaded++
-      var date_prev = new Date()
-      var date_next = new Date()
-      date_prev.setDate(date.getDate() - 1)
-      date_next.setDate(date.getDate() + 1)
-
-      hudx = '\
-      <span class="glow nomobile"><img src="/static/assets/images/glow.png" alt="" /></span>\
-      <span class="link"></span>\
-      <a href="javascript:io_class_toggle(\'.pane.top\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><span class="on"><em class="fa fa-calendar nomobile"></em><em class="fa fa-info nodesktop"></em></span><span class="lab">Day View</span></a>\
-      <div class="inner">\
-      <h4 class="tit"><span>Bitcoin Blockchain</span> <br class="" /><i class="date">' + date_nice(date) + '</i></h4>\
-      <div class="ul">\
-      <div class="li"><small>Fee</small> <em class="fa fa-bitcoin"></em> <b>' + (fee / 100000000).toLocaleString('en') + '</b></div>\
-      <div class="li"><small>Total Input Value</small> <em class="fa fa-bitcoin"></em> <b>' + (input / 100000000).toLocaleString('en') + '</b></div>\
-      <div class="li"><small>Total Output Value</small> <em class="fa fa-bitcoin"></em> <b>' + (output / 100000000).toLocaleString('en') + '</b></div>\
-      </div>\
-      </div>'
-
-      date_selected = date
-      latest_block_date = hudx
-
-      if (days_loaded == 1) {
-        console.log('first day of blocks loaded')
-        $('#intro_text').addClass('empty')
-        //$('#welcome_text').addClass('off')
-        //$('.pane.left.bottom').addClass('off')
-        $('.sound_control').removeClass('off')
-        $('.pane.left.bottom').removeClass('none')
-        // $(".search_control").removeClass('none');
-        setTimeout(function () {
-          //$('#welcome_text').html(intro_text)
-          //$('#welcome_text').removeClass('off')
-          $('.pane.left.bottom .update').html(intro_text)
-          //$('.pane.left.bottom').removeClass('off')
-        }, 1500)
-      } else {
-        //$('#welcome_text').removeClass('off')
-        //$('.pane.left.bottom').removeClass('off')
-        if (blocks_selected > 0) {
-          $('#intro_text').addClass('empty').html('')
-          //$('#welcome_text').addClass('none').html('')
-          //$('.pane.left.bottom').addClass('off')
-          //$('.pane.left.bottom .update').html('')
-        }
-      }
-      $('.pane.left.bottom').removeClass('off')
-      $("#symphony_hud").removeClass('block-top-off');
-
-      $('.pane.left.top').removeClass('off').html(hudx)
-      $('.day_prev').attr('rel',date_prev.getFullYear() + '/' + date_prev.getMonth() + '/' + date_prev.getDate());
-      $('.day_next').attr('rel',date_next.getFullYear() + '/' + date_next.getMonth() + '/' + date_next.getDate());
-
-      $('.controls.top').removeClass('none');
-      $('.controls.top .date .date').html(date_nice(date));
-
-      if(!featured_blocks_loaded){
-        featured_blocks_loaded = true;
-        $('#featured').removeClass('none')
-
-        featured_blocks_list();
-      }
-
-
-            if(!loaded_block){
-
-                    if($('#symphony').hasClass('view-block')){
-                      $('#symphony').removeClass('view-block');
-                    }
-                    if(!$('#symphony').hasClass('view-day')){
-                      $('#symphony').addClass('view-day');
-                    }
-
-                    if(!$('#symphony_hud').hasClass('viewing-day')){
-                      $('#symphony_hud').addClass('viewing-day')
-                    }
-                    if($('#symphony_hud').hasClass('viewing-block')){
-                      $('#symphony_hud').removeClass('viewing-block')
-                    }
-
-
-            }
-
-
-      $('.datepicker').val(num_pad(date.getDate()) + '/' + num_pad(date.getMonth() + 1) + '/' + date.getFullYear())
-      datepicker_init()
-
-
-      $('.pane.top .opener').click(function (e) {
-        if($("#symphony_hud").hasClass('block-top-off')){
-          $("#symphony_hud").removeClass('block-top-off');
-        }else{
-          $("#symphony_hud").addClass('block-top-off');
-        }
-      })
-
-      $('.day_prev').click(function (e) {
-        e.preventDefault()
-        var rel = $(this).attr('rel')
-        var date_arr = rel.split('/')
-        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-      })
-      $('.day_next').click(function (e) {
-        e.preventDefault()
-        var rel = $(this).attr('rel')
-        var date_arr = rel.split('/')
-        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-      })
-      $('.nomobile .datepicker_icon').click(function (e) {
-        e.preventDefault()
-        $('#datepicker').datepicker('show')
-      })
-      $('.nodesktop .datepicker_icon').click(function (e) {
-        e.preventDefault()
-        $('#datepicker2').datepicker('show')
-      })
-      $('#loading_text').html('')
-      setTimeout(function () {
-        $('#loading_text').html('')
-      }, 5000)
-    })
-
-    /*
-    Event called when a block is selected
-    */
-  	app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
-    $('#intro_text').empty()
-    console.log('search opened')
-
-    loaded_block = true;
-
-    //$('#welcome_text').addClass('off')
-    //$('.pane.left.bottom').addClass('off')
-    setTimeout(function () {
-      //$('#welcome_text').addClass('none').html('')
-      //$('.pane.left.bottom .update').addClass('none').html('')
-    }, 1500)
-    if ($('#intro_text').hasClass('empty')) {
-      $('#intro_text').removeClass('empty')
-    }
-    blocks_selected++
-    if (blocks_selected == 1) {
-      //$('#intro_text').html(intro_text_pref + text_block_selected_first(time, n_tx))
-      $('.pane.left.bottom .update').html(intro_text_pref + text_block_selected_first(time, n_tx))
-    } else {
-      //$('#intro_text').html(intro_text_pref + text_block_selected(time, n_tx, output.toLocaleString('USD')))
-      $('.pane.left.bottom .update').html(intro_text_pref + text_block_selected(time, n_tx, output.toLocaleString('USD')))
-    }
-    hudx = '\
-    <span class="glow nomobile"><img src="/static/assets/images/glow.png" alt="" /></span>\
-      <span class="link"></span>\
-        <a href="javascript:io_class_toggle(\'.pane.middle\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><span class="on"><em class="fa fa-bitcoin nomobile"></em><em class="fa fa-info nodesktop"></em></span><span class="lab">Block details</span></a>\
-        <div class="inner">\
-        <h4 class="tit">Block ' + hash.substr(-16) + ' <br class="" /><i class="date">' + datetime_nice(time) + '</i></h4>\
-          <div class="ul">\
-          <div class="li"><small>Bits</small> ' + (bits / 100000000).toLocaleString('en') + '</div>\
-          <div class="li"><small>Fee</small> <em class="fa fa-bitcoin"></em> <b>' + (fee / 100000000).toLocaleString('en') + '</b></div>\
-          <div class="li"><small>Fee Level</small> ' + feeToInputRatio + '</div>\
-          <div class="li nomobile"><small>Block height</small> ' + height + '</div>\
-          <div class="li nomobile"><small>Block Hash</small> ' + hash.substr(-16) + '</div>\
-          <div class="li"><small>Total Input Value</small> <em class="fa fa-bitcoin"></em> <b>' + (input / 100000000).toLocaleString('en') + '</b></div>\
-          <div class="li"><small>Total Output Value</small> <em class="fa fa-bitcoin"></em> <b>' + (output / 100000000).toLocaleString('en') + '</b></div>\
-          <div class="li"><small>Number of Transactions</small> ' + n_tx + '</div>\
-          </div>\
-          <div class="controls text-center nomobile">\
-            <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
-            <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
-            <a href="#" title="Close block" class="block_close"><img src="/static/assets/images/close-block.svg" alt="Cancel" /></a>\
-          </div>\
-        </div>\
-        '
-      //$('#details').html(hudx)
-      $('.pane.left.middle').removeClass('none');
-      $('.pane.left.middle').removeClass('off').html(hudx)
-      $("#symphony_hud").removeClass('block-middle-off');
-
-
-      if (!$('.pane.left.bottom').hasClass('off')) {
-        $('.pane.left.bottom').addClass('off');
-      }
-      if($(document).width() < 768){
-        if (!$('.pane.left.top').hasClass('off')) {
-          $('.pane.left.top').addClass('off');
-        }
-        if (!$("#symphony_hud").hasClass('block-bottom-off')) {
-          $("#symphony_hud").addClass('block-bottom-off');
-        }
-
-      }
-
-
-      if($('#symphony').hasClass('view-day')){
-        $('#symphony').removeClass('view-day');
-      }
-      if(!$('#symphony').hasClass('view-block')){
-        $('#symphony').addClass('view-block');
-      }
-
-      if(!$('#symphony_hud').hasClass('viewing-block')){
-        $('#symphony_hud').addClass('viewing-block')
-      }
-      if($('#symphony_hud').hasClass('viewing-day')){
-        $('#symphony_hud').removeClass('viewing-day')
-      }
-
-
-      $('.block_prev').click(function (e) {
-        e.preventDefault()
-        app.goToPrevBlock()
-      })
-      $('.block_next').click(function (e) {
-        e.preventDefault()
-        app.goToNextBlock()
-      })
-      $('#details .back,.block_close').click(function (e) {
-        e.preventDefault();
-        $('.pane.left.middle').addClass('none');
-        app.resetDayView()
-      })
-
-      $(".pane.middle .opener").click(function(e){
-        if(!$(".pane.bottom").hasClass('off')){
-          //if(!$(".pane.middle").hasClass('off')){
-            //app.resetDayView();
-            $(".pane.bottom").addClass('off');
-          //}
-        }
-        if($("#symphony_hud").hasClass('block-middle-off')){
-          $("#symphony_hud").removeClass('block-middle-off');
-        }else{
-          $("#symphony_hud").addClass('block-middle-off');
-        }
-      });
-
-
-
-  	})
-
-
-    app.on('blockMouseOver', () => {
-      if($("#page").hasClass('home')){
-        document.body.style.cursor = "pointer";
-      }
-    })
-    app.on('blockMouseOut', () => {
-      if($("#page").hasClass('home')){
-        document.body.style.cursor = "default";
-      }
-    })
-
-    /**
-     * on iOS devices, the user must first interact with the page before any sound will play
-     */
-    app.audio.on('bgAudioLoaded', function () {
-      StartAudioContext(app.audio.context, '#stage')
-
-      var muteButton = document.querySelector('#mute')
-      if (muteButton) {
-        muteButton.addEventListener('click', function () {
-          app.audio.muteAudio()
-        })
-      }
-
-      var unMuteButton = document.querySelector('#unmute')
-      if (unMuteButton) {
-        unMuteButton.addEventListener('click', function () {
-          app.audio.unMuteAudio()
-        })
-      }
-
-      var muteButton2 = document.querySelector('#mute2')
-      if (muteButton2) {
-        muteButton2.addEventListener('click', function () {
-          app.audio.muteAudio()
-        })
-      }
-
-      var unMuteButton2 = document.querySelector('#unmute2')
-      if (unMuteButton2) {
-        unMuteButton2.addEventListener('click', function () {
-          app.audio.unMuteAudio()
-        })
-      }
-
-
-    })
-
-    const cameraMove = function (direction = 'positive', speedMultiplier = 1, lookatOffset = 1000) {
-      if (app.scrollBlocked) {
-        return
-      }
-      if (app.currentBlockObject) {
-        return
-      }
-
-      app.scrollBlocked = true
-
-      setTimeout(() => {
-        app.scrollBlocked = false
-      }, 50)
-
-      if (direction === 'positive') {
-        app.stage.targetCameraPos.z += app.stage.cameraMoveStep * speedMultiplier
-      } else {
-        app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * speedMultiplier
-      }
-
-      app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - lookatOffset
-    }
-
-    /**
-     * touch navigation
-     */
-    var stageEl = document.getElementById('stage')
-
-    var hammer = new Hammer(stageEl)
-    hammer.get('pinch').set({ enable: true })
-    hammer.on('pinchin', function (e) {
-      cameraMove('positive', 0.5)
-    })
-    hammer.on('pinchout', function (e) {
-      cameraMove('negative', 0.5)
-    })
-
-  	app.on('blockUnselected', _ => {
-      //$('#intro_text').addClass('empty').html('')
-      //$('#details').html(latest_block_date)
-      //$('.pane.top').html(latest_block_date)
-      loaded_block = false;
-      $('.pane.middle').addClass('none');
-      $('.datepicker').val(num_pad(date_selected.getDate()) + '/' + num_pad(date_selected.getMonth() + 1) + '/' + date_selected.getFullYear())
-      datepicker_init()
-
-      if(!$('#symphony').hasClass('view-day')){
-        $('#symphony').addClass('view-day');
-      }
-      if($('#symphony').hasClass('view-block')){
-        $('#symphony').removeClass('view-block');
-      }
-      if(!$('#symphony_hud').hasClass('viewing-day')){
-        $('#symphony_hud').addClass('viewing-day')
-      }
-      if($('#symphony_hud').hasClass('viewing-block')){
-        $('#symphony_hud').removeClass('viewing-block')
-      }
-
-      if($(document).width() < 768){
-        if ($('.pane.left.top').hasClass('off')) {
-          $('.pane.left.top').removeClass('off');
-        }
-      }
-
-
-      $('.nomobile .datepicker_icon').click(function (e) {
-        e.preventDefault()
-        $('#datepicker').datepicker('show')
-      })
-      $('.nodesktop .datepicker_icon').click(function (e) {
-        e.preventDefault()
-        $('#datepicker2').datepicker('show')
-      })
-
-      $('.day_prev').click(function (e) {
-        e.preventDefault()
-        var rel = $(this).attr('rel')
-        var date_arr = rel.split('/')
-        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-      })
-      $('.day_next').click(function (e) {
-        e.preventDefault()
-        var rel = $(this).attr('rel')
-        var date_arr = rel.split('/')
-        app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
-      })
-    })
-
-    var scrolled_once = 0
-    // move camera on z axis with mouse wheel
-    $("#symphony_hud").removeClass('block-bottom-off');
-
-    var symphony_scroll = true;
-
-    $("body").mousemove(function( e ) {
-      var featured = $('#featured');
-      var offset = featured.offset();
-      var offsetWidth = offset.left + featured.width();
-      var offsetHeight = offset.top + featured.height();
-
-      //var pageCoords = "( " + event.pageX + ", " + event.pageY + " )";
-      //var clientCoords = "( " + event.clientX + ", " + event.clientY + " )";
-
-      if(e.pageX >= offset.left && e.pageY >= offset.top &&
-        e.pageX <= offsetWidth && e.pageY <= offsetHeight) {
-
-        symphony_scroll = false;
-      }else {
-        symphony_scroll = true;
-      }
-      //$( "span:first" ).text( "( event.pageX, event.pageY ) : " + pageCoords );
-      //$( "span:last" ).text( "( event.clientX, event.clientY ) : " + clientCoords );
-
-    });
-
-    // move camera on z axis with mouse wheel
-    const onDocumentMouseWheel = function (event) {
-      if(symphony_scroll){
-        if (event.deltaY > 0) {
-          cameraMove('negative')
-        } else {
-          cameraMove('positive')
-        }
-        intro_scrolled += event.deltaY
-        if (blocks_selected == 0) {
-          scrolled_once++
-          if (scrolled_once == 1) {
-            //$('#welcome_text').addClass('off')
-            //$('.pane.left.bottom').addClass('off')
-            setTimeout(function () {
-              //$('#welcome_text').html(intro_onscroll)
-              //$('#welcome_text').removeClass('off')
-              $('.pane.left.bottom .update').html(intro_onscroll)
-              //$('.pane.left.bottom').removeClass('off')
-            }, 1500)
-          }
-        } else {
-          //$('#welcome_text').addClass('none').html('')
-          //$('.pane.left.bottom').addClass('off')
-          //$('.pane.left.bottom .update').html('')
-        }
-      }
-    }
-
-    document.addEventListener('wheel', onDocumentMouseWheel, false)
-    document.addEventListener('mousewheel', onDocumentMouseWheel, false)
-    window.onscroll = onDocumentMouseWheel
-
-    document.querySelector('#symphony-search-form').addEventListener('submit', function (e) {
-      e.preventDefault()
-      var searchInput = document.querySelector('#symphony-search-field')
-      console.log('search hit')
-      searchInput.value = searchInput.value.trim()
-
-      if (searchInput.value !== '') {
-        app.goToBlock(searchInput.value)
-          .then(function (data) {
-            console.log(data)
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
-      }
-    })
-  })
+  // orpheusApp({ path: '/static/assets/' }).then(app => {
+  //   window.app = app
+
+  //   window.addEventListener('resize', () => app.setSize(window.innerWidth, window.innerHeight))
+  //   app.setSize(window.innerWidth, window.innerHeight)
+
+  // /*
+  //   Destroys the Orpheus instance and unloads all data.
+  //   The application instance cannot be used after this is called
+  // */
+  // // app.destroy()
+  //   const goToNextBlock = app.goToBlock
+  //   const goToPrevBlock = app.goToBlock
+  //   window.goToNextBlock = goToNextBlock
+  //   window.goToPrevBlock = goToPrevBlock
+
+  // 	/*
+  // 		Event called when the first day loads
+  // 	*/
+  //   var days_loaded = 0
+  //   /*
+  // 	app.on('firstDayLoaded', data => {
+  //     console.log('first day of blocks loaded');
+
+  //     $("#intro_text").addClass('empty');
+  //     $("#welcome_text").addClass('off');
+  //     setTimeout(function(){
+  //       $("#welcome_text").html(intro_text);
+  //       $("#welcome_text").removeClass('off');
+  //     },1500);
+
+  //     //$("#intro_text").html(intro_text_pref+intro_text);
+  //     $(".io_timeline_day").click(function(e){
+  //       e.preventDefault();
+  //       var rel = $(this).attr('rel');
+  //       io_timeline_day(rel);
+  //     });
+  //     $(".datepicker").val('01/01/2018');
+  //     datepicker_init();
+  //   })
+  //   */
+  //   $('#symphony_hud').addClass('viewing-about')
+
+  //   $(".pane.bottom .opener").click(function(e){
+  //     if($(".pane.bottom").hasClass('off')){
+  //       if(!$(".pane.middle").hasClass('off')){
+  //         //app.resetDayView();
+  //         $(".pane.middle").addClass('off');
+  //       }
+  //     }
+  //     if($("#symphony_hud").hasClass('block-bottom-off')){
+  //       $("#symphony_hud").removeClass('block-bottom-off');
+  //     }else{
+  //       $("#symphony_hud").addClass('block-bottom-off');
+  //     }
+  //     if(!$('#symphony_hud').hasClass('viewing-about')){
+  //       $('#symphony_hud').addClass('viewing-about')
+  //     }else{
+  //       $('#symphony_hud').removeClass('viewing-about')
+  //     }
+  //   });
+
+  //   $("#navbar ul a").click(function(e){
+  //     app.audio.muteAudio()
+  //     app.destroy()
+  //   });
+
+
+  //   var featured_blocks_loaded = false;
+
+
+
+  //   function io_timeline_day (date) {
+  //     var date_arr = date.split('-')
+  //     app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+  //   }
+
+  //   function io_get_date_index (date) {
+  //     out = ''
+  //     for (var i = 0; i < daysOfYear.length; i++) {
+  //       if (date === daysOfYear[i]) {
+  //         out = i
+  //       }
+  //     }
+  //     return out
+  //   }
+
+  // 	/*
+  // 		Event called as a user scrolls through time and the current day changes
+  // 	*/
+
+  //   /*
+  //   $("#search-input-button").click(function(e){
+  //     e.preventDefault();
+  //     alert($("#search-field").val());
+  //     app.goToBlock($("#search-field").val());
+  //     //alert("fa");
+  //   });
+  //   */
+  //   $('.pane.left.middle').addClass('none');
+
+  //   app.on('dayChanged', ({ date, input, output, fee }) => {
+  //     days_loaded++
+  //     var date_prev = new Date()
+  //     var date_next = new Date()
+  //     date_prev.setDate(date.getDate() - 1)
+  //     date_next.setDate(date.getDate() + 1)
+
+  //     hudx = '\
+  //     <span class="glow nomobile"><img src="/static/assets/images/glow.png" alt="" /></span>\
+  //     <span class="link"></span>\
+  //     <a href="javascript:io_class_toggle(\'.pane.top\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><span class="on"><em class="fa fa-calendar nomobile"></em><em class="fa fa-info nodesktop"></em></span><span class="lab">Day View</span></a>\
+  //     <div class="inner">\
+  //     <h4 class="tit"><span>Bitcoin Blockchain</span> <br class="" /><i class="date">' + date_nice(date) + '</i></h4>\
+  //     <div class="ul">\
+  //     <div class="li"><small>Fee</small> <em class="fa fa-bitcoin"></em> <b>' + (fee / 100000000).toLocaleString('en') + '</b></div>\
+  //     <div class="li"><small>Total Input Value</small> <em class="fa fa-bitcoin"></em> <b>' + (input / 100000000).toLocaleString('en') + '</b></div>\
+  //     <div class="li"><small>Total Output Value</small> <em class="fa fa-bitcoin"></em> <b>' + (output / 100000000).toLocaleString('en') + '</b></div>\
+  //     </div>\
+  //     </div>'
+
+  //     date_selected = date
+  //     latest_block_date = hudx
+
+  //     if (days_loaded == 1) {
+  //       console.log('first day of blocks loaded')
+  //       $('#intro_text').addClass('empty')
+  //       //$('#welcome_text').addClass('off')
+  //       //$('.pane.left.bottom').addClass('off')
+  //       $('.sound_control').removeClass('off')
+  //       $('.pane.left.bottom').removeClass('none')
+  //       // $(".search_control").removeClass('none');
+  //       setTimeout(function () {
+  //         //$('#welcome_text').html(intro_text)
+  //         //$('#welcome_text').removeClass('off')
+  //         $('.pane.left.bottom .update').html(intro_text)
+  //         //$('.pane.left.bottom').removeClass('off')
+  //       }, 1500)
+  //     } else {
+  //       //$('#welcome_text').removeClass('off')
+  //       //$('.pane.left.bottom').removeClass('off')
+  //       if (blocks_selected > 0) {
+  //         $('#intro_text').addClass('empty').html('')
+  //         //$('#welcome_text').addClass('none').html('')
+  //         //$('.pane.left.bottom').addClass('off')
+  //         //$('.pane.left.bottom .update').html('')
+  //       }
+  //     }
+  //     $('.pane.left.bottom').removeClass('off')
+  //     $("#symphony_hud").removeClass('block-top-off');
+
+  //     $('.pane.left.top').removeClass('off').html(hudx)
+  //     $('.day_prev').attr('rel',date_prev.getFullYear() + '/' + date_prev.getMonth() + '/' + date_prev.getDate());
+  //     $('.day_next').attr('rel',date_next.getFullYear() + '/' + date_next.getMonth() + '/' + date_next.getDate());
+
+  //     $('.controls.top').removeClass('none');
+  //     $('.controls.top .date .date').html(date_nice(date));
+
+  //     if(!featured_blocks_loaded){
+  //       featured_blocks_loaded = true;
+  //       $('#featured').removeClass('none')
+
+  //       featured_blocks_list();
+  //     }
+
+
+  //           if(!loaded_block){
+
+  //                   if($('#symphony').hasClass('view-block')){
+  //                     $('#symphony').removeClass('view-block');
+  //                   }
+  //                   if(!$('#symphony').hasClass('view-day')){
+  //                     $('#symphony').addClass('view-day');
+  //                   }
+
+  //                   if(!$('#symphony_hud').hasClass('viewing-day')){
+  //                     $('#symphony_hud').addClass('viewing-day')
+  //                   }
+  //                   if($('#symphony_hud').hasClass('viewing-block')){
+  //                     $('#symphony_hud').removeClass('viewing-block')
+  //                   }
+
+
+  //           }
+
+
+  //     $('.datepicker').val(num_pad(date.getDate()) + '/' + num_pad(date.getMonth() + 1) + '/' + date.getFullYear())
+  //     datepicker_init()
+
+
+  //     $('.pane.top .opener').click(function (e) {
+  //       if($("#symphony_hud").hasClass('block-top-off')){
+  //         $("#symphony_hud").removeClass('block-top-off');
+  //       }else{
+  //         $("#symphony_hud").addClass('block-top-off');
+  //       }
+  //     })
+
+  //     $('.day_prev').click(function (e) {
+  //       e.preventDefault()
+  //       var rel = $(this).attr('rel')
+  //       var date_arr = rel.split('/')
+  //       app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+  //     })
+  //     $('.day_next').click(function (e) {
+  //       e.preventDefault()
+  //       var rel = $(this).attr('rel')
+  //       var date_arr = rel.split('/')
+  //       app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+  //     })
+  //     $('.nomobile .datepicker_icon').click(function (e) {
+  //       e.preventDefault()
+  //       $('#datepicker').datepicker('show')
+  //     })
+  //     $('.nodesktop .datepicker_icon').click(function (e) {
+  //       e.preventDefault()
+  //       $('#datepicker2').datepicker('show')
+  //     })
+  //     $('#loading_text').html('')
+  //     setTimeout(function () {
+  //       $('#loading_text').html('')
+  //     }, 5000)
+  //   })
+
+  //   /*
+  //   Event called when a block is selected
+  //   */
+  // 	app.on('blockSelected', ({ bits, fee, feeToInputRatio, hash, height, input, n_tx, output, size, time }) => {
+  //   $('#intro_text').empty()
+  //   console.log('search opened')
+
+  //   loaded_block = true;
+
+  //   //$('#welcome_text').addClass('off')
+  //   //$('.pane.left.bottom').addClass('off')
+  //   setTimeout(function () {
+  //     //$('#welcome_text').addClass('none').html('')
+  //     //$('.pane.left.bottom .update').addClass('none').html('')
+  //   }, 1500)
+  //   if ($('#intro_text').hasClass('empty')) {
+  //     $('#intro_text').removeClass('empty')
+  //   }
+  //   blocks_selected++
+  //   if (blocks_selected == 1) {
+  //     //$('#intro_text').html(intro_text_pref + text_block_selected_first(time, n_tx))
+  //     $('.pane.left.bottom .update').html(intro_text_pref + text_block_selected_first(time, n_tx))
+  //   } else {
+  //     //$('#intro_text').html(intro_text_pref + text_block_selected(time, n_tx, output.toLocaleString('USD')))
+  //     $('.pane.left.bottom .update').html(intro_text_pref + text_block_selected(time, n_tx, output.toLocaleString('USD')))
+  //   }
+  //   hudx = '\
+  //   <span class="glow nomobile"><img src="/static/assets/images/glow.png" alt="" /></span>\
+  //     <span class="link"></span>\
+  //       <a href="javascript:io_class_toggle(\'.pane.middle\',\'off\')" class="opener"><span class="off"><em class="icon-arrow-left nomobile"></em><em class="icon-arrow-down nodesktop"></em></span><span class="on"><em class="fa fa-bitcoin nomobile"></em><em class="fa fa-info nodesktop"></em></span><span class="lab">Block details</span></a>\
+  //       <div class="inner">\
+  //       <h4 class="tit">Block ' + hash.substr(-16) + ' <br class="" /><i class="date">' + datetime_nice(time) + '</i></h4>\
+  //         <div class="ul">\
+  //         <div class="li"><small>Bits</small> ' + (bits / 100000000).toLocaleString('en') + '</div>\
+  //         <div class="li"><small>Fee</small> <em class="fa fa-bitcoin"></em> <b>' + (fee / 100000000).toLocaleString('en') + '</b></div>\
+  //         <div class="li"><small>Fee Level</small> ' + feeToInputRatio + '</div>\
+  //         <div class="li nomobile"><small>Block height</small> ' + height + '</div>\
+  //         <div class="li nomobile"><small>Block Hash</small> ' + hash.substr(-16) + '</div>\
+  //         <div class="li"><small>Total Input Value</small> <em class="fa fa-bitcoin"></em> <b>' + (input / 100000000).toLocaleString('en') + '</b></div>\
+  //         <div class="li"><small>Total Output Value</small> <em class="fa fa-bitcoin"></em> <b>' + (output / 100000000).toLocaleString('en') + '</b></div>\
+  //         <div class="li"><small>Number of Transactions</small> ' + n_tx + '</div>\
+  //         </div>\
+  //         <div class="controls text-center nomobile">\
+  //           <a href="#" title="Previous block" class="block_prev"><img src="/static/assets/images/arrow-left.svg" alt="Prev" /></a>\
+  //           <a href="#" title="Next block" class="block_next"><img src="/static/assets/images/arrow-right.svg" alt="Next" /></a>\
+  //           <a href="#" title="Close block" class="block_close"><img src="/static/assets/images/close-block.svg" alt="Cancel" /></a>\
+  //         </div>\
+  //       </div>\
+  //       '
+  //     //$('#details').html(hudx)
+  //     $('.pane.left.middle').removeClass('none');
+  //     $('.pane.left.middle').removeClass('off').html(hudx)
+  //     $("#symphony_hud").removeClass('block-middle-off');
+
+
+  //     if (!$('.pane.left.bottom').hasClass('off')) {
+  //       $('.pane.left.bottom').addClass('off');
+  //     }
+  //     if($(document).width() < 768){
+  //       if (!$('.pane.left.top').hasClass('off')) {
+  //         $('.pane.left.top').addClass('off');
+  //       }
+  //       if (!$("#symphony_hud").hasClass('block-bottom-off')) {
+  //         $("#symphony_hud").addClass('block-bottom-off');
+  //       }
+
+  //     }
+
+
+  //     if($('#symphony').hasClass('view-day')){
+  //       $('#symphony').removeClass('view-day');
+  //     }
+  //     if(!$('#symphony').hasClass('view-block')){
+  //       $('#symphony').addClass('view-block');
+  //     }
+
+  //     if(!$('#symphony_hud').hasClass('viewing-block')){
+  //       $('#symphony_hud').addClass('viewing-block')
+  //     }
+  //     if($('#symphony_hud').hasClass('viewing-day')){
+  //       $('#symphony_hud').removeClass('viewing-day')
+  //     }
+
+
+  //     $('.block_prev').click(function (e) {
+  //       e.preventDefault()
+  //       app.goToPrevBlock()
+  //     })
+  //     $('.block_next').click(function (e) {
+  //       e.preventDefault()
+  //       app.goToNextBlock()
+  //     })
+  //     $('#details .back,.block_close').click(function (e) {
+  //       e.preventDefault();
+  //       $('.pane.left.middle').addClass('none');
+  //       app.resetDayView()
+  //     })
+
+  //     $(".pane.middle .opener").click(function(e){
+  //       if(!$(".pane.bottom").hasClass('off')){
+  //         //if(!$(".pane.middle").hasClass('off')){
+  //           //app.resetDayView();
+  //           $(".pane.bottom").addClass('off');
+  //         //}
+  //       }
+  //       if($("#symphony_hud").hasClass('block-middle-off')){
+  //         $("#symphony_hud").removeClass('block-middle-off');
+  //       }else{
+  //         $("#symphony_hud").addClass('block-middle-off');
+  //       }
+  //     });
+
+
+
+  // 	})
+
+
+  //   app.on('blockMouseOver', () => {
+  //     if($("#page").hasClass('home')){
+  //       document.body.style.cursor = "pointer";
+  //     }
+  //   })
+  //   app.on('blockMouseOut', () => {
+  //     if($("#page").hasClass('home')){
+  //       document.body.style.cursor = "default";
+  //     }
+  //   })
+
+  //   /**
+  //    * on iOS devices, the user must first interact with the page before any sound will play
+  //    */
+  //   app.audio.on('bgAudioLoaded', function () {
+  //     StartAudioContext(app.audio.context, '#stage')
+
+  //     var muteButton = document.querySelector('#mute')
+  //     if (muteButton) {
+  //       muteButton.addEventListener('click', function () {
+  //         app.audio.muteAudio()
+  //       })
+  //     }
+
+  //     var unMuteButton = document.querySelector('#unmute')
+  //     if (unMuteButton) {
+  //       unMuteButton.addEventListener('click', function () {
+  //         app.audio.unMuteAudio()
+  //       })
+  //     }
+
+  //     var muteButton2 = document.querySelector('#mute2')
+  //     if (muteButton2) {
+  //       muteButton2.addEventListener('click', function () {
+  //         app.audio.muteAudio()
+  //       })
+  //     }
+
+  //     var unMuteButton2 = document.querySelector('#unmute2')
+  //     if (unMuteButton2) {
+  //       unMuteButton2.addEventListener('click', function () {
+  //         app.audio.unMuteAudio()
+  //       })
+  //     }
+
+
+  //   })
+
+  //   const cameraMove = function (direction = 'positive', speedMultiplier = 1, lookatOffset = 1000) {
+  //     if (app.scrollBlocked) {
+  //       return
+  //     }
+  //     if (app.currentBlockObject) {
+  //       return
+  //     }
+
+  //     app.scrollBlocked = true
+
+  //     setTimeout(() => {
+  //       app.scrollBlocked = false
+  //     }, 50)
+
+  //     if (direction === 'positive') {
+  //       app.stage.targetCameraPos.z += app.stage.cameraMoveStep * speedMultiplier
+  //     } else {
+  //       app.stage.targetCameraPos.z -= app.stage.cameraMoveStep * speedMultiplier
+  //     }
+
+  //     app.stage.targetCameraLookAt.z = app.stage.targetCameraPos.z - lookatOffset
+  //   }
+
+  //   /**
+  //    * touch navigation
+  //    */
+  //   var stageEl = document.getElementById('stage')
+
+  //   var hammer = new Hammer(stageEl)
+  //   hammer.get('pinch').set({ enable: true })
+  //   hammer.on('pinchin', function (e) {
+  //     cameraMove('positive', 0.5)
+  //   })
+  //   hammer.on('pinchout', function (e) {
+  //     cameraMove('negative', 0.5)
+  //   })
+
+  // 	app.on('blockUnselected', _ => {
+  //     //$('#intro_text').addClass('empty').html('')
+  //     //$('#details').html(latest_block_date)
+  //     //$('.pane.top').html(latest_block_date)
+  //     loaded_block = false;
+  //     $('.pane.middle').addClass('none');
+  //     $('.datepicker').val(num_pad(date_selected.getDate()) + '/' + num_pad(date_selected.getMonth() + 1) + '/' + date_selected.getFullYear())
+  //     datepicker_init()
+
+  //     if(!$('#symphony').hasClass('view-day')){
+  //       $('#symphony').addClass('view-day');
+  //     }
+  //     if($('#symphony').hasClass('view-block')){
+  //       $('#symphony').removeClass('view-block');
+  //     }
+  //     if(!$('#symphony_hud').hasClass('viewing-day')){
+  //       $('#symphony_hud').addClass('viewing-day')
+  //     }
+  //     if($('#symphony_hud').hasClass('viewing-block')){
+  //       $('#symphony_hud').removeClass('viewing-block')
+  //     }
+
+  //     if($(document).width() < 768){
+  //       if ($('.pane.left.top').hasClass('off')) {
+  //         $('.pane.left.top').removeClass('off');
+  //       }
+  //     }
+
+
+  //     $('.nomobile .datepicker_icon').click(function (e) {
+  //       e.preventDefault()
+  //       $('#datepicker').datepicker('show')
+  //     })
+  //     $('.nodesktop .datepicker_icon').click(function (e) {
+  //       e.preventDefault()
+  //       $('#datepicker2').datepicker('show')
+  //     })
+
+  //     $('.day_prev').click(function (e) {
+  //       e.preventDefault()
+  //       var rel = $(this).attr('rel')
+  //       var date_arr = rel.split('/')
+  //       app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+  //     })
+  //     $('.day_next').click(function (e) {
+  //       e.preventDefault()
+  //       var rel = $(this).attr('rel')
+  //       var date_arr = rel.split('/')
+  //       app.setDate(new Date(date_arr[0], date_arr[1], date_arr[2]))
+  //     })
+  //   })
+
+  //   var scrolled_once = 0
+  //   // move camera on z axis with mouse wheel
+  //   $("#symphony_hud").removeClass('block-bottom-off');
+
+  //   var symphony_scroll = true;
+
+  //   $("body").mousemove(function( e ) {
+  //     var featured = $('#featured');
+  //     var offset = featured.offset();
+  //     var offsetWidth = offset.left + featured.width();
+  //     var offsetHeight = offset.top + featured.height();
+
+  //     //var pageCoords = "( " + event.pageX + ", " + event.pageY + " )";
+  //     //var clientCoords = "( " + event.clientX + ", " + event.clientY + " )";
+
+  //     if(e.pageX >= offset.left && e.pageY >= offset.top &&
+  //       e.pageX <= offsetWidth && e.pageY <= offsetHeight) {
+
+  //       symphony_scroll = false;
+  //     }else {
+  //       symphony_scroll = true;
+  //     }
+  //     //$( "span:first" ).text( "( event.pageX, event.pageY ) : " + pageCoords );
+  //     //$( "span:last" ).text( "( event.clientX, event.clientY ) : " + clientCoords );
+
+  //   });
+
+  //   // move camera on z axis with mouse wheel
+  //   const onDocumentMouseWheel = function (event) {
+  //     if(symphony_scroll){
+  //       if (event.deltaY > 0) {
+  //         cameraMove('negative')
+  //       } else {
+  //         cameraMove('positive')
+  //       }
+  //       intro_scrolled += event.deltaY
+  //       if (blocks_selected == 0) {
+  //         scrolled_once++
+  //         if (scrolled_once == 1) {
+  //           //$('#welcome_text').addClass('off')
+  //           //$('.pane.left.bottom').addClass('off')
+  //           setTimeout(function () {
+  //             //$('#welcome_text').html(intro_onscroll)
+  //             //$('#welcome_text').removeClass('off')
+  //             $('.pane.left.bottom .update').html(intro_onscroll)
+  //             //$('.pane.left.bottom').removeClass('off')
+  //           }, 1500)
+  //         }
+  //       } else {
+  //         //$('#welcome_text').addClass('none').html('')
+  //         //$('.pane.left.bottom').addClass('off')
+  //         //$('.pane.left.bottom .update').html('')
+  //       }
+  //     }
+  //   }
+
+  //   document.addEventListener('wheel', onDocumentMouseWheel, false)
+  //   document.addEventListener('mousewheel', onDocumentMouseWheel, false)
+  //   window.onscroll = onDocumentMouseWheel
+
+  //   document.querySelector('#symphony-search-form').addEventListener('submit', function (e) {
+  //     e.preventDefault()
+  //     var searchInput = document.querySelector('#symphony-search-field')
+  //     console.log('search hit')
+  //     searchInput.value = searchInput.value.trim()
+
+  //     if (searchInput.value !== '') {
+  //       app.goToBlock(searchInput.value)
+  //         .then(function (data) {
+  //           console.log(data)
+  //         })
+  //         .catch(function (error) {
+  //           console.log(error)
+  //         })
+  //     }
+  //   })
+  // })
 }

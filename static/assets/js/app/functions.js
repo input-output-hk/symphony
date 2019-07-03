@@ -503,216 +503,216 @@ function io_which_way_alter(){
 		}
 	}
 
-	//gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
-	//console.log(chosen);
-		if(chosen != 'home'){
-			$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
-				var config = {
-	          git: {
-							owner: 'input-output-hk',
-	            repo: 'symphony',
-	            commitHash: '', // hash of commit to load
-	            commitDate: '', // date to load (YYYY-MM-DD)
-	            loadLatest: true // load latest commit in db
-	          },
-	          display: {
-	            showUI: false,
-							customUI: false,
-							showSidebar: false
-	          },
-	          FDG: {
-	            nodeSpritePath: '/static/assets/textures/gource/dot.png', // path to node texture
-	            nodeUpdatedSpritePath: '/static/assets/textures/gource/dot-concentric.png', // path to node updated state texture
-	            fontTexturePath: '/static/assets/textures/gource/UbuntuMono.png', // path to font texture
-	 						nodeSpritePathBlur: '/static/assets/textures/gource/dot-blur.png', // path to blur node texture
-	            autoPlay: false,
-	            delayAmount: 1500, // time in between new commits being added to the graph
-	            sphereProject: 0, // project graph onto sphere? 1 == true, 0 == false
-	            sphereRadius: 700, // radius of sphere if in sphere projection mode
-	            showFilePaths: true, // display filepath overlay on nodes
-	            colorCooldownSpeed: 0.05, // speed at which node colors cycle
-	            cycleColors: false, // cycle colors based on file edit time from red to blue to white
-	            colorPalette: [ // colors to use if cycleColors is switched off (colors cannot contain)
-	              '#eb2256',
-	              '#f69ab3',
-	              '#1746a0',
-	              '#6f9cef',
-	              '#652b91',
-	              '#0e5c8d',
-	              '#1fc1c3'
-	            ]
-	          },
-						scene: {
-	            fullScreen: true,
-	            width: 800,
-	            height: 600,
-	            bgColor: 0x121327,
-	            antialias: false,
-	            canvasID: 'gource-stage', // ID of webgl canvas element
-	            autoRotate: false, // auto rotate camera around target
-	            autoRotateSpeed: 0.0 // speed of auto rotation
-	          },
-	          post: {
-	            vignette: true
-	          },
-	          camera: {
-	            fov: 45,
-	            initPos: {x: 0, y: 0, z: 600}
-	          }
-	        }
-					if (gource.canRun()) {
-            gource.init(config).on('ready', function() {
+	// //gource.iohk.io/client/build/static/js/gource.main.2e291bb8.js
+	// //console.log(chosen);
+	// 	if(chosen != 'home'){
+	// 		$.getScript( "//gource.iohk.io/client/build/static/js/gource.main.js", function( data, textStatus, jqxhr ) {
+	// 			var config = {
+	//           git: {
+	// 						owner: 'input-output-hk',
+	//             repo: 'symphony',
+	//             commitHash: '', // hash of commit to load
+	//             commitDate: '', // date to load (YYYY-MM-DD)
+	//             loadLatest: true // load latest commit in db
+	//           },
+	//           display: {
+	//             showUI: false,
+	// 						customUI: false,
+	// 						showSidebar: false
+	//           },
+	//           FDG: {
+	//             nodeSpritePath: '/static/assets/textures/gource/dot.png', // path to node texture
+	//             nodeUpdatedSpritePath: '/static/assets/textures/gource/dot-concentric.png', // path to node updated state texture
+	//             fontTexturePath: '/static/assets/textures/gource/UbuntuMono.png', // path to font texture
+	//  						nodeSpritePathBlur: '/static/assets/textures/gource/dot-blur.png', // path to blur node texture
+	//             autoPlay: false,
+	//             delayAmount: 1500, // time in between new commits being added to the graph
+	//             sphereProject: 0, // project graph onto sphere? 1 == true, 0 == false
+	//             sphereRadius: 700, // radius of sphere if in sphere projection mode
+	//             showFilePaths: true, // display filepath overlay on nodes
+	//             colorCooldownSpeed: 0.05, // speed at which node colors cycle
+	//             cycleColors: false, // cycle colors based on file edit time from red to blue to white
+	//             colorPalette: [ // colors to use if cycleColors is switched off (colors cannot contain)
+	//               '#eb2256',
+	//               '#f69ab3',
+	//               '#1746a0',
+	//               '#6f9cef',
+	//               '#652b91',
+	//               '#0e5c8d',
+	//               '#1fc1c3'
+	//             ]
+	//           },
+	// 					scene: {
+	//             fullScreen: true,
+	//             width: 800,
+	//             height: 600,
+	//             bgColor: 0x121327,
+	//             antialias: false,
+	//             canvasID: 'gource-stage', // ID of webgl canvas element
+	//             autoRotate: false, // auto rotate camera around target
+	//             autoRotateSpeed: 0.0 // speed of auto rotation
+	//           },
+	//           post: {
+	//             vignette: true
+	//           },
+	//           camera: {
+	//             fov: 45,
+	//             initPos: {x: 0, y: 0, z: 600}
+	//           }
+	//         }
+	// 				if (gource.canRun()) {
+    //         gource.init(config).on('ready', function() {
 
-							function commitInfo(data){
-								return '\
-								<ul onclick="javascript:io_class_toggle(\'#gource-box\',\'infohidden\')">\
-								<li class="msg"><small>Msg: </small><b>'+data.msg+'</b></li>\
-								<li class="date"><small>Date: </small><b>'+data.date+'</b></li>\
-								<li class="author"><small>Author: </small><b>'+data.author+'</b></li>\
-								<li class="added"><small>Added: </small><b>'+data.added+'</b></li>\
-								<li class="changed"><small>Changed: </small><b>'+data.changed+'</b></li>\
-								<li class="removed"><small>Removed: </small><b>'+data.removed+'</b></li>\
-								<li class="hash"><small>Hash: </small><b><a href="https://github.com/'+config.git.owner+'/'+config.git.repo+'/commit/'+data.hash+'" target="_blank">'+data.hash+' <em class="icon-link"></em></a></b></li>\
-								</ul>\
-								';
-							}
-
-
-							$(".commit--switcher a.prev").click(function(){
-								gource.goToPrev()
-							})
-							$(".commit--switcher a.next").click(function(){
-								gource.goToNext()
-							})
-
-							$(".view--switcher a.normal").click(function(){
-								gource.setSphereView(false);
-							})
-							$(".view--switcher a.sphere").click(function(){
-								gource.setSphereView(true);
-							})
-							$(".play--switcher a.play").click(function(){
-								gource.setPlay(true);
-							})
-							$(".play--switcher a.stop").click(function(){
-								gource.setPlay(false);
-							})
+	// 						function commitInfo(data){
+	// 							return '\
+	// 							<ul onclick="javascript:io_class_toggle(\'#gource-box\',\'infohidden\')">\
+	// 							<li class="msg"><small>Msg: </small><b>'+data.msg+'</b></li>\
+	// 							<li class="date"><small>Date: </small><b>'+data.date+'</b></li>\
+	// 							<li class="author"><small>Author: </small><b>'+data.author+'</b></li>\
+	// 							<li class="added"><small>Added: </small><b>'+data.added+'</b></li>\
+	// 							<li class="changed"><small>Changed: </small><b>'+data.changed+'</b></li>\
+	// 							<li class="removed"><small>Removed: </small><b>'+data.removed+'</b></li>\
+	// 							<li class="hash"><small>Hash: </small><b><a href="https://github.com/'+config.git.owner+'/'+config.git.repo+'/commit/'+data.hash+'" target="_blank">'+data.hash+' <em class="icon-link"></em></a></b></li>\
+	// 							</ul>\
+	// 							';
+	// 						}
 
 
-							var commitFirst = new Object();
-							var commitLast = new Object();
+	// 						$(".commit--switcher a.prev").click(function(){
+	// 							gource.goToPrev()
+	// 						})
+	// 						$(".commit--switcher a.next").click(function(){
+	// 							gource.goToNext()
+	// 						})
 
-							gource.getFirstCommit().then(data => {
-			            //console.log(data)
-									commitFirst = data;
-									gource.getlastCommit().then(data => {
-										commitLast = data;
+	// 						$(".view--switcher a.normal").click(function(){
+	// 							gource.setSphereView(false);
+	// 						})
+	// 						$(".view--switcher a.sphere").click(function(){
+	// 							gource.setSphereView(true);
+	// 						})
+	// 						$(".play--switcher a.play").click(function(){
+	// 							gource.setPlay(true);
+	// 						})
+	// 						$(".play--switcher a.stop").click(function(){
+	// 							gource.setPlay(false);
+	// 						})
 
-										$("#gource-box .opener").removeClass('opa0');
 
-										var min_val = commitFirst.date/1000;
-										var max_val = commitLast.date/1000;
+	// 						var commitFirst = new Object();
+	// 						var commitLast = new Object();
 
-										function zeroPad(num, places) {
-										  var zero = places - num.toString().length + 1;
-										  return Array(+(zero > 0 && zero)).join("0") + num;
-										}
-										function formatNice(__dt) {
-										    var year = __dt.getFullYear();
-										    var month = zeroPad(__dt.getMonth()+1, 2);
-										    var date = zeroPad(__dt.getDate(), 2);
-										    return  date+'. '+month+'. '+year;
-										}
-										function formatBot(__dt) {
-										    var year = __dt.getFullYear();
-										    var month = zeroPad(__dt.getMonth()+1, 2);
-										    var date = zeroPad(__dt.getDate(), 2);
-										    return  year+'-'+month+'-'+date;
-										}
-										var manual = true;
-										$( ".date--slider.normal" ).slider({
-											min: min_val,
-											max: max_val,
-											value: min_val,
-											slide: function( event, ui ) {
-												manual = true;
-												var dt_cur_from = new Date(ui.value*1000);
-												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-											}
-											,
-											change: function( event, ui ) {
-												var dt_cur_from = new Date(ui.value*1000);
-												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-												if(manual){
-													gource.setDate(formatBot(dt_cur_from));
-												}
-											},
-											create: function( event, ui ) {
-												var dt_cur_from = new Date(min_val*1000);
-												$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-												$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
-											}
-										});
-										var end = new Date(commitLast.date);
-										console.log(formatBot(end))
-										//gource.setDate(formatBot(end));
-										$('.datepicker').datepicker({
-											dateFormat: 'yy-mm-dd',
-											maxDate: new Date(max_val*1000),
-											minDate: new Date(min_val*1000),
-											beforeShow: function () {
-												$(this).datepicker('widget').wrap('<div class="ll-skin-melon">')
-											},
-											onSelect: function (dateText, inst) {
-												gource.setDate(dateText);
-											},
-											onClose: function () {
-													// $(this).datepicker("widget").removeClass("ll-skin-melon");
-											}
-										})
-										$('.datepicker_icon').click(function (e) {
-							        e.preventDefault()
-							        $('#datepicker').datepicker('show')
-							      })
+	// 						gource.getFirstCommit().then(data => {
+	// 		            //console.log(data)
+	// 								commitFirst = data;
+	// 								gource.getlastCommit().then(data => {
+	// 									commitLast = data;
 
-										gource.on('commitChanged', (data) => {
-											manual = false;
-											//console.log(data)
-											var pos = Date.parse(data.date)/1000;
-											$( ".date--slider" ).slider( "value", pos );
+	// 									$("#gource-box .opener").removeClass('opa0');
 
-											if(data.index == 0){
-												$("#gource-box").addClass('commit-first');
-											}else{
-												if($("#gource-box").hasClass('commit-first')){
-													$("#gource-box").removeClass('commit-first');
-												}
-											}
-											if(data.index == commitLast.index){
-												$("#gource-box").addClass('commit-last');
-											}else{
-												if($("#gource-box").hasClass('commit-last')){
-													$("#gource-box").removeClass('commit-last');
-												}
-											}
-											if(commitLast.index == data.index){
-												$("#gource-box").removeClass('playing');
-											}
-											$("#gource-box .infopanel .inner").html(commitInfo(data));
-										})
+	// 									var min_val = commitFirst.date/1000;
+	// 									var max_val = commitLast.date/1000;
 
-								})
-							})
+	// 									function zeroPad(num, places) {
+	// 									  var zero = places - num.toString().length + 1;
+	// 									  return Array(+(zero > 0 && zero)).join("0") + num;
+	// 									}
+	// 									function formatNice(__dt) {
+	// 									    var year = __dt.getFullYear();
+	// 									    var month = zeroPad(__dt.getMonth()+1, 2);
+	// 									    var date = zeroPad(__dt.getDate(), 2);
+	// 									    return  date+'. '+month+'. '+year;
+	// 									}
+	// 									function formatBot(__dt) {
+	// 									    var year = __dt.getFullYear();
+	// 									    var month = zeroPad(__dt.getMonth()+1, 2);
+	// 									    var date = zeroPad(__dt.getDate(), 2);
+	// 									    return  year+'-'+month+'-'+date;
+	// 									}
+	// 									var manual = true;
+	// 									$( ".date--slider.normal" ).slider({
+	// 										min: min_val,
+	// 										max: max_val,
+	// 										value: min_val,
+	// 										slide: function( event, ui ) {
+	// 											manual = true;
+	// 											var dt_cur_from = new Date(ui.value*1000);
+	// 											$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 											$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 										}
+	// 										,
+	// 										change: function( event, ui ) {
+	// 											var dt_cur_from = new Date(ui.value*1000);
+	// 											$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 											$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 											if(manual){
+	// 												gource.setDate(formatBot(dt_cur_from));
+	// 											}
+	// 										},
+	// 										create: function( event, ui ) {
+	// 											var dt_cur_from = new Date(min_val*1000);
+	// 											$(".date--slider.normal").find(".ui-slider-handle").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 											$(".date--mobile").html('<span class="lab">'+formatNice(dt_cur_from)+'</span>');
+	// 										}
+	// 									});
+	// 									var end = new Date(commitLast.date);
+	// 									console.log(formatBot(end))
+	// 									//gource.setDate(formatBot(end));
+	// 									$('.datepicker').datepicker({
+	// 										dateFormat: 'yy-mm-dd',
+	// 										maxDate: new Date(max_val*1000),
+	// 										minDate: new Date(min_val*1000),
+	// 										beforeShow: function () {
+	// 											$(this).datepicker('widget').wrap('<div class="ll-skin-melon">')
+	// 										},
+	// 										onSelect: function (dateText, inst) {
+	// 											gource.setDate(dateText);
+	// 										},
+	// 										onClose: function () {
+	// 												// $(this).datepicker("widget").removeClass("ll-skin-melon");
+	// 										}
+	// 									})
+	// 									$('.datepicker_icon').click(function (e) {
+	// 						        e.preventDefault()
+	// 						        $('#datepicker').datepicker('show')
+	// 						      })
 
-						}
-					});
-					//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
+	// 									gource.on('commitChanged', (data) => {
+	// 										manual = false;
+	// 										//console.log(data)
+	// 										var pos = Date.parse(data.date)/1000;
+	// 										$( ".date--slider" ).slider( "value", pos );
 
-			});
+	// 										if(data.index == 0){
+	// 											$("#gource-box").addClass('commit-first');
+	// 										}else{
+	// 											if($("#gource-box").hasClass('commit-first')){
+	// 												$("#gource-box").removeClass('commit-first');
+	// 											}
+	// 										}
+	// 										if(data.index == commitLast.index){
+	// 											$("#gource-box").addClass('commit-last');
+	// 										}else{
+	// 											if($("#gource-box").hasClass('commit-last')){
+	// 												$("#gource-box").removeClass('commit-last');
+	// 											}
+	// 										}
+	// 										if(commitLast.index == data.index){
+	// 											$("#gource-box").removeClass('playing');
+	// 										}
+	// 										$("#gource-box .infopanel .inner").html(commitInfo(data));
+	// 									})
 
-		}
+	// 							})
+	// 						})
+
+	// 					}
+	// 				});
+	// 				//$( ".date--current" ).text( "$" + $( "#date--slider" ).slider( "value" ) );
+
+	// 		});
+
+	// 	}
 
 
 

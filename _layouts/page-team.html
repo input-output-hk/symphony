@@ -31,8 +31,8 @@ layout: page-team
                 <div id="team-load" class="ready">
 
 
-
-                    {% for member in site.pages %}
+                    {% assign items = site.pages | sort: 'order' %}
+                    {% for member in items %}
                         {% if member.parent == 'team' %}
 
                             <div class="profile team {{member.key}} smaller">
