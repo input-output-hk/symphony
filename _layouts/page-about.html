@@ -23,28 +23,30 @@ layout: page-about
               <div class="container">
                 <div class="entry centerline">
 
-
                   <div class="item top"></div>
 
                   <h2>The Blockchain as art</h2>
 
                   <blockquote>
-                    <p>Symphony of Blockchain is an interactive, visual and auditory exploration of bitcoin, cryptocurrency and the blockchain. The project is a research initiative that aims to bring about greater understanding of blockchain technology. We hope to inspire a wide audience by representing blockchain data in new and innovative ways.</p>
+                    <p>The Symphony project began with a question: how do we represent blockchain technology in a way that is stimulating,
+                       entertaining, and audio-visually engaging for a wider audience, technical and non-technical. In other words, how 
+                       do we explain the abstract and give form to the formless. Starting as a single project, Symphony has grown to become 
+                       several creative initiatives. </p>
                   </blockquote>
                   <br><br>
 
-
                   <div class="item text-center">
 
+                      <iframe width="684" height="371" src="https://www.youtube.com/embed/gyo5BQjA5OE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-                                      <div class="gallery">
-                                        <div class="thumbnails">
-                                          <div class="thumbnail">
-                                            <a href="#" class="iohk_video_load_modal" rel="_Xw-0ANS2X0"><img src="/static/assets/images/intro-video.jpg" alt="" width="660" height="300" /></a>
-                                            <caption>IOHK | Symphony of Blockchains Meetup in London</caption>
-                                          </div>
-                                        </div>
-                                      </div>
+                  <!-- <div class="gallery">
+                    <div class="thumbnails">
+                      <div class="thumbnail">
+                        <a href="#" class="iohk_video_load_modal" rel="_Xw-0ANS2X0"><img src="/static/assets/images/intro-video.jpg" alt="" width="660" height="300" /></a>
+                        <caption>IOHK | Symphony of Blockchains Meetup in London</caption>
+                      </div>
+                    </div>
+                  </div> -->
 
                   </div>
 
@@ -52,17 +54,14 @@ layout: page-about
 
                   <br><br>
 
-                  <h2>Visual</h2>
-
-
+                  <h2>Symphony 2.0 by IOHK</h2>
 
                   <div class="item day-view">
                     <div class="hr"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>
                     <div class="info">
-                      <h3>Day View</h3>
-                      <p>Blocks are organised in separate spirals, with each spiral representing a day. A spiral is a spatially efficient structure to represent linear time and lends itself well to a web-based interaction model.</p>
-                      <p>The size of each of the blocks is determined by its underlying Merkle tree, which is in turn defined by the number of transactions in a block. The Merkle tree structure is created as two data blocks (leaves) are paired together ('hashed'); eventually, into a Merkle 'root'.</p>
-                      <p>From the day view, the user can gain an insight into how many transactions are flowing through the Bitcoin network at a given point in time.</p>
+                      <!-- <h3>Day View</h3> -->
+                      <p>IOHK is responsible for Symphony 2.0: an interactive 3D explorer that allows users to traverse the topographic history of the Bitcoin blockchain. Symphony 2.0 visualizes the blockchain’s mempool – where unconfirmed transactions are stored – as a gravitational swell, around which confirmed transactions spiral in concentric rings. Users can explore these rings block-by-block, from the first transaction confirmed to the most recent.</p>
+                      <p>Symphony 2.0 also has a virtual reality component developed for Vive using WebVR. This has been exhibited at past events and will be available to experience throughout the Symphony world tour. </p>
                     </div>
 
                     <div class="gallery">
@@ -70,7 +69,6 @@ layout: page-about
                       <div class="thumbnails">
                         <div class="thumbnail">
                           <img src="/static/assets/images/day-view.jpg" alt="" width="330" height="193" />
-                          <caption>Day view</caption>
                         </div>
                       </div>
                     </div>
@@ -84,9 +82,10 @@ layout: page-about
                   <div class="item block-view">
                     <div class="hr"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>
                     <div class="info">
-                      <h3>Block View</h3>
-                      <p>When a block is brought into focus, its underlying Merkle tree is revealed. The 3D Merkle tree is determined by data parameters that give each block a unique structure. From the block hash we derive a 'signature angle', which is used by the algorithm that controls how the branches fan out and grow. This demonstrates the immutable nature of bitcoin blocks and reflects how hash functions always produce the same output from the same input.</p>
-                      <p>The average fee-to-value ratio for the entire block (which can be an indicator of network 'health') is used to add randomness to the angle at which the branches grow. The higher the fee-to-value ratio, the more contorted the tree becomes. A 'healthy' blockchain is one where the cost of a transaction, and hence the fee-to-value ratio, is very low. Visually, a 'healthy' blockchain has a more regular-looking tree.</p>
+                      <h3>Symphony 2.0: How It Works</h3>
+                      <p>Giving feeling to data isn’t easy, but telling a good story requires an emotional connection. </p>
+                      <p>To achieve this, we used a technique called additive synthesis to generate sound on the fly, and utilized the parallel nature of graphics cards to synthesize a sound for each of the thousands of transactions that can make up a block. The unique sound signature that plays when you visit a block consists of each transaction producing eight sine waves (a fundamental pitch and seven harmonics). The fundamental pitch is determined by the transaction value, and the amount of randomness added to the harmonics partials is controlled by the fee-to-value ratio of the transaction.</p>
+                      <p>The volume of the harmonic partials, meanwhile, is determined by the spent-to-unspent output ratio. This creates a range of sound that communicates the health of the block: a virtual heartbeat that codifies the volume of transactions and the number of transactions unspent.</p>
                     </div>
 
                     <div class="gallery">
@@ -94,45 +93,35 @@ layout: page-about
                       <div class="thumbnails">
                         <div class="thumbnail">
                           <img src="/static/assets/images/block-angle.jpg" alt="" width="330" height="193" />
-                          <caption>Block view</caption>
+                          <caption>Merkle Tree View</caption>
                         </div>
                       </div>
                     </div>
 
                     <div class="clear"></div>
 
-                  </div><!--item-->
+                  </div> 
+                  <!--item-->
 
-
-
-
-                  <h2>Audio</h2>
-
-
+                  <h2>Symphony by Kuva</h2>
 
                   <div class="item background-audio mirrored">
                     <div class="hr"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>
 
                     <div class="info">
-                      <h3>Background audio</h3>
-                      <p>Sound is a fundamental part of the experience and provides a detailed and dynamic insight into the data.</p>
-                      <p>The first thing you hear is a background hum. This sound represents the network hash rate for the day you are viewing. As you traverse down the tunnel of blocks, the number of frequencies present in sound changes. When the hashrate is low (relative to the highest historic hashrate), only a few low frequencies come through.</p>
-                      <p>At the front of the chain, where the hashrate is generally highest, the sound is most energetic and more high frequencies are played. This sound is a live representation of the energy within the bitcoin network and gives the user a sense of the network as a living, power-hungry, entity.</p>
+                      <!-- <h3>Background audio</h3> -->
+                      <p>Kuva is a boutique creative agency based in the UK, and is responsible for developing the virtual and augmented reality pieces for Symphony’s events and exhibitions. These experiences augment specific components of the blockchain using Symphony’s code. </p>
+                      <p>Kuva also develops the Symphony mobile app: a 3D visualization of the blockchain’s mempool that provides real-world information on the current traffic and fee of the network. The Symphony mobile app currently supports the Bitcoin network, but will soon extend to second-generation (Ethereum) and third-generation (Cardano) blockchains. </p>
                     </div>
-
                     <div class="gallery">
-                      <h5>Preview</h5>
-                      <div class="thumbnails">
-                        <div class="thumbnail">
-                          <img src="/static/assets/images/hashrate-low.jpg" alt="Hashrate low" />
-                          <caption>Hashrate low</caption>
-                        </div>
-                        <div class="thumbnail">
-                          <img src="/static/assets/images/hashrate-high.jpg" alt="Hashrate high" />
-                          <caption>Hashrate high</caption>
+                        <h5>Preview</h5>
+                        <div class="thumbnails">
+                          <div class="thumbnail">
+                            <img src="/static/assets/images/mempool.jpg" alt="" width="330" height="193" />
+                            <caption>The Mempool</caption>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
                     <div class="clear"></div>
 
@@ -140,7 +129,7 @@ layout: page-about
 
 
 
-                  <div class="item block-audio mirrored">
+                  <!-- <div class="item block-audio mirrored">
                     <div class="hr"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>
                     <div class="info">
                       <h3>Block Audio</h3>
@@ -166,10 +155,11 @@ layout: page-about
 
                     <div class="clear"></div>
 
-                  </div><!--item-->
+                  </div> -->
+                  <!--item-->
 
 
-                  <div class="item midi mirrored">
+                  <!-- <div class="item midi mirrored">
                     <div class="hr"><img src="/static/assets/images/circle.svg" class="circle" alt="" /></div>
 
                     <div class="info">
@@ -193,25 +183,21 @@ layout: page-about
 
                     <div class="clear"></div>
 
-                  </div><!--item-->
+                  </div> -->
+                  
+                  <!--item-->
 
-
-                  <h2>Summary</h2>
+                  <h2><a href="https://github.com/input-output-hk/symphony-2" target="_blank">Get Involved</a></h2>
 
                   <blockquote>
-                    <p>Symphony of Blockchain is an interactive, visual and auditory exploration of bitcoin, cryptocurrency and blockchain technology. Symphony was described by The Next Web as a 'mesmerizing live 3D visualization and audio experience that’s not just gorgeous, but also incredibly informative'. This project is an educational tool that aims to make it easier for people to understand blockchain.</p>
+                    <p>Access the Symphony GitHub repo to learn more about Symphony’s development, or build your own version using Symphony’s open-source code.</p>
                   </blockquote>
 
-
                   <div class="item final">
-                    <div class="tit inline-block">Symphony 2018</div>
+                    <div class="tit inline-block">Symphony 2019</div>
                     <div class="hr"></div>
-                    <div class="github inline-block"><a href="https://github.com/input-output-hk/symphony" target="_blank"><em class="fa fa-github"></em></a></div>
+                    <div class="github inline-block"><a href="https://github.com/input-output-hk/symphony-2" target="_blank"><em class="fa fa-github"></em></a></div>
                   </div>
-
-
-
-
 
                 </div><!-- .entry -->
               </div>
