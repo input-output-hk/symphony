@@ -4,7 +4,13 @@
 
 <head>
   {% include analytics.html %}
+  <script>
+if (location.protocol !== "https:") {
+  location.protocol = "https:";
+}
 
+  </script>
+  
 {% assign title = page.title %}
 {% assign thumbnail = "/static/assets/images/meta-logo-2.jpg" %}
 {% assign urlprefix = site.baseurl %}
