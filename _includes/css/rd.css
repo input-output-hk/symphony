@@ -20,7 +20,7 @@ p{line-height: 1.5;}
 .roadmap .nav--lines {border-bottom:1px solid #409c9e; max-width:185px;margin:auto;background:url('/static/assets/images/timeline.svg') repeat-y right}
 .roadmap .nav--line {background:url('/static/assets/images/timeline.svg') repeat-y left;height:20px;width:33.33%;display: inline-block;}
 
-.roadmap  .timeline{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:20px 0}
+/* .roadmap  .timeline{background:url('/static/assets/images/timeline.svg') repeat-y center;padding:20px 0} */
 
 .roadmap .timeline.extra{margin-top:-132px;height: 150px;}
 @media (max-width:1199px){

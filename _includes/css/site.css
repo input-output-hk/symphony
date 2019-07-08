@@ -1,9 +1,9 @@
 html {
-	background: #121327
+	background: #000
 }
 
 body {
-	background: #121327;
+	background: #000;
 	color: #eee;
 	font-family: 'Montserrat', sans-serif;
 	;
@@ -95,13 +95,13 @@ p {
 }
 
 blockquote {
-	background: #171c31;
+	background: #0c0c0c;
 	font-size: 100%;
 	padding: 30px;
 	border-radius: 3px;
 	text-align: center;
 	margin: 0 20% 0 20%;
-	border: 1px solid #1c2c43
+	border: 1px solid #2f2f2f
 }
 
 blockquote p {
@@ -560,7 +560,7 @@ input[type=text]:focus {
 }
 
 .entry.centerline .item .gallery .thumbnail img {
-	border: 1px solid #243d5a;
+	border: 1px solid #2f2f2f;
 	border-radius: 4px;
 	margin: 0 0 5px 0
 }
@@ -625,7 +625,7 @@ input[type=text]:focus {
 }
 
 .entry.centerline .item .hr {
-	border-top: 1px solid #0bdcf9;
+	border-top: 1px solid #585858;
 	width: 20px;
 	margin: 0 0 0 -10px;
 	opacity: 1;
@@ -637,7 +637,7 @@ input[type=text]:focus {
 .entry.centerline .item .hr:after {
 	line-height: 0;
 	content: "•";
-	color: #0bdcf9;
+	color: #585858;
 	font-size: 280%;
 	display: inline-block;
 	vertical-align: top;
@@ -669,7 +669,7 @@ input[type=text]:focus {
 		font-size: 90%
 	}
 	.entry.centerline .item .hr {
-		border-top: 1px solid #0bdcf9;
+		border-top: 1px solid #585858;
 		width: 120px;
 		margin: 0 0 0 -60px;
 		opacity: 1;
@@ -680,7 +680,7 @@ input[type=text]:focus {
 	.entry.centerline .item .hr:after {
 		line-height: 0;
 		content: "•";
-		color: #0bdcf9;
+		color: #c3c3c3;
 		font-size: 280%;
 		display: inline-block;
 		vertical-align: top;
@@ -697,7 +697,6 @@ input[type=text]:focus {
 	.entry.centerline .item.text-center {
 		background: transparent
 	}
-	.entry.centerline .item.mirrored {}
 	.entry.centerline .item .info {
 		padding: 0 80px 0 0
 	}
@@ -970,7 +969,7 @@ input[type=text]:focus {
 
 #main .profile .img-circle {
 	background: rgba(0, 0, 0, 0.25);
-	border: 1px solid rgba(30, 210, 210, 0.6);
+	border: 1px solid rgba(255, 255, 255, 0.25);
 	padding: 5px;
 	width: 150px !important;
 	height: 150px !important;
