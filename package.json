@@ -30,7 +30,7 @@
     "firebase": "^5.1.0",
     "hasha": "^3.0.0",
     "ify-loader": "^1.1.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.13",
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.22.2",
     "npm": "^6.1.0",
