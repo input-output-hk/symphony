@@ -33,7 +33,7 @@
     "lodash": "^4.17.10",
     "merkle-tree-gen": "^1.1.0",
     "moment": "^2.22.2",
-    "npm": "^6.1.0",
+    "npm": "^6.13.4",
     "seedrandom": "^2.4.3",
     "three": "^0.93.0",
     "three-orbit-controls": "^82.1.0",
